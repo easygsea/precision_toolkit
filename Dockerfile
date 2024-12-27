@@ -1,4 +1,8 @@
-FROM python:3.11.7-slim-bullseye
+# Stage 1: Build Stage
+FROM python:3.11.7-slim-bookworm AS build
+
+# Set non-interactive frontend for apt
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends --no-install-suggests \
@@ -24,8 +28,13 @@ RUN poetry install --only main --no-root --no-ansi
 # Copy the rest of the application code
 COPY src/ /app/src/
 
-# Build the project
-RUN poetry build
+# Stage 2: Runtime Stage
+FROM python:3.11.7-slim-bookworm
 
-# Adjust permissions so files are readable by the user running the container
-RUN chmod a+rx /app -R
+# Copy required runtime dependencies from the build stage
+COPY --from=build /app /app
+
+# Set non-root user and working directory
+RUN useradd -ms /bin/bash appuser && chown -R appuser:appuser /app
+USER appuser
+WORKDIR /app
