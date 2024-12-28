@@ -1,32 +1,27 @@
-# Stage 1: Build Stage
-FROM python:3.11.7-slim-bookworm AS build
+FROM python:3.11.7-slim-bookworm
+
+# Prepare for manual installation of vulnerable dependencies
+ENV LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+ENV ZLIB_VERSION 1.3.1
 
 # Set non-interactive frontend for apt
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends --no-install-suggests \
-    build-essential \
-    libexpat1 libexpat1-dev \
-    libkrb5-dev \
-    wget \
-    bash \
-    git && \
-    wget https://zlib.net/zlib-1.3.1.tar.gz && \
-    tar -xzf zlib-1.3.1.tar.gz && cd zlib-1.3.1 && \
+    build-essential wget libexpat1 libexpat1-dev libkrb5-dev zlib1g bash && \
+    # Download and build the latest zlib
+    wget https://zlib.net/zlib-${ZLIB_VERSION}.tar.gz && \
+    tar -xzf zlib-${ZLIB_VERSION}.tar.gz && cd zlib-${ZLIB_VERSION} && \
     ./configure && make && make install && \
-    cd .. && rm -rf zlib-1.3 zlib-1.3.tar.gz && \
-    wget https://www.cpan.org/src/5.0/perl-5.40.0.tar.gz && \
-    tar -xzf perl-5.40.0.tar.gz && cd perl-5.40.0 && \
-    ./Configure -des -Dprefix=/usr/local && \
-    make && make install && \
-    cd .. && rm -rf perl-5.40.0 perl-5.40.0.tar.gz && \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir poetry && \
+    cp zlib.h zconf.h /usr/local/include && chmod 644 /usr/local/include/zlib.h /usr/local/include/zconf.h && \
+    cd .. && rm -rf zlib-${ZLIB_VERSION} zlib-${ZLIB_VERSION}.tar.gz && \
+    # Clean up build tools and unnecessary files
+    apt-get remove -y build-essential wget && apt-get autoremove -y && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables for installed binaries
-ENV PATH="/usr/local/bin:$PATH"
+# Upgrade pip and install poetry
+RUN pip install --upgrade pip && pip install --no-cache-dir poetry
 
 # Create and set working directory
 WORKDIR /app
@@ -41,14 +36,6 @@ RUN poetry install --only main --no-root --no-ansi
 # Copy the rest of the application code
 COPY src/ /app/src/
 
-# Stage 2: Runtime Stage
-FROM python:3.11.7-slim-bookworm
-
-# Copy required runtime dependencies from the build stage
-COPY --from=build /usr/local /usr/local
-COPY --from=build /app /app
-
-# Set non-root user and working directory
+# Set non-root user
 RUN useradd -ms /bin/bash appuser && chown -R appuser:appuser /app
 USER appuser
-WORKDIR /app
