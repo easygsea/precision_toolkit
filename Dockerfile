@@ -25,7 +25,6 @@ RUN chmod a+rx /app -R
 
 # Stage 2: Runtime
 FROM python:3.11.7-slim-bookworm
-ENV ZLIB_VERSION 1.3.1
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Create and set working directory
