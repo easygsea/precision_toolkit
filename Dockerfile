@@ -47,7 +47,7 @@ RUN poetry build
 # Adjust permissions so files are readable by the user running the container
 RUN chmod a+rx /app -R
 
-#FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+# Stage 4: Runtime
 FROM python:${PYTHON_VERSION}-slim-bookworm
 ARG DOTNET_VERSION=6.0
 
