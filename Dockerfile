@@ -76,14 +76,14 @@ RUN rm -f /hap.py/bin/python
 COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
 ENV PATH="$PATH:/hap.py/bin:/witty.er/bin"
 
-# Update shebangs in all Python scripts in /hap.py/bin to use Python 2.7
+# Update shebangs in all Python scripts in /hap.py/bin to use python2.7
 RUN find /hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/env python~#!/usr/bin/env python2.7~' {} \;
 
 # Create a wrapper script for witty.er
 RUN echo '#!/bin/bash\ndotnet /witty.er/bin/Release/net6.0/Wittyer.dll "$@"' > /witty.er/bin/witty.er && \
     chmod +x /witty.er/bin/witty.er
 
-# Set Python 3.7 as the default python and pip
+# Set python3 as the default python and pip
 RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1 && \
     update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1
 ENV PATH="$PATH:/usr/bin"
