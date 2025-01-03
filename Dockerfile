@@ -1,6 +1,7 @@
 # Environment variables
 ARG DOTNET_VERSION=6.0
 ARG PYTHON_VERSION=3.11.7
+ARG WITTYER_VERSION=0.5.2
 
 # Stage 1: Use the official biocontainers hap.py image
 FROM quay.io/biocontainers/hap.py:0.3.15--py27hcb73b3d_0 AS hap_py
@@ -13,7 +14,7 @@ RUN pip uninstall --y certifi setuptools pip
 
 # Stage 2: Build witty.er from source
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS witty_er_builder
-ARG WITTYER_VERSION=0.5.2
+ARG WITTYER_VERSION
 
 # Install additional dependencies
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
@@ -52,7 +53,7 @@ RUN chmod a+rx /app -R
 
 # Stage 4: Runtime
 FROM python:${PYTHON_VERSION}-slim-bookworm
-ARG DOTNET_VERSION=6.0
+ARG DOTNET_VERSION
 
 # Create and set working directory
 WORKDIR /app
