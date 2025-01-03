@@ -8,7 +8,7 @@ FROM quay.io/biocontainers/hap.py:0.3.15--py27hcb73b3d_0 AS hap_py
 # Upgrade python2.7 packages to available latest
 RUN pip install --upgrade numpy==1.16.6 scipy==1.2.3
 
-# Uninstall vulnerable packages in python2.7
+# Uninstall unused vulnerable packages in python2.7
 RUN pip uninstall --y certifi setuptools pip
 
 # Stage 2: Build witty.er from source
@@ -69,22 +69,12 @@ RUN apt-get remove --purge -y wget apt-transport-https software-properties-commo
     apt-get autoremove -y && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set Python 3.7 as the default python and pip
-RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1 && \
-    update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1
-ENV PATH="/usr/bin:$PATH"
-
-# Install the package and cleanup
-COPY --from=clinical_tools_builder /app/dist/*.whl .
-RUN pip install --upgrade pip setuptools && pip install *.whl && \
-    rm *.whl
-
 # Copy binaries
 COPY --from=hap_py /usr/local/bin /hap.py/bin
 COPY --from=hap_py /usr/local/lib /hap.py/lib
 RUN rm -f /hap.py/bin/python
 COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
-ENV PATH="/hap.py/bin:/witty.er/bin:$PATH"
+ENV PATH="$PATH:/hap.py/bin:/witty.er/bin"
 
 # Update shebangs in all Python scripts in /hap.py/bin to use Python 2.7
 RUN find /hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/env python~#!/usr/bin/env python2.7~' {} \;
@@ -92,6 +82,17 @@ RUN find /hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/env python~
 # Create a wrapper script for witty.er
 RUN echo '#!/bin/bash\ndotnet /witty.er/bin/Release/net6.0/Wittyer.dll "$@"' > /witty.er/bin/witty.er && \
     chmod +x /witty.er/bin/witty.er
+
+# Set Python 3.7 as the default python and pip
+RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1 && \
+    update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1
+ENV PATH="$PATH:/usr/bin"
+
+# Install the package and cleanup
+COPY --from=clinical_tools_builder /app/dist/*.whl .
+RUN python -m pip install --upgrade pip setuptools && pip install *.whl && \
+    rm *.whl
+RUN rm -rf /tmp/*
 
 # Set non-root user
 RUN useradd -ms /bin/bash appuser && chown -R appuser:appuser /app
