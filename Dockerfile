@@ -21,8 +21,6 @@ RUN git clone https://github.com/Illumina/witty.er.git . && \
     git checkout tags/v${WITTYER_VERSION} -b v${WITTYER_VERSION}-build && \
     cd Wittyer && \
     dotnet publish . -c Release
-#    dotnet publish -f net6.0 -r linux-x64 -c Release -o /output && \
-#    chmod +x /output/Wittyer
 
 # Stage 3: Build custom package via Poetry
 FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
