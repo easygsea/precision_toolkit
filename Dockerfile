@@ -1,12 +1,16 @@
 # Environment variables
-ARG DEBIAN_FRONTEND=noninteractive
 ARG DOTNET_VERSION=6.0
-ARG HAPPY_VERSION=0.3.15
 ARG PYTHON_VERSION=3.11.7
 ARG WITTYER_VERSION=0.5.2
 
-# Stage 1: Use the official hap.py image
+# Stage 1: Use the official biocontainers hap.py image
 FROM quay.io/biocontainers/hap.py:0.3.15--py27hcb73b3d_0 AS hap_py
+
+# Upgrade python2.7 packages to available latest
+RUN pip install --upgrade numpy==1.16.6 scipy==1.2.3
+
+# Uninstall vulnerable packages in python2.7
+RUN pip uninstall --y certifi setuptools pip
 
 # Stage 2: Build witty.er from source
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS witty_er_builder
@@ -54,7 +58,7 @@ ARG DOTNET_VERSION=6.0
 # Create and set working directory
 WORKDIR /app
 
-# Update system packages for fixed vulnerabilities and .NET SDK
+# Update system packages for fixed vulnerabilities and install .NET SDK
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y wget apt-transport-https software-properties-common && \
     wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb && \
