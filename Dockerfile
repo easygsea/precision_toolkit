@@ -1,7 +1,6 @@
 # Environment variables
 ARG DOTNET_VERSION=6.0
 ARG PYTHON_VERSION=3.11.7
-ARG WITTYER_VERSION=0.5.2
 
 # Stage 1: Use the official biocontainers hap.py image
 FROM quay.io/biocontainers/hap.py:0.3.15--py27hcb73b3d_0 AS hap_py
