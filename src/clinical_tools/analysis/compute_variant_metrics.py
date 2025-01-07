@@ -24,7 +24,7 @@ def load_data_from_files(files, data_type="happy"):
     if data_type == "happy":
         parser = HappyDataParser.process_hap_py_output
     elif data_type == "wittyer":
-        parser = WittyerDataParser.process_wittyer_output
+        parser = WittyerDataParser.process_witty_er_output
     else:
         raise ValueError("data_type must be either 'happy' or 'wittyer'")
 
