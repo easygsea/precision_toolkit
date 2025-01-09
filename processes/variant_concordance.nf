@@ -1,10 +1,8 @@
 process run_variant_concordance_engine {
-    container params.clinical_tools_container
-
     tag "${params.variant_concordance_engine} analysis"
 
     input:
-    tuple val(sampleName), val(truth_vcf), val(query_vcf)
+    tuple val(sampleName), path(truth_vcf), path(query_vcf)
 
     output:
     path("${params.output_dir}/${params.variant_concordance_engine}/${sampleName}*"), emit: concordance_outputs
@@ -13,6 +11,7 @@ process run_variant_concordance_engine {
     if (params.variant_concordance_engine == "happy") {
         """
         export HGREF=${params.genome_ref}
+        mkdir -p ${params.scratch_dir}
         mkdir -p ${params.output_dir}/${params.variant_concordance_engine}
         /opt/hap.py/bin/hap.py \
         ${truth_vcf} \
