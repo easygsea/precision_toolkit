@@ -27,7 +27,7 @@ workflow variant_concordance_workflow {
 
         // Run variant concordance engine per sample
         concordance_outputs = run_variant_concordance_engine(
-            vcf_pairs, genome_ref_channel, genome_fai_channel)
+            vcf_pairs, genome_ref_channel, genome_fai_channel, params.variant_concordance_engine)
 
         // Summarize variant concordance across samples
         summarize_variant_concordance(concordance_outputs)
