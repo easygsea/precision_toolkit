@@ -13,8 +13,8 @@ process run_variant_concordance_engine {
     if (params.variant_concordance_engine == "happy") {
         """
         export HGREF=${genome_ref}
-        mkdir -p ${params.scratch_dir}
         mkdir -p ${params.output_dir}/${params.variant_concordance_engine}
+        mkdir -p scratch_happy
         # Check if .fai index exists for the genome reference
         if [ ! -f ${genome_fai} ]; then
             echo "Index file not found. Generating .fai index for ${genome_ref}..."
@@ -28,7 +28,7 @@ process run_variant_concordance_engine {
         -r ${genome_ref} \
         -o ${params.output_dir}/${params.variant_concordance_engine}/${sampleName} \
         --engine=vcfeval \
-        --scratch-prefix ${params.scratch_dir} \
+        --scratch-prefix scratch_happy \
         --write-vcf \
         --write-counts
         """
