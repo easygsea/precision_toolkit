@@ -21,6 +21,14 @@ workflow variant_concordance_workflow {
         // Create VCF pair channels
         vcf_pairs = build_vcf_pair_channels(params.truth_dir, params.query_dir)
 
-        // Run variant concordance engine and summarize results
-        vcf_pairs | run_variant_concordance_engine | summarize_variant_concordance
+        // Create a value channel for genome reference and its index
+        genome_ref_channel = Channel.value(params.genome_ref)
+        genome_fai_channel = genome_ref_channel.map { it + '.fai' }
+
+        // Run variant concordance engine per sample
+        concordance_outputs = run_variant_concordance_engine(
+            vcf_pairs, genome_ref_channel, genome_fai_channel)
+
+        // Summarize variant concordance across samples
+        summarize_variant_concordance(concordance_outputs)
 }
