@@ -1,5 +1,6 @@
 include {
-    run_variant_concordance_engine
+    run_happy
+    run_wittyer
     summarize_variant_concordance
 } from '../processes/variant_concordance'
 
@@ -25,10 +26,12 @@ workflow variant_concordance_workflow {
         genome_ref_channel = Channel.value(params.genome_ref)
         genome_fai_channel = genome_ref_channel.map { it + '.fai' }
 
-        // Run variant concordance engine per sample
-        concordance_outputs = run_variant_concordance_engine(
-            vcf_pairs, genome_ref_channel, genome_fai_channel, params.variant_concordance_engine)
-
-        // Summarize variant concordance across samples
-        summarize_variant_concordance(concordance_outputs)
+        // Condition based on the engine parameter to run the appropriate process
+        if (params.variant_concordance_engine == "happy") {
+            happy_outputs = run_happy(vcf_pairs, genome_ref_channel, genome_fai_channel, params.happy_options)
+            summarize_variant_concordance(happy_outputs.happy_outputs)
+        } else if (params.variant_concordance_engine == "wittyer") {
+            wittyer_outputs = run_wittyer(vcf_pairs, params.wittyer_options)
+            summarize_variant_concordance(wittyer_outputs.wittyer_outputs)
+        }
 }

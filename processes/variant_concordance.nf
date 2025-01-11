@@ -1,39 +1,55 @@
-process run_variant_concordance_engine {
-    tag "${params.variant_concordance_engine} analysis"
-    publishDir "${params.output_dir}/${params.variant_concordance_engine}", mode: 'copy'
+process run_happy {
+    tag "${sampleName} - happy analysis"
+    containerOptions = "-B /home"
+    publishDir "${params.output_dir}/happy", mode: 'copy'
 
     input:
     tuple val(sampleName), path(truth_vcf), path(query_vcf)
     path genome_ref
     path genome_fai
-    val engine
+    val happy_options
 
     output:
-    path("${sampleName}*"), emit: concordance_outputs
+    path("${sampleName}*"), emit: happy_outputs
 
     script:
-    if (engine == "happy") {
-        """
-        export HGREF=${genome_ref}
-        mkdir -p scratch_happy
+    """
+    export HGREF=${genome_ref}
+    mkdir -p scratch_happy
 
-        # Check if .fai index exists for the genome reference
-        if [ ! -f ${genome_fai} ]; then
-            echo "Index file not found. Generating .fai index for ${genome_ref}..."
-            samtools faidx ${genome_ref}
-        fi
+    # Check if .fai index exists for the genome reference
+    if [[ ! -f ${genome_fai} ]]; then
+        echo "Index file not found. Generating .fai index for ${genome_ref}..."
+        samtools faidx ${genome_ref}
+    fi
 
-        /opt/hap.py/bin/hap.py \
-        ${truth_vcf} \
-        ${query_vcf} \
-        -r ${genome_ref} \
-        -o ${sampleName} \
-        --engine=vcfeval \
-        --scratch-prefix scratch_happy \
-        --write-vcf \
-        --write-counts
-        """
-    }
+    /opt/hap.py/bin/hap.py \
+    ${truth_vcf} \
+    ${query_vcf} \
+    -r ${genome_ref} \
+    -o ${sampleName} \
+    --engine=vcfeval \
+    --scratch-prefix scratch_happy \
+    ${happy_options}
+    """
+}
+
+process run_wittyer {
+    tag "${sampleName} - wittyer analysis"
+    containerOptions = "-B /home"
+    publishDir "${params.output_dir}/wittyer", mode: 'copy'
+
+    input:
+    tuple val(sampleName), path(truth_vcf), path(query_vcf)
+    val wittyer_options
+
+    output:
+    path("${sampleName}*"), emit: wittyer_outputs
+
+    script:
+    """
+    witty.er -i ${query_vcf} -t ${truth_vcf} -o ${sampleName} ${wittyer_options}
+    """
 }
 
 process summarize_variant_concordance {
