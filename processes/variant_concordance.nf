@@ -1,6 +1,5 @@
 process run_happy {
     tag "${sampleName} - happy analysis"
-    containerOptions = "-B /home"
     publishDir "${params.output_dir}/happy", mode: 'copy'
 
     input:
