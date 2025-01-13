@@ -53,19 +53,22 @@ process run_wittyer {
 
 process summarize_variant_concordance {
     tag "summarize variant concordance"
+    publishDir "${params.output_dir}", mode: 'copy'
 
     input:
     path concordance_outputs
 
     output:
-    file("output_clinical_tools/concordance_cnv.md")
-    file("output_clinical_tools/concordance_cnv.docx")
+    file("concordance_${params.variant_concordance_engine}.csv")
+    file("concordance_${params.variant_concordance_engine}.md")
+    file("concordance_${params.variant_concordance_engine}.docx")
 
     script:
     """
-    compute-variant-concordance -t ${params.variant_concordance_engine} \
-        -f ${concordance_outputs.collect().join(' ')} \
-        --md-output output_clinical_tools/concordance_cnv.md \
-        --docx-output output_clinical_tools/concordance_cnv.docx
+    compute-variant-concordance --type ${params.variant_concordance_engine} \
+        --files ${concordance_outputs.collect().join(' ')} \
+        --csv-output concordance_${params.variant_concordance_engine}.csv \
+        --md-output concordance_${params.variant_concordance_engine}.md \
+        --docx-output concordance_${params.variant_concordance_engine}.docx
     """
 }
