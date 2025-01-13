@@ -2,8 +2,10 @@
 import argparse
 from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
 from clinical_tools.render.concordance import (
-    save_concordance_markdown,
-    save_concordance_word,
+    generate_concordance_table,
+    export_concordance_to_csv,
+    export_concordance_to_markdown,
+    export_concordance_to_word,
 )
 
 
@@ -24,24 +26,40 @@ def main():
     parser.add_argument(
         "-f", "--files", nargs="+", required=True, help="List of file paths to process."
     )
-    parser.add_argument(
-        "--md-output",
-        default="variant_concordance_results.md",
-        help="Output Markdown file (default: variant_concordance_results.md).",
-    )
-    parser.add_argument(
-        "--docx-output",
-        default="variant_concordance_results.docx",
-        help="Output Word file (default: concordance_results.docx).",
-    )
+
+    # Parse arguments first so we can use args.type
     args = parser.parse_args()
 
+    # Now set the default filenames with the type argument
+    parser.set_defaults(
+        csv_output=f"variant_concordance_{args.type}.csv",
+        md_output=f"variant_concordance_{args.type}.md",
+        docx_output=f"variant_concordance_{args.type}.docx",
+    )
+
+    # Re-parse arguments to apply the new defaults
+    args = parser.parse_args()
+
+    # Generate the concordance table
     concordance_results = process_variant_metrics(
         file_paths=args.files, data_type=args.type
     )
+    concordance_table = generate_concordance_table(concordance_results)
 
-    save_concordance_markdown(concordance_results, args.md_output)
-    save_concordance_word(concordance_results, args.docx_output)
+    # Export to different formats
+    export_concordance_to_csv(concordance_table, args.csv_output)
+    export_concordance_to_markdown(
+        concordance_table,
+        args.md_output,
+        heading="Variant Concordance",
+        summary="This table summarizes the concordance of variant calls.",
+    )
+    export_concordance_to_word(
+        concordance_table,
+        args.docx_output,
+        heading="Variant Concordance",
+        summary="This document summarizes the concordance of variant calls.",
+    )
 
 
 if __name__ == "__main__":

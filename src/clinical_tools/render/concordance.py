@@ -1,31 +1,43 @@
-from tabulate import tabulate
-from docx import Document
+import typing
+import pandas as pd
+from clinical_tools.core.format import format_percentage
+from clinical_tools.core.writers.csv import pandas_to_csv
+from clinical_tools.core.writers.markdown import populate_markdown, save_markdown
+from clinical_tools.core.writers.word import (
+    pandas_to_word,
+    initiate_word_document,
+    save_word_document,
+)
 from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
 
 
-def save_concordance_markdown(results, output_file):
-    """Save variant concordance results in Markdown format."""
-    headers = [
-        "Variant Type",
-        "Variant Filter",
-        "True Positive",
-        "False Negative",
-        "False Positive",
-        "Concordance",
-        "CI Lower",
-        "CI Upper",
+def generate_concordance_table(
+    results: typing.Dict[
+        typing.Tuple[str, str], typing.Tuple[int, int, int, float, float, float]
     ]
+) -> pd.DataFrame:
+    """
+    Generate a pandas DataFrame for variant concordance summary.
+
+    Args:
+        results (dict): A dictionary where keys are tuples of (variant_type,
+            variant_filter) and values are tuples of metrics (true_positive,
+            false_negative, false_positive, concordance, ci_lower, ci_upper).
+
+    Returns:
+        pd.DataFrame: A DataFrame summarizing variant concordance.
+    """
     data = [
-        [
-            variant_type,
-            variant_filter,
-            true_positive,
-            false_negative,
-            false_positive,
-            f"{concordance:.4f}",
-            f"{ci_lower:.4f}",
-            f"{ci_upper:.4f}",
-        ]
+        {
+            "Variant Type": variant_type,
+            "Variant Filter": variant_filter,
+            "True Positive": true_positive,
+            "False Negative": false_negative,
+            "False Positive": false_positive,
+            "Concordance": concordance,
+            "CI Lower": ci_lower,
+            "CI Upper": ci_upper,
+        }
         for (variant_type, variant_filter), (
             true_positive,
             false_negative,
@@ -35,59 +47,75 @@ def save_concordance_markdown(results, output_file):
             ci_upper,
         ) in results.items()
     ]
-
-    markdown_table = tabulate(data, headers, tablefmt="github")
-
-    summary = (
-        "The table below summarizes the concordance metrics calculated for each "
-        "variant type and filter."
-    )
-
-    with open(output_file, "w") as f:
-        f.write("# Variant Concordance\n\n")
-        f.write(f"{summary}\n\n")
-        f.write(markdown_table)
-    print(f"Variant concordance results saved to {output_file}")
+    return pd.DataFrame(data)
 
 
-def save_concordance_word(results, output_file):
-    """Save variant concordance results in Word format."""
-    doc = Document()
-    doc.add_heading("Variant Concordance", level=1)
+def format_concordance_table(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Format the Concordance, CI Lower, and CI Upper columns as percentages.
 
-    summary = (
-        "The table below summarizes the concordance metrics calculated for each "
-        "variant type and filter."
-    )
-    doc.add_paragraph(summary)
+    Args:
+        df (pd.DataFrame): The concordance DataFrame to format.
 
-    headers = [
-        "Variant Type",
-        "Variant Filter",
-        "True Positive",
-        "False Negative",
-        "False Positive",
-        "Concordance",
-        "CI Lower",
-        "CI Upper",
-    ]
-    table = doc.add_table(rows=len(results) + 1, cols=len(headers))
+    Returns:
+        pd.DataFrame: A new DataFrame with formatted columns.
+    """
+    formatted_df = df.copy()
+    for col in ["Concordance", "CI Lower", "CI Upper"]:
+        formatted_df[col] = formatted_df[col].apply(format_percentage)
+    return formatted_df
 
-    for j, header in enumerate(headers):
-        table.cell(0, j).text = header
 
-    for i, ((variant_type, variant_filter), metrics) in enumerate(results.items(), 1):
-        true_positive, false_negative, false_positive = metrics[:3]
-        concordance, ci_lower, ci_upper = metrics[3:]
-        row_cells = table.rows[i].cells
-        table.cell(i, 0).text = variant_type
-        table.cell(i, 1).text = variant_filter
-        table.cell(i, 2).text = str(true_positive)
-        table.cell(i, 3).text = str(false_negative)
-        table.cell(i, 4).text = str(false_positive)
-        table.cell(i, 5).text = f"{concordance:.4f}"
-        table.cell(i, 6).text = f"{ci_lower:.4f}"
-        table.cell(i, 7).text = f"{ci_upper:.4f}"
+def export_concordance_to_csv(df: pd.DataFrame, output_file: str) -> None:
+    """
+    Export concordance DataFrame to a CSV file.
 
-    doc.save(output_file)
-    print(f"Variant concordance results saved to {output_file}")
+    Args:
+        df (pd.DataFrame): The concordance DataFrame.
+        output_file (str): The path to save the CSV file.
+
+    Returns:
+        None
+    """
+    pandas_to_csv(df, output_file)
+
+
+def export_concordance_to_markdown(
+    df: pd.DataFrame, output_file: str, heading: str = None, summary: str = None
+) -> None:
+    """
+    Export concordance DataFrame to a Markdown file.
+
+    Args:
+        df (pd.DataFrame): The concordance DataFrame.
+        output_file (str): The path to save the Markdown file.
+        heading (str, optional): A heading to add to the Markdown file. Defaults to None.
+        summary (str, optional): A summary to add before the table. Defaults to None.
+
+    Returns:
+        None
+    """
+    formatted_df = format_concordance_table(df)
+    content = populate_markdown(formatted_df, heading, summary)
+    save_markdown(content, output_file)
+
+
+def export_concordance_to_word(
+    df: pd.DataFrame, output_file: str, heading: str = None, summary: str = None
+) -> None:
+    """
+    Export concordance DataFrame to a Word file.
+
+    Args:
+        df (pd.DataFrame): The concordance DataFrame.
+        output_file (str): The path to save the Word file.
+        heading (str, optional): A heading to add to the Word file. Defaults to None.
+        summary (str, optional): A summary to add before the table. Defaults to None.
+
+    Returns:
+        None
+    """
+    formatted_df = format_concordance_table(df)
+    doc = initiate_word_document()
+    pandas_to_word(doc, formatted_df, heading, summary)
+    save_word_document(doc, output_file)
