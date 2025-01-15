@@ -34,7 +34,7 @@ process run_happy {
 }
 
 process run_wittyer {
-    tag "${sampleName} - wittyer analysis"
+    tag "${sampleName}"
     containerOptions = "-B /home"
     publishDir "${params.output_dir}/wittyer", mode: 'copy'
 
