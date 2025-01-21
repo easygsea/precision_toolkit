@@ -72,9 +72,9 @@ process summarize_variant_concordance {
     path concordance_outputs
 
     output:
-    file("{PREFIX}.csv")
-    file("{PREFIX}.md")
-    file("{PREFIX}.docx")
+    path("${PREFIX}.csv"), emit: csv_output
+    path("${PREFIX}.md"), emit: md_output
+    path("${PREFIX}.docx"), emit: docx_output
 
     script:
     PREFIX="concordance_${params.variant_concordance_engine}"

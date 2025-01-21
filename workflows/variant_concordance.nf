@@ -28,15 +28,21 @@ workflow variant_concordance_workflow {
 
         // Conditionally generate .fai index if it doesn't exist
         genome_fai_channel = genome_fai_channel.ifEmpty {
-            generate_fai(genome_ref_channel).out.genome_fai
+            generate_fai(genome_ref_channel).genome_fai
         }
 
-        // Condition based on the engine parameter to run the appropriate process
+        // Conditionally run processes based on the selected engine
         if (params.variant_concordance_engine == "happy") {
-            run_happy(vcf_pairs, genome_ref_channel, genome_fai_channel, params.happy_options)
-            summarize_variant_concordance(run_happy.out.happy_summary)
+            happy_results = run_happy(vcf_pairs, genome_ref_channel, genome_fai_channel, params.happy_options)
+            summary_files = happy_results.happy_summary.collect()
         } else if (params.variant_concordance_engine == "wittyer") {
-            run_wittyer(vcf_pairs, params.wittyer_options)
-            summarize_variant_concordance(run_wittyer.out.wittyer_summary)
+            wittyer_results = run_wittyer(vcf_pairs, params.wittyer_options)
+            summary_files = wittyer_results.wittyer_summary.collect()
         }
+
+        // Summarize variant concordance after all summary files are ready
+        summarize_variant_concordance(summary_files)
+
+    emit:
+        summary_files
 }
