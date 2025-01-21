@@ -1,10 +1,7 @@
 from collections import defaultdict
-from clinical_tools.core.data_parser import (
-    HappyDataParser,
-    WittyerDataParser,
-    VariantCallMetrics,
-)
-from clinical_tools.core.variant_metrics import ConcordanceMetrics, VariantCallMetrics
+from clinical_tools.core.parsers.happy import HappyDataParser
+from clinical_tools.core.parsers.wittyer import WittyerDataParser
+from clinical_tools.core.metrics.variant import ConcordanceMetrics, VariantCallMetrics
 
 
 def load_data_from_files(files, data_type="happy"):

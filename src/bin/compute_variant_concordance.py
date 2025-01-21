@@ -26,18 +26,14 @@ def main():
     parser.add_argument(
         "-f", "--files", nargs="+", required=True, help="List of file paths to process."
     )
-
-    # Parse arguments first so we can use args.type
-    args = parser.parse_args()
-
-    # Now set the default filenames with the type argument
-    parser.set_defaults(
-        csv_output=f"variant_concordance_{args.type}.csv",
-        md_output=f"variant_concordance_{args.type}.md",
-        docx_output=f"variant_concordance_{args.type}.docx",
+    parser.add_argument(
+        "-p",
+        "--prefix",
+        default="variant_concordance",
+        help="Prefix for output filenames. Default is 'variant_concordance'."
     )
 
-    # Re-parse arguments to apply the new defaults
+    # Parse arguments first so we can use args.type
     args = parser.parse_args()
 
     # Generate the concordance table
@@ -46,17 +42,22 @@ def main():
     )
     concordance_table = generate_concordance_table(concordance_results)
 
+    # Define output filenames with the given prefix
+    csv_output = f"{args.prefix}_{args.type}.csv"
+    md_output = f"{args.prefix}_{args.type}.md"
+    docx_output = f"{args.prefix}_{args.type}.docx"
+    
     # Export to different formats
-    export_concordance_to_csv(concordance_table, args.csv_output)
+    export_concordance_to_csv(concordance_table, csv_output)
     export_concordance_to_markdown(
         concordance_table,
-        args.md_output,
+        md_output,
         heading="Variant Concordance",
         summary="This table summarizes the concordance of variant calls.",
     )
     export_concordance_to_word(
         concordance_table,
-        args.docx_output,
+        docx_output,
         heading="Variant Concordance",
         summary="This document summarizes the concordance of variant calls.",
     )
