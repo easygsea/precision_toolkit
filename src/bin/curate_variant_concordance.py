@@ -2,7 +2,7 @@
 
 import argparse
 import pandas as pd
-from clinical_tools.core.variant_metrics import ConcordanceMetrics, VariantCallMetrics
+from clinical_tools.core.metrics.variant import ConcordanceMetrics, VariantCallMetrics
 from clinical_tools.render.concordance import (
     export_concordance_to_csv,
     export_concordance_to_markdown,
