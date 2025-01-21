@@ -61,16 +61,17 @@ process summarize_variant_concordance {
     path concordance_outputs
 
     output:
-    file("concordance_${params.variant_concordance_engine}.csv")
-    file("concordance_${params.variant_concordance_engine}.md")
-    file("concordance_${params.variant_concordance_engine}.docx")
+    file("{PREFIX}.csv")
+    file("{PREFIX}.md")
+    file("{PREFIX}.docx")
 
     script:
+    PREFIX="concordance_${params.variant_concordance_engine}"
     """
     compute-variant-concordance --type ${params.variant_concordance_engine} \
         --files ${concordance_outputs.collect().join(' ')} \
-        --csv-output concordance_${params.variant_concordance_engine}.csv \
-        --md-output concordance_${params.variant_concordance_engine}.md \
-        --docx-output concordance_${params.variant_concordance_engine}.docx
+        --csv-output ${PREFIX}.csv \
+        --md-output ${PREFIX}.md \
+        --docx-output ${PREFIX}.docx
     """
 }
