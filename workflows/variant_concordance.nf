@@ -26,6 +26,11 @@ workflow variant_concordance_workflow {
         genome_ref_channel = Channel.value(params.genome_ref)
         genome_fai_channel = genome_ref_channel.map { it + '.fai' }
 
+        // Conditionally generate .fai index if it doesn't exist
+        genome_fai_channel = genome_fai_channel.ifEmpty {
+            generate_fai(genome_ref_channel).out.genome_fai
+        }
+
         // Condition based on the engine parameter to run the appropriate process
         if (params.variant_concordance_engine == "happy") {
             run_happy(vcf_pairs, genome_ref_channel, genome_fai_channel, params.happy_options)

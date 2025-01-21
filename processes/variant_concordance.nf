@@ -1,3 +1,20 @@
+process generate_fai {
+    tag "${genome_ref}"
+
+    publishDir "${params.output_dir}/indices", mode: 'copy'
+
+    input:
+    path genome_ref
+
+    output:
+    path "${genome_ref}.fai", emit: genome_fai
+
+    script:
+    """
+    samtools faidx ${genome_ref}
+    """
+}
+
 process run_happy {
     tag "${sampleName}"
     publishDir "${params.output_dir}/happy", mode: 'copy'
@@ -16,12 +33,6 @@ process run_happy {
     """
     export HGREF=${genome_ref}
     mkdir -p scratch_happy
-
-    # Check if .fai index exists for the genome reference
-    if [[ ! -f ${genome_fai} ]]; then
-        echo "Index file not found. Generating .fai index for ${genome_ref}..."
-        samtools faidx ${genome_ref}
-    fi
 
     /opt/hap.py/bin/hap.py \
     ${truth_vcf} \
