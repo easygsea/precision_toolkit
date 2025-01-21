@@ -9,6 +9,7 @@ process run_happy {
     val happy_options
 
     output:
+    path("${sampleName}.summary.csv"), emit: happy_summary
     path("${sampleName}*"), emit: happy_outputs
 
     script:
@@ -43,6 +44,7 @@ process run_wittyer {
     val wittyer_options
 
     output:
+    path("*/*Wittyer.Stats.json"), emit: wittyer_summary
     path("${sampleName}*"), emit: wittyer_outputs
 
     script:

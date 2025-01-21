@@ -28,12 +28,10 @@ workflow variant_concordance_workflow {
 
         // Condition based on the engine parameter to run the appropriate process
         if (params.variant_concordance_engine == "happy") {
-            happy_outputs = run_happy(vcf_pairs, genome_ref_channel, genome_fai_channel, params.happy_options)
-            happy_summary_outputs = happy_outputs.filter { it.toString().endsWith('.summary.csv') }
-            summarize_variant_concordance(happy_summary_outputs)
+            run_happy(vcf_pairs, genome_ref_channel, genome_fai_channel, params.happy_options)
+            summarize_variant_concordance(run_happy.out.happy_summary)
         } else if (params.variant_concordance_engine == "wittyer") {
-            wittyer_outputs = run_wittyer(vcf_pairs, params.wittyer_options)
-            wittyer_summary_outputs = wittyer_outputs.filter { it.toString().contains('Wittyer.Stats.json') }
-            summarize_variant_concordance(wittyer_summary_outputs)
+            run_wittyer(vcf_pairs, params.wittyer_options)
+            summarize_variant_concordance(run_wittyer.out.wittyer_summary)
         }
 }
