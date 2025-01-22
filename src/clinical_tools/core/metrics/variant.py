@@ -1,4 +1,4 @@
-from clinical_tools.core.statistics import ProportionConfidenceInterval
+from clinical_tools.core.statistics.proportion import ProportionConfidenceInterval
 from dataclasses import dataclass
 
 
