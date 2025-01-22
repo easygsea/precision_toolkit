@@ -102,7 +102,3 @@ COPY --from=clinical_tools_builder /app/dist/*.whl .
 RUN python -m pip install --upgrade pip setuptools && pip install *.whl && \
     rm *.whl
 RUN rm -rf /tmp/*
-
-# Set non-root user
-RUN useradd -ms /bin/bash appuser && chown -R appuser:appuser /app
-USER appuser
