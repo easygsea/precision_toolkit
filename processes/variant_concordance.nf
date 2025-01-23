@@ -65,7 +65,6 @@ process run_wittyer {
 }
 
 process summarize_variant_concordance {
-    tag "summarize variant concordance"
     publishDir "${params.output_dir}", mode: 'copy'
 
     input:
