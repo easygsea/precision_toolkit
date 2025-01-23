@@ -7,16 +7,6 @@ enum VariantConcordanceEngine {
     happy, wittyer
 }
 
-// Module parameters
-params {
-    // Input parameters
-    truth_dir = null // directory containing truth VCFs
-    query_dir = null // directory containing query VCFs
-    variant_concordance_engine = "happy" // default happy
-    happy_options = '--write-vcf --write-counts' // default options for happy
-    wittyer_options = '' // default options for wittyer, if any
-}
-
 // Validate engine selection
 def valid_engines = VariantConcordanceEngine.values()*.toString()
 if (!(params.variant_concordance_engine in valid_engines)) {
