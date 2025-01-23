@@ -82,10 +82,6 @@ workflow.onComplete {
     }
 }
 
-params {
-    workflows = null  // Comma-separated list of workflows to run
-}
-
 workflow {
     // Default workflow (show help)
     if (!params.workflows) {
