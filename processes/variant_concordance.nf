@@ -16,6 +16,7 @@ process generate_fai {
 }
 
 process run_happy {
+    label "dynamic_resource"
     tag "${sampleName}"
     publishDir "${params.output_dir}/happy", mode: 'copy'
 
@@ -46,6 +47,7 @@ process run_happy {
 }
 
 process run_wittyer {
+    label "dynamic_resource"
     tag "${sampleName}"
     containerOptions = "-B /home"
     publishDir "${params.output_dir}/wittyer", mode: 'copy'

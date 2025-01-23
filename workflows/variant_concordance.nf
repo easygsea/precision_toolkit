@@ -13,11 +13,6 @@ def build_vcf_pair_channels(truth_dir, query_dir) {
             def query_vcf = file("${query_dir}/${sampleName}.*.vcf.gz") ?:
                             file("${query_dir}/${sampleName}.*.vcf")
             
-            // Add error handling for missing query VCFs
-            if (!query_vcf.exists()) {
-                error "No matching query VCF found for sample: ${sampleName}"
-            }
-            
             return tuple(sampleName, truth_vcf, query_vcf)
         }
 }
@@ -30,12 +25,6 @@ workflow variant_concordance_workflow {
         }
         if (!file(params.query_dir).exists()) {
             error "Query directory not found: ${params.query_dir}"
-        }
-        
-        // Validate output directory
-        def output_dir = file(params.output_dir)
-        if (output_dir.exists() && !params.force) {
-            error "Output directory exists. Use --force to overwrite: ${params.output_dir}"
         }
 
         // Validate required inputs
@@ -61,7 +50,22 @@ workflow variant_concordance_workflow {
             summary_files = happy_results.happy_summary.collect()
         } else if (params.variant_concordance_engine == "wittyer") {
             wittyer_results = run_wittyer(vcf_pairs, params.wittyer_options)
-            summary_files = wittyer_results.wittyer_summary.collect()
+            // Rename witty.er output to include the sample name in the file
+            summary_files = wittyer_results.wittyer_summary
+                .map { stats_file ->
+                    // Extract sample name
+                    def taskDir = stats_file.getParent()
+                    def sampleName = taskDir.getBaseName()
+
+                    // Create new file name with sample
+                    def newName = "${sampleName}.Wittyer.Stats.json"
+                    def newFile = file("${taskDir}/${newName}")
+
+                    // Rename and return
+                    stats_file.renameTo(newFile)
+                    return newFile
+                }
+                .collect()
         }
 
         // Summarize variant concordance after all summary files are ready
