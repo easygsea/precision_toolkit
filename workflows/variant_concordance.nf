@@ -77,7 +77,10 @@ workflow variant_concordance_workflow {
                 .collect()
         }
 
-        summarize_variant_concordance(summary_files, params.concordance_dir)
+        summarize_variant_concordance(
+            summary_files, 
+            params.concordance_dir
+        )
 
     emit:
         summary_files

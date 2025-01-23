@@ -25,7 +25,7 @@ process run_happy {
     path genome_ref
     path genome_fai
     val happy_options
-    val output_dir = ''
+    val output_dir
 
     output:
     path("${sampleName}.summary.csv"), emit: happy_summary
@@ -56,7 +56,7 @@ process run_wittyer {
     input:
     tuple val(sampleName), path(truth_vcf), path(query_vcf)
     val wittyer_options
-    val output_dir = ''
+    val output_dir
 
     output:
     path("*/*Wittyer.Stats.json"), emit: wittyer_summary
@@ -73,7 +73,7 @@ process summarize_variant_concordance {
 
     input:
     path concordance_outputs
-    val output_dir = ''
+    val output_dir
 
     output:
     path("${PREFIX}*"), emit: variant_concordance_summary
