@@ -18,13 +18,14 @@ process generate_fai {
 process run_happy {
     label "dynamic_resource"
     tag "${sampleName}"
-    publishDir "${params.output_dir}/happy", mode: 'copy'
+    publishDir "${params.output_dir}/${output_dir ?: ''}/happy", mode: 'copy'
 
     input:
     tuple val(sampleName), path(truth_vcf), path(query_vcf)
     path genome_ref
     path genome_fai
     val happy_options
+    val output_dir = ''
 
     output:
     path("${sampleName}.summary.csv"), emit: happy_summary
@@ -50,11 +51,12 @@ process run_wittyer {
     label "dynamic_resource"
     tag "${sampleName}"
     containerOptions = "-B /home"
-    publishDir "${params.output_dir}/wittyer", mode: 'copy'
+    publishDir "${params.output_dir}/${output_dir ?: ''}/wittyer", mode: 'copy'
 
     input:
     tuple val(sampleName), path(truth_vcf), path(query_vcf)
     val wittyer_options
+    val output_dir = ''
 
     output:
     path("*/*Wittyer.Stats.json"), emit: wittyer_summary
@@ -67,10 +69,11 @@ process run_wittyer {
 }
 
 process summarize_variant_concordance {
-    publishDir "${params.output_dir}", mode: 'copy'
+    publishDir "${params.output_dir}/${output_dir ?: ''}", mode: 'copy'
 
     input:
     path concordance_outputs
+    val output_dir = ''
 
     output:
     path("${PREFIX}*"), emit: variant_concordance_summary
