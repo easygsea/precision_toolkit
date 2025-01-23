@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 
 import argparse
+import logging
 import pandas as pd
-from clinical_tools.core.metrics.variant import ConcordanceMetrics, VariantCallMetrics
+
+from clinical_tools.core.metrics.variant import (
+    ConcordanceMetrics,
+    VariantCallMetrics,
+)
 from clinical_tools.render.variant_concordance import (
     export_concordance_to_csv,
     export_concordance_to_markdown,
@@ -10,25 +15,47 @@ from clinical_tools.render.variant_concordance import (
 )
 
 
-def abbreviation_to_metric(abbreviation):
+def abbreviation_to_metric(abbreviation: str) -> str:
     """
     Convert a metric abbreviation into its full name.
 
     Args:
-        abbreviation (str): Abbreviation of the metric (e.g., "TP")
+        abbreviation: Abbreviation of the metric (e.g., "TP")
 
     Returns:
-        str: Full name of the metric (e.g., "True Positive")
+        Full name of the metric (e.g., "True Positive")
 
     Note:
         This function assumes a predefined mapping of abbreviations to full names.
     """
-    metric_map = {
+    metric_map: dict[str, str] = {
         'TP': 'True Positive',
         'FN': 'False Negative',
         'FP': 'False Positive'
     }
-    return metric_map.get(abbreviation)
+    return metric_map.get(abbreviation, abbreviation)
+
+
+def validate_curation_format(curation: str) -> bool:
+    """Validate manual curation input format.
+    
+    Args:
+        curation: Manual curation input in format type:filter:metric:count
+        
+    Returns:
+        True if format is valid
+        
+    Raises:
+        ValueError: If format is invalid
+    """
+    try:
+        variant_type, filter_type, metric, count = curation.split(':')
+        int(count)
+        if metric not in {'TP', 'FN', 'FP'}:
+            raise ValueError(f"Invalid metric: {metric}")
+        return True
+    except ValueError as e:
+        raise ValueError(f"Invalid curation format: {e}")
 
 
 def main():
@@ -64,6 +91,14 @@ def main():
 
     # Flatten the list of curation criteria
     curations = [item for sublist in args.curation for item in sublist]
+
+    # Validate manual curation input before processing
+    try:
+        for curation in curations:
+            validate_curation_format(curation)
+    except ValueError as e:
+        logging.error(f"Invalid curation format: {e}")
+        raise
 
     # Update df's metrics based on curation input
     for curation in curations:

@@ -1,35 +1,50 @@
 import json
-import pandas as pd
+import logging
+from collections.abc import Sequence
+from pathlib import Path
+
 from clinical_tools.core.metrics.variant import VariantCallMetrics
 
 
 class WittyerDataParser:
     @staticmethod
-    def process_witty_er_output(file_path):
-        """Process the Wittyer output JSON file to extract relevant information for each sample.
+    def process_witty_er_output(file_path: Path | str) -> Sequence[VariantCallMetrics]:
+        """Process the Wittyer output JSON file to extract metrics information.
 
         Args:
-            file_path (str): Path to the Wittyer.Stats.json output file.
+            file_path: Path to the Wittyer.Stats.json output file
 
         Returns:
-            List[VariantCallMetrics]: List of VariantCallMetrics objects for each type of stats found.
+            Sequence of VariantCallMetrics objects containing processed data
         """
-        with open(file_path, "r") as file:
-            data = json.load(file)
+        logging.info(f"Processing Wittyer output file: {file_path}")
+        
+        try:
+            with open(file_path, "r") as file:
+                data = json.load(file)
 
-        results = []
-        if "PerSampleStats" in data:
-            for sample in data["PerSampleStats"]:
-                for stats in sample["OverallStats"]:
-                    metrics = VariantCallMetrics(
-                        VariantType=stats["StatsType"],
-                        VariantCallFilter="All",
-                        TruthTotal=stats["TruthTotalCount"],
-                        TruthTP=stats["TruthTpCount"],
-                        TruthFN=stats["TruthFnCount"],
-                        QueryTotal=stats["QueryTotalCount"],
-                        QueryTP=stats["QueryTpCount"],
-                        QueryFP=stats["QueryFpCount"],
-                    )
-                    results.append(metrics)
-        return results
+            results = []
+            if "PerSampleStats" in data:
+                for sample in data["PerSampleStats"]:
+                    for stats in sample["OverallStats"]:
+                        try:
+                            metrics = VariantCallMetrics(
+                                VariantType=stats["StatsType"],
+                                VariantCallFilter="All",
+                                TruthTotal=stats["TruthTotalCount"],
+                                TruthTP=stats["TruthTpCount"],
+                                TruthFN=stats["TruthFnCount"],
+                                QueryTotal=stats["QueryTotalCount"],
+                                QueryTP=stats["QueryTpCount"],
+                                QueryFP=stats["QueryFpCount"],
+                            )
+                            results.append(metrics)
+                        except Exception as e:
+                            logging.warning(f"Error processing stats: {str(e)}")
+            
+            logging.info(f"Successfully processed {len(results)} metrics")
+            return results
+            
+        except Exception as e:
+            logging.error(f"Failed to process file {file_path}: {str(e)}")
+            raise

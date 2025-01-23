@@ -1,9 +1,23 @@
-from clinical_tools.core.statistics.proportion import ProportionConfidenceInterval
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from clinical_tools.core.statistics.proportion import ProportionConfidenceInterval
 
-@dataclass
+
+@dataclass(frozen=True)
 class VariantCallMetrics:
+    """Container for variant call metrics data.
+    
+    Attributes:
+        VariantType: Type of variant (e.g., SNV, INDEL)
+        VariantCallFilter: Filter status (e.g., PASS, ALL)
+        TruthTotal: Total variants in truth set
+        TruthTP: True positives in truth set
+        TruthFN: False negatives
+        QueryTotal: Total variants in query set
+        QueryTP: True positives in query set
+        QueryFP: False positives
+    """
     VariantType: str
     VariantCallFilter: str
     TruthTotal: int
@@ -14,49 +28,67 @@ class VariantCallMetrics:
     QueryFP: int
 
 
-class BaseVariantCallMetrics:
-    """
-    Base class to hold and process variant call metrics.
-    """
+class BaseVariantCallMetrics(ABC):
+    """Base class for variant call metrics calculations."""
 
-    def __init__(self, metrics: VariantCallMetrics):
-        """
-        Initialize a VariantCallMetrics instance.
-
+    def __init__(self, metrics: VariantCallMetrics) -> None:
+        """Initialize with metrics data.
+        
         Args:
-          metrics (VariantCallMetrics): Metrics object containing variant data.
+            metrics: Container with variant metrics data
         """
-        self.metrics = metrics
+        self._metrics = metrics
+
+    @property
+    def metrics(self) -> VariantCallMetrics:
+        """Get the metrics instance."""
+        return self._metrics
+
+    @abstractmethod
+    def confidence_interval(
+        self, 
+        method: str = "wilson", 
+        **kwargs
+    ) -> tuple[float, float]:
+        """Calculate confidence interval for the metric.
+        
+        Args:
+            method: Statistical method for CI calculation
+            **kwargs: Additional parameters for the method
+
+        Returns:
+            Lower and upper bounds of the confidence interval
+        """
+        pass
 
 
 class SensitivityMetrics(BaseVariantCallMetrics):
-    """
-    Sensitivity-related metrics.
-    """
+    """Handles sensitivity (recall) calculations."""
 
     @property
-    def sensitivity(self):
-        """
-        Calculate and return sensitivity (recall).
+    def sensitivity(self) -> float:
+        """Calculate sensitivity (recall).
 
         Returns:
-          float: Sensitivity (recall).
+            Sensitivity value between 0 and 1
         """
         if self.metrics.TruthTotal == 0:
             return 0.0
         return self.metrics.TruthTP / self.metrics.TruthTotal
 
-    def confidence_interval(self, method="wilson", **kwargs):
-        """
-        Calculate the confidence interval for sensitivity.
-
+    def confidence_interval(
+        self, 
+        method: str = "wilson", 
+        **kwargs
+    ) -> tuple[float, float]:
+        """Calculate confidence interval for sensitivity.
+        
         Args:
-          method (str): Method for confidence interval calculation.
-                        Defaults to 'wilson'.
-          **kwargs: Additional parameters for the confidence interval method.
+            method: Statistical method for CI calculation
+            **kwargs: Additional parameters for the method
 
         Returns:
-          tuple[float, float]: Lower and upper bounds of the confidence interval.
+            Lower and upper bounds of the confidence interval
         """
         return ProportionConfidenceInterval.proportion_confidence_interval(
             successes=self.metrics.TruthTP,
@@ -67,33 +99,32 @@ class SensitivityMetrics(BaseVariantCallMetrics):
 
 
 class PrecisionMetrics(BaseVariantCallMetrics):
-    """
-    Precision-related metrics.
-    """
+    """Handles precision calculations."""
 
     @property
-    def precision(self):
-        """
-        Calculate and return precision.
+    def precision(self) -> float:
+        """Calculate precision.
 
         Returns:
-          float: Precision.
+            Precision value between 0 and 1
         """
         if self.metrics.QueryTotal == 0:
             return 0.0
         return self.metrics.QueryTP / self.metrics.QueryTotal
 
-    def confidence_interval(self, method="wilson", **kwargs):
-        """
-        Calculate the confidence interval for precision.
-
+    def confidence_interval(
+        self, 
+        method: str = "wilson", 
+        **kwargs
+    ) -> tuple[float, float]:
+        """Calculate confidence interval for precision.
+        
         Args:
-          method (str): Method for confidence interval calculation.
-                        Defaults to 'wilson'.
-          **kwargs: Additional parameters for the confidence interval method.
+            method: Statistical method for CI calculation
+            **kwargs: Additional parameters for the method
 
         Returns:
-          tuple[float, float]: Lower and upper bounds of the confidence interval.
+            Lower and upper bounds of the confidence interval
         """
         return ProportionConfidenceInterval.proportion_confidence_interval(
             successes=self.metrics.QueryTP,
@@ -104,45 +135,46 @@ class PrecisionMetrics(BaseVariantCallMetrics):
 
 
 class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
-    """
-    Concordance-related metrics.
-    """
+    """Handles concordance and combined metrics calculations."""
 
     @property
-    def concordance(self):
-        """
-        Calculate and return concordance rate.
+    def concordance(self) -> float:
+        """Calculate concordance rate.
 
         Returns:
-          float: Concordance rate.
+            Concordance value between 0 and 1
         """
         total_calls = self.metrics.TruthTotal + self.metrics.QueryFP
         return self.metrics.TruthTP / total_calls if total_calls > 0 else 0
 
-    def confidence_interval(self, method="wilson", **kwargs):
-        """
-        Calculate the confidence interval for concordance.
-
+    def confidence_interval(
+        self, 
+        method: str = "wilson", 
+        **kwargs
+    ) -> tuple[float, float]:
+        """Calculate confidence interval for concordance.
+        
         Args:
-          method (str): Method for confidence interval calculation.
-                        Defaults to 'wilson'.
-          **kwargs: Additional parameters for the confidence interval method.
+            method: Statistical method for CI calculation
+            **kwargs: Additional parameters for the method
 
         Returns:
-          tuple[float, float]: Lower and upper bounds of the confidence interval.
+            Lower and upper bounds of the confidence interval
         """
         total_calls = self.metrics.TruthTotal + self.metrics.QueryFP
         return ProportionConfidenceInterval.proportion_confidence_interval(
-            successes=self.metrics.TruthTP, total=total_calls, method=method, **kwargs
+            successes=self.metrics.TruthTP,
+            total=total_calls,
+            method=method,
+            **kwargs
         )
 
     @property
-    def f1_score(self):
-        """
-        Calculate and return the F1 score.
+    def f1_score(self) -> float:
+        """Calculate F1 score (harmonic mean of precision and sensitivity).
 
         Returns:
-          float: F1 score.
+            F1 score value between 0 and 1
         """
         precision = self.precision
         sensitivity = self.sensitivity

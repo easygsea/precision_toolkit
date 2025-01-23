@@ -1,18 +1,18 @@
 import math
 
 
-def format_percentage(x, decimals=1) -> str:
-    """Convert a float or integer to percentage string.
+def format_percentage(x: int | float, decimals: int = 1) -> str:
+    """Convert number to percentage string.
 
     Args:
-        x: Number (float or int) to convert to percentage.
-        decimals (int, optional): Decimal places. Defaults to 1.
+        x: Number to convert
+        decimals: Decimal places to show
 
     Returns:
-        str: Number formatted as a percentage string.
+        Formatted percentage string
 
     Raises:
-        ValueError: If input can't be float or decimals invalid.
+        ValueError: If input invalid or decimals negative
 
     Examples:
         >>> format_percentage(0.456)

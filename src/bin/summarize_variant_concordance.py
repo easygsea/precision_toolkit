@@ -2,10 +2,10 @@
 import argparse
 from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
 from clinical_tools.render.variant_concordance import (
-    generate_concordance_table,
     export_concordance_to_csv,
     export_concordance_to_markdown,
     export_concordance_to_word,
+    generate_concordance_table,
 )
 
 

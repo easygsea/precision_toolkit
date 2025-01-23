@@ -1,11 +1,11 @@
 import logging
-import typing
 import pandas as pd
 from docx import Document
+from pathlib import Path
 
 
 def pandas_to_word(
-    doc: Document, df: pd.DataFrame, heading: str = None, summary: str = None
+    doc: Document, df: pd.DataFrame, heading: str | None = None, summary: str | None = None
 ) -> Document:
     """
     Generate a Word document from a pandas DataFrame.
@@ -47,7 +47,7 @@ def initiate_word_document() -> Document:
     return Document()
 
 
-def save_word_document(doc: Document, output_file: typing.Union[str, bytes]) -> None:
+def save_word_document(doc: Document, output_file: str | Path) -> None:
     """
     Save a Word document to a file.
 

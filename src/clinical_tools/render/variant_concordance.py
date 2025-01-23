@@ -1,5 +1,5 @@
-import typing
 import pandas as pd
+from pathlib import Path
 from clinical_tools.core.format import format_percentage
 from clinical_tools.core.writers.csv import pandas_to_csv
 from clinical_tools.core.writers.markdown import populate_markdown, save_markdown
@@ -12,20 +12,18 @@ from clinical_tools.analysis.compute_variant_metrics import process_variant_metr
 
 
 def generate_concordance_table(
-    results: typing.Dict[
-        typing.Tuple[str, str], typing.Tuple[int, int, int, float, float, float]
-    ]
+    results: dict[tuple[str, str], tuple[int, int, int, float, float, float]]
 ) -> pd.DataFrame:
     """
     Generate a pandas DataFrame for variant concordance summary.
 
     Args:
-        results (dict): A dictionary where keys are tuples of (variant_type,
-            variant_filter) and values are tuples of metrics (true_positive,
-            false_negative, false_positive, concordance, ci_lower, ci_upper).
+        results: Dictionary where keys are tuples of (variant_type, variant_filter) 
+            and values are tuples of metrics (true_positive, false_negative, 
+            false_positive, concordance, ci_lower, ci_upper)
 
     Returns:
-        pd.DataFrame: A DataFrame summarizing variant concordance.
+        DataFrame summarizing variant concordance
     """
     data = [
         {
@@ -51,14 +49,13 @@ def generate_concordance_table(
 
 
 def format_concordance_table(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Format the Concordance, CI Lower, and CI Upper columns as percentages.
+    """Format the Concordance, CI Lower, and CI Upper columns as percentages.
 
     Args:
-        df (pd.DataFrame): The concordance DataFrame to format.
+        df: The concordance DataFrame to format
 
     Returns:
-        pd.DataFrame: A new DataFrame with formatted columns.
+        New DataFrame with formatted columns
     """
     formatted_df = df.copy()
     for col in ["Concordance", "CI Lower", "CI Upper"]:
@@ -66,34 +63,29 @@ def format_concordance_table(df: pd.DataFrame) -> pd.DataFrame:
     return formatted_df
 
 
-def export_concordance_to_csv(df: pd.DataFrame, output_file: str) -> None:
-    """
-    Export concordance DataFrame to a CSV file.
+def export_concordance_to_csv(df: pd.DataFrame, output_file: str | Path) -> None:
+    """Export concordance DataFrame to CSV file.
 
     Args:
-        df (pd.DataFrame): The concordance DataFrame.
-        output_file (str): The path to save the CSV file.
-
-    Returns:
-        None
+        df: The concordance DataFrame
+        output_file: Path to save the CSV file
     """
     pandas_to_csv(df, output_file)
 
 
 def export_concordance_to_markdown(
-    df: pd.DataFrame, output_file: str, heading: str = None, summary: str = None
+    df: pd.DataFrame,
+    output_file: str | Path,
+    heading: str | None = None,
+    summary: str | None = None
 ) -> None:
-    """
-    Export concordance DataFrame to a Markdown file.
+    """Export concordance DataFrame to Markdown file.
 
     Args:
-        df (pd.DataFrame): The concordance DataFrame.
-        output_file (str): The path to save the Markdown file.
-        heading (str, optional): A heading to add to the Markdown file. Defaults to None.
-        summary (str, optional): A summary to add before the table. Defaults to None.
-
-    Returns:
-        None
+        df: The concordance DataFrame
+        output_file: Path to save the Markdown file
+        heading: Optional heading to add to the file
+        summary: Optional summary to add before the table
     """
     formatted_df = format_concordance_table(df)
     content = populate_markdown(formatted_df, heading, summary)
@@ -101,19 +93,18 @@ def export_concordance_to_markdown(
 
 
 def export_concordance_to_word(
-    df: pd.DataFrame, output_file: str, heading: str = None, summary: str = None
+    df: pd.DataFrame,
+    output_file: str | Path,
+    heading: str | None = None,
+    summary: str | None = None
 ) -> None:
-    """
-    Export concordance DataFrame to a Word file.
+    """Export concordance DataFrame to Word file.
 
     Args:
-        df (pd.DataFrame): The concordance DataFrame.
-        output_file (str): The path to save the Word file.
-        heading (str, optional): A heading to add to the Word file. Defaults to None.
-        summary (str, optional): A summary to add before the table. Defaults to None.
-
-    Returns:
-        None
+        df: The concordance DataFrame
+        output_file: Path to save the Word file
+        heading: Optional heading to add to the file
+        summary: Optional summary to add before the table
     """
     formatted_df = format_concordance_table(df)
     doc = initiate_word_document()

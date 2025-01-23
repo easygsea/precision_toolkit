@@ -1,97 +1,148 @@
-from collections import defaultdict
+from collections.abc import Sequence
+
+from clinical_tools.core.metrics.variant import (
+    ConcordanceMetrics,
+    VariantCallMetrics,
+)
 from clinical_tools.core.parsers.happy import HappyDataParser
 from clinical_tools.core.parsers.wittyer import WittyerDataParser
-from clinical_tools.core.metrics.variant import ConcordanceMetrics, VariantCallMetrics
 
 
-def load_data_from_files(files, data_type="happy"):
+def load_data_from_files(
+    files: Sequence[str], 
+    data_type: str = "happy"
+) -> Sequence[VariantCallMetrics]:
     """Load data from files based on the specified data type.
 
     Args:
-      files (list): List of paths to the files to be loaded.
-      data_type (str): Specifies whether to load 'happy' or 'wittyer' data.
-                       Default is 'happy'.
+        files: Sequence of paths to the files to be loaded
+        data_type: Specifies whether to load 'happy' or 'wittyer' data
 
     Returns:
-      list[VariantCallMetrics]: List of parsed metrics.
+        Sequence of parsed metrics
 
     Raises:
-      ValueError: If an invalid data_type is provided.
+        ValueError: If no files provided or invalid data_type
     """
+    if not files:
+        raise ValueError("No files provided")
+        
     if data_type == "happy":
         parser = HappyDataParser.process_hap_py_output
     elif data_type == "wittyer":
         parser = WittyerDataParser.process_witty_er_output
     else:
-        raise ValueError("data_type must be either 'happy' or 'wittyer'")
+        raise ValueError(f"Unsupported data_type: {data_type}. Must be 'happy' or 'wittyer'")
 
     all_metrics = []
     for file_path in files:
-        all_metrics.extend(parser(file_path))
+        try:
+            all_metrics.extend(parser(file_path))
+        except Exception as e:
+            raise RuntimeError(f"Error processing file {file_path}: {str(e)}")
 
     return all_metrics
 
 
-def compute_concordance_and_ci(metrics):
-    """Compute concordance and confidence intervals grouped by VariantType and VariantCallFilter.
-
+def compute_concordance_and_ci(
+    metrics: Sequence[VariantCallMetrics]
+) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
+    """Compute concordance and confidence intervals grouped by variant type and filter.
+    
     Args:
-      metrics (list[VariantCallMetrics]): Parsed metrics across samples.
+        metrics: Sequence of parsed metrics across samples
 
     Returns:
-      dict: A dictionary where keys are (VariantType, VariantCallFilter), and values are tuples:
-            (concordance, lower_ci, upper_ci)
+        Dictionary mapping (variant_type, filter) to metrics tuple:
+            truth_tp: Number of true positives in truth set
+            truth_fn: Number of false negatives
+            query_fp: Number of false positives
+            concordance: Concordance rate between 0 and 1
+            ci_lower: Lower bound of confidence interval
+            ci_upper: Upper bound of confidence interval
     """
-    grouped_metrics = defaultdict(list)
+    grouped_metrics = {
+        (metric.VariantType, metric.VariantCallFilter): []
+        for metric in metrics
+    }
+    
     for metric in metrics:
-        grouped_metrics[(metric.VariantType, metric.VariantCallFilter)].append(metric)
+        key = (metric.VariantType, metric.VariantCallFilter)
+        grouped_metrics[key].append(metric)
 
-    results = {}
-    for (variant_type, variant_filter), group in grouped_metrics.items():
-        total_truth_tp = sum(metric.TruthTP for metric in group)
-        total_truth_fn = sum(metric.TruthFN for metric in group)
-        total_query_tp = sum(metric.QueryTP for metric in group)
-        total_query_fp = sum(metric.QueryFP for metric in group)
+    return {
+        (variant_type, variant_filter): _compute_concordance_and_ci_for_group(group)
+        for (variant_type, variant_filter), group in grouped_metrics.items()
+    }
 
-        aggregated_metrics = VariantCallMetrics(
-            VariantType=variant_type,
-            VariantCallFilter=variant_filter,
-            TruthTotal=total_truth_tp + total_truth_fn,
-            TruthTP=total_truth_tp,
-            TruthFN=total_truth_fn,
-            QueryTotal=total_query_tp + total_query_fp,
-            QueryTP=total_query_tp,
-            QueryFP=total_query_fp,
-        )
+def _compute_concordance_and_ci_for_group(
+    group: list[VariantCallMetrics]
+) -> tuple[int, int, int, float, float, float]:
+    """Calculate concordance metrics for a group of variants.
+    
+    Helper function for compute_concordance_and_ci that processes
+    a single group of variants with the same type and filter.
 
-        analysis = ConcordanceMetrics(aggregated_metrics)
-        concordance = analysis.concordance
-        ci_lower, ci_upper = analysis.confidence_interval()
+    Args:
+        group: List of variant metrics to aggregate, all with same type and filter
 
-        results[(variant_type, variant_filter)] = (
-            aggregated_metrics.TruthTP,
-            aggregated_metrics.TruthFN,
-            aggregated_metrics.QueryFP,
-            concordance,
-            ci_lower,
-            ci_upper,
-        )
+    Returns:
+        Tuple of metrics:
+            truth_tp: Number of true positives in truth set
+            truth_fn: Number of false negatives
+            query_fp: Number of false positives
+            concordance: Concordance rate between 0 and 1
+            ci_lower: Lower bound of confidence interval
+            ci_upper: Upper bound of confidence interval
+    """
+    total_truth_tp = sum(metric.TruthTP for metric in group)
+    total_truth_fn = sum(metric.TruthFN for metric in group)
+    total_query_tp = sum(metric.QueryTP for metric in group)
+    total_query_fp = sum(metric.QueryFP for metric in group)
 
-    return results
+    aggregated_metrics = VariantCallMetrics(
+        VariantType=group[0].VariantType,
+        VariantCallFilter=group[0].VariantCallFilter,
+        TruthTotal=total_truth_tp + total_truth_fn,
+        TruthTP=total_truth_tp,
+        TruthFN=total_truth_fn,
+        QueryTotal=total_query_tp + total_query_fp,
+        QueryTP=total_query_tp,
+        QueryFP=total_query_fp,
+    )
+
+    analysis = ConcordanceMetrics(aggregated_metrics)
+    concordance = analysis.concordance
+    ci_lower, ci_upper = analysis.confidence_interval()
+
+    return (
+        aggregated_metrics.TruthTP,
+        aggregated_metrics.TruthFN,
+        aggregated_metrics.QueryFP,
+        concordance,
+        ci_lower,
+        ci_upper,
+    )
 
 
-def process_variant_metrics(file_paths, data_type):
+def process_variant_metrics(
+    file_paths: Sequence[str], 
+    data_type: str
+) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
     """Process variant metrics and compute confidence intervals.
 
     Args:
-        file_paths (list): List of file paths to process.
-        data_type (str): Specifies whether the files are 'happy' or 'wittyer' data.
+        file_paths: Sequence of file paths to process
+        data_type: Specifies whether the files are 'happy' or 'wittyer' data
 
     Returns:
-        dict: Variant metrics grouped by VariantType and VariantCallFilter.
+        Dictionary mapping (variant_type, filter) to metrics tuple:
+            truth_tp: Number of true positives in truth set
+            truth_fn: Number of false negatives
+            query_fp: Number of false positives
+            concordance: Concordance rate between 0 and 1
+            ci_lower: Lower bound of confidence interval
+            ci_upper: Upper bound of confidence interval
     """
     metrics = load_data_from_files(file_paths, data_type=data_type)
-
-    concordance_results = compute_concordance_and_ci(metrics)
-
-    return concordance_results
+    return compute_concordance_and_ci(metrics)

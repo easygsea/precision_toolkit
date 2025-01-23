@@ -1,22 +1,23 @@
 import logging
-import typing
 import pandas as pd
+from pathlib import Path
 from tabulate import tabulate
 
 
 def populate_markdown(
-    df: pd.DataFrame, heading: str = None, summary: str = None
+    df: pd.DataFrame, 
+    heading: str | None = None, 
+    summary: str | None = None
 ) -> str:
-    """
-    Generate a Markdown string from a pandas DataFrame.
+    """Generate a Markdown string from DataFrame.
 
     Args:
-        df (pd.DataFrame): The pandas DataFrame to convert.
-        heading (str, optional): A heading to add to the Markdown content. Defaults to None.
-        summary (str, optional): A summary to add before the table. Defaults to None.
+        df: DataFrame to convert
+        heading: Optional heading to add
+        summary: Optional summary before table
 
     Returns:
-        str: The generated Markdown content.
+        Generated Markdown content
     """
     markdown_content = ""
 
@@ -31,17 +32,20 @@ def populate_markdown(
     return markdown_content
 
 
-def save_markdown(content: str, output_file: typing.Union[str, bytes]) -> None:
-    """
-    Save a Markdown string to a file.
+def save_markdown(content: str, output_file: str | Path) -> None:
+    """Save Markdown content to file.
 
     Args:
-        content (str): The Markdown content to save.
-        output_file (Union[str, bytes]): The path to save the Markdown file.
+        content: Markdown content to save
+        output_file: Path to output file
 
-    Returns:
-        None
+    Raises:
+        IOError: If file cannot be written
     """
-    with open(output_file, "w") as f:
-        f.write(content)
-    logging.info(f"Markdown content saved to {output_file}")
+    try:
+        with open(output_file, "w") as f:
+            f.write(content)
+        logging.info(f"Markdown content saved to {output_file}")
+    except IOError as e:
+        logging.error(f"Failed to save markdown to {output_file}: {e}")
+        raise
