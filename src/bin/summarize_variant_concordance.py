@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from clinical_tools.core.constants import VariantConcordanceEngine
 from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
 from clinical_tools.render.variant_concordance import (
     export_concordance_to_csv,
@@ -19,7 +20,7 @@ def main():
     parser.add_argument(
         "-t",
         "--type",
-        choices=["happy", "wittyer"],
+        choices=[engine.value for engine in VariantConcordanceEngine],
         required=True,
         help="Type of files to process: 'happy' or 'wittyer'.",
     )
@@ -33,7 +34,6 @@ def main():
         help="Prefix for output filenames. Default is 'variant_concordance'."
     )
 
-    # Parse arguments first so we can use args.type
     args = parser.parse_args()
 
     # Generate the concordance table

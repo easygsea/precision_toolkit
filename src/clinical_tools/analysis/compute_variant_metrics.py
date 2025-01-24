@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 
+from clinical_tools.core.constants import VariantConcordanceEngine
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     VariantCallMetrics,
@@ -10,7 +11,7 @@ from clinical_tools.core.parsers.wittyer import WittyerDataParser
 
 def load_data_from_files(
     files: Sequence[str], 
-    data_type: str
+    data_type: VariantConcordanceEngine
 ) -> Sequence[VariantCallMetrics]:
     """Load data from files based on the specified data type.
 
@@ -27,9 +28,9 @@ def load_data_from_files(
     if not files:
         raise ValueError("No files provided")
         
-    if data_type == "happy":
+    if data_type == VariantConcordanceEngine.HAPPY:
         parser = HappyDataParser.process_hap_py_output
-    elif data_type == "wittyer":
+    elif data_type == VariantConcordanceEngine.WITTYER:
         parser = WittyerDataParser.process_witty_er_output
     else:
         raise ValueError(f"Unsupported data_type: {data_type}. Must be 'happy' or 'wittyer'")
@@ -127,7 +128,7 @@ def _compute_concordance_and_ci_for_group(
 
 def process_variant_metrics(
     file_paths: Sequence[str], 
-    data_type: str
+    data_type: VariantConcordanceEngine
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
     """Process variant metrics and compute confidence intervals.
 
