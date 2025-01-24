@@ -81,7 +81,7 @@ process summarize_variant_concordance {
     script:
     PREFIX="variant_concordance"
     """
-    summarize-variant-concordance --type ${params.variant_concordance_engine} \
+    summarize-variant-concordance --engine ${params.variant_concordance_engine} \
         --files ${concordance_outputs.collect().join(' ')} \
         --prefix ${PREFIX}
     """

@@ -18,14 +18,18 @@ def main():
         )
     )
     parser.add_argument(
-        "-t",
-        "--type",
+        "-e",
+        "--engine",
         choices=[engine.value for engine in VariantConcordanceEngine],
         required=True,
-        help="Type of files to process: 'happy' or 'wittyer'.",
+        help="Engine output format: 'happy' or 'wittyer'.",
     )
     parser.add_argument(
-        "-f", "--files", nargs="+", required=True, help="List of file paths to process."
+        "-f",
+        "--files",
+        nargs="+",
+        required=True,
+        help="List of engine output files to process."
     )
     parser.add_argument(
         "-p",
@@ -38,14 +42,14 @@ def main():
 
     # Generate the concordance table
     concordance_results = process_variant_metrics(
-        file_paths=args.files, data_type=args.type
+        file_paths=args.files, data_type=args.engine
     )
     concordance_table = generate_concordance_table(concordance_results)
 
     # Define output filenames with the given prefix
-    csv_output = f"{args.prefix}_{args.type}.csv"
-    md_output = f"{args.prefix}_{args.type}.md"
-    docx_output = f"{args.prefix}_{args.type}.docx"
+    csv_output = f"{args.prefix}_{args.engine}.csv"
+    md_output = f"{args.prefix}_{args.engine}.md"
+    docx_output = f"{args.prefix}_{args.engine}.docx"
     
     # Export to different formats
     export_concordance_to_csv(concordance_table, csv_output)
