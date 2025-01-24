@@ -1,4 +1,14 @@
+from enum import StrEnum
 from statsmodels.stats.proportion import proportion_confint
+
+
+class ProportionConfidenceIntervalMethod(StrEnum):
+    """Supported methods for calculating confidence intervals."""
+    WILSON = "wilson"
+    AGRESTI_COULL = "agresti_coull"
+    BETA = "beta"
+    JEFFREYS = "jeffreys"
+    WALD = "wald"
 
 
 class ProportionConfidenceInterval:
@@ -6,7 +16,7 @@ class ProportionConfidenceInterval:
     A class for calculating confidence intervals for proportions.
     """
 
-    SUPPORTED_METHODS = ["wilson", "agresti_coull", "beta", "jeffreys", "wald"]
+    SUPPORTED_METHODS = [method.value for method in ProportionConfidenceIntervalMethod]
 
     @staticmethod
     def proportion_confidence_interval(successes, total, method="wilson", **kwargs):
@@ -14,17 +24,17 @@ class ProportionConfidenceInterval:
         Calculate the confidence interval for a binomial proportion.
 
         Args:
-          successes (int): Number of success events.
-          total (int): Total number of events.
-          method (str, optional): The method to use for CI calculation.
-                                  Defaults to 'wilson'.
-          **kwargs: Additional keyword arguments to pass to proportion_confint.
+            successes (int): Number of success events.
+            total (int): Total number of events.
+            method (str, optional): The method to use for CI calculation.
+                                   Defaults to 'wilson'.
+            **kwargs: Additional keyword arguments to pass to proportion_confint.
 
         Returns:
-          tuple[float, float]: Lower and upper bounds of the CI.
+            tuple[float, float]: Lower and upper bounds of the CI.
 
         Raises:
-          ValueError: If the provided method is not supported.
+            ValueError: If the provided method is not supported.
         """
         if method not in ProportionConfidenceInterval.SUPPORTED_METHODS:
             raise ValueError(
