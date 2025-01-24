@@ -5,19 +5,28 @@ class VariantConcordanceEngine(StrEnum):
     HAPPY = "happy"
     WITTYER = "wittyer"
 
-class VariantConcordanceMetricMap:
-    """Class to hold variant concordance metric mappings and related methods."""
+class NameMapper:
+    """Class to hold abbreviations and full names."""
     
-    METRIC_MAP = {
+    NAME_MAP = {
         "TP": "True Positives",
         "FP": "False Positives",
         "TN": "True Negatives",
         "FN": "False Negatives",
     }
 
-    @classmethod
-    def get_full_name(cls, abbreviation: str) -> str:
+    @staticmethod
+    def get_full_name(abbreviation: str) -> str:
         """Get the full name of a metric based on its abbreviation."""
-        if abbreviation not in cls.METRIC_MAP:
-            raise ValueError(f"Unknown metric abbreviation: {abbreviation}")
-        return cls.METRIC_MAP[abbreviation]
+        full_name = NameMapper.NAME_MAP.get(abbreviation)
+        if full_name is None:
+            raise ValueError(f"Unknown abbreviation: {abbreviation}")
+        return full_name
+    
+    @staticmethod
+    def get_abbreviation(full_name: str) -> str:
+        """Get the abbreviation of a metric based on its full name."""
+        for abbr, name in NameMapper.NAME_MAP.items():
+            if name == full_name:
+                return abbr
+        raise ValueError(f"Unknown full name: {full_name}")

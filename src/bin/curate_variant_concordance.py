@@ -4,7 +4,7 @@ import argparse
 import logging
 import pandas as pd
 
-from clinical_tools.core.constants import VariantConcordanceMetricMap
+from clinical_tools.core.constants import NameMapper
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     VariantCallMetrics,
@@ -86,7 +86,7 @@ def main():
         count = int(count)
 
         try:
-            metric_full = VariantConcordanceMetricMap.get_full_name(metric)
+            metric_full = NameMapper.get_full_name(metric)
         except ValueError as e:
             logging.error(e)
             raise
