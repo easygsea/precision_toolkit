@@ -4,6 +4,7 @@ import argparse
 import logging
 import pandas as pd
 
+from clinical_tools.core.constants import VariantConcordanceMetricMap
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     VariantCallMetrics,
@@ -13,27 +14,6 @@ from clinical_tools.render.variant_concordance import (
     export_concordance_to_markdown,
     export_concordance_to_word,
 )
-
-
-def abbreviation_to_metric(abbreviation: str) -> str:
-    """
-    Convert a metric abbreviation into its full name.
-
-    Args:
-        abbreviation: Abbreviation of the metric (e.g., "TP")
-
-    Returns:
-        Full name of the metric (e.g., "True Positive")
-
-    Note:
-        This function assumes a predefined mapping of abbreviations to full names.
-    """
-    metric_map: dict[str, str] = {
-        'TP': 'True Positive',
-        'FN': 'False Negative',
-        'FP': 'False Positive'
-    }
-    return metric_map.get(abbreviation, abbreviation)
 
 
 def validate_curation_format(curation: str) -> bool:
@@ -63,7 +43,7 @@ def main():
     Main function to manually curate variant concordance summary and export results.
 
     This script reads a CSV file containing variant concordance summary, updates
-    specified metrics based on user input, and then exports the results.
+    specified statistics based on user input, and then exports the results.
 
     Args:
         None (arguments are parsed from command line)
@@ -73,7 +53,7 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description="Curate variant concordance from an existing table with count "
-                    "information and recompute metrics."
+                    "information and recompute statistics."
     )
     parser.add_argument(
         "--input", required=True,
@@ -81,10 +61,10 @@ def main():
     parser.add_argument(
         "--curation", nargs='+', action='append',
         required=True,
-        help="Curation criteria (type:filter:metric:count).")
+        help="Manual curation (type:filter:metric:count).")
     parser.add_argument(
         "--output_prefix", default="curated_concordance",
-        help="Prefix for output files (CSV, MD, DOCX).")
+        help="Prefix for output files.")
 
     args = parser.parse_args()
     df = pd.read_csv(args.input)
@@ -100,18 +80,20 @@ def main():
         logging.error(f"Invalid curation format: {e}")
         raise
 
-    # Update df's metrics based on curation input
+    # Update counts based on manual input
     for curation in curations:
         variant_type, filter_type, metric, count = curation.split(':')
         count = int(count)
 
-        metric_full = abbreviation_to_metric(metric)
+        try:
+            metric_full = VariantConcordanceMetricMap.get_full_name(metric)
+        except ValueError as e:
+            logging.error(e)
+            raise
 
-        # Update the count for matching rows
         mask = (df['Variant Type'] == variant_type) & (
                     df['Variant Filter'] == filter_type)
 
-        # Update metric counts
         df.loc[mask, metric_full] = count
 
         metrics = VariantCallMetrics(
@@ -135,7 +117,6 @@ def main():
         df.loc[mask, "CI Lower"] = ci_lower
         df.loc[mask, "CI Upper"] = ci_upper
 
-    # Since summary_text is not defined, we'll create a simple one
     summary_text = "Curated variant concordance summary."
 
     # Export using the output prefix
