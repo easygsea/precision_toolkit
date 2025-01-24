@@ -10,13 +10,13 @@ from clinical_tools.core.parsers.wittyer import WittyerDataParser
 
 def load_data_from_files(
     files: Sequence[str], 
-    data_type: str = "happy"
+    data_type: str
 ) -> Sequence[VariantCallMetrics]:
     """Load data from files based on the specified data type.
 
     Args:
         files: Sequence of paths to the files to be loaded
-        data_type: Specifies whether to load 'happy' or 'wittyer' data
+        data_type: Type of data to load ('happy' or 'wittyer')
 
     Returns:
         Sequence of parsed metrics

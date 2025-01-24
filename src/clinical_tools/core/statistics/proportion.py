@@ -3,7 +3,7 @@ from statsmodels.stats.proportion import proportion_confint
 
 
 class ProportionConfidenceIntervalMethod(StrEnum):
-    """Supported methods for calculating confidence intervals."""
+    """Supported methods for calculating proportion confidence intervals."""
     WILSON = "wilson"
     AGRESTI_COULL = "agresti_coull"
     BETA = "beta"
