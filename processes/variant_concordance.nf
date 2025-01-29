@@ -72,17 +72,90 @@ process summarize_variant_concordance {
     publishDir "${params.output_dir}/${output_dir ?: ''}", mode: 'copy'
 
     input:
-    path concordance_outputs
+    path raw_files
+    path curated_files, optional: true
     val output_dir
 
     output:
     path("${PREFIX}*"), emit: variant_concordance_summary
 
     script:
-    PREFIX="variant_concordance"
+    PREFIX = curated_files ? "variant_concordance_combined" : "variant_concordance_raw"
     """
     summarize-variant-concordance --engine ${params.variant_concordance_engine} \
-        --files ${concordance_outputs.collect().join(' ')} \
+        --raw-files ${raw_files.collect().join(' ')} \
+        ${curated_files ? "--curated-files " + curated_files.collect().join(' ') : ""} \
         --prefix ${PREFIX}
     """
+}
+
+process bgzip_vcf {
+    tag "${sampleName}"
+    
+    input:
+    tuple val(sampleName), path(original_vcf)
+    
+    output:
+    path("${original_vcf}.gz"), emit: gzipped_vcf
+    
+    script:
+    """
+    bgzip -c ${original_vcf} > ${original_vcf}.gz
+    """
+}
+
+process index_vcf {
+    tag "${sampleName}"
+    
+    input:
+    path gzipped_vcf
+    
+    output:
+    path("${gzipped_vcf}.tbi"), emit: indexed_vcf
+    
+    script:
+    """
+    tabix -p vcf ${gzipped_vcf}
+    """
+}
+
+process exclude_spurious_variants {
+    tag "${sampleName}"
+    
+    input:
+    tuple val(sampleName), path(original_vcf)
+    path exclude_spurious_variants
+    
+    output:
+    path("${sampleName}.curated.vcf.gz"), emit: curated_vcf
+    
+    script:
+    """
+    # Determine if we need to bgzip
+    if [[ ${original_vcf} != *.gz ]]; then
+        mv ${original_vcf} ${original_vcf}.unzipped
+        original_vcf=${original_vcf}.unzipped
+    fi
+    
+    # Determine if we need to index
+    if [[ ! -f ${original_vcf}.tbi ]]; then
+        mv ${original_vcf} ${original_vcf}.unindexed
+        original_vcf=${original_vcf}.unindexed
+    fi
+    
+    # Perform variant exclusion
+    bcftools isec --collapse both --complement --write 1 --output-type z \
+        --output ${sampleName}.curated.vcf.gz ${spurious_variants_vcf} ${original_vcf}
+    """
+    
+    exec:
+    // Handle bgzip if needed
+    if (original_vcf.toString().endsWith('.unzipped')) {
+        original_vcf = bgzip_vcf(sampleName, original_vcf).gzipped_vcf
+    }
+    
+    // Handle indexing if needed
+    if (original_vcf.toString().endsWith('.unindexed')) {
+        original_vcf = index_vcf(original_vcf).indexed_vcf
+    }
 }

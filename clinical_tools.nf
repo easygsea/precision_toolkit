@@ -29,6 +29,7 @@ def helpMessage() {
             --concordance_dir         Subdirectory for concordance results (default: concordance)
             --happy_options         Additional options for hap.py
             --wittyer_options       Additional options for witty.er
+            --spurious_variants_vcf  VCF file containing spurious variants to exclude
             --force                 Overwrite existing output directory
 
     General Options:
@@ -40,7 +41,15 @@ def helpMessage() {
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/ \\
             --variant_concordance_engine happy \\
-            --output_dir my_analysis
+            --output_dir output_clinical_tools
+
+        # Run concordance with spurious variant exclusion
+        nextflow run clinical_tools.nf --workflows concordance \\
+            --truth_dir truth_vcfs/ \\
+            --query_dir query_vcfs/ \\
+            --variant_concordance_engine happy \\
+            --spurious_variants_vcf spurious_variants.vcf.gz \\
+            --output_dir output_clinical_tools
 
         # Run multiple workflows
         nextflow run clinical_tools.nf --workflows concordance,sensitivity,specificity \\
@@ -52,7 +61,9 @@ def helpMessage() {
         └── <concordance_dir>/
             ├── happy/          # hap.py results if using happy engine
             ├── wittyer/        # witty.er results if using wittyer engine
-            └── variant_concordance_summary.csv
+            ├── variant_concordance_combined.csv  # Combined raw/curated concordance in CSV
+            ├── variant_concordance_combined.md   # Combined raw/curated concordance in Markdown
+            └── variant_concordance_combined.docx # Combined raw/curated concordance in Word
     """.stripIndent()
 }
 
