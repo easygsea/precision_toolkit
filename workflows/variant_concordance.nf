@@ -61,6 +61,7 @@ workflow variant_concordance_workflow {
                 params.concordance_dir
             )
             summary_files = wittyer_results.wittyer_summary
+                // Prefix output with sampleName due to conflicting Wittyer.Stats.json links
                 .map { stats_file ->
                     // Extract sample name
                     def taskDir = stats_file.getParent()
