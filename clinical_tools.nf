@@ -98,12 +98,6 @@ workflow {
         }
         
         // Run user-selected workflows
-        workflowList.each { workflow ->
-            switch(workflow) {
-                case 'concordance':
-                    concordance()
-                    break
-            }
-        }
+        workflowList.each { workflow -> "$workflow"() }
     }
 }
