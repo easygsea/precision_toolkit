@@ -4,12 +4,6 @@ nextflow.enable.dsl=2
 
 include { concordance } from './modules/concordance'
 
-// Show help message
-if (params.help) {
-    helpMessage()
-    exit 0
-}
-
 def helpMessage() {
     log.info"""
     =========================================
