@@ -29,7 +29,7 @@ def main():
         "--raw-files",
         nargs="+",
         required=True,
-        help="List of engine output files to process."
+        help="List of raw engine output files to process."
     )
     parser.add_argument(
         "-c",
