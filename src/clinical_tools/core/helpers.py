@@ -1,3 +1,5 @@
+import pandas as pd
+
 def convert_to_list_if_single_instance(value, expected_type):
     """Convert single instances to lists while preserving None and existing lists.
     
