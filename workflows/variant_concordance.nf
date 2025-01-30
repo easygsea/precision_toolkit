@@ -115,7 +115,7 @@ workflow variant_concordance_workflow {
                     genome_ref_path,
                     genome_fai_path,
                     params.happy_options,
-                    params.concordance_dir
+                    "${params.concordance_dir}/curated"
                 )
             
                 // Collect hap.py results after excluding spurious variants
