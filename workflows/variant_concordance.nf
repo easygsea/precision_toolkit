@@ -4,9 +4,10 @@ include {
     index_vcf
     exclude_spurious_variants as exclude_spurious_variants_truth
     exclude_spurious_variants as exclude_spurious_variants_query
-    run_happy as run_happy_initial
+    run_happy as run_happy_raw
     run_happy as run_happy_curated
-    run_wittyer
+    run_wittyer as run_wittyer_raw
+    run_wittyer as run_wittyer_curated
     summarize_variant_concordance
 } from '../processes/variant_concordance'
 
@@ -103,7 +104,7 @@ workflow variant_concordance_workflow {
             }
 
             // Run initial happy analysis
-            happy_results = run_happy_initial(
+            happy_results = run_happy_raw(
                 vcf_pairs, 
                 genome_ref_path, 
                 genome_fai_path, 
@@ -127,7 +128,7 @@ workflow variant_concordance_workflow {
             }
         } else if (params.variant_concordance_engine == "wittyer") {
             // Run wittyer analysis
-            wittyer_results = run_wittyer(
+            wittyer_results = run_wittyer_raw(
                 vcf_pairs, 
                 params.wittyer_options,
                 params.concordance_dir,
@@ -164,7 +165,7 @@ workflow variant_concordance_workflow {
         // Process variant concordance results based on whether curated files exist
         summarize_variant_concordance(
             summary_files,         // raw files
-            summary_files_curated, // curated files or null
+            summary_files_curated ?: "", // curated files or empty string
             params.concordance_dir
         )
 
