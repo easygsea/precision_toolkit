@@ -39,12 +39,12 @@ def assemble_exports(
     # Convert single instances to lists for consistent processing
     dfs = convert_to_list_if_single_instance(dfs, pd.DataFrame)
     headings = convert_to_list_if_single_instance(headings, str)
-    summaries = convert_to_list_if_single_instance(summaries, str)
+    descriptions = convert_to_list_if_single_instance(descriptions, str)
     
-    # Ensure headings and summaries match the number of DataFrames
+    # Ensure headings and descriptions match the number of DataFrames
     if headings is not None and len(headings) != len(dfs):
         raise ValueError("Number of headings must match number of DataFrames")
-    if summaries is not None and len(summaries) != len(dfs):
-        raise ValueError("Number of summaries must match number of DataFrames")
+    if descriptions is not None and len(descriptions) != len(dfs):
+        raise ValueError("Number of descriptions must match number of DataFrames")
     
-    return dfs, headings, summaries
+    return dfs, headings, descriptions
