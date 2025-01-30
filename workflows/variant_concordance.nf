@@ -1,7 +1,10 @@
 include {
-    run_happy
+    run_happy as run_happy_initial
+    run_happy as run_happy_curated
     run_wittyer
     summarize_variant_concordance
+    exclude_spurious_variants as exclude_spurious_variants_truth
+    exclude_spurious_variants as exclude_spurious_variants_query
 } from '../processes/variant_concordance'
 
 // Function to build VCF pair channels
@@ -46,7 +49,7 @@ workflow variant_concordance_workflow {
                 generate_fai(genome_ref_channel).genome_fai
             }
 
-            happy_results = run_happy(
+            happy_results = run_happy_initial(
                 vcf_pairs, 
                 genome_ref_channel, 
                 genome_fai_channel, 
@@ -58,25 +61,34 @@ workflow variant_concordance_workflow {
             // If spurious_variants_vcf is provided, run the exclude_spurious_variants process
             if (params.spurious_variants_vcf) {
                 // Run exclude_spurious_variants process for each sample
-                curated_vcfs = exclude_spurious_variants(
+                // Process truth VCFs to remove spurious variants
+                curated_truth_vcfs = exclude_spurious_variants_truth(
+                    vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, truth_vcf) },
+                    file(params.spurious_variants_vcf),
+                    "truth" 
+                )
+                
+                // Process query VCFs to remove spurious variants
+                curated_query_vcfs = exclude_spurious_variants_query(
                     vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, query_vcf) },
-                    params.spurious_variants_vcf
+                    file(params.spurious_variants_vcf),
+                    "query"
                 )
             
-                // Pair the curated VCFs with their corresponding truth VCFs
+                // Pair the curated VCFs
                 curated_vcf_pairs = vcf_pairs
-                    .combine(curated_vcfs)
+                    .combine(curated_query_vcfs)
                     .map { sampleName, truth_vcf, query_vcf, curated_vcf -> 
                         tuple(sampleName, truth_vcf, curated_vcf) 
                     }
             
                 // Run happy analysis on the curated VCFs
-                curated_happy_results = run_happy(
+                curated_happy_results = run_happy_curated(
                     curated_vcf_pairs,
                     genome_ref_channel,
                     genome_fai_channel,
                     params.happy_options,
-                    "${params.concordance_dir}/curated"
+                    params.concordance_dir
                 )
             
                 // Collect hap.py results after excluding spurious variants

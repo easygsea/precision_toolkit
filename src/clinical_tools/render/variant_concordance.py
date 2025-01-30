@@ -74,39 +74,92 @@ def export_concordance_to_csv(df: pd.DataFrame, output_file: str | Path) -> None
 
 
 def export_concordance_to_markdown(
-    df: pd.DataFrame,
+    dfs: list[pd.DataFrame] | pd.DataFrame,
     output_file: str | Path,
-    heading: str | None = None,
-    summary: str | None = None
+    headings: list[str] | str | None = None,
+    summaries: list[str] | str | None = None
 ) -> None:
-    """Export concordance DataFrame to Markdown file.
+    """Export one or more concordance DataFrames to Markdown file.
 
     Args:
-        df: The concordance DataFrame
+        dfs: Single DataFrame or list of DataFrames to export
         output_file: Path to save the Markdown file
-        heading: Optional heading to add to the file
-        summary: Optional summary to add before the table
+        headings: Optional heading(s) to add to the file. If multiple DataFrames,
+            should be a list of headings matching the number of DataFrames.
+        summaries: Optional summary(s) to add before the table(s). If multiple DataFrames,
+            should be a list of summaries matching the number of DataFrames.
     """
-    formatted_df = format_concordance_table(df)
-    content = populate_markdown(formatted_df, heading, summary)
-    save_markdown(content, output_file)
+    # Convert single DataFrame to list for consistent processing
+    if isinstance(dfs, pd.DataFrame):
+        dfs = [dfs]
+    
+    # Convert single heading/summary to list if needed
+    if isinstance(headings, str):
+        headings = [headings]
+    if isinstance(summaries, str):
+        summaries = [summaries]
+    
+    # Ensure headings and summaries match the number of DataFrames
+    if headings is not None and len(headings) != len(dfs):
+        raise ValueError("Number of headings must match number of DataFrames")
+    if summaries is not None and len(summaries) != len(dfs):
+        raise ValueError("Number of summaries must match number of DataFrames")
+    
+    # Process each DataFrame and collect markdown content
+    all_content = []
+    for i, df in enumerate(dfs):
+        formatted_df = format_concordance_table(df)
+        heading = headings[i] if headings else None
+        summary = summaries[i] if summaries else None
+        content = populate_markdown(formatted_df, heading, summary)
+        all_content.append(content)
+    
+    # Combine all content and save to file
+    final_content = "\n\n".join(all_content)
+    save_markdown(final_content, output_file)
 
 
 def export_concordance_to_word(
-    df: pd.DataFrame,
+    dfs: list[pd.DataFrame] | pd.DataFrame,
     output_file: str | Path,
-    heading: str | None = None,
-    summary: str | None = None
+    headings: list[str] | str | None = None,
+    summaries: list[str] | str | None = None
 ) -> None:
-    """Export concordance DataFrame to Word file.
+    """Export one or more concordance DataFrames to Word file.
 
     Args:
-        df: The concordance DataFrame
+        dfs: Single DataFrame or list of DataFrames to export
         output_file: Path to save the Word file
-        heading: Optional heading to add to the file
-        summary: Optional summary to add before the table
+        headings: Optional heading(s) to add to the file. If multiple DataFrames,
+            should be a list of headings matching the number of DataFrames.
+        summaries: Optional summary(s) to add before the table(s). If multiple DataFrames,
+            should be a list of summaries matching the number of DataFrames.
     """
-    formatted_df = format_concordance_table(df)
+    # Convert single DataFrame to list for consistent processing
+    if isinstance(dfs, pd.DataFrame):
+        dfs = [dfs]
+    
+    # Convert single heading/summary to list if needed
+    if isinstance(headings, str):
+        headings = [headings]
+    if isinstance(summaries, str):
+        summaries = [summaries]
+    
+    # Ensure headings and summaries match the number of DataFrames
+    if headings is not None and len(headings) != len(dfs):
+        raise ValueError("Number of headings must match number of DataFrames")
+    if summaries is not None and len(summaries) != len(dfs):
+        raise ValueError("Number of summaries must match number of DataFrames")
+    
+    # Initiate Word document
     doc = initiate_word_document()
-    pandas_to_word(doc, formatted_df, heading, summary)
+    
+    # Process each DataFrame and add to Word document
+    for i, df in enumerate(dfs):
+        formatted_df = format_concordance_table(df)
+        heading = headings[i] if headings else None
+        summary = summaries[i] if summaries else None
+        pandas_to_word(doc, formatted_df, heading, summary)
+    
+    # Save final Word document
     save_word_document(doc, output_file)

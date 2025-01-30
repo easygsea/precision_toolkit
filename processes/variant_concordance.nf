@@ -73,7 +73,7 @@ process summarize_variant_concordance {
 
     input:
     path raw_files
-    path curated_files, optional: true
+    path curated_files
     val output_dir
 
     output:
@@ -124,38 +124,38 @@ process exclude_spurious_variants {
     
     input:
     tuple val(sampleName), path(original_vcf)
-    path exclude_spurious_variants
+    path spurious_variants_vcf
+    val label
     
     output:
-    path("${sampleName}.curated.vcf.gz"), emit: curated_vcf
-    
+    path("${sampleName}.${label}.curated.vcf.gz"), emit: curated_vcf
+
     script:
     """
-    # Determine if we need to bgzip
+    # Check and compress original VCF if needed
     if [[ ${original_vcf} != *.gz ]]; then
-        mv ${original_vcf} ${original_vcf}.unzipped
-        original_vcf=${original_vcf}.unzipped
+        bgzip -c ${original_vcf} > ${original_vcf}.gz
+        original_vcf=${original_vcf}.gz
     fi
     
-    # Determine if we need to index
+    # Index original VCF if needed
     if [[ ! -f ${original_vcf}.tbi ]]; then
-        mv ${original_vcf} ${original_vcf}.unindexed
-        original_vcf=${original_vcf}.unindexed
+        tabix -p vcf ${original_vcf}
     fi
     
-    # Perform variant exclusion
+    # Check and compress spurious variants VCF if needed
+    if [[ ${spurious_variants_vcf} != *.gz ]]; then
+        bgzip -c ${spurious_variants_vcf} > ${spurious_variants_vcf}.gz
+        spurious_variants_vcf=${spurious_variants_vcf}.gz
+    fi
+    
+    # Index spurious variants VCF if needed
+    if [[ ! -f ${spurious_variants_vcf}.tbi ]]; then
+        tabix -p vcf ${spurious_variants_vcf}
+    fi
+    
+    # Perform variant exclusion using bcftools isec
     bcftools isec --collapse both --complement --write 1 --output-type z \
-        --output ${sampleName}.curated.vcf.gz ${spurious_variants_vcf} ${original_vcf}
+        --output ${sampleName}.${label}.curated.vcf.gz ${original_vcf} ${spurious_variants_vcf}
     """
-    
-    exec:
-    // Handle bgzip if needed
-    if (original_vcf.toString().endsWith('.unzipped')) {
-        original_vcf = bgzip_vcf(sampleName, original_vcf).gzipped_vcf
-    }
-    
-    // Handle indexing if needed
-    if (original_vcf.toString().endsWith('.unindexed')) {
-        original_vcf = index_vcf(original_vcf).indexed_vcf
-    }
 }
