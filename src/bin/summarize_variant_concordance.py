@@ -63,7 +63,7 @@ def main():
 
     # Initialize combined tables with raw results
     tables = [raw_concordance_table]
-    headings = ["RawVariant Concordance"]
+    headings = ["Raw Variant Concordance"]
     summaries = ["This table summarizes the raw concordance of variant calls."]
 
     # Process curated results if provided
