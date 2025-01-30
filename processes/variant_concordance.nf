@@ -130,8 +130,8 @@ process summarize_variant_concordance {
     publishDir "${params.output_dir}/${output_dir ?: ''}", mode: 'copy'
 
     input:
-    path raw_files
-    path curated_files
+    path raw_concordance_outputs
+    path curated_concordance_outputs
     val output_dir
 
     output:
@@ -141,8 +141,8 @@ process summarize_variant_concordance {
     PREFIX = "variant_concordance"
     """
     summarize-variant-concordance --engine ${params.variant_concordance_engine} \
-        --raw-files ${raw_files.collect().join(' ')} \
-        ${(curated_files != "") ? "--curated-files " + curated_files.collect().join(' ') : ""} \
+        --raw-files ${raw_concordance_outputs.collect().join(' ')} \
+        ${(curated_concordance_outputs != "") ? "--curated-files " + curated_concordance_outputs.collect().join(' ') : ""} \
         --prefix ${PREFIX}
     """
 }
