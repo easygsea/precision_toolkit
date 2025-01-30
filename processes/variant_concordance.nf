@@ -82,9 +82,10 @@ process run_happy {
     path genome_fai
     val happy_options
     val output_dir
+    val label
 
     output:
-    path("${sampleName}.summary.csv"), emit: happy_summary
+    path("${sampleName}.${label}.summary.csv"), emit: happy_summary
     path("${sampleName}*"), emit: happy_outputs
 
     script:
@@ -96,7 +97,7 @@ process run_happy {
     ${truth_vcf} \
     ${query_vcf} \
     -r ${genome_ref} \
-    -o ${sampleName} \
+    -o ${sampleName}.${label} \
     --engine=vcfeval \
     --scratch-prefix scratch_happy \
     ${happy_options}
