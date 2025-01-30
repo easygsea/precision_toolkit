@@ -13,6 +13,32 @@ process generate_fai {
     """
 }
 
+process bgzip_vcf {
+    input:
+    path original_vcf
+    
+    output:
+    path("${original_vcf}.gz"), emit: gzipped_vcf
+    
+    script:
+    """
+    bgzip -c ${original_vcf} > ${original_vcf}.gz
+    """
+}
+
+process index_vcf {
+    input:
+    path gzipped_vcf
+    
+    output:
+    path("${gzipped_vcf}.tbi"), emit: indexed_vcf
+    
+    script:
+    """
+    tabix -p vcf ${gzipped_vcf}
+    """
+}
+
 process exclude_spurious_variants {
     tag "${sampleName}"
     
@@ -94,32 +120,6 @@ process run_wittyer {
     script:
     """
     witty.er -i ${query_vcf} -t ${truth_vcf} -o ${sampleName} ${wittyer_options}
-    """
-}
-
-process bgzip_vcf {
-    input:
-    path original_vcf
-    
-    output:
-    path("${original_vcf}.gz"), emit: gzipped_vcf
-    
-    script:
-    """
-    bgzip -c ${original_vcf} > ${original_vcf}.gz
-    """
-}
-
-process index_vcf {
-    input:
-    path gzipped_vcf
-    
-    output:
-    path("${gzipped_vcf}.tbi"), emit: indexed_vcf
-    
-    script:
-    """
-    tabix -p vcf ${gzipped_vcf}
     """
 }
 
