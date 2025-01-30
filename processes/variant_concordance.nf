@@ -1,8 +1,6 @@
 process generate_fai {
     tag "${genome_ref}"
 
-    publishDir "${params.output_dir}/indices", mode: 'copy'
-
     input:
     path genome_ref
 
@@ -68,32 +66,9 @@ process run_wittyer {
     """
 }
 
-process summarize_variant_concordance {
-    publishDir "${params.output_dir}/${output_dir ?: ''}", mode: 'copy'
-
-    input:
-    path raw_files
-    path curated_files
-    val output_dir
-
-    output:
-    path("${PREFIX}*"), emit: variant_concordance_summary
-
-    script:
-    PREFIX = curated_files ? "variant_concordance_combined" : "variant_concordance_raw"
-    """
-    summarize-variant-concordance --engine ${params.variant_concordance_engine} \
-        --raw-files ${raw_files.collect().join(' ')} \
-        ${curated_files ? "--curated-files " + curated_files.collect().join(' ') : ""} \
-        --prefix ${PREFIX}
-    """
-}
-
 process bgzip_vcf {
-    tag "${sampleName}"
-    
     input:
-    tuple val(sampleName), path(original_vcf)
+    path original_vcf
     
     output:
     path("${original_vcf}.gz"), emit: gzipped_vcf
@@ -105,8 +80,6 @@ process bgzip_vcf {
 }
 
 process index_vcf {
-    tag "${sampleName}"
-    
     input:
     path gzipped_vcf
     
@@ -125,6 +98,7 @@ process exclude_spurious_variants {
     input:
     tuple val(sampleName), path(original_vcf)
     path spurious_variants_vcf
+    path spurious_variants_vcf_tbi
     val label
     
     output:
@@ -143,19 +117,29 @@ process exclude_spurious_variants {
         tabix -p vcf ${original_vcf}
     fi
     
-    # Check and compress spurious variants VCF if needed
-    if [[ ${spurious_variants_vcf} != *.gz ]]; then
-        bgzip -c ${spurious_variants_vcf} > ${spurious_variants_vcf}.gz
-        spurious_variants_vcf=${spurious_variants_vcf}.gz
-    fi
-    
-    # Index spurious variants VCF if needed
-    if [[ ! -f ${spurious_variants_vcf}.tbi ]]; then
-        tabix -p vcf ${spurious_variants_vcf}
-    fi
-    
     # Perform variant exclusion using bcftools isec
     bcftools isec --collapse both --complement --write 1 --output-type z \
         --output ${sampleName}.${label}.curated.vcf.gz ${original_vcf} ${spurious_variants_vcf}
+    """
+}
+
+process summarize_variant_concordance {
+    publishDir "${params.output_dir}/${output_dir ?: ''}", mode: 'copy'
+
+    input:
+    path raw_files
+    path curated_files
+    val output_dir
+
+    output:
+    path("${PREFIX}*"), emit: variant_concordance_summary
+
+    script:
+    PREFIX = curated_files ? "variant_concordance_combined" : "variant_concordance_raw"
+    """
+    summarize-variant-concordance --engine ${params.variant_concordance_engine} \
+        --raw-files ${raw_files.collect().join(' ')} \
+        ${curated_files ? "--curated-files " + curated_files.collect().join(' ') : ""} \
+        --prefix ${PREFIX}
     """
 }

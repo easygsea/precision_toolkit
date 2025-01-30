@@ -1,4 +1,7 @@
 include {
+    generate_fai
+    bgzip_vcf
+    index_vcf
     run_happy as run_happy_initial
     run_happy as run_happy_curated
     run_wittyer
@@ -8,6 +11,7 @@ include {
 } from '../processes/variant_concordance'
 
 // Function to build VCF pair channels
+// This function creates a channel of tuples containing sample name, truth VCF, and query VCF
 def build_vcf_pair_channels(truth_dir, query_dir) {
     return Channel
         .fromPath("${truth_dir}/*.{vcf,vcf.gz}")
@@ -20,6 +24,8 @@ def build_vcf_pair_channels(truth_dir, query_dir) {
         }
 }
 
+// Main variant concordance workflow
+// Handles the complete variant concordance analysis pipeline
 workflow variant_concordance_workflow {
     main:
         // Validate input directories exist
@@ -40,19 +46,20 @@ workflow variant_concordance_workflow {
                 error "genome_ref parameter is required for happy engine"
             }
 
-            // Create genome reference channels
-            genome_ref_channel = Channel.value(params.genome_ref)
-            genome_fai_channel = genome_ref_channel.map { it + '.fai' }
-
-            // Conditionally generate .fai index if it doesn't exist
-            genome_fai_channel = genome_fai_channel.ifEmpty {
-                generate_fai(genome_ref_channel).genome_fai
+            def genome_ref_path = file(params.genome_ref)
+            
+            // Check if .fai index file exists, if not generate it
+            // Using a simple file existence check is more straightforward than creating a channel
+            def genome_fai_path = file("${params.genome_ref}.fai")
+            if (!genome_fai_path.exists()) {
+                genome_fai_path = generate_fai(genome_ref_path).genome_fai
             }
 
+            // Run initial happy analysis
             happy_results = run_happy_initial(
                 vcf_pairs, 
-                genome_ref_channel, 
-                genome_fai_channel, 
+                genome_ref_path, 
+                genome_fai_path, 
                 params.happy_options,
                 params.concordance_dir
             )
@@ -60,33 +67,56 @@ workflow variant_concordance_workflow {
 
             // If spurious_variants_vcf is provided, run the exclude_spurious_variants process
             if (params.spurious_variants_vcf) {
-                // Run exclude_spurious_variants process for each sample
-                // Process truth VCFs to remove spurious variants
-                curated_truth_vcfs = exclude_spurious_variants_truth(
-                    vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, truth_vcf) },
-                    file(params.spurious_variants_vcf),
-                    "truth" 
-                )
+                def spurious_variants_vcf = file(params.spurious_variants_vcf)
                 
-                // Process query VCFs to remove spurious variants
-                curated_query_vcfs = exclude_spurious_variants_query(
-                    vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, query_vcf) },
-                    file(params.spurious_variants_vcf),
+                // Handle gzipped VCF
+                def spurious_variants_vcf_gz = spurious_variants_vcf.toString().endsWith('.gz') ? 
+                    spurious_variants_vcf : file("${params.spurious_variants_vcf}.gz")
+                
+                // Handle .tbi index
+                def spurious_variants_vcf_tbi = file("${spurious_variants_vcf_gz}.tbi")
+                def spurious_variants_vcf_tbi_exists = spurious_variants_vcf.toString().endsWith('.gz') ?
+                    file("${params.spurious_variants_vcf}.tbi").exists() : spurious_variants_vcf_tbi.exists()
+
+                // If input VCF is not gzipped and .gz file doesn't exist, generate it
+                if (!spurious_variants_vcf.toString().endsWith('.gz') && !spurious_variants_vcf_gz.exists()) {
+                    spurious_variants_vcf_gz = bgzip_vcf(spurious_variants_vcf).gzipped_vcf
+                }
+
+                // If .tbi index file doesn't exist, generate it
+                if (!spurious_variants_vcf_tbi_exists) {
+                    spurious_variants_vcf_tbi = index_vcf(spurious_variants_vcf_gz).indexed_vcf
+                }
+
+                // Create channels for truth and query VCFs
+                truth_vcfs = vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, truth_vcf) }
+                query_vcfs = vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, query_vcf) }
+
+                // Run exclude_spurious_variants process for truth and query VCFs
+                curated_truth = exclude_spurious_variants_truth(
+                    truth_vcfs,
+                    spurious_variants_vcf_gz,
+                    spurious_variants_vcf_tbi,
+                    "truth"
+                )
+                curated_query = exclude_spurious_variants_query(
+                    query_vcfs,
+                    spurious_variants_vcf_gz,
+                    spurious_variants_vcf_tbi,
                     "query"
                 )
-            
-                // Pair the curated VCFs
-                curated_vcf_pairs = vcf_pairs
-                    .combine(curated_query_vcfs)
-                    .map { sampleName, truth_vcf, query_vcf, curated_vcf -> 
-                        tuple(sampleName, truth_vcf, curated_vcf) 
+
+                // Combine results while maintaining sample pairing
+                curated_vcf_pairs = curated_truth.join(curated_query)
+                    .map { truth, query ->
+                        tuple(truth[0], truth[1], query[1])
                     }
             
                 // Run happy analysis on the curated VCFs
                 curated_happy_results = run_happy_curated(
                     curated_vcf_pairs,
-                    genome_ref_channel,
-                    genome_fai_channel,
+                    genome_ref_path,
+                    genome_fai_path,
                     params.happy_options,
                     params.concordance_dir
                 )
@@ -95,6 +125,7 @@ workflow variant_concordance_workflow {
                 summary_files_curated = curated_happy_results.happy_summary.collect()
             }
         } else if (params.variant_concordance_engine == "wittyer") {
+            // Run wittyer analysis
             wittyer_results = run_wittyer(
                 vcf_pairs, 
                 params.wittyer_options,
