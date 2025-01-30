@@ -2,12 +2,12 @@ include {
     generate_fai
     bgzip_vcf
     index_vcf
+    exclude_spurious_variants as exclude_spurious_variants_truth
+    exclude_spurious_variants as exclude_spurious_variants_query
     run_happy as run_happy_initial
     run_happy as run_happy_curated
     run_wittyer
     summarize_variant_concordance
-    exclude_spurious_variants as exclude_spurious_variants_truth
-    exclude_spurious_variants as exclude_spurious_variants_query
 } from '../processes/variant_concordance'
 
 // Function to build VCF pair channels

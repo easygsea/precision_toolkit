@@ -13,6 +13,37 @@ process generate_fai {
     """
 }
 
+process exclude_spurious_variants {
+    tag "${sampleName}"
+    
+    input:
+    tuple val(sampleName), path(original_vcf)
+    path spurious_variants_vcf
+    path spurious_variants_vcf_tbi
+    val label
+    
+    output:
+    path("${sampleName}.${label}.curated.vcf.gz"), emit: curated_vcf
+
+    script:
+    """
+    # Check and compress original VCF if needed
+    if [[ ${original_vcf} != *.gz ]]; then
+        bgzip -c ${original_vcf} > ${original_vcf}.gz
+        original_vcf=${original_vcf}.gz
+    fi
+    
+    # Index original VCF if needed
+    if [[ ! -f ${original_vcf}.tbi ]]; then
+        tabix -p vcf ${original_vcf}
+    fi
+    
+    # Perform variant exclusion using bcftools isec
+    bcftools isec --collapse both --complement --write 1 --output-type z \
+        --output ${sampleName}.${label}.curated.vcf.gz ${original_vcf} ${spurious_variants_vcf}
+    """
+}
+
 process run_happy {
     label "dynamic_resource"
     tag "${sampleName}"
@@ -89,37 +120,6 @@ process index_vcf {
     script:
     """
     tabix -p vcf ${gzipped_vcf}
-    """
-}
-
-process exclude_spurious_variants {
-    tag "${sampleName}"
-    
-    input:
-    tuple val(sampleName), path(original_vcf)
-    path spurious_variants_vcf
-    path spurious_variants_vcf_tbi
-    val label
-    
-    output:
-    path("${sampleName}.${label}.curated.vcf.gz"), emit: curated_vcf
-
-    script:
-    """
-    # Check and compress original VCF if needed
-    if [[ ${original_vcf} != *.gz ]]; then
-        bgzip -c ${original_vcf} > ${original_vcf}.gz
-        original_vcf=${original_vcf}.gz
-    fi
-    
-    # Index original VCF if needed
-    if [[ ! -f ${original_vcf}.tbi ]]; then
-        tabix -p vcf ${original_vcf}
-    fi
-    
-    # Perform variant exclusion using bcftools isec
-    bcftools isec --collapse both --complement --write 1 --output-type z \
-        --output ${sampleName}.${label}.curated.vcf.gz ${original_vcf} ${spurious_variants_vcf}
     """
 }
 
