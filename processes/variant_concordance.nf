@@ -114,6 +114,7 @@ process run_wittyer {
     tuple val(sampleName), path(truth_vcf), path(query_vcf)
     val wittyer_options
     val output_dir
+    val label
 
     output:
     path("*/*Wittyer.Stats.json"), emit: wittyer_summary
@@ -121,7 +122,7 @@ process run_wittyer {
 
     script:
     """
-    witty.er -i ${query_vcf} -t ${truth_vcf} -o ${sampleName} ${wittyer_options}
+    witty.er -i ${query_vcf} -t ${truth_vcf} -o ${sampleName}.${label} ${wittyer_options}
     """
 }
 
