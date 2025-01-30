@@ -43,7 +43,7 @@ def helpMessage() {
             --variant_concordance_engine happy \\
             --output_dir output_clinical_tools
 
-        # Run concordance with spurious variant exclusion
+        # Run concordance workflow with spurious variant exclusion
         nextflow run clinical_tools.nf --workflows concordance \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/ \\
