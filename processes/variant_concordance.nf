@@ -121,8 +121,10 @@ process run_wittyer {
     path("${sampleName}*"), emit: wittyer_outputs
 
     script:
+    PREFIX = "${sampleName}.${label}"
     """
-    witty.er -i ${query_vcf} -t ${truth_vcf} -o ${sampleName}.${label} ${wittyer_options}
+    witty.er -i ${query_vcf} -t ${truth_vcf} -o ${PREFIX} ${wittyer_options}
+    mv ${PREFIX}/Wittyer.Stats.json ${PREFIX}/${PREFIX}.Wittyer.Stats.json
     """
 }
 

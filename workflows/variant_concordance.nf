@@ -109,7 +109,7 @@ workflow variant_concordance_workflow {
                 genome_ref_path, 
                 genome_fai_path, 
                 params.happy_options,
-                params.concordance_dir,
+                "${params.concordance_dir}/raw",
                 "raw"
             )
             summary_files = happy_results.happy_summary.collect()
@@ -131,25 +131,11 @@ workflow variant_concordance_workflow {
             wittyer_results = run_wittyer_raw(
                 vcf_pairs, 
                 params.wittyer_options,
-                params.concordance_dir,
+                "${params.concordance_dir}/raw",
                 "raw"
             )
-            summary_files = wittyer_results.wittyer_summary
-                // Prefix output with sampleName due to conflicting Wittyer.Stats.json links
-                .map { stats_file ->
-                    // Extract sample name
-                    def taskDir = stats_file.getParent()
-                    def sampleName = taskDir.getBaseName()
-
-                    // Create new file name with sample
-                    def newName = "${sampleName}.Wittyer.Stats.json"
-                    def newFile = file("${taskDir}/${newName}")
-
-                    // Rename and return
-                    stats_file.renameTo(newFile)
-                    return newFile
-                }
-                .collect()
+            // Collect result files with full paths to ensure unique identification
+            summary_files = wittyer_results.wittyer_summary.collect()
             // If spurious variants VCF is provided, run wittyer on curated VCFs
             if (params.spurious_variants_vcf) {
                 curated_wittyer_results = run_wittyer_curated(
@@ -158,7 +144,7 @@ workflow variant_concordance_workflow {
                     "${params.concordance_dir}/curated",
                     "curated"
                 )
-                summary_files_curated = curated_wittyer_results.wittyer_summary
+                summary_files_curated = curated_wittyer_results.wittyer_summary.collect()
             }
         }
 
