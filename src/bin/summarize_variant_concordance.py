@@ -46,8 +46,10 @@ def main():
 
     args = parser.parse_args()
 
-    # Define output prefix
-    output_prefix = f"{args.prefix}_{args.engine}"
+    # Determine output prefix suffix based on presence of curated files
+    # Use "combined" suffix if curated files exist, otherwise use "raw"
+    suffix = "combined" if args.curated_files else "raw"
+    output_prefix = f"{args.prefix}_{args.engine}_{suffix}"
 
     # Process raw variant concordance results
     raw_concordance_results = process_variant_metrics(

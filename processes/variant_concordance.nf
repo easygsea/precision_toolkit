@@ -138,7 +138,7 @@ process summarize_variant_concordance {
     path("${PREFIX}*"), emit: variant_concordance_summary
 
     script:
-    PREFIX = (curated_files != "") ? "variant_concordance_combined" : "variant_concordance_raw"
+    PREFIX = "variant_concordance"
     """
     summarize-variant-concordance --engine ${params.variant_concordance_engine} \
         --raw-files ${raw_files.collect().join(' ')} \
