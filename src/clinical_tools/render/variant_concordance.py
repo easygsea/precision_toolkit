@@ -1,10 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from clinical_tools.core.format import format_percentage
-from clinical_tools.core.helpers import (
-    convert_to_list_if_single_instance,
-    assemble_exports,
-)
+from clinical_tools.core.helpers import assemble_exports
 from clinical_tools.core.writers.csv import pandas_to_csv
 from clinical_tools.core.writers.markdown import populate_markdown, save_markdown
 from clinical_tools.core.writers.word import (
