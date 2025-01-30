@@ -98,19 +98,16 @@ workflow variant_concordance_workflow {
                     spurious_variants_vcf_gz,
                     spurious_variants_vcf_tbi,
                     "truth"
-                )
+                ).curated_vcf
                 curated_query = exclude_spurious_variants_query(
                     query_vcfs,
                     spurious_variants_vcf_gz,
                     spurious_variants_vcf_tbi,
                     "query"
-                )
+                ).curated_vcf
 
                 // Combine results while maintaining sample pairing
                 curated_vcf_pairs = curated_truth.join(curated_query)
-                    .map { truth, query ->
-                        tuple(truth[0], truth[1], query[1])
-                    }
             
                 // Run happy analysis on the curated VCFs
                 curated_happy_results = run_happy_curated(

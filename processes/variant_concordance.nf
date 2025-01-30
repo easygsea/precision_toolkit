@@ -23,7 +23,7 @@ process exclude_spurious_variants {
     val label
     
     output:
-    path("${sampleName}.${label}.curated.vcf.gz"), emit: curated_vcf
+    tuple val(sampleName), path("${sampleName}.${label}.curated.vcf.gz"), emit: curated_vcf
 
     script:
     """
