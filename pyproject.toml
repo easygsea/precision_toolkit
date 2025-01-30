@@ -2,7 +2,7 @@
 name = "clinical-tools"
 version = "0.1.0"
 description = "An integrated toolset to support clinical validation"
-authors = ["Canada's Michael Smith Genome Sciences Centre"]
+authors = ["Canada's Michael Smith Genome Sciences Centre - Precision Informatics"]
 readme = "README.md"
 packages = [
     { include = "clinical_tools", from = "src" },

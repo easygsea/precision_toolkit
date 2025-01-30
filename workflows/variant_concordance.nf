@@ -26,7 +26,6 @@ def build_vcf_pair_channels(truth_dir, query_dir) {
 }
 
 // Main variant concordance workflow
-// Handles the complete variant concordance analysis pipeline
 workflow variant_concordance_workflow {
     main:
         // Validate input directories exist
