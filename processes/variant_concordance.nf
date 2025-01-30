@@ -47,7 +47,8 @@ process exclude_spurious_variants {
     path spurious_variants_vcf
     path spurious_variants_vcf_tbi
     val label
-    
+    val collapse // collapse option for bcftools isec
+
     output:
     tuple val(sampleName), path("${sampleName}.${label}.curated.vcf.gz"), emit: curated_vcf
 
@@ -65,7 +66,7 @@ process exclude_spurious_variants {
     fi
     
     # Perform variant exclusion using bcftools isec
-    bcftools isec --collapse both --complement --write 1 --output-type z \
+    bcftools isec --collapse ${collapse} --complement --write 1 --output-type z \
         --output ${sampleName}.${label}.curated.vcf.gz ${original_vcf} ${spurious_variants_vcf}
     """
 }

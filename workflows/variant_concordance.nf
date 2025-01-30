@@ -97,13 +97,15 @@ workflow variant_concordance_workflow {
                     truth_vcfs,
                     spurious_variants_vcf_gz,
                     spurious_variants_vcf_tbi,
-                    "truth"
+                    "truth",
+                    params.collapse
                 ).curated_vcf
                 curated_query = exclude_spurious_variants_query(
                     query_vcfs,
                     spurious_variants_vcf_gz,
                     spurious_variants_vcf_tbi,
-                    "query"
+                    "query",
+                    params.collapse
                 ).curated_vcf
 
                 // Combine results while maintaining sample pairing

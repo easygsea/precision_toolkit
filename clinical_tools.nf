@@ -30,7 +30,7 @@ def helpMessage() {
             --happy_options         Additional options for hap.py
             --wittyer_options       Additional options for witty.er
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
-            --force                 Overwrite existing output directory
+            --collapse              Collapse option for bcftools isec (default: both)
 
     General Options:
         --help          Show this help message
@@ -49,6 +49,7 @@ def helpMessage() {
             --query_dir query_vcfs/ \\
             --variant_concordance_engine happy \\
             --spurious_variants_vcf spurious_variants.vcf.gz \\
+            --collapse both \\
             --output_dir output_clinical_tools
 
         # Run multiple workflows
