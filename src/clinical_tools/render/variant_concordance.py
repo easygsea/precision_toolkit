@@ -1,7 +1,10 @@
 import pandas as pd
 from pathlib import Path
 from clinical_tools.core.format import format_percentage
-from clinical_tools.core.helpers import convert_to_list_if_single_instance
+from clinical_tools.core.helpers import (
+    convert_to_list_if_single_instance,
+    assemble_exports,
+)
 from clinical_tools.core.writers.csv import pandas_to_csv
 from clinical_tools.core.writers.markdown import populate_markdown, save_markdown
 from clinical_tools.core.writers.word import (
@@ -74,36 +77,6 @@ def export_concordance_to_csv(df: pd.DataFrame, output_file: str | Path) -> None
     pandas_to_csv(df, output_file)
 
 
-def _process_concordance_inputs(
-    dfs: list[pd.DataFrame] | pd.DataFrame,
-    headings: list[str] | str | None,
-    summaries: list[str] | str | None
-) -> tuple[list[pd.DataFrame], list[str] | None, list[str] | None]:
-    """Process common inputs for concordance export functions.
-
-    Args:
-        dfs: Single DataFrame or list of DataFrames to export
-        headings: Optional heading(s) to add to the file
-        summaries: Optional summary(s) to add before the table(s)
-
-    Returns:
-        Tuple of (processed DataFrames, processed headings, processed summaries)
-    """
-    
-    # Convert single instances to lists for consistent processing
-    dfs = convert_to_list_if_single_instance(dfs, pd.DataFrame)
-    headings = convert_to_list_if_single_instance(headings, str)
-    summaries = convert_to_list_if_single_instance(summaries, str)
-    
-    # Ensure headings and summaries match the number of DataFrames
-    if headings is not None and len(headings) != len(dfs):
-        raise ValueError("Number of headings must match number of DataFrames")
-    if summaries is not None and len(summaries) != len(dfs):
-        raise ValueError("Number of summaries must match number of DataFrames")
-    
-    return dfs, headings, summaries
-
-
 def export_concordance_to_markdown(
     dfs: list[pd.DataFrame] | pd.DataFrame,
     output_file: str | Path,
@@ -120,7 +93,7 @@ def export_concordance_to_markdown(
         summaries: Optional summary(s) to add before the table(s). If multiple DataFrames,
             should be a list of summaries matching the number of DataFrames.
     """
-    dfs, headings, summaries = _process_concordance_inputs(dfs, headings, summaries)
+    dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
     
     # Process each DataFrame and collect markdown content
     all_content = []
@@ -152,7 +125,7 @@ def export_concordance_to_word(
         summaries: Optional summary(s) to add before the table(s). If multiple DataFrames,
             should be a list of summaries matching the number of DataFrames.
     """
-    dfs, headings, summaries = _process_concordance_inputs(dfs, headings, summaries)
+    dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
     
     # Initiate Word document
     doc = initiate_word_document()
