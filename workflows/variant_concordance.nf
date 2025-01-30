@@ -102,7 +102,7 @@ workflow variant_concordance_workflow {
                 genome_fai_path = generate_fai(genome_ref_path).genome_fai
             }
 
-            // Run initial happy analysis
+            // Run raw happy analysis
             happy_results = run_happy_raw(
                 vcf_pairs, 
                 genome_ref_path, 
@@ -126,14 +126,13 @@ workflow variant_concordance_workflow {
                 summary_files_curated = curated_happy_results.happy_summary.collect()
             }
         } else if (params.variant_concordance_engine == "wittyer") {
-            // Run wittyer analysis
+            // Run raw wittyer analysis
             wittyer_results = run_wittyer_raw(
                 vcf_pairs, 
                 params.wittyer_options,
                 "${params.concordance_dir}/raw",
                 "raw"
             )
-            // Collect result files with full paths to ensure unique identification
             summary_files = wittyer_results.wittyer_summary.collect()
             // If spurious variants VCF is provided, run wittyer on curated VCFs
             if (params.spurious_variants_vcf) {
