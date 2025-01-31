@@ -1,6 +1,6 @@
 import pandas as pd
 
-def convert_to_list_if_single_instance(value, expected_type):
+def convert_to_list_if_single_instance(value: Any, expected_type: type) -> List[Any] | Any | None:
     """Convert single instances to lists while preserving None and existing lists.
     
     Ensures consistent handling of inputs that can be either single values or lists
