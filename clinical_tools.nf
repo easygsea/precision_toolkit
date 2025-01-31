@@ -25,15 +25,12 @@ def helpMessage() {
 
         Optional:
             --genome_ref             Reference genome FASTA (required for happy)
-            --output_dir              Base output directory (default: output_clinical_tools)
-            --concordance_dir         Subdirectory for concordance results (default: concordance)
-            --happy_options         Additional options for hap.py
-            --wittyer_options       Additional options for witty.er
+            --output_dir             Base output directory (default: output_clinical_tools)
+            --concordance_dir        Subdirectory for concordance results (default: concordance)
+            --happy_options          Additional options for hap.py
+            --wittyer_options        Additional options for witty.er
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
-            --collapse              Collapse option for bcftools isec (default: both)
-
-    General Options:
-        --help          Show this help message
+            --collapse               Collapse option for bcftools isec (default: 'both' for happy, 'id' for wittyer)
 
     Examples:
         # Run concordance workflow
