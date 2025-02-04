@@ -1,10 +1,18 @@
 include {
-    run_happy
-    run_wittyer
+    generate_fai
+    bgzip_vcf
+    index_vcf
+    exclude_spurious_variants as exclude_spurious_variants_truth
+    exclude_spurious_variants as exclude_spurious_variants_query
+    run_happy as run_happy_raw
+    run_happy as run_happy_curated
+    run_wittyer as run_wittyer_raw
+    run_wittyer as run_wittyer_curated
     summarize_variant_concordance
 } from '../processes/variant_concordance'
 
 // Function to build VCF pair channels
+// This function creates a channel of tuples containing sample name, truth VCF, and query VCF
 def build_vcf_pair_channels(truth_dir, query_dir) {
     return Channel
         .fromPath("${truth_dir}/*.{vcf,vcf.gz}")
@@ -17,6 +25,7 @@ def build_vcf_pair_channels(truth_dir, query_dir) {
         }
 }
 
+// Main variant concordance workflow
 workflow variant_concordance_workflow {
     main:
         // Validate input directories exist
@@ -30,6 +39,54 @@ workflow variant_concordance_workflow {
         // Create VCF pair channels
         vcf_pairs = build_vcf_pair_channels(params.truth_dir, params.query_dir)
 
+        // Handle spurious variants VCF if provided
+        def summary_files_curated = null
+        if (params.spurious_variants_vcf) {
+            def spurious_variants_vcf = file(params.spurious_variants_vcf)
+            
+            // Handle gzipped VCF
+            def spurious_variants_vcf_gz = spurious_variants_vcf.toString().endsWith('.gz') ? 
+                spurious_variants_vcf : file("${params.spurious_variants_vcf}.gz")
+            
+            // Handle .tbi index
+            def spurious_variants_vcf_tbi = file("${spurious_variants_vcf_gz}.tbi")
+            def spurious_variants_vcf_tbi_exists = spurious_variants_vcf.toString().endsWith('.gz') ?
+                file("${params.spurious_variants_vcf}.tbi").exists() : spurious_variants_vcf_tbi.exists()
+
+            // If input VCF is not gzipped and .gz file doesn't exist, generate it
+            if (!spurious_variants_vcf.toString().endsWith('.gz') && !spurious_variants_vcf_gz.exists()) {
+                spurious_variants_vcf_gz = bgzip_vcf(spurious_variants_vcf).gzipped_vcf
+            }
+
+            // If .tbi index file doesn't exist, generate it
+            if (!spurious_variants_vcf_tbi_exists) {
+                spurious_variants_vcf_tbi = index_vcf(spurious_variants_vcf_gz).indexed_vcf
+            }
+
+            // Create channels for truth and query VCFs
+            truth_vcfs = vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, truth_vcf) }
+            query_vcfs = vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, query_vcf) }
+
+            // Run exclude_spurious_variants process for truth and query VCFs
+            curated_truth = exclude_spurious_variants_truth(
+                truth_vcfs,
+                spurious_variants_vcf_gz,
+                spurious_variants_vcf_tbi,
+                "truth",
+                params.collapse
+            ).curated_vcf
+            curated_query = exclude_spurious_variants_query(
+                query_vcfs,
+                spurious_variants_vcf_gz,
+                spurious_variants_vcf_tbi,
+                "query",
+                params.collapse
+            ).curated_vcf
+
+            // Combine results while maintaining sample pairing
+            curated_vcf_pairs = curated_truth.join(curated_query)
+        }
+
         // Conditionally run processes based on the selected engine
         if (params.variant_concordance_engine == "happy") {
             // Validate genome_ref for happy
@@ -37,49 +94,62 @@ workflow variant_concordance_workflow {
                 error "genome_ref parameter is required for happy engine"
             }
 
-            // Create genome reference channels
-            genome_ref_channel = Channel.value(params.genome_ref)
-            genome_fai_channel = genome_ref_channel.map { it + '.fai' }
-
-            // Conditionally generate .fai index if it doesn't exist
-            genome_fai_channel = genome_fai_channel.ifEmpty {
-                generate_fai(genome_ref_channel).genome_fai
+            def genome_ref_path = file(params.genome_ref)
+            
+            // Check if .fai index file exists, if not generate it
+            def genome_fai_path = file("${params.genome_ref}.fai")
+            if (!genome_fai_path.exists()) {
+                genome_fai_path = generate_fai(genome_ref_path).genome_fai
             }
 
-            happy_results = run_happy(
+            // Run raw happy analysis
+            happy_results = run_happy_raw(
                 vcf_pairs, 
-                genome_ref_channel, 
-                genome_fai_channel, 
+                genome_ref_path, 
+                genome_fai_path, 
                 params.happy_options,
-                params.concordance_dir
+                "${params.concordance_dir}/raw",
+                "raw"
             )
             summary_files = happy_results.happy_summary.collect()
+
+            // If spurious variants VCF is provided, run happy on curated VCFs
+            if (params.spurious_variants_vcf) {
+                curated_happy_results = run_happy_curated(
+                    curated_vcf_pairs,
+                    genome_ref_path,
+                    genome_fai_path,
+                    params.happy_options,
+                    "${params.concordance_dir}/curated",
+                    "curated"
+                )
+                summary_files_curated = curated_happy_results.happy_summary.collect()
+            }
         } else if (params.variant_concordance_engine == "wittyer") {
-            wittyer_results = run_wittyer(
+            // Run raw wittyer analysis
+            wittyer_results = run_wittyer_raw(
                 vcf_pairs, 
                 params.wittyer_options,
-                params.concordance_dir
+                "${params.concordance_dir}/raw",
+                "raw"
             )
-            summary_files = wittyer_results.wittyer_summary
-                // Prefix output with sampleName due to conflicting Wittyer.Stats.json links
-                .map { stats_file ->
-                    // Extract sample name
-                    def taskDir = stats_file.getParent()
-                    def sampleName = taskDir.getBaseName()
-
-                    // Create new file name with sample
-                    def newName = "${sampleName}.Wittyer.Stats.json"
-                    def newFile = file("${taskDir}/${newName}")
-
-                    // Rename and return
-                    stats_file.renameTo(newFile)
-                    return newFile
-                }
-                .collect()
+            summary_files = wittyer_results.wittyer_summary.collect()
+            // If spurious variants VCF is provided, run wittyer on curated VCFs
+            if (params.spurious_variants_vcf) {
+                curated_wittyer_results = run_wittyer_curated(
+                    curated_vcf_pairs,
+                    params.wittyer_options,
+                    "${params.concordance_dir}/curated",
+                    "curated"
+                )
+                summary_files_curated = curated_wittyer_results.wittyer_summary.collect()
+            }
         }
 
+        // Process variant concordance results based on whether curated files exist
         summarize_variant_concordance(
-            summary_files, 
+            summary_files,         // raw files
+            summary_files_curated ?: "", // curated files or empty string
             params.concordance_dir
         )
 
