@@ -1,6 +1,6 @@
 import pandas as pd
 
-def convert_to_list_if_single_instance(value: Any, expected_type: type) -> List[Any] | Any | None:
+def convert_to_list_if_single_instance(value, expected_type: type) -> list | None:
     """Convert single instances to lists while preserving None and existing lists.
     
     Ensures consistent handling of inputs that can be either single values or lists
@@ -41,7 +41,7 @@ def assemble_exports(
     headings = convert_to_list_if_single_instance(headings, str)
     summaries = convert_to_list_if_single_instance(summaries, str)
     
-    # Ensure headings and summaries match the number of DataFrames
+    # Validate that headings and summaries match the number of DataFrames
     if headings is not None and len(headings) != len(dfs):
         raise ValueError("Number of headings must match number of DataFrames")
     if summaries is not None and len(summaries) != len(dfs):
