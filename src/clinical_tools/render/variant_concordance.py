@@ -24,7 +24,7 @@ def generate_concordance_table(
             false_positive, concordance, ci_lower, ci_upper)
 
     Returns:
-        DataFrame summarizing variant concordance
+        DataFrame summarizing variant concordance, sorted by Variant Type then Variant Filter
     """
     data = [
         {
@@ -46,7 +46,8 @@ def generate_concordance_table(
             ci_upper,
         ) in results.items()
     ]
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
+    return df.sort_values(by=["Variant Type", "Variant Filter"])
 
 
 def format_concordance_table(df: pd.DataFrame) -> pd.DataFrame:
