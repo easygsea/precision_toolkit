@@ -149,7 +149,7 @@ workflow variant_concordance_workflow {
         // Process variant concordance results based on whether curated files exist
         summarize_variant_concordance(
             summary_files,         // raw files
-            summary_files_curated ?: "", // curated files or empty string
+            summary_files_curated ?: [], // curated files or empty list
             params.concordance_dir
         )
 
