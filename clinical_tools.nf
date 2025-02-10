@@ -31,6 +31,7 @@ def helpMessage() {
             --wittyer_options        Additional options for witty.er
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
             --collapse               Collapse option for bcftools isec (default: 'both' for happy, 'id' for wittyer)
+            --skip_raw               Skip raw analysis (only available when spurious_variants_vcf is provided)
 
     Examples:
         # Run concordance workflow

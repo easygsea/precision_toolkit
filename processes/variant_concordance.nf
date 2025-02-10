@@ -143,7 +143,7 @@ process summarize_variant_concordance {
     PREFIX = "variant_concordance"
     """
     summarize-variant-concordance --engine ${params.variant_concordance_engine} \
-        --raw-files ${raw_concordance_outputs.collect().join(' ')} \
+        ${(raw_concordance_outputs != []) ? "--raw-files " + raw_concordance_outputs.collect().join(' ') : ""} \
         ${(curated_concordance_outputs != []) ? "--curated-files " + curated_concordance_outputs.collect().join(' ') : ""} \
         --prefix ${PREFIX}
     """

@@ -109,6 +109,11 @@ workflow variant_concordance_workflow {
         if (!file(params.truth_dir).exists()) error "Truth directory not found: ${params.truth_dir}"
         if (!file(params.query_dir).exists()) error "Query directory not found: ${params.query_dir}"
 
+        // Validate skip_raw parameter
+        if (params.skip_raw && !params.spurious_variants_vcf) {
+            error "skip_raw parameter can only be used when spurious_variants_vcf is provided"
+        }
+
         // Create VCF pair channels
         def vcf_pairs = build_vcf_pair_channels(params.truth_dir, params.query_dir)
 
@@ -137,15 +142,17 @@ workflow variant_concordance_workflow {
                 genome_fai_path = generate_fai(genome_ref_path).genome_fai
             }
 
-            // Run raw happy analysis
-            summary_files = run_happy_analysis(
-                vcf_pairs,
-                genome_ref_path,
-                genome_fai_path,
-                params.happy_options,
-                "${params.concordance_dir}/raw",
-                "raw"
-            )
+            // Only run raw analysis if skip_raw is false
+            if (!params.skip_raw) {
+                summary_files = run_happy_analysis(
+                    vcf_pairs,
+                    genome_ref_path,
+                    genome_fai_path,
+                    params.happy_options,
+                    "${params.concordance_dir}/raw",
+                    "raw"
+                )
+            }
 
             // If spurious variants VCF is provided, run happy on curated VCFs
             if (params.spurious_variants_vcf) {
@@ -159,13 +166,15 @@ workflow variant_concordance_workflow {
                 )
             }
         } else if (params.variant_concordance_engine == "wittyer") {
-            // Run raw wittyer analysis
-            summary_files = run_wittyer_analysis(
-                vcf_pairs,
-                params.wittyer_options,
-                "${params.concordance_dir}/raw",
-                "raw"
-            )
+            // Only run raw analysis if skip_raw is false
+            if (!params.skip_raw) {
+                summary_files = run_wittyer_analysis(
+                    vcf_pairs,
+                    params.wittyer_options,
+                    "${params.concordance_dir}/raw",
+                    "raw"
+                )
+            }
 
             // If spurious variants VCF is provided, run wittyer on curated VCFs
             if (params.spurious_variants_vcf) {

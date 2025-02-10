@@ -28,7 +28,6 @@ def main():
         "-f",
         "--raw-files",
         nargs="+",
-        required=True,
         help="List of raw engine output files to process."
     )
     parser.add_argument(
@@ -46,25 +45,39 @@ def main():
 
     args = parser.parse_args()
 
-    # Determine output prefix suffix based on presence of curated files
-    # Use "combined" suffix if curated files exist, otherwise use "raw"
-    suffix = "combined" if args.curated_files else "raw"
+    # Validate that at least one of raw-files or curated-files is provided
+    if not args.raw_files and not args.curated_files:
+        parser.error("At least one of --raw-files or --curated-files must be provided")
+
+    # Determine output prefix suffix based on provided files
+    if args.raw_files and args.curated_files:
+        suffix = "combined"
+    elif args.raw_files:
+        suffix = "raw"
+    else:
+        suffix = "curated"
     output_prefix = f"{args.prefix}_{args.engine}_{suffix}"
 
-    # Process raw variant concordance results
-    raw_concordance_results = process_variant_metrics(
-        file_paths=args.raw_files, data_type=args.engine
-    )
-    raw_concordance_table = generate_concordance_table(raw_concordance_results)
-    
-    # Export raw results to CSV
-    raw_csv_output = f"{args.prefix}_{args.engine}_raw.csv"
-    export_concordance_to_csv(raw_concordance_table, raw_csv_output)
+    # Initialize tables, headings and summaries
+    tables = []
+    headings = []
+    summaries = []
 
-    # Initialize combined tables with raw results
-    tables = [raw_concordance_table]
-    headings = ["Raw Variant Concordance"]
-    summaries = ["This table summarizes the raw concordance of variant calls."]
+    # Process raw variant concordance results if provided
+    if args.raw_files:
+        raw_concordance_results = process_variant_metrics(
+            file_paths=args.raw_files, data_type=args.engine
+        )
+        raw_concordance_table = generate_concordance_table(raw_concordance_results)
+        
+        # Export raw results to CSV
+        raw_csv_output = f"{args.prefix}_{args.engine}_raw.csv"
+        export_concordance_to_csv(raw_concordance_table, raw_csv_output)
+        
+        # Add raw results to tables
+        tables.append(raw_concordance_table)
+        headings.append("Raw Variant Concordance")
+        summaries.append("This table summarizes the raw concordance of variant calls.")
 
     # Process curated results if provided
     if args.curated_files:
@@ -77,12 +90,12 @@ def main():
         curated_csv_output = f"{args.prefix}_{args.engine}_curated.csv"
         export_concordance_to_csv(curated_concordance_table, curated_csv_output)
         
-        # Add curated results to combined tables
+        # Add curated results to tables
         tables.append(curated_concordance_table)
         headings.append("Curated Variant Concordance")
         summaries.append("This table summarizes the concordance of curated variant calls.")
 
-    # Export combined results to markdown and word formats
+    # Export results to markdown and word formats
     export_concordance_to_markdown(
         tables,
         f"{output_prefix}.md",
