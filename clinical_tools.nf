@@ -103,11 +103,20 @@ def helpMessage() {
     ====================
     <output_dir>/
     └── <concordance_dir>/
-        ├── happy/          # hap.py results if using happy engine
-        ├── wittyer/        # witty.er results if using wittyer engine
-        ├── variant_concordance_combined.csv  # Combined raw/curated concordance in CSV
-        ├── variant_concordance_combined.md   # Combined raw/curated concordance in Markdown
-        └── variant_concordance_combined.docx # Combined raw/curated concordance in Word
+        ├── raw/            # Raw engine reports
+        │   ├── happy/      # hap.py raw reports if using happy engine
+        │   └── wittyer/    # witty.er raw reports if using wittyer engine
+        │       ├── sample1/
+        │       └── sample2/
+        ├── curated/        # Curated engine reports (after spurious variant filtering)
+        │   ├── happy/      # hap.py curated reports if using happy engine
+        │   └── wittyer/    # witty.er curated reports if using wittyer engine
+        │       ├── sample1/
+        │       └── sample2/
+        ├── variant_concordance_happy_raw.csv       # Raw concordance in CSV
+        ├── variant_concordance_happy_curated.csv   # Curated concordance in CSV
+        ├── variant_concordance_happy_combined.md   # Combined raw/curated concordance in Markdown
+        └── variant_concordance_happy_combined.docx # Combined raw/curated concordance in Word
     """.stripIndent()
 }
 
