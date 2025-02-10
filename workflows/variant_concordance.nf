@@ -25,19 +25,20 @@ def build_vcf_pair_channels(truth_dir, query_dir) {
 }
 
 // Function to handle spurious variants processing
-def process_spurious_variants(vcf_pairs, spurious_variants_vcf, collapse) {
-    def spurious_variants_vcf_gz = spurious_variants_vcf.toString().endsWith('.gz') ? 
-        file(spurious_variants_vcf) : file("${spurious_variants_vcf}.gz")
+def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
+    def spurious_variants_vcf = file(spurious_variants_vcf_path)
+    if (!spurious_variants_vcf.exists()) error "Input file not found, please check: ${spurious_variants_vcf}"
     
-    def spurious_variants_vcf_tbi = file("${spurious_variants_vcf_gz}.tbi")
-    def spurious_variants_vcf_tbi_exists = spurious_variants_vcf.toString().endsWith('.gz') ?
-        file("${spurious_variants_vcf}.tbi").exists() : spurious_variants_vcf_tbi.exists()
-
-    if (!spurious_variants_vcf.toString().endsWith('.gz') && !spurious_variants_vcf_gz.exists()) {
-        spurious_variants_vcf_gz = bgzip_vcf(spurious_variants_vcf).gzipped_vcf
+    // Check and compress VCF
+    def spurious_variants_vcf_gz = spurious_variants_vcf.toString().endsWith('.gz') ? 
+        spurious_variants_vcf : file("${spurious_variants_vcf}.gz")
+    if (!spurious_variants_vcf_gz.exists()) {
+        spurious_variants_vcf_gz = bgzip_vcf(file(spurious_variants_vcf)).gzipped_vcf
     }
 
-    if (!spurious_variants_vcf_tbi_exists) {
+    // Check and index VCF
+    def spurious_variants_vcf_tbi = file("${spurious_variants_vcf_gz}.tbi")
+    if (!spurious_variants_vcf_tbi.exists()) {
         spurious_variants_vcf_tbi = index_vcf(spurious_variants_vcf_gz).indexed_vcf
     }
 
