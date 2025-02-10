@@ -31,11 +31,8 @@ WORKDIR /app
 # Configure poetry to not create a virtual environment
 RUN poetry config virtualenvs.create false
 
-# Install package dependencies
+# Copy application files
 COPY README.md pyproject.toml poetry.lock ./
-RUN poetry install --only main --no-root --no-ansi
-
-# Copy the rest of the application code
 COPY src/ /app/src/
 
 # Build the project
