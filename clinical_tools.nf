@@ -10,20 +10,30 @@ def helpMessage() {
     Clinical Validation Tools v${workflow.manifest.version}
     =========================================
 
-    Usage:
+    ====================
+    Quick Start Guide
+    ====================
+    
+    Basic Usage:
         nextflow run clinical_tools.nf --workflows <workflow1,workflow2,...> [options]
-
+    
+    ====================
+    Workflow Overview
+    ====================
     Available Workflows:
         concordance    Run variant concordance analysis
         (more workflows to come...)
-
-    Concordance Workflow Arguments:
-        Mandatory:
+    
+    ====================
+    Detailed Usage
+    ====================
+    Concordance Workflow:
+        Mandatory Parameters:
             --truth_dir   Directory containing truth VCF files
             --query_dir   Directory containing query VCF files
             --variant_concordance_engine  Analysis engine: 'happy' or 'wittyer' (default: happy)
-
-        Optional:
+        
+        Optional Parameters:
             --genome_ref             Reference genome FASTA (required for happy)
             --output_dir             Base output directory (default: output_clinical_tools)
             --concordance_dir        Subdirectory for concordance results (default: concordance)
@@ -32,16 +42,31 @@ def helpMessage() {
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
             --collapse               Collapse option for bcftools isec (default: 'both' for happy, 'id' for wittyer)
             --skip_raw               Skip raw analysis (only available when spurious_variants_vcf is provided)
-
-    Examples:
-        # Run concordance workflow
+    
+    ====================
+    Resource Management
+    ====================
+    Resource Adjustment:
+        --max_cpus <num_cpus>               # Maximum CPUs per task (default: 16)
+        --max_memory <memory_size>          # Maximum memory per task (default: 64.GB)
+    
+    SLURM Execution:
+        --profile slurm                     # Enable SLURM execution
+        --slurm_account <your_account>      # Your SLURM account name (required)
+        --slurm_partition <partition_name>  # SLURM partition to use (default: general)
+        --slurm_queue <queue_name>          # SLURM queue to use (default: general)
+    
+    ====================
+    Example Commands
+    ====================
+    Basic Concordance:
         nextflow run clinical_tools.nf --workflows concordance \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/ \\
             --variant_concordance_engine happy \\
             --output_dir output_clinical_tools
-
-        # Run concordance workflow with spurious variant exclusion
+    
+    Concordance with Spurious Variant Exclusion:
         nextflow run clinical_tools.nf --workflows concordance \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/ \\
@@ -49,20 +74,40 @@ def helpMessage() {
             --spurious_variants_vcf spurious_variants.vcf.gz \\
             --collapse both \\
             --output_dir output_clinical_tools
-
-        # Run multiple workflows
+    
+    Multiple Workflows:
         nextflow run clinical_tools.nf --workflows concordance,sensitivity,specificity \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/
-
-    Output Structure:
-        <output_dir>/
-        └── <concordance_dir>/
-            ├── happy/          # hap.py results if using happy engine
-            ├── wittyer/        # witty.er results if using wittyer engine
-            ├── variant_concordance_combined.csv  # Combined raw/curated concordance in CSV
-            ├── variant_concordance_combined.md   # Combined raw/curated concordance in Markdown
-            └── variant_concordance_combined.docx # Combined raw/curated concordance in Word
+    
+    Local Execution with Custom Resources:
+        nextflow run clinical_tools.nf \\
+            --max_cpus 8 \\
+            --max_memory 32.GB \\
+            --workflows concordance \\
+            --truth_dir truth_vcfs/ \\
+            --query_dir query_vcfs/
+    
+    SLURM Execution:
+        nextflow run clinical_tools.nf --profile slurm \\
+            --slurm_account my_account \\
+            --slurm_partition general \\
+            --max_cpus 8 \\
+            --max_memory 32.GB \\
+            --workflows concordance \\
+            --truth_dir truth_vcfs/ \\
+            --query_dir query_vcfs/
+    
+    ====================
+    Output Structure
+    ====================
+    <output_dir>/
+    └── <concordance_dir>/
+        ├── happy/          # hap.py results if using happy engine
+        ├── wittyer/        # witty.er results if using wittyer engine
+        ├── variant_concordance_combined.csv  # Combined raw/curated concordance in CSV
+        ├── variant_concordance_combined.md   # Combined raw/curated concordance in Markdown
+        └── variant_concordance_combined.docx # Combined raw/curated concordance in Word
     """.stripIndent()
 }
 
