@@ -64,7 +64,7 @@ RUN apt-get update && apt-get upgrade -y && \
     apt-get update && apt-get install -y dotnet-sdk-${DOTNET_VERSION} && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install runtime Python and htslib
+# Install runtime Python, htslib, samtools and bcftools
 RUN apt-get update && apt-get install -y build-essential libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev \
     libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev && \
     wget https://github.com/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2 && \
@@ -72,7 +72,19 @@ RUN apt-get update && apt-get install -y build-essential libssl-dev zlib1g-dev l
     cd htslib-${HTSLIB_VERSION} && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
-    cd .. && rm -rf htslib-* && \
+    # Build samtools
+    wget https://github.com/samtools/samtools/releases/download/${HTSLIB_VERSION}/samtools-${HTSLIB_VERSION}.tar.bz2 && \
+    tar -xjf samtools-${HTSLIB_VERSION}.tar.bz2 && \
+    cd samtools-${HTSLIB_VERSION} && \
+    ./configure --prefix=/opt/hap.py && \
+    make && make install && \
+    # Build bcftools
+    wget https://github.com/samtools/bcftools/releases/download/${HTSLIB_VERSION}/bcftools-${HTSLIB_VERSION}.tar.bz2 && \
+    tar -xjf bcftools-${HTSLIB_VERSION}.tar.bz2 && \
+    cd bcftools-${HTSLIB_VERSION} && \
+    ./configure --prefix=/opt/hap.py && \
+    make && make install && \
+    cd ../.. && rm -rf htslib-* samtools-* bcftools-* && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
