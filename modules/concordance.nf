@@ -7,17 +7,20 @@ enum VariantConcordanceEngine {
     happy, wittyer
 }
 
-// Validate engine selection
-def valid_engines = VariantConcordanceEngine.values()*.toString()
-if (!(params.variant_concordance_engine in valid_engines)) {
-    throw new IllegalArgumentException(
-        "Invalid 'variant_concordance_engine': ${params.variant_concordance_engine}. " +
-        "Valid options are: ${valid_engines.join(', ')}"
-    )
+// Function to validate engine selection
+def validate_engine_selection(engine) {
+    def valid_engines = VariantConcordanceEngine.values()*.toString()
+    if (!(engine in valid_engines)) {
+        throw new IllegalArgumentException(
+            "Invalid 'variant_concordance_engine': ${engine}. " +
+            "Valid options are: ${valid_engines.join(', ')}"
+        )
+    }
 }
 
 include { variant_concordance_workflow } from '../workflows/variant_concordance'
 
 workflow concordance {
+    validate_engine_selection(params.variant_concordance_engine)
     variant_concordance_workflow()
 }
