@@ -22,7 +22,7 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
    cd clinical_tools
    ```
 
-2. Run the workflow:
+2. Run specific workflows. Example:
    ```bash
    nextflow run clinical_tools.nf --workflows concordance \
        --truth_dir truth_vcfs/ \
@@ -38,7 +38,7 @@ Using containerized tools:
    singularity pull docker://quay.io/easygsea/clinical_tools
    ```
 
-2. Run specific tools:
+2. Run specific tools. Example:
    ```bash
    singularity exec -B <data_path> /path/to/clinical_tools_latest.sif curate-variant-concordance -h
    ```
