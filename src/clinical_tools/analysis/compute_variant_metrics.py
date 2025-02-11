@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-
+from collections import defaultdict
 from clinical_tools.core.constants import VariantConcordanceEngine
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
@@ -63,17 +63,14 @@ def compute_concordance_and_ci(
             ci_lower: Lower bound of confidence interval
             ci_upper: Upper bound of confidence interval
     """
-    grouped_metrics = {
-        (metric.VariantType, metric.VariantCallFilter): [] for metric in metrics
-    }
-
+    grouped_metrics = defaultdict(list)
     for metric in metrics:
         key = (metric.VariantType, metric.VariantCallFilter)
         grouped_metrics[key].append(metric)
 
     return {
-        (variant_type, variant_filter): _compute_concordance_and_ci_for_group(group)
-        for (variant_type, variant_filter), group in grouped_metrics.items()
+        key: _compute_concordance_and_ci_for_group(group)
+        for key, group in grouped_metrics.items()
     }
 
 
