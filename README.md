@@ -9,8 +9,8 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 ## Dependencies
 
 - Java (>=17.0.2)
-- Nextflow (>=20.04.0)
-- Singularity (>=3.5.0)
+- Nextflow (>=24.10.3)
+- Singularity (>=3.8.7)
 
 Containerized dependencies (no installation required): hap.py v0.3.15 htslib 1.4.1 (bcftools bgzip samtools tabix) witty.er 0.5.2.0 Python 3.11.7
 
@@ -54,7 +54,7 @@ Using containerized tools:
     - [Spurious Variant Filtering](#spurious-variant-filtering)
     - [Variant Concordance Output](#variant-concordance-output)
     - [Manual Curation](#variant-concordance-manual-curation)
-  - [Resource Optimization and High-Performance Computing](#resource-optimization-and-high-performance-computing)
+- [Resource Optimization and High-Performance Computing](#resource-optimization-and-hpc)
 
 ## [Motivation](#motivation)
 
@@ -248,3 +248,77 @@ singularity exec -B <data_path> /path/to/clinical_tools_latest.sif curate-varian
 --curation INDEL:PASS:TP:30 --curation INDEL:PASS:TP:30 INDEL:PASS:FP:1 \
 --output_prefix variant_concordance_happy_curated_final
 ```
+
+## [Resource Optimization and High-Performance Computing](#resource-optimization-and-hpc)
+
+The package can be executed across diverse computing environments, from local machines to high-performance computing (HPC) clusters.
+
+### Resource Management
+
+Its workflows implement several resource optimization strategies:
+
+1. **Dynamic Resource Allocation**:
+   - Automatically allocates CPU and memory based on task requirements and retry attempts
+   - Allocation scaling:
+     - Initial attempt: 2 CPUs, 4GB memory
+     - Second attempt: 4 CPUs, 8GB memory
+     - Third attempt: 6 CPUs, 16GB memory
+     - Subsequent attempts: Up to 8 CPUs, 32GB memory
+
+2. **Containerization**:
+   - All dependencies are containerized using Docker/Singularity
+   - Reduces installation overhead and dependency conflicts
+
+3. **Parallel Execution**:
+   - Processes samples in parallel where possible
+
+### HPC Integration
+
+It supports seamless integration with HPC environments:
+
+1. **SLURM Support**:
+   - Pre-configured SLURM profile for cluster execution
+   - Customizable parameters:
+     ```bash
+     --slurm_account <account_name>
+     --slurm_partition <partition_name>
+     --slurm_queue <queue_name>
+     ```
+   - Automatic job submission and monitoring
+
+2. **Resource Limits**:
+   - Configurable maximum resource usage:
+     ```bash
+     --max_cpus <n>  # Maximum CPUs per task (default: 16)
+     --max_memory <size>  # Maximum memory per task (default: 64GB)
+     ```
+
+3. **Error Handling**:
+   - Automatic retry for common HPC errors:
+     - Memory allocation failures
+     - Timeout errors
+     - Disk quota exceeded
+   - Maximum 5 retry attempts per task
+
+### Performance Optimization Tips
+
+1. **Local Execution**:
+   ```bash
+   nextflow run clinical_tools.nf -profile standard
+   ```
+
+2. **Cluster Execution**:
+   ```bash
+   nextflow run clinical_tools.nf -profile slurm \
+       --slurm_account <your_account> \
+       --slurm_partition <partition_name>
+   ```
+
+3. **Resource Monitoring**:
+   - Use Nextflow's built-in monitoring:
+     ```bash
+     nextflow log <run_id>
+     ```
+   - View detailed resource usage statistics
+
+For optimal performance, ensure your system meets the minimum requirements and consider these recommendations when configuring your execution environment.
