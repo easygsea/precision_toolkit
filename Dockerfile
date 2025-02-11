@@ -1,6 +1,7 @@
 # Environment variables
 ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
+ARG HTSLIB_VERSION=1.21
 ARG PYTHON_VERSION=3.11.7
 ARG WITTYER_VERSION=0.5.2
 
@@ -30,11 +31,8 @@ WORKDIR /app
 # Configure poetry to not create a virtual environment
 RUN poetry config virtualenvs.create false
 
-# Install package dependencies
-COPY README.md pyproject.toml ./
-RUN poetry install --only main --no-root --no-ansi
-
-# Copy the rest of the application code
+# Copy application files
+COPY README.md pyproject.toml poetry.lock ./
 COPY src/ /app/src/
 
 # Build the project
@@ -46,6 +44,7 @@ RUN chmod a+rx /app -R
 # Stage 3: Runtime
 FROM mgibio/hap.py:v${HAPPY_VERSION}
 ARG DOTNET_VERSION
+ARG HTSLIB_VERSION
 ARG PYTHON_VERSION
 
 # Create and set working directory
@@ -65,9 +64,27 @@ RUN apt-get update && apt-get upgrade -y && \
     apt-get update && apt-get install -y dotnet-sdk-${DOTNET_VERSION} && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install runtime Python
+# Install runtime Python, htslib, samtools and bcftools
 RUN apt-get update && apt-get install -y build-essential libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev \
-    libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev && \
+    libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev && \
+    wget https://github.com/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2 && \
+    tar -xjf htslib-${HTSLIB_VERSION}.tar.bz2 && \
+    cd htslib-${HTSLIB_VERSION} && \
+    ./configure --prefix=/opt/hap.py && \
+    make && make install && \
+    # Build samtools
+    wget https://github.com/samtools/samtools/releases/download/${HTSLIB_VERSION}/samtools-${HTSLIB_VERSION}.tar.bz2 && \
+    tar -xjf samtools-${HTSLIB_VERSION}.tar.bz2 && \
+    cd samtools-${HTSLIB_VERSION} && \
+    ./configure --prefix=/opt/hap.py && \
+    make && make install && \
+    # Build bcftools
+    wget https://github.com/samtools/bcftools/releases/download/${HTSLIB_VERSION}/bcftools-${HTSLIB_VERSION}.tar.bz2 && \
+    tar -xjf bcftools-${HTSLIB_VERSION}.tar.bz2 && \
+    cd bcftools-${HTSLIB_VERSION} && \
+    ./configure --prefix=/opt/hap.py && \
+    make && make install && \
+    cd ../.. && rm -rf htslib-* samtools-* bcftools-* && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
@@ -102,7 +119,3 @@ COPY --from=clinical_tools_builder /app/dist/*.whl .
 RUN python -m pip install --upgrade pip setuptools && pip install *.whl && \
     rm *.whl
 RUN rm -rf /tmp/*
-
-# Set non-root user
-RUN useradd -ms /bin/bash appuser && chown -R appuser:appuser /app
-USER appuser
