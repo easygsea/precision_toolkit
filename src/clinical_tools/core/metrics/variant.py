@@ -7,7 +7,7 @@ from clinical_tools.core.statistics.proportion import ProportionConfidenceInterv
 @dataclass(frozen=True)
 class VariantCallMetrics:
     """Container for variant call metrics data.
-    
+
     Attributes:
         VariantType: Type of variant (e.g., SNV, INDEL)
         VariantCallFilter: Filter status (e.g., PASS, ALL)
@@ -18,6 +18,7 @@ class VariantCallMetrics:
         QueryTP: True positives in query set
         QueryFP: False positives
     """
+
     VariantType: str
     VariantCallFilter: str
     TruthTotal: int
@@ -33,7 +34,7 @@ class BaseVariantCallMetrics(ABC):
 
     def __init__(self, metrics: VariantCallMetrics) -> None:
         """Initialize with metrics data.
-        
+
         Args:
             metrics: Container with variant metrics data
         """
@@ -46,12 +47,10 @@ class BaseVariantCallMetrics(ABC):
 
     @abstractmethod
     def confidence_interval(
-        self, 
-        method: str = "wilson", 
-        **kwargs
+        self, method: str = "wilson", **kwargs
     ) -> tuple[float, float]:
         """Calculate confidence interval for the metric.
-        
+
         Args:
             method: Statistical method for CI calculation
             **kwargs: Additional parameters for the method
@@ -77,12 +76,10 @@ class SensitivityMetrics(BaseVariantCallMetrics):
         return self.metrics.TruthTP / self.metrics.TruthTotal
 
     def confidence_interval(
-        self, 
-        method: str = "wilson", 
-        **kwargs
+        self, method: str = "wilson", **kwargs
     ) -> tuple[float, float]:
         """Calculate confidence interval for sensitivity.
-        
+
         Args:
             method: Statistical method for CI calculation
             **kwargs: Additional parameters for the method
@@ -113,12 +110,10 @@ class PrecisionMetrics(BaseVariantCallMetrics):
         return self.metrics.QueryTP / self.metrics.QueryTotal
 
     def confidence_interval(
-        self, 
-        method: str = "wilson", 
-        **kwargs
+        self, method: str = "wilson", **kwargs
     ) -> tuple[float, float]:
         """Calculate confidence interval for precision.
-        
+
         Args:
             method: Statistical method for CI calculation
             **kwargs: Additional parameters for the method
@@ -148,12 +143,10 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         return self.metrics.TruthTP / total_calls if total_calls > 0 else 0
 
     def confidence_interval(
-        self, 
-        method: str = "wilson", 
-        **kwargs
+        self, method: str = "wilson", **kwargs
     ) -> tuple[float, float]:
         """Calculate confidence interval for concordance.
-        
+
         Args:
             method: Statistical method for CI calculation
             **kwargs: Additional parameters for the method
@@ -163,10 +156,7 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         """
         total_calls = self.metrics.TruthTotal + self.metrics.QueryFP
         return ProportionConfidenceInterval.proportion_confidence_interval(
-            successes=self.metrics.TruthTP,
-            total=total_calls,
-            method=method,
-            **kwargs
+            successes=self.metrics.TruthTP, total=total_calls, method=method, **kwargs
         )
 
     @property

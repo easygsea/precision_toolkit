@@ -10,8 +10,7 @@ from clinical_tools.core.parsers.wittyer import WittyerDataParser
 
 
 def load_data_from_files(
-    files: Sequence[str], 
-    data_type: VariantConcordanceEngine
+    files: Sequence[str], data_type: VariantConcordanceEngine
 ) -> Sequence[VariantCallMetrics]:
     """Load data from files based on the specified data type.
 
@@ -27,13 +26,15 @@ def load_data_from_files(
     """
     if not files:
         raise ValueError("No files provided")
-        
+
     if data_type == VariantConcordanceEngine.HAPPY:
         parser = HappyDataParser.process_hap_py_output
     elif data_type == VariantConcordanceEngine.WITTYER:
         parser = WittyerDataParser.process_witty_er_output
     else:
-        raise ValueError(f"Unsupported data_type: {data_type}. Must be 'happy' or 'wittyer'")
+        raise ValueError(
+            f"Unsupported data_type: {data_type}. Must be 'happy' or 'wittyer'"
+        )
 
     all_metrics = []
     for file_path in files:
@@ -46,10 +47,10 @@ def load_data_from_files(
 
 
 def compute_concordance_and_ci(
-    metrics: Sequence[VariantCallMetrics]
+    metrics: Sequence[VariantCallMetrics],
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
     """Compute concordance and confidence intervals grouped by variant type and filter.
-    
+
     Args:
         metrics: Sequence of parsed metrics across samples
 
@@ -63,10 +64,9 @@ def compute_concordance_and_ci(
             ci_upper: Upper bound of confidence interval
     """
     grouped_metrics = {
-        (metric.VariantType, metric.VariantCallFilter): []
-        for metric in metrics
+        (metric.VariantType, metric.VariantCallFilter): [] for metric in metrics
     }
-    
+
     for metric in metrics:
         key = (metric.VariantType, metric.VariantCallFilter)
         grouped_metrics[key].append(metric)
@@ -76,11 +76,12 @@ def compute_concordance_and_ci(
         for (variant_type, variant_filter), group in grouped_metrics.items()
     }
 
+
 def _compute_concordance_and_ci_for_group(
-    group: list[VariantCallMetrics]
+    group: list[VariantCallMetrics],
 ) -> tuple[int, int, int, float, float, float]:
     """Calculate concordance metrics for a group of variants.
-    
+
     Helper function for compute_concordance_and_ci that processes
     a single group of variants with the same type and filter.
 
@@ -127,8 +128,7 @@ def _compute_concordance_and_ci_for_group(
 
 
 def process_variant_metrics(
-    file_paths: Sequence[str], 
-    data_type: VariantConcordanceEngine
+    file_paths: Sequence[str], data_type: VariantConcordanceEngine
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
     """Process variant metrics and compute confidence intervals.
 

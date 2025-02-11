@@ -18,7 +18,7 @@ class WittyerDataParser:
             Sequence of VariantCallMetrics objects containing processed data
         """
         logging.info(f"Processing Wittyer output file: {file_path}")
-        
+
         try:
             with open(file_path, "r") as file:
                 data = json.load(file)
@@ -41,10 +41,10 @@ class WittyerDataParser:
                             results.append(metrics)
                         except Exception as e:
                             logging.warning(f"Error processing stats: {str(e)}")
-            
+
             logging.info(f"Successfully processed {len(results)} metrics")
             return results
-            
+
         except Exception as e:
             logging.error(f"Failed to process file {file_path}: {str(e)}")
             raise

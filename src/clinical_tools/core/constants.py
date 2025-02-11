@@ -1,13 +1,16 @@
 from enum import StrEnum
 
+
 class VariantConcordanceEngine(StrEnum):
     """Supported variant concordance analysis engines."""
+
     HAPPY = "happy"
     WITTYER = "wittyer"
 
+
 class NameMapper:
     """Class to hold abbreviations and full names."""
-    
+
     NAME_MAP = {
         "TP": "True Positives",
         "FP": "False Positives",
@@ -22,7 +25,7 @@ class NameMapper:
         if full_name is None:
             raise ValueError(f"Unknown abbreviation: {abbreviation}")
         return full_name
-    
+
     @staticmethod
     def get_abbreviation(full_name: str) -> str:
         """Get the abbreviation of a metric based on its full name."""

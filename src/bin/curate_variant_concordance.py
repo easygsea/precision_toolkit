@@ -18,20 +18,20 @@ from clinical_tools.render.variant_concordance import (
 
 def validate_curation_format(curation: str) -> bool:
     """Validate manual curation input format.
-    
+
     Args:
         curation: Manual curation input in format type:filter:metric:count
-        
+
     Returns:
         True if format is valid
-        
+
     Raises:
         ValueError: If format is invalid
     """
     try:
-        variant_type, filter_type, metric, count = curation.split(':')
+        variant_type, filter_type, metric, count = curation.split(":")
         int(count)
-        if metric not in {'TP', 'FN', 'FP'}:
+        if metric not in {"TP", "FN", "FP"}:
             raise ValueError(f"Invalid metric: {metric}")
         return True
     except ValueError as e:
@@ -53,18 +53,23 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description="Curate variant concordance from an existing table with count "
-                    "information and recompute statistics."
+        "information and recompute statistics."
     )
     parser.add_argument(
-        "--input", required=True,
-        help="Raw concordance summary table (CSV format).")
+        "--input", required=True, help="Raw concordance summary table (CSV format)."
+    )
     parser.add_argument(
-        "--curation", nargs='+', action='append',
+        "--curation",
+        nargs="+",
+        action="append",
         required=True,
-        help="Manual curation (type:filter:metric:count).")
+        help="Manual curation (type:filter:metric:count).",
+    )
     parser.add_argument(
-        "--output_prefix", default="curated_concordance",
-        help="Prefix for output files.")
+        "--output_prefix",
+        default="curated_concordance",
+        help="Prefix for output files.",
+    )
 
     args = parser.parse_args()
     df = pd.read_csv(args.input)
@@ -82,7 +87,7 @@ def main():
 
     # Update counts based on manual input
     for curation in curations:
-        variant_type, filter_type, metric, count = curation.split(':')
+        variant_type, filter_type, metric, count = curation.split(":")
         count = int(count)
 
         try:
@@ -91,22 +96,23 @@ def main():
             logging.error(e)
             raise
 
-        mask = (df['Variant Type'] == variant_type) & (
-                    df['Variant Filter'] == filter_type)
+        mask = (df["Variant Type"] == variant_type) & (
+            df["Variant Filter"] == filter_type
+        )
 
         df.loc[mask, metric_full] = count
 
         metrics = VariantCallMetrics(
             VariantType=variant_type,
             VariantCallFilter=filter_type,
-            TruthTotal=df.loc[mask, 'True Positive'].sum() + df.loc[
-                mask, 'False Negative'].sum(),
-            TruthTP=df.loc[mask, 'True Positive'].sum(),
-            TruthFN=df.loc[mask, 'False Negative'].sum(),
-            QueryTotal=df.loc[mask, 'True Positive'].sum() + df.loc[
-                mask, 'False Positive'].sum(),
-            QueryTP=df.loc[mask, 'True Positive'].sum(),
-            QueryFP=df.loc[mask, 'False Positive'].sum(),
+            TruthTotal=df.loc[mask, "True Positive"].sum()
+            + df.loc[mask, "False Negative"].sum(),
+            TruthTP=df.loc[mask, "True Positive"].sum(),
+            TruthFN=df.loc[mask, "False Negative"].sum(),
+            QueryTotal=df.loc[mask, "True Positive"].sum()
+            + df.loc[mask, "False Positive"].sum(),
+            QueryTP=df.loc[mask, "True Positive"].sum(),
+            QueryFP=df.loc[mask, "False Positive"].sum(),
         )
 
         analysis = ConcordanceMetrics(metrics)
@@ -121,12 +127,18 @@ def main():
 
     # Export using the output prefix
     export_concordance_to_csv(df, f"{args.output_prefix}.csv")
-    export_concordance_to_markdown(df, f"{args.output_prefix}.md",
-                                   heading="Curated Variant Concordance",
-                                   summary=summary_text)
-    export_concordance_to_word(df, f"{args.output_prefix}.docx",
-                               heading="Curated Variant Concordance",
-                               summary=summary_text)
+    export_concordance_to_markdown(
+        df,
+        f"{args.output_prefix}.md",
+        heading="Curated Variant Concordance",
+        summary=summary_text,
+    )
+    export_concordance_to_word(
+        df,
+        f"{args.output_prefix}.docx",
+        heading="Curated Variant Concordance",
+        summary=summary_text,
+    )
 
 
 if __name__ == "__main__":

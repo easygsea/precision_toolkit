@@ -5,9 +5,7 @@ from tabulate import tabulate
 
 
 def populate_markdown(
-    df: pd.DataFrame, 
-    heading: str | None = None, 
-    summary: str | None = None
+    df: pd.DataFrame, heading: str | None = None, summary: str | None = None
 ) -> str:
     """Generate a Markdown string from DataFrame.
 

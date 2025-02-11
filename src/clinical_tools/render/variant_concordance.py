@@ -19,8 +19,8 @@ def generate_concordance_table(
     Generate a pandas DataFrame for variant concordance summary.
 
     Args:
-        results: Dictionary where keys are tuples of (variant_type, variant_filter) 
-            and values are tuples of metrics (true_positive, false_negative, 
+        results: Dictionary where keys are tuples of (variant_type, variant_filter)
+            and values are tuples of metrics (true_positive, false_negative,
             false_positive, concordance, ci_lower, ci_upper)
 
     Returns:
@@ -79,7 +79,7 @@ def export_concordance_to_markdown(
     dfs: list[pd.DataFrame] | pd.DataFrame,
     output_file: str | Path,
     headings: list[str] | str | None = None,
-    summaries: list[str] | str | None = None
+    summaries: list[str] | str | None = None,
 ) -> None:
     """Export one or more concordance DataFrames to Markdown file.
 
@@ -92,7 +92,7 @@ def export_concordance_to_markdown(
             should be a list of summaries matching the number of DataFrames.
     """
     dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
-    
+
     # Process each DataFrame and collect markdown content
     all_content = []
     for i, df in enumerate(dfs):
@@ -101,7 +101,7 @@ def export_concordance_to_markdown(
         summary = summaries[i] if summaries else None
         content = populate_markdown(formatted_df, heading, summary)
         all_content.append(content)
-    
+
     # Combine all content and save to file
     final_content = "\n\n".join(all_content)
     save_markdown(final_content, output_file)
@@ -111,7 +111,7 @@ def export_concordance_to_word(
     dfs: list[pd.DataFrame] | pd.DataFrame,
     output_file: str | Path,
     headings: list[str] | str | None = None,
-    summaries: list[str] | str | None = None
+    summaries: list[str] | str | None = None,
 ) -> None:
     """Export one or more concordance DataFrames to Word file.
 
@@ -124,16 +124,16 @@ def export_concordance_to_word(
             should be a list of summaries matching the number of DataFrames.
     """
     dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
-    
+
     # Initiate Word document
     doc = initiate_word_document()
-    
+
     # Process each DataFrame and add to Word document
     for i, df in enumerate(dfs):
         formatted_df = format_concordance_table(df)
         heading = headings[i] if headings else None
         summary = summaries[i] if summaries else None
         pandas_to_word(doc, formatted_df, heading, summary)
-    
+
     # Save final Word document
     save_word_document(doc, output_file)

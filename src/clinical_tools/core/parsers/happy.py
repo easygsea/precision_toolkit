@@ -10,7 +10,7 @@ class HappyDataParser:
     @staticmethod
     def process_hap_py_output(file_path: Path | str) -> Sequence[VariantCallMetrics]:
         """Process the hap.py output file to extract relevant information.
-        
+
         Args:
             file_path: Path to the hap.py .summary.csv output file.
 
@@ -18,11 +18,11 @@ class HappyDataParser:
             Sequence of VariantCallMetrics objects containing processed data.
         """
         logging.info(f"Processing hap.py output file: {file_path}")
-        
+
         try:
             df = pd.read_csv(file_path)
             logging.debug(f"Successfully loaded CSV with {len(df)} rows")
-            
+
             results = []
             for idx, row in df.iterrows():
                 try:
@@ -39,10 +39,10 @@ class HappyDataParser:
                     results.append(metrics)
                 except Exception as e:
                     logging.warning(f"Error processing row {idx}: {str(e)}")
-                    
+
             logging.info(f"Successfully processed {len(results)} metrics")
             return results
-            
+
         except Exception as e:
             logging.error(f"Failed to process file {file_path}: {str(e)}")
             raise

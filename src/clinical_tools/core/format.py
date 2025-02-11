@@ -21,5 +21,5 @@ def format_percentage(x: int | float, decimals: int = 1) -> str:
     """
     if not isinstance(decimals, int) or decimals < 0:
         raise ValueError("Decimals must be a non-negative integer.")
-    
+
     return f"{x * 100:.{decimals}f}%"

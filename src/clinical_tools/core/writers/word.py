@@ -5,7 +5,10 @@ from pathlib import Path
 
 
 def pandas_to_word(
-    doc: Document, df: pd.DataFrame, heading: str | None = None, summary: str | None = None
+    doc: Document,
+    df: pd.DataFrame,
+    heading: str | None = None,
+    summary: str | None = None,
 ) -> Document:
     """
     Generate a Word document from a pandas DataFrame.

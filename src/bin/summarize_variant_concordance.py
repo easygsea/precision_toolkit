@@ -28,19 +28,19 @@ def main():
         "-f",
         "--raw-files",
         nargs="+",
-        help="List of raw engine output files to process."
+        help="List of raw engine output files to process.",
     )
     parser.add_argument(
         "-c",
         "--curated-files",
         nargs="+",
-        help="List of curated engine output files to process."
+        help="List of curated engine output files to process.",
     )
     parser.add_argument(
         "-p",
         "--prefix",
         default="variant_concordance",
-        help="Prefix for output filenames. Default is 'variant_concordance'."
+        help="Prefix for output filenames. Default is 'variant_concordance'.",
     )
 
     args = parser.parse_args()
@@ -69,11 +69,11 @@ def main():
             file_paths=args.raw_files, data_type=args.engine
         )
         raw_concordance_table = generate_concordance_table(raw_concordance_results)
-        
+
         # Export raw results to CSV
         raw_csv_output = f"{args.prefix}_{args.engine}_raw.csv"
         export_concordance_to_csv(raw_concordance_table, raw_csv_output)
-        
+
         # Add raw results to tables
         tables.append(raw_concordance_table)
         headings.append("Raw Variant Concordance")
@@ -84,29 +84,27 @@ def main():
         curated_concordance_results = process_variant_metrics(
             file_paths=args.curated_files, data_type=args.engine
         )
-        curated_concordance_table = generate_concordance_table(curated_concordance_results)
-        
+        curated_concordance_table = generate_concordance_table(
+            curated_concordance_results
+        )
+
         # Export curated results to CSV
         curated_csv_output = f"{args.prefix}_{args.engine}_curated.csv"
         export_concordance_to_csv(curated_concordance_table, curated_csv_output)
-        
+
         # Add curated results to tables
         tables.append(curated_concordance_table)
         headings.append("Curated Variant Concordance")
-        summaries.append("This table summarizes the concordance of curated variant calls.")
+        summaries.append(
+            "This table summarizes the concordance of curated variant calls."
+        )
 
     # Export results to markdown and word formats
     export_concordance_to_markdown(
-        tables,
-        f"{output_prefix}.md",
-        headings=headings,
-        summaries=summaries
+        tables, f"{output_prefix}.md", headings=headings, summaries=summaries
     )
     export_concordance_to_word(
-        tables,
-        f"{output_prefix}.docx",
-        headings=headings,
-        summaries=summaries
+        tables, f"{output_prefix}.docx", headings=headings, summaries=summaries
     )
 
 
