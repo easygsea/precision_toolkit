@@ -1,10 +1,8 @@
-from collections.abc import Sequence
 from collections import defaultdict
+from collections.abc import Sequence
+
 from clinical_tools.core.constants import VariantConcordanceEngine
-from clinical_tools.core.metrics.variant import (
-    ConcordanceMetrics,
-    VariantCallMetrics,
-)
+from clinical_tools.core.metrics.variant import ConcordanceMetrics, VariantCallMetrics
 from clinical_tools.core.parsers.happy import HappyDataParser
 from clinical_tools.core.parsers.wittyer import WittyerDataParser
 

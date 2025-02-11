@@ -1,15 +1,17 @@
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+
+from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
 from clinical_tools.core.format import format_percentage
 from clinical_tools.core.helpers import assemble_exports
 from clinical_tools.core.writers.csv import pandas_to_csv
 from clinical_tools.core.writers.markdown import populate_markdown, save_markdown
 from clinical_tools.core.writers.word import (
-    pandas_to_word,
     initiate_word_document,
+    pandas_to_word,
     save_word_document,
 )
-from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
 
 
 def generate_concordance_table(

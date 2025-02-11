@@ -2,13 +2,11 @@
 
 import argparse
 import logging
+
 import pandas as pd
 
 from clinical_tools.core.constants import NameMapper
-from clinical_tools.core.metrics.variant import (
-    ConcordanceMetrics,
-    VariantCallMetrics,
-)
+from clinical_tools.core.metrics.variant import ConcordanceMetrics, VariantCallMetrics
 from clinical_tools.render.variant_concordance import (
     export_concordance_to_csv,
     export_concordance_to_markdown,

@@ -1,7 +1,8 @@
 import logging
-import pandas as pd
 from collections.abc import Sequence
 from pathlib import Path
+
+import pandas as pd
 
 from clinical_tools.core.metrics.variant import VariantCallMetrics
 

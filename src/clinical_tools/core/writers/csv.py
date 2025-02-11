@@ -1,6 +1,7 @@
 import logging
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 
 def pandas_to_csv(df: pd.DataFrame, output_file: str | Path) -> None:

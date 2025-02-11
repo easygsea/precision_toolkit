@@ -1,7 +1,8 @@
 import logging
+from pathlib import Path
+
 import pandas as pd
 from docx import Document
-from pathlib import Path
 
 
 def pandas_to_word(
