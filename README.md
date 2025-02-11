@@ -73,9 +73,9 @@ The variant concordance module compares variant calls between truth and query VC
 #### [Variant Concordance Parameters](#variant-concordance-parameters)
 
 **Required Parameters:**
-- `--truth_dir`: Path to directory containing truth VCF files
-- `--query_dir`: Path to directory containing query VCF files  
-- `--variant_concordance_engine`: Analysis engine to use (`happy` or `wittyer`, default: `happy`)
+- `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
+- `--query_dir`: The directory containing query VCF files (the test or experimental dataset). These must be named as <sample>.query.vcf or <sample>.query.vcf.gz.
+- `--variant_concordance_engine`: Analysis engine for variant concordance (`happy` or `wittyer`, default: `happy`)
 
 **Optional Parameters:**
 - `--genome_ref`: Reference genome FASTA file (required for hap.py)
@@ -139,7 +139,7 @@ Larger variants:
 ```
 ##fileformat=VCFv4.2
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-chr11   67490495	DRAGEN:LOSS:chr17:43099822-43101081 N   <DEL>   .   .   .   
+chr17   43099821	DRAGEN:LOSS:chr17:43099822-43101081 N   <DEL>   .   .   .   
 ```
 2. **Chromosome Naming**: Ensure chromosome naming matches your reference genome
 3. **Variant Representation**: 
@@ -150,9 +150,7 @@ chr11   67490495	DRAGEN:LOSS:chr17:43099822-43101081 N   <DEL>   .   .   .
    - Validate against reference genome
    - Include only high-confidence spurious calls
 5. **bcftools isec**:
-   Refer to the official [--collapse](https://samtools.github.io/bcftools/bcftools.html#isec) option for detailed guidance. In this package:
-   - Small variants (SNPs, indels <50bp): The default setting is 'both' for precise allele matching.
-   - Larger variants (SVs, CNVs >50bp): The default setting is 'id' for precise ID matching.
+   Refer to the official [--collapse](https://samtools.github.io/bcftools/bcftools.html#isec) option for detailed guidance. Default is 'none' for identical REF and ALT alleles matching.
 
 **Pipeline Processing Steps:**
 1. Raw Variant Concordance: Performs an initial analysis without spurious variant filtering. Use --skip_raw to bypass this step if only curated results are required.
