@@ -12,7 +12,7 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 - Nextflow (>=24.10.3)
 - Singularity (>=3.8.7)
 
-Containerized dependencies (no installation required): hap.py v0.3.15 htslib 1.4.1 (bcftools bgzip samtools tabix) witty.er 0.5.2.0 Python 3.11.7
+Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3.15 htslib 1.21 (bgzip tabix) witty.er 0.5.2.0 Python 3.11.7 samtools 1.21
 
 ## Quick Start
 
