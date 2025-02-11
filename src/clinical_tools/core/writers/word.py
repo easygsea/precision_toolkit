@@ -53,7 +53,7 @@ def save_word_document(doc: Document, output_file: str | Path) -> None:
 
     Args:
         doc (Document): The Word document object to save.
-        output_file (Union[str, bytes]): The path to save the Word file.
+        output_file (str | Path): The path to save the Word file.
 
     Returns:
         None
