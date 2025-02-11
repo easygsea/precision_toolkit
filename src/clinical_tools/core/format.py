@@ -1,5 +1,6 @@
 def format_percentage(x: int | float, decimals: int = 1) -> str:
-    """Convert number to percentage string.
+    """
+    Convert number to percentage string.
 
     Args:
         x: Number to convert

@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from clinical_tools.core.statistics.proportion import ProportionConfidenceInterval
+from clinical_tools.core.statistics.proportion import (
+    ProportionConfidenceInterval,
+    ProportionConfidenceIntervalMethod,
+)
 
 
 @dataclass(frozen=True)
@@ -47,7 +50,9 @@ class BaseVariantCallMetrics(ABC):
 
     @abstractmethod
     def confidence_interval(
-        self, method: str = "wilson", **kwargs
+        self,
+        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        **kwargs,
     ) -> tuple[float, float]:
         """Calculate confidence interval for the metric.
 
@@ -76,7 +81,9 @@ class SensitivityMetrics(BaseVariantCallMetrics):
         return self.metrics.TruthTP / self.metrics.TruthTotal
 
     def confidence_interval(
-        self, method: str = "wilson", **kwargs
+        self,
+        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        **kwargs,
     ) -> tuple[float, float]:
         """Calculate confidence interval for sensitivity.
 
@@ -110,7 +117,9 @@ class PrecisionMetrics(BaseVariantCallMetrics):
         return self.metrics.QueryTP / self.metrics.QueryTotal
 
     def confidence_interval(
-        self, method: str = "wilson", **kwargs
+        self,
+        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        **kwargs,
     ) -> tuple[float, float]:
         """Calculate confidence interval for precision.
 
@@ -143,7 +152,9 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         return self.metrics.TruthTP / total_calls if total_calls > 0 else 0
 
     def confidence_interval(
-        self, method: str = "wilson", **kwargs
+        self,
+        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        **kwargs,
     ) -> tuple[float, float]:
         """Calculate confidence interval for concordance.
 

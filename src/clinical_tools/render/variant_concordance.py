@@ -53,7 +53,8 @@ def generate_concordance_table(
 
 
 def format_concordance_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Format the Concordance, CI Lower, and CI Upper columns as percentages.
+    """
+    Format the Concordance, CI Lower, and CI Upper columns as percentages.
 
     Args:
         df: The concordance DataFrame to format
@@ -68,7 +69,8 @@ def format_concordance_table(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def export_concordance_to_csv(df: pd.DataFrame, output_file: str | Path) -> None:
-    """Export concordance DataFrame to CSV file.
+    """
+    Export concordance DataFrame to CSV file.
 
     Args:
         df: The concordance DataFrame
@@ -83,7 +85,8 @@ def export_concordance_to_markdown(
     headings: list[str] | str | None = None,
     summaries: list[str] | str | None = None,
 ) -> None:
-    """Export one or more concordance DataFrames to Markdown file.
+    """
+    Export one or more concordance DataFrames to Markdown file.
 
     Args:
         dfs: Single DataFrame or list of DataFrames to export
@@ -115,7 +118,8 @@ def export_concordance_to_word(
     headings: list[str] | str | None = None,
     summaries: list[str] | str | None = None,
 ) -> None:
-    """Export one or more concordance DataFrames to Word file.
+    """
+    Export one or more concordance DataFrames to Word file.
 
     Args:
         dfs: Single DataFrame or list of DataFrames to export

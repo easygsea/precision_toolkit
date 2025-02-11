@@ -10,7 +10,8 @@ from clinical_tools.core.parsers.wittyer import WittyerDataParser
 def load_data_from_files(
     files: Sequence[str], data_type: VariantConcordanceEngine
 ) -> Sequence[VariantCallMetrics]:
-    """Load data from files based on the specified data type.
+    """
+    Load data from files based on the specified data type.
 
     Args:
         files: Sequence of paths to the files to be loaded
@@ -47,7 +48,8 @@ def load_data_from_files(
 def compute_concordance_and_ci(
     metrics: Sequence[VariantCallMetrics],
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
-    """Compute concordance and confidence intervals grouped by variant type and filter.
+    """
+    Compute concordance and confidence intervals grouped by variant type and filter.
 
     Args:
         metrics: Sequence of parsed metrics across samples
@@ -75,7 +77,8 @@ def compute_concordance_and_ci(
 def _compute_concordance_and_ci_for_group(
     group: list[VariantCallMetrics],
 ) -> tuple[int, int, int, float, float, float]:
-    """Calculate concordance metrics for a group of variants.
+    """
+    Calculate concordance metrics for a group of variants.
 
     Helper function for compute_concordance_and_ci that processes
     a single group of variants with the same type and filter.
@@ -125,7 +128,8 @@ def _compute_concordance_and_ci_for_group(
 def process_variant_metrics(
     file_paths: Sequence[str], data_type: VariantConcordanceEngine
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
-    """Process variant metrics and compute confidence intervals.
+    """
+    Process variant metrics and compute confidence intervals.
 
     Args:
         file_paths: Sequence of file paths to process

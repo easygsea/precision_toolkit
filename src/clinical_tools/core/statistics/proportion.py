@@ -21,19 +21,22 @@ class ProportionConfidenceInterval:
     SUPPORTED_METHODS = [method.value for method in ProportionConfidenceIntervalMethod]
 
     @staticmethod
-    def proportion_confidence_interval(successes, total, method="wilson", **kwargs):
-        """
-        Calculate the confidence interval for a binomial proportion.
+    def proportion_confidence_interval(
+        successes: int,
+        total: int,
+        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        **kwargs
+    ) -> tuple[float, float]:
+        """Calculate the confidence interval for a binomial proportion.
 
         Args:
-            successes (int): Number of success events.
-            total (int): Total number of events.
-            method (str, optional): The method to use for CI calculation.
-                                   Defaults to 'wilson'.
-            **kwargs: Additional keyword arguments to pass to proportion_confint.
+            successes: Number of success events.
+            total: Total number of events.
+            method: CI calculation method. Must be one of ProportionConfidenceIntervalMethod
+            **kwargs: Additional keyword arguments passed to proportion_confint.
 
         Returns:
-            tuple[float, float]: Lower and upper bounds of the CI.
+            A tuple containing the lower and upper bounds of the CI.
 
         Raises:
             ValueError: If the provided method is not supported.

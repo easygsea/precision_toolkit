@@ -1,8 +1,11 @@
 import pandas as pd
+from typing import Any
 
-
-def convert_to_list_if_single_instance(value, expected_type: type) -> list | None:
-    """Convert single instances to lists while preserving None and existing lists.
+def convert_to_list_if_single_instance(
+    value: Any, expected_type: type
+) -> list | None:
+    """
+    Convert single instances to lists while preserving None and existing lists.
 
     Ensures consistent handling of inputs that can be either single values or lists
     by converting single instances of the expected type to single-item lists.
@@ -27,7 +30,8 @@ def assemble_exports(
     headings: list[str] | str | None,
     summaries: list[str] | str | None,
 ) -> tuple[list[pd.DataFrame], list[str] | None, list[str] | None]:
-    """Assemble and validate inputs for export functions across different modules.
+    """
+    Assemble and validate inputs for export functions across different modules.
 
     Args:
         dfs: Single DataFrame or list of DataFrames to export
