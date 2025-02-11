@@ -70,7 +70,8 @@ RUN apt-get update && apt-get install -y build-essential libssl-dev zlib1g-dev l
     wget https://github.com/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2 && \
     tar -xjf htslib-${HTSLIB_VERSION}.tar.bz2 && \
     cd htslib-${HTSLIB_VERSION} && \
-    ./configure && make && make install && \
+    ./configure --prefix=/opt/hap.py && \
+    make && make install && \
     cd .. && rm -rf htslib-* && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
