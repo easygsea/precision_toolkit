@@ -25,7 +25,7 @@ class ProportionConfidenceInterval:
         successes: int,
         total: int,
         method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
-        **kwargs
+        **kwargs,
     ) -> tuple[float, float]:
         """Calculate the confidence interval for a binomial proportion.
 

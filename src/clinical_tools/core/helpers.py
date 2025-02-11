@@ -1,9 +1,9 @@
-import pandas as pd
 from typing import Any
 
-def convert_to_list_if_single_instance(
-    value: Any, expected_type: type
-) -> list | None:
+import pandas as pd
+
+
+def convert_to_list_if_single_instance(value: Any, expected_type: type) -> list | None:
     """
     Convert single instances to lists while preserving None and existing lists.
 

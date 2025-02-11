@@ -98,7 +98,7 @@ class SensitivityMetrics(BaseVariantCallMetrics):
             successes=self.metrics.TruthTP,
             total=self.metrics.TruthTotal,
             method=method,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -134,7 +134,7 @@ class PrecisionMetrics(BaseVariantCallMetrics):
             successes=self.metrics.QueryTP,
             total=self.metrics.QueryTotal,
             method=method,
-            **kwargs
+            **kwargs,
         )
 
 
