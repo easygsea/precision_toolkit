@@ -1,6 +1,3 @@
-import math
-
-
 def format_percentage(x: int | float, decimals: int = 1) -> str:
     """Convert number to percentage string.
 
@@ -22,15 +19,7 @@ def format_percentage(x: int | float, decimals: int = 1) -> str:
         >>> format_percentage(1, decimals=2)
         '100.00%'
     """
-    try:
-        number = float(x)
-        if not isinstance(decimals, int) or decimals < 0:
-            raise ValueError("Decimals must be non-negative int.")
-
-        # Floating-point precision edge case handling
-        if math.isclose(number, 0):
-            return "0." + "0" * decimals + "%"
-
-        return f"{number * 100:.{decimals}f}%"
-    except ValueError as e:
-        raise ValueError(f"Error in formatting: {e}")
+    if not isinstance(decimals, int) or decimals < 0:
+        raise ValueError("Decimals must be a non-negative integer.")
+    
+    return f"{x * 100:.{decimals}f}%"
