@@ -15,7 +15,7 @@ from clinical_tools.core.writers.word import (
 
 
 def generate_concordance_table(
-    results: dict[tuple[str, str], tuple[int, int, int, float, float, float]]
+    results: dict[tuple[str, str], tuple[int, int, int, float, float, float]],
 ) -> pd.DataFrame:
     """
     Generate a pandas DataFrame for variant concordance summary.
