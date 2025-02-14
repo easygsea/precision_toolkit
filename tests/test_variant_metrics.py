@@ -25,21 +25,19 @@ def sample_metrics() -> VariantCallMetrics:
 
 
 @pytest.mark.parametrize(
-    "truth_total, truth_tp, truth_fn, query_total, query_tp, query_fp, expected_sensitivity",
+    "truth_total, truth_tp, truth_fn, expected_sensitivity",
     [
-        (100, 90, 10, 120, 90, 30, 0.9),  # Normal case
-        (0, 0, 0, 120, 90, 30, 0.0),  # Zero TruthTotal
-        (100, 0, 100, 120, 90, 30, 0.0),  # Zero TruthTP
+        (100, 90, 10, 0.9),  # Normal case
+        (0, 0, 0, 0.0),  # Zero TruthTotal
+        (100, 0, 100, 0.0),  # Zero TruthTP
+        (100, 100, 0, 1.0),  # Perfect sensitivity (zero TruthFN)
     ],
-    ids=["normal_case", "zero_truth_total", "zero_truth_tp"],
+    ids=["normal_case", "zero_truth_total", "zero_truth_tp", "perfect_sensitivity"],
 )
 def test_sensitivity_metrics(
     truth_total: int,
     truth_tp: int,
     truth_fn: int,
-    query_total: int,
-    query_tp: int,
-    query_fp: int,
     expected_sensitivity: float,
 ) -> None:
     """
@@ -59,27 +57,25 @@ def test_sensitivity_metrics(
         TruthTotal=truth_total,
         TruthTP=truth_tp,
         TruthFN=truth_fn,
-        QueryTotal=query_total,
-        QueryTP=query_tp,
-        QueryFP=query_fp,
+        QueryTotal=120,
+        QueryTP=90,
+        QueryFP=30,
     )
     sensitivity_metrics = SensitivityMetrics(metrics)
     assert sensitivity_metrics.sensitivity == expected_sensitivity
 
 
 @pytest.mark.parametrize(
-    "truth_total, truth_tp, truth_fn, query_total, query_tp, query_fp, expected_precision",
+    "query_total, query_tp, query_fp, expected_precision",
     [
-        (100, 90, 10, 120, 90, 30, 0.75),  # Normal case
-        (100, 90, 10, 0, 0, 0, 0.0),  # Zero QueryTotal
-        (100, 90, 10, 120, 0, 120, 0.0),  # Zero QueryTP
+        (120, 90, 30, 0.75),  # Normal case
+        (0, 0, 0, 0.0),  # Zero QueryTotal
+        (120, 0, 120, 0.0),  # Zero QueryTP
+        (120, 120, 0, 1.0),  # Perfect precision (zero QueryFP)
     ],
-    ids=["normal_case", "zero_query_total", "zero_query_tp"],
+    ids=["normal_case", "zero_query_total", "zero_query_tp", "perfect_precision"],
 )
 def test_precision_metrics(
-    truth_total: int,
-    truth_tp: int,
-    truth_fn: int,
     query_total: int,
     query_tp: int,
     query_fp: int,
@@ -99,9 +95,9 @@ def test_precision_metrics(
     metrics = VariantCallMetrics(
         VariantType="SNV",
         VariantCallFilter="PASS",
-        TruthTotal=truth_total,
-        TruthTP=truth_tp,
-        TruthFN=truth_fn,
+        TruthTotal=100,
+        TruthTP=90,
+        TruthFN=10,
         QueryTotal=query_total,
         QueryTP=query_tp,
         QueryFP=query_fp,
