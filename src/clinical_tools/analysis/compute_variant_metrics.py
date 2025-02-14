@@ -4,7 +4,11 @@ from collections import defaultdict
 from collections.abc import Sequence
 
 from clinical_tools.core.constants import VariantConcordanceEngine
-from clinical_tools.core.metrics.variant import ConcordanceMetrics, VariantCallMetrics
+from clinical_tools.core.metrics.variant import (
+    ConcordanceMetrics,
+    ConcordanceTPMethod,
+    VariantCallMetrics,
+)
 from clinical_tools.core.parsers.happy import HappyDataParser
 from clinical_tools.core.parsers.wittyer import WittyerDataParser
 
@@ -49,12 +53,14 @@ def load_data_from_files(
 
 def compute_concordance_and_ci(
     metrics: list[VariantCallMetrics],
+    tp_method: ConcordanceTPMethod = ConcordanceTPMethod.MinTP,
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
     """
     Compute concordance and confidence intervals grouped by variant type and filter.
 
     Args:
         metrics: Sequence of parsed metrics across samples
+        tp_method: Method for selecting TP in concordance (default: MinTP)
 
     Returns:
         Dictionary mapping (variant_type, filter) to metrics tuple:
@@ -71,13 +77,14 @@ def compute_concordance_and_ci(
         grouped_metrics[key].append(metric)
 
     return {
-        key: _compute_concordance_and_ci_for_group(group)
+        key: _compute_concordance_and_ci_for_group(group, tp_method)
         for key, group in grouped_metrics.items()
     }
 
 
 def _compute_concordance_and_ci_for_group(
     group: list[VariantCallMetrics],
+    tp_method: ConcordanceTPMethod = ConcordanceTPMethod.MinTP,
 ) -> tuple[int, int, int, float, float, float]:
     """
     Calculate concordance metrics for a group of variants.
@@ -87,6 +94,7 @@ def _compute_concordance_and_ci_for_group(
 
     Args:
         group: List of variant metrics to aggregate, all with same type and filter
+        tp_method: Method for selecting TP in concordance (default: MinTP)
 
     Returns:
         Tuple of metrics:
@@ -113,7 +121,7 @@ def _compute_concordance_and_ci_for_group(
         QueryFP=total_query_fp,
     )
 
-    analysis = ConcordanceMetrics(aggregated_metrics)
+    analysis = ConcordanceMetrics(aggregated_metrics, tp_method)
     concordance = analysis.concordance
     ci_lower, ci_upper = analysis.confidence_interval()
 
@@ -128,7 +136,9 @@ def _compute_concordance_and_ci_for_group(
 
 
 def process_variant_metrics(
-    file_paths: Sequence[str], data_type: VariantConcordanceEngine
+    file_paths: Sequence[str],
+    data_type: VariantConcordanceEngine,
+    tp_method: ConcordanceTPMethod = ConcordanceTPMethod.MinTP,
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
     """
     Process variant metrics and compute confidence intervals.
@@ -147,4 +157,4 @@ def process_variant_metrics(
             ci_upper: Upper bound of confidence interval
     """
     metrics = load_data_from_files(file_paths, data_type=data_type)
-    return compute_concordance_and_ci(metrics)
+    return compute_concordance_and_ci(metrics, tp_method)

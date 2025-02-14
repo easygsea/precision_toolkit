@@ -50,13 +50,13 @@ Using containerized tools:
 - [Usage](#usage)
   - [Variant Concordance](#variant-concordance)
     - [Variant Concordance Parameters](#variant-concordance-parameters)
-    - [Engine Selection Guidelines](#variant-concordance-engine)
+    - [Engine Selection Guidelines](#engine-selection-guidelines)
     - [Spurious Variant Filtering](#spurious-variant-filtering)
     - [Variant Concordance Output](#variant-concordance-output)
-    - [Manual Curation](#variant-concordance-manual-curation)
-- [Resource Optimization and High-Performance Computing](#resource-optimization-and-hpc)
+    - [Variant Concordance Manual Curation](#variant-concordance-manual-curation)
+- [Resource Optimization and High-Performance Computing](#resource-optimization-and-high-performance-computing)
 
-## [Motivation](#motivation)
+## Motivation
 
 Clinical validation of genomic assays is critical in ensuring the accuracy and reliability of diagnostic tests. However, manual workflows are often time-consuming, error-prone, and difficult to standardize across laboratories, leading to challenges in consistency and reproducibility.
 
@@ -64,13 +64,13 @@ The Clinical Tools software package addresses these challenges with an automated
 
 The pipeline's architecture supports execution across various computing environments, from local machines to high-performance computing clusters, making it accessible to laboratories with different computational resources. By automating complex analysis workflows and providing standardized outputs ([CSV](https://en.wikipedia.org/wiki/Comma-separated_values), [Markdown](https://www.markdownguide.org/), and [Word](https://www.microsoft.com/en-us/microsoft-365/word)), this tool aims to improve the efficiency and reliability of clinical validation studies while meeting regulatory requirements for diagnostic test validation.
 
-## [Usage](#usage)
+## Usage
 
-### [Variant Concordance Analysis](#variant-concordance)
+### Variant Concordance Analysis
 
 The variant concordance module compares variant calls between truth and query VCF files using either [hap.py](https://github.com/Illumina/hap.py) or [witty.er](https://github.com/EBIvariation/witty.er) as the analysis engine.
 
-#### [Variant Concordance Parameters](#variant-concordance-parameters)
+#### Variant Concordance Parameters
 
 **Required Parameters:**
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
@@ -86,13 +86,14 @@ The variant concordance module compares variant calls between truth and query VC
 - `--spurious_variants_vcf`: VCF file containing spurious variants to exclude
 - `--collapse`: Collapse option for bcftools isec (default: `both` for happy, `id` for wittyer)
 - `--skip_raw`: Skip raw analysis (only available when `spurious_variants_vcf` is provided)
+- `--concordance_tp`: Method for defining TP in concordance calculation. Available options: `truth` (use truth set's TP count), `query` (use query set's TP count), `min` (use minimum of truth and query TP counts, default)
 
 **Official Parameter References:**
 - [hap.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/happy.md#command-line-options)
 - [witty.er parameters](https://github.com/EBIvariation/witty.er/wiki/Configuration-Parameters)
 
 
-#### [Engine Selection Guidelines](#variant-concordance-engine)
+#### Engine Selection Guidelines
 
 1. **Use hap.py when:**
    - Your analysis requires strict matching of variant positions and alleles
@@ -120,7 +121,7 @@ The variant concordance module compares variant calls between truth and query VC
 | Best Use Case      | Small variants, precision | Large variants, throughput |
 
 
-#### [Spurious Variant Filtering](#spurious-variant-filtering)
+#### Spurious Variant Filtering
 
 The pipeline supports automatic filtering of known spurious variants using [bcftools isec](https://samtools.github.io/bcftools/bcftools.html#isec) for curated statistics. To utilize this feature, prepare your spurious variant VCF file following these guidelines:
 
@@ -162,7 +163,7 @@ chr17   43099821	DRAGEN:LOSS:chr17:43099822-43101081 N   <DEL>   .   .   .
 - Update the VCF based on new findings
 
 
-### [Variant Concordance Output](#variant-concordance-output)
+#### Variant Concordance Output
 
 The pipeline records reports from variant concordance analysis engines and generates summary tables in multiple formats, facilitating streamlined reporting:
 
@@ -235,7 +236,7 @@ For more defails on hap.py and witty.er outputs:
 - [hap.py output documentation](https://github.com/Illumina/hap.py?tab=readme-ov-file#happy)
 - [witty.er output documentation](https://github.com/Illumina/witty.er?tab=readme-ov-file#outputs)
 
-#### [Manual Curation](#variant-concordance-manual-curation)
+#### Variant Concordance Manual Curation
 
 In some cases, manual curation of variant concordance results is necessary, for example, reclassifying a false negative (FN) as a true positive (TP) after investigation. Users can run the curate-variant-concordance script to manually update counts, after which the pipeline will recalculate the curated statistics.
 
@@ -247,7 +248,7 @@ singularity exec -B <data_path> /path/to/clinical_tools_latest.sif curate-varian
 --output_prefix variant_concordance_happy_curated_final
 ```
 
-## [Resource Optimization and High-Performance Computing](#resource-optimization-and-hpc)
+## Resource Optimization and High-Performance Computing
 
 The package can be executed across diverse computing environments, from local machines to high-performance computing (HPC) clusters.
 

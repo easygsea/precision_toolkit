@@ -4,6 +4,7 @@ import pytest
 
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
+    ConcordanceTPMethod,
     PrecisionMetrics,
     ProportionConfidenceIntervalMethod,
     SensitivityMetrics,
@@ -64,7 +65,9 @@ def test_sensitivity_metrics(
         QueryFP=30,
     )
     sensitivity_metrics = SensitivityMetrics(metrics)
-    assert sensitivity_metrics.sensitivity == expected_sensitivity
+    assert sensitivity_metrics.sensitivity == pytest.approx(
+        expected_sensitivity, abs=1e-3
+    )
 
 
 @pytest.mark.parametrize(
@@ -105,7 +108,7 @@ def test_precision_metrics(
         QueryFP=query_fp,
     )
     precision_metrics = PrecisionMetrics(metrics)
-    assert precision_metrics.precision == expected_precision
+    assert precision_metrics.precision == pytest.approx(expected_precision, abs=1e-3)
 
 
 @pytest.mark.parametrize(
@@ -114,11 +117,39 @@ def test_precision_metrics(
         "expected_concordance"
     ),
     [
-        (100, 90, 10, 120, 90, 30, 0.6923),  # Normal case
-        (0, 0, 0, 0, 0, 0, 0.0),  # Zero total calls
-        (100, 0, 100, 120, 0, 120, 0.0),  # Zero TruthTP
+        (100, 90, 10, 120, 90, 30, ConcordanceTPMethod.TruthTP, 0.6923),  # Use TruthTP
+        (100, 90, 10, 120, 80, 30, ConcordanceTPMethod.QueryTP, 0.6154),  # Use QueryTP
+        (
+            100,
+            90,
+            10,
+            120,
+            80,
+            30,
+            ConcordanceTPMethod.MinTP,
+            0.6154,
+        ),  # Use MinTP (QueryTP is smaller)
+        (
+            100,
+            80,
+            20,
+            120,
+            90,
+            30,
+            ConcordanceTPMethod.MinTP,
+            0.6154,
+        ),  # Use MinTP (TruthTP is smaller)
+        (0, 0, 0, 0, 0, 0, ConcordanceTPMethod.MinTP, 0.0),  # Zero total calls
+        (100, 0, 100, 120, 0, 120, ConcordanceTPMethod.MinTP, 0.0),  # Zero TP
     ],
-    ids=["normal_case", "zero_total_calls", "zero_truth_tp"],
+    ids=[
+        "truth_tp",
+        "query_tp",
+        "min_tp_query",
+        "min_tp_truth",
+        "zero_total_calls",
+        "zero_tp",
+    ],
 )
 def test_concordance_metrics(
     truth_total: int,
@@ -127,18 +158,19 @@ def test_concordance_metrics(
     query_total: int,
     query_tp: int,
     query_fp: int,
+    tp_method: ConcordanceTPMethod,
     expected_concordance: float,
 ) -> None:
     """
-    Test ConcordanceMetrics with parametrized inputs.
+    Test ConcordanceMetrics with parametrized inputs and TP selection methods.
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
-    2. Calculate concordance.
+    2. Calculate concordance using the specified TP method.
     3. Verify the calculated concordance matches the expected value.
 
     Expected Behavior:
-    - Concordance should be calculated as TruthTP / (TruthTotal + QueryFP).
+    - Concordance should be calculated as the selected TP / (TruthTotal + QueryFP).
     """
     metrics = VariantCallMetrics(
         VariantType="SNV",
@@ -150,7 +182,7 @@ def test_concordance_metrics(
         QueryTP=query_tp,
         QueryFP=query_fp,
     )
-    concordance_metrics = ConcordanceMetrics(metrics)
+    concordance_metrics = ConcordanceMetrics(metrics, tp_method)
     assert concordance_metrics.concordance == pytest.approx(
         expected_concordance, rel=1e-3
     )

@@ -100,6 +100,7 @@ process summarize_variant_concordance {
     path raw_concordance_outputs
     path curated_concordance_outputs
     val output_dir
+    val concordance_tp
 
     output:
     path("${PREFIX}*"), emit: variant_concordance_summary
@@ -110,6 +111,7 @@ process summarize_variant_concordance {
     summarize-variant-concordance --engine ${params.variant_concordance_engine} \
         ${(raw_concordance_outputs != []) ? "--raw-files " + raw_concordance_outputs.collect().join(' ') : ""} \
         ${(curated_concordance_outputs != []) ? "--curated-files " + curated_concordance_outputs.collect().join(' ') : ""} \
+        --tp-method ${concordance_tp} \
         --prefix ${PREFIX}
     """
 }

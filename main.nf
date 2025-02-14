@@ -42,6 +42,11 @@ def helpMessage() {
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
             --collapse               Collapse option for bcftools isec (default: 'none')
             --skip_raw               Skip raw analysis (only available when spurious_variants_vcf is provided)
+            --concordance_tp         Method for defining TP in concordance calculation
+                                     Available options:
+                                     - 'truth': Use truth set's TP count
+                                     - 'query': Use query set's TP count
+                                     - 'min': Use minimum of truth and query TP counts (default)
 
     ====================
     Resource Management

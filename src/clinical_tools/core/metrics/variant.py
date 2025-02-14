@@ -2,11 +2,20 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum
 
 from clinical_tools.core.statistics.proportion import (
     ProportionConfidenceInterval,
     ProportionConfidenceIntervalMethod,
 )
+
+
+class ConcordanceTPMethod(Enum):
+    """Enum for TP selection methods for variant concordance."""
+
+    TruthTP = "truth"  # Use truth TP for variant concordance
+    QueryTP = "query"  # Use query TP for variant concordance
+    MinTP = "min"  # Use minimum of truth and query TP for variant concordance (default)
 
 
 @dataclass(frozen=True)
@@ -154,6 +163,21 @@ class PrecisionMetrics(BaseVariantCallMetrics):
 class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
     """Handles concordance and combined metrics calculations."""
 
+    def __init__(
+        self,
+        metrics: VariantCallMetrics,
+        tp_method: ConcordanceTPMethod = ConcordanceTPMethod.MinTP,
+    ) -> None:
+        """
+        Initialize with metrics data and TP selection method.
+
+        Args:
+            metrics: Container with variant metrics data
+            tp_method: Method for selecting TP in concordance
+        """
+        super().__init__(metrics)
+        self._tp_method = tp_method
+
     @property
     def concordance(self) -> float:
         """
@@ -162,8 +186,12 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         Returns:
             Concordance value between 0 and 1
         """
-        total_calls = self.metrics.TruthTotal + self.metrics.QueryFP
-        return self.metrics.TruthTP / total_calls if total_calls > 0 else 0
+        selected_tp = {
+            ConcordanceTPMethod.TruthTP: self.metrics.TruthTP,
+            ConcordanceTPMethod.QueryTP: self.metrics.QueryTP,
+        }.get(self._tp_method, min(self.metrics.TruthTP, self.metrics.QueryTP))
+        total_calls = selected_tp + self.metrics.TruthFN + self.metrics.QueryFP
+        return 0.0 if total_calls == 0 else selected_tp / total_calls
 
     def confidence_interval(
         self,
