@@ -1,5 +1,3 @@
-from enum import Enum
-
 import pytest
 
 from clinical_tools.core.metrics.variant import (
