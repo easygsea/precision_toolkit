@@ -5,7 +5,7 @@ process generate_fai {
     path genome_ref
 
     output:
-    path "${genome_ref}.fai", emit: genome_fai
+    path("${genome_ref}.fai"), emit: genome_fai
 
     script:
     """
@@ -39,18 +39,35 @@ process index_vcf {
     """
 }
 
+process normalize_vcf {
+    tag "${vcf}"
+    
+    input:
+    path vcf
+    path vcf_tbi
+
+    output:
+    path("${vcf}.normalized.vcf.gz"), emit: normalized_vcf
+
+    script:
+    """
+    # Normalize VCF
+    bcftools norm -m -any ${vcf} -o ${vcf}.normalized.vcf.gz
+    """
+}
+
 process exclude_spurious_variants {
     tag "${sampleName}"
     
     input:
     tuple val(sampleName), path(original_vcf)
-    path spurious_variants_vcf
-    path spurious_variants_vcf_tbi
+    path normalized_spurious_vcf
+    path normalized_spurious_vcf_tbi
     val label
     val collapse // collapse option for bcftools isec
 
     output:
-    tuple val(sampleName), path("${sampleName}.${label}.curated.vcf.gz"), emit: curated_vcf
+    tuple val(sampleName), path("${sampleName}.${label}.no_spurious.vcf.gz"), emit: no_spurious_vcf
 
     script:
     """
@@ -65,9 +82,15 @@ process exclude_spurious_variants {
         tabix -p vcf ${original_vcf}
     fi
     
-    # Perform variant exclusion using bcftools isec
+    # Normalize and decompose multiallelic variants in original VCF
+    bcftools norm -m -any ${original_vcf} -o normalized_original.vcf.gz
+
+    # Index normalized original VCF
+    tabix -p vcf normalized_original.vcf.gz
+
+    # Perform variant exclusion using bcftools isec on normalized VCFs
     bcftools isec --collapse ${collapse} --complement --write 1 --output-type z \
-        --output ${sampleName}.${label}.curated.vcf.gz ${original_vcf} ${spurious_variants_vcf}
+        --output ${sampleName}.${label}.no_spurious.vcf.gz normalized_original.vcf.gz ${normalized_spurious_vcf}
     """
 }
 
