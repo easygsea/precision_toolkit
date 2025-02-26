@@ -16,9 +16,7 @@ class ProportionConfidenceIntervalMethod(StrEnum):
 
 
 class ProportionConfidenceInterval:
-    """
-    A class for calculating confidence intervals for proportions.
-    """
+    """A class for calculating confidence intervals for proportions."""
 
     SUPPORTED_METHODS = [method.value for method in ProportionConfidenceIntervalMethod]
 
@@ -36,7 +34,7 @@ class ProportionConfidenceInterval:
         Args:
             successes: Number of success events.
             total: Total number of events.
-            method: CI calculation method. Must be a ProportionConfidenceIntervalMethod
+            method: CI calculation method. Must be a ProportionConfidenceIntervalMethod.
             **kwargs: Additional keyword arguments passed to proportion_confint.
 
         Returns:

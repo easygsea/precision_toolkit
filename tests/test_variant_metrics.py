@@ -109,7 +109,8 @@ def test_precision_metrics(
 
 
 @pytest.mark.parametrize(
-    "truth_total, truth_tp, truth_fn, query_total, query_tp, query_fp, expected_concordance",
+    ("truth_total, truth_tp, truth_fn, query_total, query_tp, query_fp, "
+     "expected_concordance"),
     [
         (100, 90, 10, 120, 90, 30, 0.6923),  # Normal case
         (0, 0, 0, 0, 0, 0, 0.0),  # Zero total calls

@@ -1,11 +1,12 @@
+"""Variant concordance rendering."""
+
 from pathlib import Path
 
 import pandas as pd
 
-from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
 from clinical_tools.core.format import format_percentage
 from clinical_tools.core.helpers import assemble_exports
-from clinical_tools.core.writers.csv import pandas_to_csv
+from clinical_tools.core.writers.table import pandas_to_csv
 from clinical_tools.core.writers.markdown import populate_markdown, save_markdown
 from clinical_tools.core.writers.word import (
     initiate_word_document,
@@ -26,7 +27,7 @@ def generate_concordance_table(
             false_positive, concordance, ci_lower, ci_upper)
 
     Returns:
-        DataFrame summarizing variant concordance, sorted by Variant Type then Variant Filter
+        DataFrame of variant concordance, sorted by Variant Type and Filter
     """
     data = [
         {
@@ -125,9 +126,9 @@ def export_concordance_to_word(
         dfs: Single DataFrame or list of DataFrames to export
         output_file: Path to save the Word file
         headings: Optional heading(s) to add to the file. If multiple DataFrames,
-            should be a list of headings matching the number of DataFrames.
+        should be a list of headings matching the number of DataFrames.
         summaries: Optional summary(s) to add before the table(s). If multiple DataFrames,
-            should be a list of summaries matching the number of DataFrames.
+        should be a list of summaries matching the number of DataFrames.
     """
     dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
 

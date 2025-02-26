@@ -28,7 +28,9 @@ def populate_markdown(
     if summary:
         markdown_content += f"{summary}\n\n"
 
-    markdown_table = tabulate(df, headers="keys", tablefmt="github", showindex=False)  # type: ignore
+    markdown_table = tabulate(
+        df, headers="keys", tablefmt="github", showindex=False  # type: ignore
+    )
     markdown_content += markdown_table
 
     return markdown_content

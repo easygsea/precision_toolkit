@@ -1,4 +1,4 @@
-"""CSV writer."""
+"""Table writer."""
 
 import logging
 from pathlib import Path
