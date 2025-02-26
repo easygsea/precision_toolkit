@@ -139,13 +139,13 @@ Larger variants:
 ```
 ##fileformat=VCFv4.2
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-chr17   43099821	DRAGEN:LOSS:chr17:43099822-43101081 N   <DEL>   .   .   .   
+chr17   43099821	DRAGEN:LOSS:chr17:43099822-43101081 N   <DEL>   .   .   .
 ```
 2. **Chromosome Naming**: Ensure chromosome naming matches your reference genome
-3. **Variant Representation**: 
+3. **Variant Representation**:
    - For SNPs: Use single base positions
    - For indels: Use precise start positions and correct REF/ALT representation
-4. **Quality Control**: 
+4. **Quality Control**:
    - Remove duplicate variants
    - Validate against reference genome
    - Include only high-confidence spurious calls

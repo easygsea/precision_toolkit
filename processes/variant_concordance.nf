@@ -16,10 +16,10 @@ process generate_fai {
 process bgzip_vcf {
     input:
     path original_vcf
-    
+
     output:
     path("${original_vcf}.gz"), emit: gzipped_vcf
-    
+
     script:
     """
     bgzip -c ${original_vcf} > ${original_vcf}.gz
@@ -29,10 +29,10 @@ process bgzip_vcf {
 process index_vcf {
     input:
     path gzipped_vcf
-    
+
     output:
     path("${gzipped_vcf}.tbi"), emit: indexed_vcf
-    
+
     script:
     """
     tabix -p vcf ${gzipped_vcf}
@@ -41,7 +41,7 @@ process index_vcf {
 
 process normalize_vcf {
     tag "${vcf}"
-    
+
     input:
     path vcf
     path vcf_tbi
@@ -58,7 +58,7 @@ process normalize_vcf {
 
 process exclude_spurious_variants {
     tag "${sampleName}"
-    
+
     input:
     tuple val(sampleName), path(original_vcf)
     path normalized_spurious_vcf
@@ -76,12 +76,12 @@ process exclude_spurious_variants {
         bgzip -c ${original_vcf} > ${original_vcf}.gz
         original_vcf=${original_vcf}.gz
     fi
-    
+
     # Index original VCF if needed
     if [[ ! -f ${original_vcf}.tbi ]]; then
         tabix -p vcf ${original_vcf}
     fi
-    
+
     # Normalize and decompose multiallelic variants in original VCF
     bcftools norm -m -any ${original_vcf} -o normalized_original.vcf.gz
 

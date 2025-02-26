@@ -30,9 +30,9 @@ def build_vcf_pair_channels(truth_dir, query_dir) {
 def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
     def spurious_variants_vcf = file(spurious_variants_vcf_path)
     if (!spurious_variants_vcf.exists()) error "Input file not found, please check: ${spurious_variants_vcf}"
-    
+
     // Check and compress spurious variants VCF
-    def spurious_variants_vcf_gz = spurious_variants_vcf.toString().endsWith('.gz') ? 
+    def spurious_variants_vcf_gz = spurious_variants_vcf.toString().endsWith('.gz') ?
         spurious_variants_vcf : file("${spurious_variants_vcf}.gz")
     if (!spurious_variants_vcf_gz.exists()) {
         spurious_variants_vcf_gz = bgzip_vcf(file(spurious_variants_vcf)).gzipped_vcf
@@ -45,7 +45,7 @@ def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
     }
 
     // Normalize spurious variants VCF
-    def normalized_spurious_variants_vcf = normalize_vcf(spurious_variants_vcf_gz, spurious_variants_vcf_tbi).normalized_vcf    
+    def normalized_spurious_variants_vcf = normalize_vcf(spurious_variants_vcf_gz, spurious_variants_vcf_tbi).normalized_vcf
 
     // Index normalized spurious variants VCF
     def normalized_spurious_variants_vcf_tbi = index_spurious_variants_normalized_vcf(normalized_spurious_variants_vcf).indexed_vcf
@@ -60,7 +60,7 @@ def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
         "truth",
         collapse
     ).no_spurious_vcf
-    
+
     def no_spurious_query = exclude_spurious_variants_query(
         query_vcfs,
         normalized_spurious_variants_vcf,
@@ -74,7 +74,7 @@ def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
 
 // Function to run happy analysis
 def run_happy_analysis(vcf_pairs, genome_ref_path, genome_fai_path, happy_options, output_dir, label) {
-    return label == "raw" ? 
+    return label == "raw" ?
         run_happy_raw(
             vcf_pairs,
             genome_ref_path,
@@ -141,9 +141,9 @@ workflow variant_concordance_workflow {
         // Run analysis based on selected engine
         if (params.variant_concordance_engine == "happy") {
             if (!params.genome_ref) error "genome_ref parameter is required for happy engine"
-            
+
             def genome_ref_path = file(params.genome_ref)
-            
+
             // Check if .fai index file exists, if not generate it
             def genome_fai_path = file("${params.genome_ref}.fai")
             if (!genome_fai_path.exists()) {

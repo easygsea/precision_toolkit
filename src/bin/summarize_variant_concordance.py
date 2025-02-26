@@ -35,9 +35,7 @@ def main():
         None. Results are saved to CSV, Markdown, and Word files.
     """
     parser = argparse.ArgumentParser(
-        description=(
-            "Compute variant metrics from VCF comparisons."
-        )
+        description=("Compute variant metrics from VCF comparisons.")
     )
     parser.add_argument(
         "-e",
