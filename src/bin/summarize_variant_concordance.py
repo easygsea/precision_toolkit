@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+"""
+Summarize variant concordance results.
+
+Usage:
+    summarize-variant-concordance --engine <engine> --raw-files <raw_files>
+    --curated-files <curated_files> --prefix <prefix>
+
+Example:
+    summarize-variant-concordance --engine happy --raw-files A.raw.summary.csv
+    B.raw.summary.csv --curated-files A.curated.summary.csv B.curated.summary.csv
+    --prefix variant_concordance
+"""
+
 import argparse
 
 from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics

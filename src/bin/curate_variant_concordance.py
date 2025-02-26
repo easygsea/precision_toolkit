@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+"""
+Manually curate variant concordance results.
+
+Usage:
+    curate-variant-concordance --input <input_file> --curation <curation_criteria> 
+    --output_prefix <output_prefix>
+
+Example:
+    curate-variant-concordance --input concordance.csv --curation "SNP:PASS:TP:100" 
+    "SNP:PASS:FN:50" "SNP:PASS:FP:20" --output_prefix curated_concordance
+"""
 
 import argparse
 import logging
