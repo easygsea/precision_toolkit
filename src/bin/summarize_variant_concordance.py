@@ -25,6 +25,16 @@ from clinical_tools.render.variant_concordance import (
 
 
 def main():
+    """
+    Compute combined variant metrics across samples from hap.py or witty.er
+    output files.
+
+    Args:
+        None (arguments are parsed from command line)
+
+    Returns:
+        None. Results are saved to CSV, Markdown, and Word files.
+    """
     parser = argparse.ArgumentParser(
         description=(
             "Compute combined variant metrics across samples from hap.py or "

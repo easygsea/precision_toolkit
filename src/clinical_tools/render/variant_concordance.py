@@ -6,8 +6,8 @@ import pandas as pd
 
 from clinical_tools.core.format import format_percentage
 from clinical_tools.core.helpers import assemble_exports
-from clinical_tools.core.writers.table import pandas_to_csv
 from clinical_tools.core.writers.markdown import populate_markdown, save_markdown
+from clinical_tools.core.writers.table import pandas_to_csv
 from clinical_tools.core.writers.word import (
     initiate_word_document,
     pandas_to_word,
