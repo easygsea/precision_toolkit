@@ -38,7 +38,7 @@ def validate_curation_format(curation: str) -> bool:
         ValueError: If format is invalid
     """
     try:
-        variant_type, filter_type, metric, count = curation.split(":")
+        _, _, metric, count = curation.split(":")
         int(count)
         if metric not in {"TP", "FN", "FP"}:
             raise ValueError(f"Invalid metric: {metric}")
@@ -132,21 +132,21 @@ def main():
         df.loc[mask, "CI Lower"] = ci_lower
         df.loc[mask, "CI Upper"] = ci_upper
 
-    summary_text = "Curated variant concordance summary."
+    summary_text = "Manually curated variant concordance summary."
 
     # Export using the output prefix
     export_concordance_to_csv(df, f"{args.output_prefix}.csv")
     export_concordance_to_markdown(
         df,
         f"{args.output_prefix}.md",
-        heading="Curated Variant Concordance",
-        summary=summary_text,
+        headings="Manually Curated Variant Concordance",
+        summaries=summary_text,
     )
     export_concordance_to_word(
         df,
         f"{args.output_prefix}.docx",
-        heading="Curated Variant Concordance",
-        summary=summary_text,
+        headings="Manually Curated Variant Concordance",
+        summaries=summary_text,
     )
 
 
