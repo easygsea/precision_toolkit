@@ -63,8 +63,8 @@ class BaseVariantCallMetrics(ABC):
         Calculate confidence interval for the metric.
 
         Args:
-            method: Statistical method for CI calculation
-            **kwargs: Additional parameters for the method
+            method: Statistical method for CI calculation.
+            **kwargs: Additional parameters for the method.
 
         Returns:
             Lower and upper bounds of the confidence interval
@@ -78,7 +78,7 @@ class SensitivityMetrics(BaseVariantCallMetrics):
     @property
     def sensitivity(self) -> float:
         """
-        Calculate sensitivity (recall).
+        Calculate the proportion of true positives among all positive calls.
 
         Returns:
             Sensitivity value between 0 and 1

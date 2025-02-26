@@ -9,6 +9,8 @@ from clinical_tools.core.metrics.variant import VariantCallMetrics
 
 
 class WittyerDataParser:
+    """Parser for Wittyer output."""
+
     @staticmethod
     def process_witty_er_output(file_path: Path | str) -> Sequence[VariantCallMetrics]:
         """Process the Wittyer output JSON file to extract metrics information.

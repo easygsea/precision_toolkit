@@ -10,6 +10,8 @@ from clinical_tools.core.metrics.variant import VariantCallMetrics
 
 
 class HappyDataParser:
+    """Parser for hap.py output."""
+
     @staticmethod
     def process_hap_py_output(file_path: Path | str) -> Sequence[VariantCallMetrics]:
         """Process the hap.py output file to extract relevant information.

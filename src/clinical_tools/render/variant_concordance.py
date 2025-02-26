@@ -93,9 +93,9 @@ def export_concordance_to_markdown(
         dfs: Single DataFrame or list of DataFrames to export
         output_file: Path to save the Markdown file
         headings: Optional heading(s) to add to the file. If multiple DataFrames,
-        should be a list of headings matching the number of DataFrames.
-        summaries: Optional summary(s) to add before the table(s). If multiple
-        DataFrames, should be a list of summaries matching the number of DataFrames.
+        should be a list of headings matching DataFrame count.
+        summaries: Optional summary(s) to add before table(s). If multiple
+        DataFrames, should be a list of summaries matching DataFrame count.
     """
     dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
 
@@ -126,9 +126,9 @@ def export_concordance_to_word(
         dfs: Single DataFrame or list of DataFrames to export
         output_file: Path to save the Word file
         headings: Optional heading(s) to add to the file. If multiple DataFrames,
-        should be a list of headings matching the number of DataFrames.
-        summaries: Optional summary(s) to add before the table(s). If multiple DataFrames,
-        should be a list of summaries matching the number of DataFrames.
+        should be a list of headings matching DataFrame count.
+        summaries: Optional summary(s) to add before table(s). If multiple
+        DataFrames, should be a list of summaries matching DataFrame count.
     """
     dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
 

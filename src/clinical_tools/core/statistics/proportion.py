@@ -2,7 +2,9 @@
 
 from enum import StrEnum
 
-from statsmodels.stats.proportion import proportion_confint
+from statsmodels.stats.proportion import (  # type: ignore[import-untyped]
+    proportion_confint,
+)
 
 
 class ProportionConfidenceIntervalMethod(StrEnum):

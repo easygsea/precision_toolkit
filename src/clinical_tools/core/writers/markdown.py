@@ -29,7 +29,10 @@ def populate_markdown(
         markdown_content += f"{summary}\n\n"
 
     markdown_table = tabulate(
-        df, headers="keys", tablefmt="github", showindex=False  # type: ignore
+        df.to_dict(orient="list"),
+        headers="keys",
+        tablefmt="github",
+        showindex=False,
     )
     markdown_content += markdown_table
 
