@@ -1,16 +1,22 @@
+"""Word writer."""
+
 import logging
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 from docx import Document
 
+# Module-level default document
+_DEFAULT_DOCUMENT = Document()
+
 
 def pandas_to_word(
-    doc: Document,
     df: pd.DataFrame,
+    doc: Any = _DEFAULT_DOCUMENT,
     heading: str | None = None,
     summary: str | None = None,
-) -> Document:
+) -> Any:
     """
     Generate a Word document from a pandas DataFrame.
 
@@ -41,7 +47,7 @@ def pandas_to_word(
     return doc
 
 
-def initiate_word_document() -> Document:
+def initiate_word_document() -> Any:
     """
     Create and return an empty Word document.
 
@@ -51,7 +57,7 @@ def initiate_word_document() -> Document:
     return Document()
 
 
-def save_word_document(doc: Document, output_file: str | Path) -> None:
+def save_word_document(output_file: str | Path, doc: Any = _DEFAULT_DOCUMENT) -> Any:
     """
     Save a Word document to a file.
 
@@ -60,7 +66,7 @@ def save_word_document(doc: Document, output_file: str | Path) -> None:
         output_file: The path to save the Word file.
 
     Returns:
-        None
+        The saved Word document object.
 
     Raises:
         IOError: If file cannot be written

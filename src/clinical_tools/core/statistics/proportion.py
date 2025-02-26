@@ -1,3 +1,5 @@
+"""Proportion confidence interval calculations."""
+
 from enum import StrEnum
 
 from statsmodels.stats.proportion import proportion_confint
@@ -24,7 +26,9 @@ class ProportionConfidenceInterval:
     def proportion_confidence_interval(
         successes: int,
         total: int,
-        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        method: ProportionConfidenceIntervalMethod = (
+            ProportionConfidenceIntervalMethod.WILSON
+        ),
         **kwargs,
     ) -> tuple[float, float]:
         """Calculate the confidence interval for a binomial proportion.
@@ -32,7 +36,7 @@ class ProportionConfidenceInterval:
         Args:
             successes: Number of success events.
             total: Total number of events.
-            method: CI calculation method. Must be one of ProportionConfidenceIntervalMethod
+            method: CI calculation method. Must be a ProportionConfidenceIntervalMethod
             **kwargs: Additional keyword arguments passed to proportion_confint.
 
         Returns:

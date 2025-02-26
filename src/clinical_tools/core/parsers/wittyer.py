@@ -1,3 +1,5 @@
+"""Parser for Witty.er output."""
+
 import json
 import logging
 from collections.abc import Sequence

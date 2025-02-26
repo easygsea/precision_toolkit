@@ -1,3 +1,5 @@
+"""Constants for the clinical tools package."""
+
 from enum import StrEnum
 
 

@@ -1,3 +1,5 @@
+"""Parser for hap.py output."""
+
 import logging
 from collections.abc import Sequence
 from pathlib import Path

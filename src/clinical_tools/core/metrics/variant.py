@@ -1,3 +1,5 @@
+"""Variant metrics classes."""
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -51,7 +53,9 @@ class BaseVariantCallMetrics(ABC):
     @abstractmethod
     def confidence_interval(
         self,
-        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        method: ProportionConfidenceIntervalMethod = (
+            ProportionConfidenceIntervalMethod.WILSON
+        ),
         **kwargs,
     ) -> tuple[float, float]:
         """Calculate confidence interval for the metric.
@@ -82,7 +86,9 @@ class SensitivityMetrics(BaseVariantCallMetrics):
 
     def confidence_interval(
         self,
-        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        method: ProportionConfidenceIntervalMethod = (
+            ProportionConfidenceIntervalMethod.WILSON
+        ),
         **kwargs,
     ) -> tuple[float, float]:
         """Calculate confidence interval for sensitivity.
@@ -118,7 +124,9 @@ class PrecisionMetrics(BaseVariantCallMetrics):
 
     def confidence_interval(
         self,
-        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        method: ProportionConfidenceIntervalMethod = (
+            ProportionConfidenceIntervalMethod.WILSON
+        ),
         **kwargs,
     ) -> tuple[float, float]:
         """Calculate confidence interval for precision.
@@ -153,7 +161,9 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
 
     def confidence_interval(
         self,
-        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        method: ProportionConfidenceIntervalMethod = (
+            ProportionConfidenceIntervalMethod.WILSON
+        ),
         **kwargs,
     ) -> tuple[float, float]:
         """Calculate confidence interval for concordance.

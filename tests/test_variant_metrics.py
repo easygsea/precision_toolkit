@@ -1,3 +1,5 @@
+"""Test variant metrics."""
+
 import pytest
 
 from clinical_tools.core.metrics.variant import (

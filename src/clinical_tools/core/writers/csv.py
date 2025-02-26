@@ -1,3 +1,5 @@
+"""CSV writer."""
+
 import logging
 from pathlib import Path
 
