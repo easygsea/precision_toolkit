@@ -1,6 +1,6 @@
-# Clinical Validation Tools
+# Clinical Genomics Assay Development & Validation Tools
 
-This software suite streamlines clinical validation workflows with automated analysis pipelines, result summarization, and report generation. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
+This software suite streamlines clinical genomics assay development and validation with automated analysis pipelines, result summarization, and report generation. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
 
 ## Supported Architectures
 
