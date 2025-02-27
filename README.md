@@ -24,7 +24,7 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
 
 2. Run specific workflows. Example:
    ```bash
-   nextflow run clinical_tools.nf --workflows concordance \
+   nextflow run main.nf --workflows concordance \
        --truth_dir truth_vcfs/ \
        --query_dir query_vcfs/ \
        --variant_concordance_engine happy \
@@ -302,12 +302,12 @@ It supports seamless integration with HPC environments:
 
 1. **Local Execution**:
    ```bash
-   nextflow run clinical_tools.nf -profile standard
+   nextflow run main.nf -profile standard
    ```
 
 2. **Cluster Execution**:
    ```bash
-   nextflow run clinical_tools.nf -profile slurm \
+   nextflow run main.nf -profile slurm \
        --slurm_account <your_account> \
        --slurm_partition <partition_name>
    ```

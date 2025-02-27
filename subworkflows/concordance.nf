@@ -11,7 +11,7 @@ include {
     run_wittyer as run_wittyer_raw
     run_wittyer as run_wittyer_curated
     summarize_variant_concordance
-} from '../processes/variant_concordance'
+} from '../modules/concordance'
 
 // Function to build VCF pair channels
 // This function creates a channel of tuples containing sample name, truth VCF, and query VCF
