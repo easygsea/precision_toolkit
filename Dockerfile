@@ -8,21 +8,17 @@ ARG WITTYER_VERSION=0.5.2
 # Stage 1: Build witty.er from source
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS witty_er_builder
 ARG WITTYER_VERSION
-
-# Install additional dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
-
-# Clone and build witty.er
 WORKDIR /opt/witty.er
-RUN git clone https://github.com/Illumina/witty.er.git . && \
+
+RUN apt-get update && apt-get install -y --no-install-recommends git && \
+    rm -rf /var/lib/apt/lists/* && \
+    git clone https://github.com/Illumina/witty.er.git . && \
     git checkout tags/v${WITTYER_VERSION} -b v${WITTYER_VERSION}-build && \
     cd Wittyer && \
     dotnet publish . -c Release
 
 # Stage 2: Build custom package via Poetry
 FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
-
-# Create and set working directory
 WORKDIR /app
 
 # Copy application files
@@ -41,8 +37,6 @@ FROM mgibio/hap.py:v${HAPPY_VERSION}
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
 ARG PYTHON_VERSION
-
-# Create and set working directory
 WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
