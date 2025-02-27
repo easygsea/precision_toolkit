@@ -8,7 +8,7 @@ Usage:
 
 Example:
     curate-variant-concordance --input concordance.csv --curation "SNP:PASS:TP:100"
-    "SNP:PASS:FN:50" "SNP:PASS:FP:20" --output_prefix curated_concordance
+    "SNP:PASS:FN:50" "SNP:PASS:FP:20" --output_prefix manually_curated_concordance
 """
 
 import argparse
@@ -76,7 +76,7 @@ def main():
     )
     parser.add_argument(
         "--output_prefix",
-        default="curated_concordance",
+        default="manually_curated_concordance",
         help="Prefix for output files.",
     )
 
