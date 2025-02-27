@@ -72,7 +72,7 @@ repos:
         types: [python]
         args: ["-r", "-lll", "-c", "pyproject.toml"]
         files: "^src/"
-        
+
   - repo: https://github.com/AleksaC/hadolint-py
     rev: v2.12.1b3
     hooks:
