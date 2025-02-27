@@ -27,7 +27,7 @@ COPY src/ /app/src/
 
 # Install and configure poetry, build project, and set permissions
 RUN pip install --upgrade pip --no-cache-dir && \
-    pip install --no-cache-dir poetry && \
+    pip install --no-cache-dir "poetry==2.0.1" && \
     poetry config virtualenvs.create false && \
     poetry build && \
     chmod a+rx /app -R
