@@ -1,3 +1,5 @@
+"""Compute variant concordance from VCF comparison tool output."""
+
 from collections import defaultdict
 from collections.abc import Sequence
 
@@ -9,7 +11,7 @@ from clinical_tools.core.parsers.wittyer import WittyerDataParser
 
 def load_data_from_files(
     files: Sequence[str], data_type: VariantConcordanceEngine
-) -> Sequence[VariantCallMetrics]:
+) -> list[VariantCallMetrics]:
     """
     Load data from files based on the specified data type.
 
@@ -35,7 +37,7 @@ def load_data_from_files(
             f"Unsupported data_type: {data_type}. Must be 'happy' or 'wittyer'"
         )
 
-    all_metrics = []
+    all_metrics: list[VariantCallMetrics] = []
     for file_path in files:
         try:
             all_metrics.extend(parser(file_path))
@@ -46,7 +48,7 @@ def load_data_from_files(
 
 
 def compute_concordance_and_ci(
-    metrics: Sequence[VariantCallMetrics],
+    metrics: list[VariantCallMetrics],
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
     """
     Compute concordance and confidence intervals grouped by variant type and filter.

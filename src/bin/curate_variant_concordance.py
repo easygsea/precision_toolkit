@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+"""
+Manually curate variant concordance results.
+
+Usage:
+    curate-variant-concordance --input <input_file> --curation <curation_criteria>
+    --output_prefix <output_prefix>
+
+Example:
+    curate-variant-concordance --input concordance.csv --curation "SNP:PASS:TP:100"
+    "SNP:PASS:FN:50" "SNP:PASS:FP:20" --output_prefix manually_curated_concordance
+"""
 
 import argparse
 import logging
@@ -27,7 +38,7 @@ def validate_curation_format(curation: str) -> bool:
         ValueError: If format is invalid
     """
     try:
-        variant_type, filter_type, metric, count = curation.split(":")
+        _, _, metric, count = curation.split(":")
         int(count)
         if metric not in {"TP", "FN", "FP"}:
             raise ValueError(f"Invalid metric: {metric}")
@@ -38,7 +49,7 @@ def validate_curation_format(curation: str) -> bool:
 
 def main():
     """
-    Main function to manually curate variant concordance summary and export results.
+    Manually curate variant concordance summary results.
 
     This script reads a CSV file containing variant concordance summary, updates
     specified statistics based on user input, and then exports the results.
@@ -65,7 +76,7 @@ def main():
     )
     parser.add_argument(
         "--output_prefix",
-        default="curated_concordance",
+        default="manually_curated_concordance",
         help="Prefix for output files.",
     )
 
@@ -121,21 +132,21 @@ def main():
         df.loc[mask, "CI Lower"] = ci_lower
         df.loc[mask, "CI Upper"] = ci_upper
 
-    summary_text = "Curated variant concordance summary."
+    summary_text = "Manually curated variant concordance summary."
 
     # Export using the output prefix
     export_concordance_to_csv(df, f"{args.output_prefix}.csv")
     export_concordance_to_markdown(
         df,
         f"{args.output_prefix}.md",
-        heading="Curated Variant Concordance",
-        summary=summary_text,
+        headings="Manually Curated Variant Concordance",
+        summaries=summary_text,
     )
     export_concordance_to_word(
         df,
         f"{args.output_prefix}.docx",
-        heading="Curated Variant Concordance",
-        summary=summary_text,
+        headings="Manually Curated Variant Concordance",
+        summaries=summary_text,
     )
 
 

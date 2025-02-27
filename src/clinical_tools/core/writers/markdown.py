@@ -1,3 +1,5 @@
+"""Markdown writer."""
+
 import logging
 from pathlib import Path
 
@@ -26,7 +28,12 @@ def populate_markdown(
     if summary:
         markdown_content += f"{summary}\n\n"
 
-    markdown_table = tabulate(df, headers="keys", tablefmt="github", showindex=False)
+    markdown_table = tabulate(
+        df.to_dict(orient="list"),
+        headers="keys",
+        tablefmt="github",
+        showindex=False,
+    )
     markdown_content += markdown_table
 
     return markdown_content

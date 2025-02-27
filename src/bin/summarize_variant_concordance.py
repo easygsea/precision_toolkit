@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+"""
+Summarize variant concordance results.
+
+Usage:
+    summarize-variant-concordance --engine <engine> --raw-files <raw_files>
+    --curated-files <curated_files> --prefix <prefix>
+
+Example:
+    summarize-variant-concordance --engine happy --raw-files A.raw.summary.csv
+    B.raw.summary.csv --curated-files A.curated.summary.csv B.curated.summary.csv
+    --prefix variant_concordance
+"""
+
 import argparse
 
 from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
@@ -12,11 +25,17 @@ from clinical_tools.render.variant_concordance import (
 
 
 def main():
+    """
+    Compute variant metrics from VCF comparisons.
+
+    Args:
+        None. Arguments are parsed from command line.
+
+    Returns:
+        None. Results are saved to CSV, Markdown, and Word files.
+    """
     parser = argparse.ArgumentParser(
-        description=(
-            "Compute combined variant metrics across samples from hap.py or "
-            "witty.er output files."
-        )
+        description=("Compute variant metrics from VCF comparisons.")
     )
     parser.add_argument(
         "-e",

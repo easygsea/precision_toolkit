@@ -1,6 +1,6 @@
-# Clinical Validation Tools
+# Clinical Genomics Assay Development & Validation Tools
 
-This software suite streamlines clinical validation workflows with automated analysis pipelines, result summarization, and report generation. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
+This software suite streamlines clinical genomics assay development and validation with automated analysis pipelines, result summarization, and report generation. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
 
 ## Supported Architectures
 
@@ -10,7 +10,7 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 
 - Java (>=17.0.2)
 - Nextflow (>=24.10.3)
-- Singularity (>=3.8.7)
+- Apptainer (>=1.3.1) or Singularity (>=3.8.7)
 
 Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3.15 htslib 1.21 (bgzip tabix) witty.er 0.5.2.0 Python 3.11.7 samtools 1.21
 
@@ -139,13 +139,13 @@ Larger variants:
 ```
 ##fileformat=VCFv4.2
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-chr17   43099821	DRAGEN:LOSS:chr17:43099822-43101081 N   <DEL>   .   .   .   
+chr17   43099821	DRAGEN:LOSS:chr17:43099822-43101081 N   <DEL>   .   .   .
 ```
 2. **Chromosome Naming**: Ensure chromosome naming matches your reference genome
-3. **Variant Representation**: 
+3. **Variant Representation**:
    - For SNPs: Use single base positions
    - For indels: Use precise start positions and correct REF/ALT representation
-4. **Quality Control**: 
+4. **Quality Control**:
    - Remove duplicate variants
    - Validate against reference genome
    - Include only high-confidence spurious calls

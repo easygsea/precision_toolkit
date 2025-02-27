@@ -1,12 +1,14 @@
+"""Variant concordance rendering."""
+
+import typing
 from pathlib import Path
 
 import pandas as pd
 
-from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
 from clinical_tools.core.format import format_percentage
 from clinical_tools.core.helpers import assemble_exports
-from clinical_tools.core.writers.csv import pandas_to_csv
 from clinical_tools.core.writers.markdown import populate_markdown, save_markdown
+from clinical_tools.core.writers.table import pandas_to_csv
 from clinical_tools.core.writers.word import (
     initiate_word_document,
     pandas_to_word,
@@ -26,7 +28,7 @@ def generate_concordance_table(
             false_positive, concordance, ci_lower, ci_upper)
 
     Returns:
-        DataFrame summarizing variant concordance, sorted by Variant Type then Variant Filter
+        DataFrame of variant concordance, sorted by Variant Type and Filter
     """
     data = [
         {
@@ -92,16 +94,16 @@ def export_concordance_to_markdown(
         dfs: Single DataFrame or list of DataFrames to export
         output_file: Path to save the Markdown file
         headings: Optional heading(s) to add to the file. If multiple DataFrames,
-            should be a list of headings matching the number of DataFrames.
-        summaries: Optional summary(s) to add before the table(s). If multiple DataFrames,
-            should be a list of summaries matching the number of DataFrames.
+        should be a list of headings matching DataFrame count.
+        summaries: Optional summary(s) to add before table(s). If multiple
+        DataFrames, should be a list of summaries matching DataFrame count.
     """
     dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
 
     # Process each DataFrame and collect markdown content
     all_content = []
     for i, df in enumerate(dfs):
-        formatted_df = format_concordance_table(df)
+        formatted_df = format_concordance_table(typing.cast(pd.DataFrame, df))
         heading = headings[i] if headings else None
         summary = summaries[i] if summaries else None
         content = populate_markdown(formatted_df, heading, summary)
@@ -125,9 +127,9 @@ def export_concordance_to_word(
         dfs: Single DataFrame or list of DataFrames to export
         output_file: Path to save the Word file
         headings: Optional heading(s) to add to the file. If multiple DataFrames,
-            should be a list of headings matching the number of DataFrames.
-        summaries: Optional summary(s) to add before the table(s). If multiple DataFrames,
-            should be a list of summaries matching the number of DataFrames.
+        should be a list of headings matching DataFrame count.
+        summaries: Optional summary(s) to add before table(s). If multiple
+        DataFrames, should be a list of summaries matching DataFrame count.
     """
     dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
 
@@ -136,10 +138,10 @@ def export_concordance_to_word(
 
     # Process each DataFrame and add to Word document
     for i, df in enumerate(dfs):
-        formatted_df = format_concordance_table(df)
+        formatted_df = format_concordance_table(typing.cast(pd.DataFrame, df))
         heading = headings[i] if headings else None
         summary = summaries[i] if summaries else None
-        pandas_to_word(doc, formatted_df, heading, summary)
+        pandas_to_word(formatted_df, doc, heading, summary)
 
     # Save final Word document
-    save_word_document(doc, output_file)
+    save_word_document(output_file, doc)

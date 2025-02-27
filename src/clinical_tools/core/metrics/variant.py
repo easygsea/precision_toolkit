@@ -1,3 +1,5 @@
+"""Variant metrics classes."""
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -9,7 +11,8 @@ from clinical_tools.core.statistics.proportion import (
 
 @dataclass(frozen=True)
 class VariantCallMetrics:
-    """Container for variant call metrics data.
+    """
+    Container for variant call metrics data.
 
     Attributes:
         VariantType: Type of variant (e.g., SNV, INDEL)
@@ -51,14 +54,17 @@ class BaseVariantCallMetrics(ABC):
     @abstractmethod
     def confidence_interval(
         self,
-        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        method: ProportionConfidenceIntervalMethod = (
+            ProportionConfidenceIntervalMethod.WILSON
+        ),
         **kwargs,
     ) -> tuple[float, float]:
-        """Calculate confidence interval for the metric.
+        """
+        Calculate confidence interval for the metric.
 
         Args:
-            method: Statistical method for CI calculation
-            **kwargs: Additional parameters for the method
+            method: Statistical method for CI calculation.
+            **kwargs: Additional parameters for the method.
 
         Returns:
             Lower and upper bounds of the confidence interval
@@ -71,7 +77,8 @@ class SensitivityMetrics(BaseVariantCallMetrics):
 
     @property
     def sensitivity(self) -> float:
-        """Calculate sensitivity (recall).
+        """
+        Calculate the proportion of true positives among all positive calls.
 
         Returns:
             Sensitivity value between 0 and 1
@@ -82,14 +89,17 @@ class SensitivityMetrics(BaseVariantCallMetrics):
 
     def confidence_interval(
         self,
-        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        method: ProportionConfidenceIntervalMethod = (
+            ProportionConfidenceIntervalMethod.WILSON
+        ),
         **kwargs,
     ) -> tuple[float, float]:
-        """Calculate confidence interval for sensitivity.
+        """
+        Calculate confidence interval for sensitivity.
 
         Args:
-            method: Statistical method for CI calculation
-            **kwargs: Additional parameters for the method
+            method: Statistical method for CI calculation.
+            **kwargs: Additional parameters for the method.
 
         Returns:
             Lower and upper bounds of the confidence interval
@@ -118,14 +128,17 @@ class PrecisionMetrics(BaseVariantCallMetrics):
 
     def confidence_interval(
         self,
-        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        method: ProportionConfidenceIntervalMethod = (
+            ProportionConfidenceIntervalMethod.WILSON
+        ),
         **kwargs,
     ) -> tuple[float, float]:
-        """Calculate confidence interval for precision.
+        """
+        Calculate confidence interval for precision.
 
         Args:
-            method: Statistical method for CI calculation
-            **kwargs: Additional parameters for the method
+            method: Statistical method for CI calculation.
+            **kwargs: Additional parameters for the method.
 
         Returns:
             Lower and upper bounds of the confidence interval
@@ -143,7 +156,8 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
 
     @property
     def concordance(self) -> float:
-        """Calculate concordance rate.
+        """
+        Calculate concordance rate.
 
         Returns:
             Concordance value between 0 and 1
@@ -153,14 +167,17 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
 
     def confidence_interval(
         self,
-        method: ProportionConfidenceIntervalMethod = ProportionConfidenceIntervalMethod.WILSON,
+        method: ProportionConfidenceIntervalMethod = (
+            ProportionConfidenceIntervalMethod.WILSON
+        ),
         **kwargs,
     ) -> tuple[float, float]:
-        """Calculate confidence interval for concordance.
+        """
+        Calculate confidence interval for concordance.
 
         Args:
-            method: Statistical method for CI calculation
-            **kwargs: Additional parameters for the method
+            method: Statistical method for CI calculation.
+            **kwargs: Additional parameters for the method.
 
         Returns:
             Lower and upper bounds of the confidence interval
@@ -172,7 +189,8 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
 
     @property
     def f1_score(self) -> float:
-        """Calculate F1 score (harmonic mean of precision and sensitivity).
+        """
+        Calculate F1 score (harmonic mean of precision and sensitivity).
 
         Returns:
             F1 score value between 0 and 1

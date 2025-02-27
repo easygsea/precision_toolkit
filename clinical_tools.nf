@@ -13,17 +13,17 @@ def helpMessage() {
     ====================
     Quick Start Guide
     ====================
-    
+
     Basic Usage:
         nextflow run clinical_tools.nf --workflows <workflow1,workflow2,...> [options]
-    
+
     ====================
     Workflow Overview
     ====================
     Available Workflows:
         concordance    Run variant concordance analysis
         (more workflows to come...)
-    
+
     ====================
     Detailed Usage
     ====================
@@ -32,7 +32,7 @@ def helpMessage() {
             --truth_dir   Directory containing truth VCF files (must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz)
             --query_dir   Directory containing query VCF files (must be named as <sample>.query.vcf or <sample>.query.vcf.gz)
             --variant_concordance_engine  Analysis engine: 'happy' or 'wittyer' (default: happy)
-        
+
         Optional Parameters:
             --genome_ref             Reference genome FASTA (required for happy)
             --output_dir             Base output directory (default: output_clinical_tools)
@@ -42,20 +42,20 @@ def helpMessage() {
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
             --collapse               Collapse option for bcftools isec (default: 'none')
             --skip_raw               Skip raw analysis (only available when spurious_variants_vcf is provided)
-    
+
     ====================
     Resource Management
     ====================
     Resource Adjustment:
         --max_cpus <num_cpus>               # Maximum CPUs per task (default: 16)
         --max_memory <memory_size>          # Maximum memory per task (default: 64.GB)
-    
+
     SLURM Execution:
         --profile slurm                     # Enable SLURM execution
         --slurm_account <your_account>      # Your SLURM account name (required)
         --slurm_partition <partition_name>  # SLURM partition to use (default: general)
         --slurm_queue <queue_name>          # SLURM queue to use (default: general)
-    
+
     ====================
     Example Commands
     ====================
@@ -65,7 +65,7 @@ def helpMessage() {
             --query_dir query_vcfs/ \\
             --variant_concordance_engine happy \\
             --output_dir output_clinical_tools
-    
+
     Concordance with Spurious Variant Exclusion:
         nextflow run clinical_tools.nf --workflows concordance \\
             --truth_dir truth_vcfs/ \\
@@ -74,12 +74,12 @@ def helpMessage() {
             --spurious_variants_vcf spurious_variants.vcf.gz \\
             --collapse both \\
             --output_dir output_clinical_tools
-    
+
     Multiple Workflows:
         nextflow run clinical_tools.nf --workflows concordance,sensitivity,specificity \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/
-    
+
     Local Execution with Custom Resources:
         nextflow run clinical_tools.nf \\
             --max_cpus 8 \\
@@ -87,7 +87,7 @@ def helpMessage() {
             --workflows concordance \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/
-    
+
     SLURM Execution:
         nextflow run clinical_tools.nf --profile slurm \\
             --slurm_account my_account \\
@@ -97,7 +97,7 @@ def helpMessage() {
             --workflows concordance \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/
-    
+
     ====================
     Output Structure
     ====================
@@ -134,7 +134,7 @@ workflow.onComplete {
     Work directory  : ${workflow.workDir}
     Output directory: ${params.output_dir}
     """
-    
+
     if (!workflow.success) {
         log.error "Pipeline failed! Check the logs for details."
     }
@@ -148,13 +148,13 @@ workflow {
     } else {
         def workflowList = params.workflows.split(',').collect { it.trim() }
         def validWorkflows = ['concordance']
-        
+
         // Validate user-selected workflows
         def invalidWorkflows = workflowList - validWorkflows
         if (invalidWorkflows) {
             error "Unknown workflow(s): ${invalidWorkflows.join(', ')}. Valid options are: ${validWorkflows.join(', ')}"
         }
-        
+
         // Run user-selected workflows
         workflowList.each { workflow -> "$workflow"() }
     }
