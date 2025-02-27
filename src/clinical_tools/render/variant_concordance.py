@@ -1,5 +1,6 @@
 """Variant concordance rendering."""
 
+import typing
 from pathlib import Path
 
 import pandas as pd
@@ -102,7 +103,7 @@ def export_concordance_to_markdown(
     # Process each DataFrame and collect markdown content
     all_content = []
     for i, df in enumerate(dfs):
-        formatted_df = format_concordance_table(df)  # type: ignore[arg-type]
+        formatted_df = format_concordance_table(typing.cast(pd.DataFrame, df))
         heading = headings[i] if headings else None
         summary = summaries[i] if summaries else None
         content = populate_markdown(formatted_df, heading, summary)
@@ -137,7 +138,7 @@ def export_concordance_to_word(
 
     # Process each DataFrame and add to Word document
     for i, df in enumerate(dfs):
-        formatted_df = format_concordance_table(df)  # type: ignore[arg-type]
+        formatted_df = format_concordance_table(typing.cast(pd.DataFrame, df))
         heading = headings[i] if headings else None
         summary = summaries[i] if summaries else None
         pandas_to_word(formatted_df, doc, heading, summary)
