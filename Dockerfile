@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
     dotnet publish . -c Release
 
 # Stage 2: Build custom package via Poetry
-ARG POETRY_VERSION=2.0.1
 FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
+ARG POETRY_VERSION=2.0.1
 WORKDIR /app
 
 # Copy application files
