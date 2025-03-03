@@ -43,7 +43,7 @@ ARG PSUTIL_VERSION=6.1.1
 WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
-RUN pip install --upgrade --no-cache-dir "joblib==0.14.1" "psutil==6.1.1" && \
+RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${PSUTIL_VERSION}}" && \
     pip uninstall --y setuptools pycrypto pillow numexpr lxml cvxopt idna cryptography pyxdg py numexpr pip && \
     apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common build-essential \
