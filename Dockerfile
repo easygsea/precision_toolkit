@@ -2,11 +2,11 @@
 ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
+ARG JOBLIB_VERSION=0.14.1
+ARG POETRY_VERSION=2.0.1
+ARG PSUTIL_VERSION=6.1.1
 ARG PYTHON_VERSION=3.11.7
 ARG WITTYER_VERSION=0.5.2
-ARG POETRY_VERSION=2.0.1
-ARG JOBLIB_VERSION=0.14.1
-ARG PSUTIL_VERSION=6.1.1
 
 # Stage 1: Build witty.er from source
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS witty_er_builder
@@ -40,9 +40,9 @@ RUN pip install --upgrade pip --no-cache-dir && \
 FROM mgibio/hap.py:v${HAPPY_VERSION}
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
-ARG PYTHON_VERSION
 ARG JOBLIB_VERSION
 ARG PSUTIL_VERSION
+ARG PYTHON_VERSION
 WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
