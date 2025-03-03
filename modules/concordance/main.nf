@@ -97,10 +97,11 @@ process summarize_variant_concordance {
     publishDir "${params.output_dir}/${output_dir ?: ''}", mode: 'copy'
 
     input:
+    val variant_concordance_engine
     path raw_concordance_outputs
     path curated_concordance_outputs
-    val output_dir
     val concordance_tp
+    val output_dir
 
     output:
     path("${PREFIX}*"), emit: variant_concordance_summary
@@ -108,7 +109,7 @@ process summarize_variant_concordance {
     script:
     PREFIX = "variant_concordance"
     """
-    summarize-variant-concordance --engine ${params.variant_concordance_engine} \
+    summarize-variant-concordance --engine ${variant_concordance_engine} \
         ${(raw_concordance_outputs != []) ? "--raw-files " + raw_concordance_outputs.collect().join(' ') : ""} \
         ${(curated_concordance_outputs != []) ? "--curated-files " + curated_concordance_outputs.collect().join(' ') : ""} \
         --tp-method ${concordance_tp} \
