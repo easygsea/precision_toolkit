@@ -1,9 +1,15 @@
 include {
     generate_fai
+} from '../../modules/fasta/main'
+
+include {
     bgzip_vcf
     index_vcf as index_spurious_variants_original_vcf
     index_vcf as index_spurious_variants_normalized_vcf
     normalize_vcf
+} from '../../modules/vcf/main'
+
+include {
     exclude_spurious_variants as exclude_spurious_variants_truth
     exclude_spurious_variants as exclude_spurious_variants_query
     run_happy as run_happy_raw
@@ -11,7 +17,7 @@ include {
     run_wittyer as run_wittyer_raw
     run_wittyer as run_wittyer_curated
     summarize_variant_concordance
-} from '../modules/concordance'
+} from '../../modules/concordance/main'
 
 // Function to build VCF pair channels
 // This function creates a channel of tuples containing sample name, truth VCF, and query VCF
