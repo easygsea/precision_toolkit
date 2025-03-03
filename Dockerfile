@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
     dotnet publish . -c Release
 
 # Stage 2: Build custom package via Poetry
+ARG POETRY_VERSION=2.0.1
 FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
 WORKDIR /app
 
@@ -27,7 +28,7 @@ COPY src/ /app/src/
 
 # Install and configure poetry, build project, and set permissions
 RUN pip install --upgrade pip --no-cache-dir && \
-    pip install --no-cache-dir "poetry==2.0.1" && \
+    pip install --no-cache-dir "poetry==${POETRY_VERSION}" && \
     poetry config virtualenvs.create false && \
     poetry build && \
     chmod a+rx /app -R
