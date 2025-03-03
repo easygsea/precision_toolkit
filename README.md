@@ -35,12 +35,12 @@ Using containerized tools:
 
 1. Clone the repository:
    ```bash
-   singularity pull docker://quay.io/easygsea/clinical_tools
+   apptainer pull docker://quay.io/easygsea/clinical_tools
    ```
 
 2. Run specific tools. Example:
    ```bash
-   singularity exec -B <data_path> /path/to/clinical_tools_latest.sif curate-variant-concordance -h
+   apptainer exec -B <data_path> /path/to/clinical_tools_latest.sif curate-variant-concordance -h
    ```
    See official [singularity exec](https://docs.sylabs.io/guides/latest/user-guide/cli/singularity_exec.html) manual for guidance on calling commands within a container.
 
