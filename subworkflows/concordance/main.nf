@@ -78,44 +78,6 @@ def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
     return no_spurious_truth.join(no_spurious_query)
 }
 
-// Function to run happy analysis
-def run_happy_analysis(vcf_pairs, genome_ref_path, genome_fai_path, happy_options, output_dir, label) {
-    return label == "raw" ?
-        run_happy_raw(
-            vcf_pairs,
-            genome_ref_path,
-            genome_fai_path,
-            happy_options,
-            output_dir,
-            label
-        ).happy_summary.collect() :
-        run_happy_curated(
-            vcf_pairs,
-            genome_ref_path,
-            genome_fai_path,
-            happy_options,
-            output_dir,
-            label
-        ).happy_summary.collect()
-}
-
-// Function to run wittyer analysis
-def run_wittyer_analysis(vcf_pairs, wittyer_options, output_dir, label) {
-    return label == "raw" ?
-        run_wittyer_raw(
-            vcf_pairs,
-            wittyer_options,
-            output_dir,
-            label
-        ).wittyer_summary.collect() :
-        run_wittyer_curated(
-            vcf_pairs,
-            wittyer_options,
-            output_dir,
-            label
-        ).wittyer_summary.collect()
-}
-
 // Main variant concordance workflow
 workflow variant_concordance_workflow {
     main:
@@ -158,46 +120,46 @@ workflow variant_concordance_workflow {
 
             // Only run raw analysis if skip_raw is false
             if (!params.skip_raw) {
-                summary_files = run_happy_analysis(
+                summary_files = run_happy_raw(
                     vcf_pairs,
                     genome_ref_path,
                     genome_fai_path,
                     params.happy_options,
                     "${params.concordance_dir}/raw",
                     "raw"
-                )
+                ).happy_summary.collect()
             }
 
             // If spurious variants VCF is provided, run happy on curated VCFs
             if (params.spurious_variants_vcf) {
-                summary_files_curated = run_happy_analysis(
+                summary_files_curated = run_happy_curated(
                     curated_vcf_pairs,
                     genome_ref_path,
                     genome_fai_path,
                     params.happy_options,
                     "${params.concordance_dir}/curated",
                     "curated"
-                )
+                ).happy_summary.collect()
             }
         } else if (params.variant_concordance_engine == "wittyer") {
             // Only run raw analysis if skip_raw is false
             if (!params.skip_raw) {
-                summary_files = run_wittyer_analysis(
+                summary_files = run_wittyer_raw(
                     vcf_pairs,
                     params.wittyer_options,
                     "${params.concordance_dir}/raw",
                     "raw"
-                )
+                ).wittyer_summary.collect()
             }
 
             // If spurious variants VCF is provided, run wittyer on curated VCFs
             if (params.spurious_variants_vcf) {
-                summary_files_curated = run_wittyer_analysis(
+                summary_files_curated = run_wittyer_curated(
                     curated_vcf_pairs,
                     params.wittyer_options,
                     "${params.concordance_dir}/curated",
                     "curated"
-                )
+                ).wittyer_summary.collect()
             }
         }
 
