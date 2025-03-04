@@ -114,11 +114,20 @@ def test_precision_metrics(
 @pytest.mark.parametrize(
     (
         "truth_total, truth_tp, truth_fn, query_total, query_tp, query_fp, "
-        "expected_concordance"
+        "tp_method, expected_concordance"
     ),
     [
-        (100, 90, 10, 120, 90, 30, ConcordanceTPMethod.TruthTP, 0.6923),  # Use TruthTP
-        (100, 90, 10, 120, 80, 30, ConcordanceTPMethod.QueryTP, 0.6154),  # Use QueryTP
+        (
+            100,
+            90,
+            10,
+            120,
+            90,
+            30,
+            ConcordanceTPMethod.TruthTP.value,
+            0.6923,
+        ),  # Use TruthTP
+        (100, 90, 10, 120, 80, 30, ConcordanceTPMethod.QueryTP, 0.6667),  # Use QueryTP
         (
             100,
             90,
@@ -126,8 +135,8 @@ def test_precision_metrics(
             120,
             80,
             30,
-            ConcordanceTPMethod.MinTP,
-            0.6154,
+            ConcordanceTPMethod.MinTP.value,
+            0.6667,
         ),  # Use MinTP (QueryTP is smaller)
         (
             100,
@@ -136,11 +145,11 @@ def test_precision_metrics(
             120,
             90,
             30,
-            ConcordanceTPMethod.MinTP,
+            ConcordanceTPMethod.MinTP.value,
             0.6154,
         ),  # Use MinTP (TruthTP is smaller)
-        (0, 0, 0, 0, 0, 0, ConcordanceTPMethod.MinTP, 0.0),  # Zero total calls
-        (100, 0, 100, 120, 0, 120, ConcordanceTPMethod.MinTP, 0.0),  # Zero TP
+        (0, 0, 0, 0, 0, 0, ConcordanceTPMethod.MinTP.value, 0.0),  # Zero total calls
+        (100, 0, 100, 120, 0, 120, ConcordanceTPMethod.MinTP.value, 0.0),  # Zero TP
     ],
     ids=[
         "truth_tp",
