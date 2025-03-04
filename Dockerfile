@@ -2,6 +2,9 @@
 ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
+ARG JOBLIB_VERSION=0.14.1
+ARG POETRY_VERSION=2.0.1
+ARG PSUTIL_VERSION=6.1.1
 ARG PYTHON_VERSION=3.11.7
 ARG WITTYER_VERSION=0.5.2
 
@@ -19,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
 
 # Stage 2: Build custom package via Poetry
 FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
+ARG POETRY_VERSION
 WORKDIR /app
 
 # Copy application files
@@ -27,7 +31,7 @@ COPY src/ /app/src/
 
 # Install and configure poetry, build project, and set permissions
 RUN pip install --upgrade pip --no-cache-dir && \
-    pip install --no-cache-dir "poetry==2.0.1" && \
+    pip install --no-cache-dir "poetry==${POETRY_VERSION}" && \
     poetry config virtualenvs.create false && \
     poetry build && \
     chmod a+rx /app -R
@@ -36,11 +40,13 @@ RUN pip install --upgrade pip --no-cache-dir && \
 FROM mgibio/hap.py:v${HAPPY_VERSION}
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
+ARG JOBLIB_VERSION
+ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
 WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
-RUN pip install --upgrade --no-cache-dir "joblib==0.14.1" "psutil==6.1.1" && \
+RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${PSUTIL_VERSION}" && \
     pip uninstall --y setuptools pycrypto pillow numexpr lxml cvxopt idna cryptography pyxdg py numexpr pip && \
     apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common build-essential \
