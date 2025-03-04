@@ -18,7 +18,7 @@ def validate_engine_selection(engine) {
     }
 }
 
-include { variant_concordance_workflow } from '../workflows/variant_concordance'
+include { variant_concordance_workflow } from '../subworkflows/concordance/main'
 
 workflow concordance {
     validate_engine_selection(params.variant_concordance_engine)

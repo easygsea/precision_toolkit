@@ -2,7 +2,7 @@
 
 nextflow.enable.dsl=2
 
-include { concordance } from './modules/concordance'
+include { concordance } from './workflows/concordance'
 
 def helpMessage() {
     log.info"""
@@ -15,7 +15,7 @@ def helpMessage() {
     ====================
 
     Basic Usage:
-        nextflow run clinical_tools.nf --workflows <workflow1,workflow2,...> [options]
+        nextflow run main.nf --workflows <workflow1,workflow2,...> [options]
 
     ====================
     Workflow Overview
@@ -60,14 +60,14 @@ def helpMessage() {
     Example Commands
     ====================
     Basic Concordance:
-        nextflow run clinical_tools.nf --workflows concordance \\
+        nextflow run main.nf --workflows concordance \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/ \\
             --variant_concordance_engine happy \\
             --output_dir output_clinical_tools
 
     Concordance with Spurious Variant Exclusion:
-        nextflow run clinical_tools.nf --workflows concordance \\
+        nextflow run main.nf --workflows concordance \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/ \\
             --variant_concordance_engine happy \\
@@ -76,12 +76,12 @@ def helpMessage() {
             --output_dir output_clinical_tools
 
     Multiple Workflows:
-        nextflow run clinical_tools.nf --workflows concordance,sensitivity,specificity \\
+        nextflow run main.nf --workflows concordance,sensitivity,specificity \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/
 
     Local Execution with Custom Resources:
-        nextflow run clinical_tools.nf \\
+        nextflow run main.nf \\
             --max_cpus 8 \\
             --max_memory 32.GB \\
             --workflows concordance \\
@@ -89,7 +89,7 @@ def helpMessage() {
             --query_dir query_vcfs/
 
     SLURM Execution:
-        nextflow run clinical_tools.nf --profile slurm \\
+        nextflow run main.nf --profile slurm \\
             --slurm_account my_account \\
             --slurm_partition general \\
             --max_cpus 8 \\
