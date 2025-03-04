@@ -15,7 +15,7 @@ class ConcordanceTPMethod(Enum):
 
     TruthTP = "truth"  # Use truth TP for variant concordance
     QueryTP = "query"  # Use query TP for variant concordance
-    MinTP = "min"  # Use minimum of truth and query TP for variant concordance (default)
+    MinTP = "min"  # Use minimum of truth and query TP for variant concordance
 
 
 @dataclass(frozen=True)
@@ -166,7 +166,7 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
     def __init__(
         self,
         metrics: VariantCallMetrics,
-        tp_method: ConcordanceTPMethod = ConcordanceTPMethod.MinTP,
+        tp_method: str,
     ) -> None:
         """
         Initialize with metrics data and TP selection method.
@@ -177,6 +177,21 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         """
         super().__init__(metrics)
         self._tp_method = tp_method
+        self._tp_selector = {
+            ConcordanceTPMethod.TruthTP.value: self.metrics.TruthTP,
+            ConcordanceTPMethod.QueryTP.value: self.metrics.QueryTP,
+            ConcordanceTPMethod.MinTP.value: min(
+                self.metrics.TruthTP, self.metrics.QueryTP
+            ),
+        }
+
+    def _get_selected_tp(self) -> int:
+        """Get TP count based on selected TP method."""
+        return self._tp_selector[self._tp_method]
+
+    def _get_total_calls(self) -> int:
+        """Calculate total calls."""
+        return self._get_selected_tp() + self.metrics.TruthFN + self.metrics.QueryFP
 
     @property
     def concordance(self) -> float:
@@ -186,12 +201,8 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         Returns:
             Concordance value between 0 and 1
         """
-        selected_tp = {
-            ConcordanceTPMethod.TruthTP: self.metrics.TruthTP,
-            ConcordanceTPMethod.QueryTP: self.metrics.QueryTP,
-        }.get(self._tp_method, min(self.metrics.TruthTP, self.metrics.QueryTP))
-        total_calls = selected_tp + self.metrics.TruthFN + self.metrics.QueryFP
-        return 0.0 if total_calls == 0 else selected_tp / total_calls
+        total_calls = self._get_total_calls()
+        return 0.0 if total_calls == 0 else self._get_selected_tp() / total_calls
 
     def confidence_interval(
         self,
@@ -210,10 +221,26 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         Returns:
             Lower and upper bounds of the confidence interval
         """
-        total_calls = self.metrics.TruthTotal + self.metrics.QueryFP
         return ProportionConfidenceInterval.proportion_confidence_interval(
-            successes=self.metrics.TruthTP, total=total_calls, method=method, **kwargs
+            successes=self._get_selected_tp(),
+            total=self._get_total_calls(),
+            method=method,
+            **kwargs,
         )
+
+
+class F1ScoreMetrics:
+    """Class for calculating F1 score metrics."""
+
+    def __init__(self, precision: float, sensitivity: float) -> None:
+        """Initialize with precision and sensitivity values.
+
+        Args:
+            precision: Precision value between 0 and 1
+            sensitivity: Sensitivity value between 0 and 1
+        """
+        self.precision = precision
+        self.sensitivity = sensitivity
 
     @property
     def f1_score(self) -> float:
@@ -223,8 +250,10 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         Returns:
             F1 score value between 0 and 1
         """
-        precision = self.precision
-        sensitivity = self.sensitivity
-        if precision + sensitivity == 0:
+        if self.precision + self.sensitivity == 0:
             return 0.0
-        return 2 * (precision * sensitivity) / (precision + sensitivity)
+        return (
+            2
+            * (self.precision * self.sensitivity)
+            / (self.precision + self.sensitivity)
+        )

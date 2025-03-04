@@ -5,6 +5,7 @@ import pytest
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     ConcordanceTPMethod,
+    F1ScoreMetrics,
     PrecisionMetrics,
     ProportionConfidenceIntervalMethod,
     SensitivityMetrics,
@@ -127,7 +128,16 @@ def test_precision_metrics(
             ConcordanceTPMethod.TruthTP.value,
             0.6923,
         ),  # Use TruthTP
-        (100, 90, 10, 120, 80, 30, ConcordanceTPMethod.QueryTP, 0.6667),  # Use QueryTP
+        (
+            100,
+            90,
+            10,
+            120,
+            80,
+            30,
+            ConcordanceTPMethod.QueryTP.value,
+            0.6667,
+        ),  # Use QueryTP
         (
             100,
             90,
@@ -167,7 +177,7 @@ def test_concordance_metrics(
     query_total: int,
     query_tp: int,
     query_fp: int,
-    tp_method: ConcordanceTPMethod,
+    tp_method: str,
     expected_concordance: float,
 ) -> None:
     """
@@ -221,8 +231,9 @@ def test_f1_score(
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
-    2. Calculate F1 score.
-    3. Verify the calculated F1 score matches the expected value.
+    2. Calculate precision and sensitivity.
+    3. Calculate F1 score using F1ScoreMetrics.
+    4. Verify the calculated F1 score matches the expected value.
 
     Expected Behavior:
     - F1 score should be calculated as the harmonic mean of precision and sensitivity.
@@ -237,8 +248,13 @@ def test_f1_score(
         QueryTP=query_tp,
         QueryFP=query_fp,
     )
-    concordance_metrics = ConcordanceMetrics(metrics)
-    assert concordance_metrics.f1_score == pytest.approx(expected_f1, rel=1e-3)
+    precision_metrics = PrecisionMetrics(metrics)
+    sensitivity_metrics = SensitivityMetrics(metrics)
+    f1_metrics = F1ScoreMetrics(
+        precision=precision_metrics.precision,
+        sensitivity=sensitivity_metrics.sensitivity,
+    )
+    assert f1_metrics.f1_score == pytest.approx(expected_f1, rel=1e-3)
 
 
 @pytest.mark.parametrize(
@@ -379,7 +395,9 @@ def test_confidence_interval_concordance(
         QueryTP=query_tp,
         QueryFP=query_fp,
     )
-    concordance_metrics = ConcordanceMetrics(metrics)
+    concordance_metrics = ConcordanceMetrics(
+        metrics, tp_method=ConcordanceTPMethod.MinTP.value
+    )
     ci_lower, ci_upper = concordance_metrics.confidence_interval(
         method=ProportionConfidenceIntervalMethod.WILSON
     )
