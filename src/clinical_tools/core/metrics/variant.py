@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 from clinical_tools.core.statistics.proportion import (
     ProportionConfidenceInterval,
@@ -10,7 +10,7 @@ from clinical_tools.core.statistics.proportion import (
 )
 
 
-class ConcordanceTPMethod(Enum):
+class ConcordanceTPMethod(StrEnum):
     """Enum for TP selection methods for variant concordance."""
 
     TruthTP = "truth"  # Use truth TP for variant concordance
