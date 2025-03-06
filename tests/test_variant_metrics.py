@@ -2,7 +2,7 @@
 
 import pytest
 
-from clinical_tools.core.metrics.variant import (
+from clinical_tools.core.metrics.variant import (  # type: ignore[import-not-found]
     ConcordanceMetrics,
     ConcordanceTPMethod,
     F1ScoreMetrics,
