@@ -166,7 +166,7 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
     def __init__(
         self,
         metrics: VariantCallMetrics,
-        tp_method: str,
+        tp_method: ConcordanceTPMethod,
     ) -> None:
         """
         Initialize with metrics data and TP selection method.
@@ -178,11 +178,9 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         super().__init__(metrics)
         self._tp_method = tp_method
         self._tp_selector = {
-            ConcordanceTPMethod.TruthTP.value: self.metrics.TruthTP,
-            ConcordanceTPMethod.QueryTP.value: self.metrics.QueryTP,
-            ConcordanceTPMethod.MinTP.value: min(
-                self.metrics.TruthTP, self.metrics.QueryTP
-            ),
+            ConcordanceTPMethod.TruthTP: self.metrics.TruthTP,
+            ConcordanceTPMethod.QueryTP: self.metrics.QueryTP,
+            ConcordanceTPMethod.MinTP: min(self.metrics.TruthTP, self.metrics.QueryTP),
         }
 
     def _get_selected_tp(self) -> int:

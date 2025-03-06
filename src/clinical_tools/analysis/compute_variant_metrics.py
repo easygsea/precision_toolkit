@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from clinical_tools.core.constants import VariantConcordanceEngine
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
+    ConcordanceTPMethod,
     VariantCallMetrics,
 )
 from clinical_tools.core.parsers.happy import HappyDataParser
@@ -52,7 +53,7 @@ def load_data_from_files(
 
 def compute_concordance_and_ci(
     metrics: list[VariantCallMetrics],
-    tp_method: str,
+    tp_method: ConcordanceTPMethod,
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
     """
     Compute concordance and confidence intervals grouped by variant type and filter.
@@ -83,7 +84,7 @@ def compute_concordance_and_ci(
 
 def _compute_concordance_and_ci_for_group(
     group: list[VariantCallMetrics],
-    tp_method: str,
+    tp_method: ConcordanceTPMethod,
 ) -> tuple[int, int, int, float, float, float]:
     """
     Calculate concordance metrics for a group of variants.
@@ -137,7 +138,7 @@ def _compute_concordance_and_ci_for_group(
 def process_variant_metrics(
     file_paths: Sequence[str],
     data_type: VariantConcordanceEngine,
-    tp_method: str,
+    tp_method: ConcordanceTPMethod,
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
     """
     Process variant metrics and compute confidence intervals.
