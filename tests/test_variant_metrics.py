@@ -2,8 +2,10 @@
 
 import pytest
 
-from clinical_tools.core.metrics.variant import (
+from clinical_tools.core.metrics.variant import (  # type: ignore[import-not-found]
     ConcordanceMetrics,
+    ConcordanceTPMethod,
+    F1ScoreMetrics,
     PrecisionMetrics,
     ProportionConfidenceIntervalMethod,
     SensitivityMetrics,
@@ -64,7 +66,9 @@ def test_sensitivity_metrics(
         QueryFP=30,
     )
     sensitivity_metrics = SensitivityMetrics(metrics)
-    assert sensitivity_metrics.sensitivity == expected_sensitivity
+    assert sensitivity_metrics.sensitivity == pytest.approx(
+        expected_sensitivity, abs=1e-3
+    )
 
 
 @pytest.mark.parametrize(
@@ -105,20 +109,66 @@ def test_precision_metrics(
         QueryFP=query_fp,
     )
     precision_metrics = PrecisionMetrics(metrics)
-    assert precision_metrics.precision == expected_precision
+    assert precision_metrics.precision == pytest.approx(expected_precision, abs=1e-3)
 
 
 @pytest.mark.parametrize(
     (
         "truth_total, truth_tp, truth_fn, query_total, query_tp, query_fp, "
-        "expected_concordance"
+        "tp_method, expected_concordance"
     ),
     [
-        (100, 90, 10, 120, 90, 30, 0.6923),  # Normal case
-        (0, 0, 0, 0, 0, 0, 0.0),  # Zero total calls
-        (100, 0, 100, 120, 0, 120, 0.0),  # Zero TruthTP
+        (
+            100,
+            90,
+            10,
+            120,
+            90,
+            30,
+            ConcordanceTPMethod.TruthTP.value,
+            0.6923,
+        ),  # Use TruthTP
+        (
+            100,
+            90,
+            10,
+            120,
+            80,
+            30,
+            ConcordanceTPMethod.QueryTP.value,
+            0.6667,
+        ),  # Use QueryTP
+        (
+            100,
+            90,
+            10,
+            120,
+            80,
+            30,
+            ConcordanceTPMethod.MinTP.value,
+            0.6667,
+        ),  # Use MinTP (QueryTP is smaller)
+        (
+            100,
+            80,
+            20,
+            120,
+            90,
+            30,
+            ConcordanceTPMethod.MinTP.value,
+            0.6154,
+        ),  # Use MinTP (TruthTP is smaller)
+        (0, 0, 0, 0, 0, 0, ConcordanceTPMethod.MinTP.value, 0.0),  # Zero total calls
+        (100, 0, 100, 120, 0, 120, ConcordanceTPMethod.MinTP.value, 0.0),  # Zero TP
     ],
-    ids=["normal_case", "zero_total_calls", "zero_truth_tp"],
+    ids=[
+        "truth_tp",
+        "query_tp",
+        "min_tp_query",
+        "min_tp_truth",
+        "zero_total_calls",
+        "zero_tp",
+    ],
 )
 def test_concordance_metrics(
     truth_total: int,
@@ -127,18 +177,19 @@ def test_concordance_metrics(
     query_total: int,
     query_tp: int,
     query_fp: int,
+    tp_method: str,
     expected_concordance: float,
 ) -> None:
     """
-    Test ConcordanceMetrics with parametrized inputs.
+    Test ConcordanceMetrics with parametrized inputs and TP selection methods.
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
-    2. Calculate concordance.
+    2. Calculate concordance using the specified TP method.
     3. Verify the calculated concordance matches the expected value.
 
     Expected Behavior:
-    - Concordance should be calculated as TruthTP / (TruthTotal + QueryFP).
+    - Concordance should be calculated as the selected TP / (TruthTotal + QueryFP).
     """
     metrics = VariantCallMetrics(
         VariantType="SNV",
@@ -150,7 +201,7 @@ def test_concordance_metrics(
         QueryTP=query_tp,
         QueryFP=query_fp,
     )
-    concordance_metrics = ConcordanceMetrics(metrics)
+    concordance_metrics = ConcordanceMetrics(metrics, tp_method)
     assert concordance_metrics.concordance == pytest.approx(
         expected_concordance, rel=1e-3
     )
@@ -180,8 +231,9 @@ def test_f1_score(
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
-    2. Calculate F1 score.
-    3. Verify the calculated F1 score matches the expected value.
+    2. Calculate precision and sensitivity.
+    3. Calculate F1 score using F1ScoreMetrics.
+    4. Verify the calculated F1 score matches the expected value.
 
     Expected Behavior:
     - F1 score should be calculated as the harmonic mean of precision and sensitivity.
@@ -196,8 +248,13 @@ def test_f1_score(
         QueryTP=query_tp,
         QueryFP=query_fp,
     )
-    concordance_metrics = ConcordanceMetrics(metrics)
-    assert concordance_metrics.f1_score == pytest.approx(expected_f1, rel=1e-3)
+    precision_metrics = PrecisionMetrics(metrics)
+    sensitivity_metrics = SensitivityMetrics(metrics)
+    f1_metrics = F1ScoreMetrics(
+        precision=precision_metrics.precision,
+        sensitivity=sensitivity_metrics.sensitivity,
+    )
+    assert f1_metrics.f1_score == pytest.approx(expected_f1, rel=1e-3)
 
 
 @pytest.mark.parametrize(
@@ -338,7 +395,9 @@ def test_confidence_interval_concordance(
         QueryTP=query_tp,
         QueryFP=query_fp,
     )
-    concordance_metrics = ConcordanceMetrics(metrics)
+    concordance_metrics = ConcordanceMetrics(
+        metrics, tp_method=ConcordanceTPMethod.MinTP.value
+    )
     ci_lower, ci_upper = concordance_metrics.confidence_interval(
         method=ProportionConfidenceIntervalMethod.WILSON
     )

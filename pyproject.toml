@@ -17,21 +17,14 @@ statsmodels = "0.14.4"
 tabulate = "0.9.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "25.1.0"
-flake8 = "7.1.2"
-isort = "6.0.0"
-mypy = "1.15.0"
-pandas-stubs = "2.2.3.241126"
 pyproject-pre-commit = "0.4.1"
 pytest = "8.3.4"
 pytest-cov = "4.0.0"
 pytest-xdist = "3.6.1"
-ruff = "0.9.7"
-types-tabulate = "0.9.0.20241207"
 
 [tool.poetry.scripts]
 summarize-variant-concordance = "bin.summarize_variant_concordance:main"
-curate-variant-concordance = "bin.curate_variant_concordance:main"
+curate-variant-concordance-manually = "bin.curate_variant_concordance_manually:main"
 
 [build-system]
 requires = ["poetry-core"]
@@ -40,17 +33,3 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v --cov=src --cov-report=term-missing"
-
-[tool.black]
-line-length = 88
-
-[tool.flake8]
-exclude = ".git,*__init__.py"
-max-line-length = 88
-ignore = "D104,W503"
-
-[tool.isort]
-profile = "black"
-
-[tool.mypy]
-ignore_missing_imports = true

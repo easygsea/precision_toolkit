@@ -165,8 +165,10 @@ workflow variant_concordance_workflow {
 
         // Summarize variant concordance results
         summarize_variant_concordance(
+            params.variant_concordance_engine,
             summary_files,
             summary_files_curated,
+            params.concordance_tp,
             params.concordance_dir
         )
 }

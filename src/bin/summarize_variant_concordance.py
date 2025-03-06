@@ -16,6 +16,7 @@ import argparse
 
 from clinical_tools.analysis.compute_variant_metrics import process_variant_metrics
 from clinical_tools.core.constants import VariantConcordanceEngine
+from clinical_tools.core.metrics.variant import ConcordanceTPMethod
 from clinical_tools.render.variant_concordance import (
     export_concordance_to_csv,
     export_concordance_to_markdown,
@@ -57,6 +58,12 @@ def main():
         help="List of curated engine output files to process.",
     )
     parser.add_argument(
+        "--tp-method",
+        choices=[method.value for method in ConcordanceTPMethod],
+        default=ConcordanceTPMethod.MinTP.value,
+        help="TP method in concordance: 'truth', 'query', or 'min' (default).",
+    )
+    parser.add_argument(
         "-p",
         "--prefix",
         default="variant_concordance",
@@ -86,7 +93,7 @@ def main():
     # Process raw variant concordance results if provided
     if args.raw_files:
         raw_concordance_results = process_variant_metrics(
-            file_paths=args.raw_files, data_type=args.engine
+            file_paths=args.raw_files, data_type=args.engine, tp_method=args.tp_method
         )
         raw_concordance_table = generate_concordance_table(raw_concordance_results)
 
@@ -102,7 +109,9 @@ def main():
     # Process curated results if provided
     if args.curated_files:
         curated_concordance_results = process_variant_metrics(
-            file_paths=args.curated_files, data_type=args.engine
+            file_paths=args.curated_files,
+            data_type=args.engine,
+            tp_method=args.tp_method,
         )
         curated_concordance_table = generate_concordance_table(
             curated_concordance_results
