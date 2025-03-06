@@ -3,12 +3,13 @@
 Manually curate variant concordance results.
 
 Usage:
-    curate-variant-concordance --input <input_file> --curation <curation_criteria>
-    --output_prefix <output_prefix>
+    curate-variant-concordance-manually --input <input_file>
+    --curation <curation_criteria> --output_prefix <output_prefix>
 
 Example:
-    curate-variant-concordance --input concordance.csv --curation "SNP:PASS:TP:100"
-    "SNP:PASS:FN:50" "SNP:PASS:FP:20" --output_prefix manually_curated_concordance
+    curate-variant-concordance-manually --input concordance.csv
+    --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" "SNP:PASS:FP:20"
+    --output_prefix manually_curated_concordance
 """
 
 import argparse

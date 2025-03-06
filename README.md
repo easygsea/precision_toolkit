@@ -40,7 +40,7 @@ Using containerized tools:
 
 2. Run specific tools. Example:
    ```bash
-   apptainer exec -B <data_path> /path/to/clinical_tools_latest.sif curate-variant-concordance -h
+   apptainer exec -B <data_path> /path/to/clinical_tools_latest.sif curate-variant-concordance-manually -h
    ```
    See official [singularity exec](https://docs.sylabs.io/guides/latest/user-guide/cli/singularity_exec.html) manual for guidance on calling commands within a container.
 
@@ -238,11 +238,11 @@ For more defails on hap.py and witty.er outputs:
 
 #### Variant Concordance Manual Curation
 
-In some cases, manual curation of variant concordance results is necessary, for example, reclassifying a false negative (FN) as a true positive (TP) after investigation. Users can run the curate-variant-concordance script to manually update counts, after which the pipeline will recalculate the curated statistics.
+In some cases, manual curation of variant concordance results is necessary, for example, reclassifying a false negative (FN) as a true positive (TP) after investigation. Users can run the curate-variant-concordance-manually script to manually update counts, after which the pipeline will recalculate the curated statistics.
 
 Example usage:
 ```bash
-singularity exec -B <data_path> /path/to/clinical_tools_latest.sif curate-variant-concordance \
+apptainer exec -B <data_path> /path/to/clinical_tools_latest.sif curate-variant-concordance-manually \
 --input variant_concordance_happy_curated.csv \
 --curation INDEL:PASS:TP:30 --curation INDEL:PASS:TP:30 INDEL:PASS:FP:1 \
 --output_prefix variant_concordance_happy_curated_final
