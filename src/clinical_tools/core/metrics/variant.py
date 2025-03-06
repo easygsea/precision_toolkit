@@ -253,7 +253,5 @@ class F1ScoreMetrics:
         if self.precision + self.sensitivity == 0:
             return 0.0
         return (
-            2
-            * (self.precision * self.sensitivity)
-            / (self.precision + self.sensitivity)
+            2 * self.precision * self.sensitivity / (self.precision + self.sensitivity)
         )
