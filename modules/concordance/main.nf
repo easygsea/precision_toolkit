@@ -109,7 +109,8 @@ process summarize_variant_concordance {
     script:
     PREFIX = "variant_concordance"
     """
-    summarize-variant-concordance --engine ${variant_concordance_engine} \
+    summarize-diagnostic-metrics --metrics concordance \
+        --engine ${variant_concordance_engine} \
         ${(raw_concordance_outputs != []) ? "--raw-files " + raw_concordance_outputs.collect().join(' ') : ""} \
         ${(curated_concordance_outputs != []) ? "--curated-files " + curated_concordance_outputs.collect().join(' ') : ""} \
         --tp-method ${concordance_tp} \
