@@ -23,7 +23,7 @@ pytest-cov = "4.0.0"
 pytest-xdist = "3.6.1"
 
 [tool.poetry.scripts]
-summarize-variant-concordance = "bin.summarize_variant_concordance:main"
+summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
 curate-variant-concordance-manually = "bin.curate_variant_concordance_manually:main"
 
 [build-system]
