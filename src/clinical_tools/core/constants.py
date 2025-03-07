@@ -1,6 +1,9 @@
 """Constants for the clinical tools package."""
 
 from enum import StrEnum
+from typing import Literal
+
+DiagnosticMetricType = Literal["concordance", "sensitivity", "precision"]
 
 
 class VariantConcordanceEngine(StrEnum):
