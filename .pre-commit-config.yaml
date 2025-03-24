@@ -51,13 +51,12 @@ repos:
     hooks:
       - id: flake8
         types: [python]
-        args:
-          - "--exclude"
-          - ".git,*__init__.py"
-          - "--max-line-length"
-          - "88"
-          - "--ignore"
-          - "D104,W503"
+        args: [
+          "--exclude", ".git,*__init__.py",
+          "--max-line-length", "88",
+          "--ignore", "D104",  # Ignore missing docstring in public package
+          "--ignore", "W503"   # Ignore line break before binary operator (matches black style)
+        ]
         additional_dependencies: [flake8-docstrings]
         files: "^src/|^tests/"
 
@@ -65,7 +64,7 @@ repos:
     rev: v0.9.7
     hooks:
       - id: ruff
-        args: ["--fix"]
+        args: ["--fix"]  # Auto-fix issues
         types: [python]
         files: "^src/|^tests/"
       - id: ruff-format
@@ -85,8 +84,8 @@ repos:
     hooks:
       - id: hadolint
         args: [
-            "--ignore", "DL3003",  # Use WORKDIR to switch to a directory
-            "--ignore", "DL3008",  # Pin versions in apt get install - we need to install latest versions
-            "--ignore", "DL3013"   # Pin versions in pip - we need latest pip for poetry
+          "--ignore", "DL3003",  # Allow WORKDIR to change directories
+          "--ignore", "DL3008",  # Allow apt-get without version pins for latest packages
+          "--ignore", "DL3013"   # Allow pip without version pins for latest pip
         ]
         files: "^Dockerfile"
