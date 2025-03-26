@@ -47,24 +47,32 @@ WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
 RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${PSUTIL_VERSION}" && \
-    pip uninstall --y setuptools pycrypto pillow numexpr lxml cvxopt idna cryptography pyxdg py numexpr pip && \
+    pip uninstall --y cryptography cvxopt idna lxml numexpr pillow pip py pyxdg pycrypto setuptools && \
     apt-get update && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common build-essential \
-    libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev \
-    libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev && \
+    apt-get install -y --no-install-recommends  \
+    apt-transport-https \
+    build-essential \
+    libbz2-dev \
+    libdb5.3-dev \
+    libexpat1-dev \
+    libffi-dev \
+    libgdbm-dev \
+    liblzma-dev \
+    libncurses5-dev \
+    libncursesw5-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    libssl-dev \
+    software-properties-common \
+    wget \
+    zlib1g-dev && \
     wget --quiet "https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb" && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && apt-get install -y --no-install-recommends "dotnet-sdk-${DOTNET_VERSION}" && \
-    # Build htslib
+    # Build htslib (dependency for bcftools and samtools)
     wget --quiet "https://github.com/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "htslib-${HTSLIB_VERSION}.tar.bz2" && \
     cd "htslib-${HTSLIB_VERSION}" && \
-    ./configure --prefix=/opt/hap.py && \
-    make && make install && \
-    # Build samtools
-    wget --quiet "https://github.com/samtools/samtools/releases/download/${HTSLIB_VERSION}/samtools-${HTSLIB_VERSION}.tar.bz2" && \
-    tar -xjf "samtools-${HTSLIB_VERSION}.tar.bz2" && \
-    cd "samtools-${HTSLIB_VERSION}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
     # Build bcftools
@@ -74,6 +82,12 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
     cd ../.. && rm -rf htslib-* samtools-* bcftools-* && \
+    # Build samtools
+    wget --quiet "https://github.com/samtools/samtools/releases/download/${HTSLIB_VERSION}/samtools-${HTSLIB_VERSION}.tar.bz2" && \
+    tar -xjf "samtools-${HTSLIB_VERSION}.tar.bz2" && \
+    cd "samtools-${HTSLIB_VERSION}" && \
+    ./configure --prefix=/opt/hap.py && \
+    make && make install && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" && \
     tar -xzf "Python-${PYTHON_VERSION}.tgz" && \
@@ -83,7 +97,6 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     make install && cd .. && rm -rf "Python-${PYTHON_VERSION}" "Python-${PYTHON_VERSION}.tgz" && \
     apt-get remove --purge -y wget apt-transport-https software-properties-common build-essential && \
     apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
-
 # Copy binaries and wheel
 COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
 COPY --from=clinical_tools_builder /app/dist/*.whl .
