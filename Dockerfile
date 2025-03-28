@@ -96,7 +96,7 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     make -j "$(nproc)" && \
     make install && cd .. && rm -rf "Python-${PYTHON_VERSION}" "Python-${PYTHON_VERSION}.tgz" && \
     apt-get remove --purge -y wget apt-transport-https software-properties-common build-essential && \
-    apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy binaries and wheel
 COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
