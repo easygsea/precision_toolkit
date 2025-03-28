@@ -1,6 +1,8 @@
 # Clinical Tools Manual
 
-The Clinical Tools provides both [workflows](#workflows) and [standalone utilities](#standalone-utilities). This manual provides detailed information on how to use the Clinical Tools software package.
+This manual provides complete documentation for Clinical Tools, including:
+- [workflows](#workflows)
+- [standalone utilities](#standalone-utilities)
 
 ## Workflows
 
