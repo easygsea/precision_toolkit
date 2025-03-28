@@ -8,4 +8,4 @@ The Clinical Tools provides both [workflows](#workflows) and [standalone utiliti
 
 ## Standalone Utilities
 
-- [Curate Variant Concordance Manually](./standalone_utilities/README.md#curate-variant-concordance-manually)
+- [Curate Variant Concordance Manually](./standalone_utilities/standalone_utilities.md#curate-variant-concordance-manually)
