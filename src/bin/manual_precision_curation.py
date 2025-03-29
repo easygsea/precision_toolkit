@@ -115,10 +115,9 @@ def main():
         metrics = VariantCallMetrics(
             VariantType=variant_type,
             VariantCallFilter=filter_type,
-            TruthTotal=df.loc[mask, "True Positive"].sum()
-            + df.loc[mask, "False Negative"].sum(),
-            TruthTP=df.loc[mask, "True Positive"].sum(),
-            TruthFN=df.loc[mask, "False Negative"].sum(),
+            TruthTotal=0,
+            TruthTP=0,
+            TruthFN=0,
             QueryTotal=df.loc[mask, "True Positive"].sum()
             + df.loc[mask, "False Positive"].sum(),
             QueryTP=df.loc[mask, "True Positive"].sum(),

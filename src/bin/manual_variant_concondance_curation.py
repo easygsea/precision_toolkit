@@ -4,12 +4,13 @@ Manually curate variant concordance results.
 
 Usage:
     manual-variant-concordance-curation --input <input_file>
-    --curation <curation_criteria> --output_prefix <output_prefix>
+    --curation <curation_criteria> --tp-method <tp_method>
+    --output_prefix <output_prefix>
 
 Example:
     manual-variant-concordance-curation --input concordance.csv
     --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" "SNP:PASS:FP:20"
-    --output_prefix manually_curated_concordance
+    --tp-method min --output_prefix manually_curated_concordance
 """
 
 import argparse
@@ -18,7 +19,11 @@ import logging
 import pandas as pd
 
 from clinical_tools.core.constants import NameMapper
-from clinical_tools.core.metrics.variant import ConcordanceMetrics, VariantCallMetrics
+from clinical_tools.core.metrics.variant import (
+    ConcordanceMetrics,
+    ConcordanceTPMethod,
+    VariantCallMetrics,
+)
 from clinical_tools.render.diagnostic_metrics import (
     export_diagnostic_metrics_to_csv,
     export_diagnostic_metrics_to_markdown,
@@ -76,6 +81,12 @@ def main():
         help="Manual curation (type:filter:metric:count).",
     )
     parser.add_argument(
+        "--tp-method",
+        choices=[method.value for method in ConcordanceTPMethod],
+        default=ConcordanceTPMethod.MinTP.value,
+        help="TP method in concordance: 'truth', 'query', or 'min' (default).",
+    )
+    parser.add_argument(
         "--output_prefix",
         default="manually_curated_concordance",
         help="Prefix for output files.",
@@ -125,7 +136,7 @@ def main():
             QueryFP=df.loc[mask, "False Positive"].sum(),
         )
 
-        analysis = ConcordanceMetrics(metrics)
+        analysis = ConcordanceMetrics(metrics, tp_method=args.tp_method)
         concordance = analysis.concordance
         ci_lower, ci_upper = analysis.confidence_interval()
 

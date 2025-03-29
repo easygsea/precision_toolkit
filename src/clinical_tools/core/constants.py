@@ -17,10 +17,10 @@ class NameMapper:
     """Class to hold abbreviations and full names."""
 
     NAME_MAP = {
-        "TP": "True Positives",
-        "FP": "False Positives",
-        "TN": "True Negatives",
-        "FN": "False Negatives",
+        "TP": "True Positive",
+        "FP": "False Positive",
+        "TN": "True Negative",
+        "FN": "False Negative",
     }
 
     @staticmethod

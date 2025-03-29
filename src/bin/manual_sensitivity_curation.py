@@ -119,10 +119,9 @@ def main():
             + df.loc[mask, "False Negative"].sum(),
             TruthTP=df.loc[mask, "True Positive"].sum(),
             TruthFN=df.loc[mask, "False Negative"].sum(),
-            QueryTotal=df.loc[mask, "True Positive"].sum()
-            + df.loc[mask, "False Positive"].sum(),
-            QueryTP=df.loc[mask, "True Positive"].sum(),
-            QueryFP=df.loc[mask, "False Positive"].sum(),
+            QueryTotal=0,
+            QueryTP=0,
+            QueryFP=0,
         )
 
         analysis = SensitivityMetrics(metrics)
