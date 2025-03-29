@@ -81,9 +81,9 @@ def main():
         "--metrics",
         nargs="+",
         choices=["concordance", "sensitivity", "precision"],
-        default=["concordance"],
+        default=["concordance", "sensitivity", "precision"],
         help="Metrics to compute. Multiple metrics separated by spaces. "
-        "Options: concordance, sensitivity, precision",
+        "Options: concordance, sensitivity, precision. Default is all metrics.",
     )
 
     args = parser.parse_args()
