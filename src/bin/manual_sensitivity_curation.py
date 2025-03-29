@@ -63,7 +63,10 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description="Curate sensitivity from an existing table with count "
-        "information and recompute statistics."
+        "information and recompute statistics. Example: "
+        "manual-sensitivity-curation --input sensitivity.csv "
+        "--curation 'SNP:PASS:TP:100' 'SNP:PASS:FN:50' "
+        "--output_prefix manually_curated_sensitivity"
     )
     parser.add_argument(
         "--input", required=True, help="Input sensitivity summary table (CSV format)."

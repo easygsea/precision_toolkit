@@ -2,8 +2,7 @@
 
 nextflow.enable.dsl=2
 
-include { concordance } from './workflows/concordance'
-
+include { variant_benchmark } from './workflows/variant_benchmark'
 def helpMessage() {
     log.info"""
     =========================================
@@ -15,28 +14,29 @@ def helpMessage() {
     ====================
 
     Basic Usage:
-        nextflow run main.nf --workflows <workflow1,workflow2,...> [options]
+        nextflow run main.nf --workflows variant_benchmark [options]
 
     ====================
     Workflow Overview
     ====================
     Available Workflows:
-        concordance    Run variant concordance analysis
+        variant_benchmark    Run variant benchmark for diagnostic metrics (concordance, sensitivity, precision)
         (more workflows to come...)
 
     ====================
     Detailed Usage
     ====================
-    Concordance Workflow:
+    Variant Benchmark (Diagnostic Metrics) Workflow:
         Mandatory Parameters:
             --truth_dir   Directory containing truth VCF files (must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz)
             --query_dir   Directory containing query VCF files (must be named as <sample>.query.vcf or <sample>.query.vcf.gz)
-            --variant_concordance_engine  Analysis engine: 'happy' or 'wittyer' (default: happy)
+            --variant_benchmark_engine  Analysis engine: 'happy' or 'wittyer' (default: happy)
 
         Optional Parameters:
+            --diagnostic_metrics     Diagnostic metrics to calculate (default: 'concordance sensitivity precision'). Multiple values must be passed as a quoted space-separated list
             --genome_ref             Reference genome FASTA (required for happy)
             --output_dir             Base output directory (default: output_clinical_tools)
-            --concordance_dir        Subdirectory for concordance results (default: concordance)
+            --variant_benchmark_dir  Subdirectory for variant benchmark results (default: variant_benchmark)
             --happy_options          Additional options for hap.py
             --wittyer_options        Additional options for witty.er
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
@@ -64,32 +64,27 @@ def helpMessage() {
     ====================
     Example Commands
     ====================
-    Basic Concordance:
-        nextflow run main.nf --workflows concordance \\
+    Basic Variant Benchmark:
+        nextflow run main.nf --workflows variant_benchmark \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/ \\
-            --variant_concordance_engine happy \\
+            --variant_benchmark_engine happy \\
             --output_dir output_clinical_tools
 
-    Concordance with Spurious Variant Exclusion:
-        nextflow run main.nf --workflows concordance \\
+    Variant Benchmark with Spurious Variant Exclusion:
+        nextflow run main.nf --workflows variant_benchmark \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/ \\
-            --variant_concordance_engine happy \\
+            --variant_benchmark_engine happy \\
             --spurious_variants_vcf spurious_variants.vcf.gz \\
             --collapse both \\
             --output_dir output_clinical_tools
-
-    Multiple Workflows:
-        nextflow run main.nf --workflows concordance,sensitivity,specificity \\
-            --truth_dir truth_vcfs/ \\
-            --query_dir query_vcfs/
 
     Local Execution with Custom Resources:
         nextflow run main.nf \\
             --max_cpus 8 \\
             --max_memory 32.GB \\
-            --workflows concordance \\
+            --workflows variant_benchmark \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/
 
@@ -99,7 +94,7 @@ def helpMessage() {
             --slurm_partition general \\
             --max_cpus 8 \\
             --max_memory 32.GB \\
-            --workflows concordance \\
+            --workflows variant_benchmark \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/
 
@@ -107,7 +102,7 @@ def helpMessage() {
     Output Structure
     ====================
     <output_dir>/
-    └── <concordance_dir>/
+    └── <variant_benchmark_engine>/
         ├── raw/            # Raw engine reports
         │   ├── happy/      # hap.py raw reports if using happy engine
         │   └── wittyer/    # witty.er raw reports if using wittyer engine
@@ -118,10 +113,14 @@ def helpMessage() {
         │   └── wittyer/    # witty.er curated reports if using wittyer engine
         │       ├── sample1/
         │       └── sample2/
-        ├── variant_concordance_happy_raw.csv       # Raw concordance in CSV
-        ├── variant_concordance_happy_curated.csv   # Curated concordance in CSV
-        ├── variant_concordance_happy_combined.md   # Combined raw/curated concordance in Markdown
-        └── variant_concordance_happy_combined.docx # Combined raw/curated concordance in Word
+        ├── diagnostic_metrics_happy_raw_concordance.csv     # Raw variant concordance in CSV
+        ├── diagnostic_metrics_happy_curated_concordance.csv # Curated variant concordance in CSV
+        ├── diagnostic_metrics_happy_raw_sensitivity.csv     # Raw sensitivity in CSV
+        ├── diagnostic_metrics_happy_curated_sensitivity.csv # Curated sensitivity in CSV
+        ├── diagnostic_metrics_happy_raw_precision.csv       # Raw precision in CSV
+        ├── diagnostic_metrics_happy_curated_precision.csv   # Curated precision in CSV
+        ├── diagnostic_metrics_happy_combined.md             # Combined raw/curated diagnostic metrics in Markdown
+        └── diagnostic_metrics_happy_combined.docx           # Combined raw/curated diagnostic metrics in Word
     """.stripIndent()
 }
 
@@ -152,7 +151,7 @@ workflow {
         exit 0
     } else {
         def workflowList = params.workflows.split(',').collect { it.trim() }
-        def validWorkflows = ['concordance']
+        def validWorkflows = ['variant_benchmark']
 
         // Validate user-selected workflows
         def invalidWorkflows = workflowList - validWorkflows

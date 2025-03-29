@@ -6,8 +6,8 @@ This manual provides complete documentation for Clinical Tools, including:
 
 ## Workflows
 
-- [Variant Concordance](./workflows/variant_concordance.md)
+- [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision)](./workflows/variant_benchmark.md)
 
 ## Standalone Utilities
 
-- [Curate Variant Concordance Manually](./standalone_utilities/standalone_utilities.md#curate-variant-concordance-manually)
+- [Manual Diagnostic Metrics Curation](./standalone_utilities/standalone_utilities.md#manual-diagnostic-metrics-curation)

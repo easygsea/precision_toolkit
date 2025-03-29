@@ -68,7 +68,10 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description="Curate variant concordance from an existing table with count "
-        "information and recompute statistics."
+        "information and recompute statistics. Example: "
+        "manual-variant-concordance-curation --input concordance.csv "
+        "--curation 'SNP:PASS:TP:100' 'SNP:PASS:FN:50' 'SNP:PASS:FP:20' "
+        "--tp-method min --output_prefix manually_curated_concordance"
     )
     parser.add_argument(
         "--input", required=True, help="Input concordance summary table (CSV format)."

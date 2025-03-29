@@ -63,7 +63,10 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description="Curate precision from an existing table with count "
-        "information and recompute statistics."
+        "information and recompute statistics. Example: "
+        "manual-precision-curation --input precision.csv "
+        "--curation 'SNP:PASS:TP:100' 'SNP:PASS:FP:50' "
+        "--output_prefix manually_curated_precision"
     )
     parser.add_argument(
         "--input", required=True, help="Input precision summary table (CSV format)."

@@ -1,15 +1,21 @@
 # Standalone Utilities
 
-- [Curate Variant Concordance Manually](#curate-variant-concordance-manually)
+- [Manual Diagnostic Metrics Curation](#manual-diagnostic-metrics-curation)
 
-## Curate Variant Concordance Manually
+## Manual Diagnostic Metrics Curation
 
-The `curate-variant-concordance-manually` tool allows users to manually curate variant concordance results after the variant concordance workflow has been run.
+We provide three tools to manually curate diagnostic metrics after the variant benchmark (diagnostic metrics) workflow has been run.
+
+- `manual-variant-concordance-curation`
+- `manual-sensitivity-curation`
+- `manual-precision-curation`
 
 To view the help message, run:
 
 ```bash
-apptainer exec <path/to/clinical_tools_latest.sif> curate-variant-concordance-manually -h
+apptainer exec <path/to/clinical_tools_latest.sif> manual-variant-concordance-curation -h
+apptainer exec <path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
+apptainer exec <path/to/clinical_tools_latest.sif> manual-precision-curation -h
 ```
 
-Detailed example usage is provided in the [Variant Concordance](../workflows/variant_concordance.md#variant-concordance-manual-curation) manual.
+Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#variant-benchmark-manual-curation) manual.

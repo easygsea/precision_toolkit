@@ -93,26 +93,27 @@ process run_wittyer {
     """
 }
 
-process summarize_variant_concordance {
+process summarize_diagnostic_metrics {
     publishDir "${params.output_dir}/${output_dir ?: ''}", mode: 'copy'
 
     input:
-    val variant_concordance_engine
-    path raw_concordance_outputs
-    path curated_concordance_outputs
+    val variant_benchmark_engine
+    path raw_variant_benchmark_outputs
+    path curated_variant_benchmark_outputs
+    val diagnostic_metrics
     val concordance_tp
     val output_dir
 
     output:
-    path("${PREFIX}*"), emit: variant_concordance_summary
+    path("${PREFIX}*"), emit: variant_benchmark_summary
 
     script:
-    PREFIX = "variant_concordance"
+    PREFIX = "diagnostic_metrics"
     """
-    summarize-diagnostic-metrics --metrics concordance \
-        --engine ${variant_concordance_engine} \
-        ${(raw_concordance_outputs != []) ? "--raw-files " + raw_concordance_outputs.collect().join(' ') : ""} \
-        ${(curated_concordance_outputs != []) ? "--curated-files " + curated_concordance_outputs.collect().join(' ') : ""} \
+    summarize-diagnostic-metrics --metrics ${diagnostic_metrics} \
+        --engine ${variant_benchmark_engine} \
+        ${(raw_variant_benchmark_outputs != []) ? "--raw-files " + raw_variant_benchmark_outputs.collect().join(' ') : ""} \
+        ${(curated_variant_benchmark_outputs != []) ? "--curated-files " + curated_variant_benchmark_outputs.collect().join(' ') : ""} \
         --tp-method ${concordance_tp} \
         --prefix ${PREFIX}
     """

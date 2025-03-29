@@ -16,8 +16,8 @@ include {
     run_happy as run_happy_curated
     run_wittyer as run_wittyer_raw
     run_wittyer as run_wittyer_curated
-    summarize_variant_concordance
-} from '../../modules/concordance/main'
+    summarize_diagnostic_metrics
+} from '../../modules/variant_benchmark/main'
 
 // Function to build VCF pair channels
 // This function creates a channel of tuples containing sample name, truth VCF, and query VCF
@@ -78,8 +78,8 @@ def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
     return no_spurious_truth.join(no_spurious_query)
 }
 
-// Main variant concordance workflow
-workflow variant_concordance_workflow {
+// Main variant benchmark workflow
+workflow variant_benchmark_workflow {
     main:
         // Validate input directories
         if (!file(params.truth_dir).exists()) error "Truth directory not found: ${params.truth_dir}"
@@ -107,7 +107,7 @@ workflow variant_concordance_workflow {
         }
 
         // Run analysis based on selected engine
-        if (params.variant_concordance_engine == "happy") {
+        if (params.variant_benchmark_engine == "happy") {
             if (!params.genome_ref) error "genome_ref parameter is required for happy engine"
 
             def genome_ref_path = file(params.genome_ref)
@@ -125,7 +125,7 @@ workflow variant_concordance_workflow {
                     genome_ref_path,
                     genome_fai_path,
                     params.happy_options,
-                    "${params.concordance_dir}/raw",
+                    "${params.variant_benchmark_dir}/raw",
                     "raw"
                 ).happy_summary.collect()
             }
@@ -137,17 +137,17 @@ workflow variant_concordance_workflow {
                     genome_ref_path,
                     genome_fai_path,
                     params.happy_options,
-                    "${params.concordance_dir}/curated",
+                    "${params.variant_benchmark_dir}/curated",
                     "curated"
                 ).happy_summary.collect()
             }
-        } else if (params.variant_concordance_engine == "wittyer") {
+        } else if (params.variant_benchmark_engine == "wittyer") {
             // Only run raw analysis if skip_raw is false
             if (!params.skip_raw) {
                 summary_files = run_wittyer_raw(
                     vcf_pairs,
                     params.wittyer_options,
-                    "${params.concordance_dir}/raw",
+                    "${params.variant_benchmark_dir}/raw",
                     "raw"
                 ).wittyer_summary.collect()
             }
@@ -157,18 +157,18 @@ workflow variant_concordance_workflow {
                 summary_files_curated = run_wittyer_curated(
                     curated_vcf_pairs,
                     params.wittyer_options,
-                    "${params.concordance_dir}/curated",
+                    "${params.variant_benchmark_dir}/curated",
                     "curated"
                 ).wittyer_summary.collect()
             }
         }
 
-        // Summarize variant concordance results
-        summarize_variant_concordance(
-            params.variant_concordance_engine,
+        summarize_diagnostic_metrics(
+            params.variant_benchmark_engine,
             summary_files,
             summary_files_curated,
+            params.diagnostic_metrics,
             params.concordance_tp,
-            params.concordance_dir
+            params.variant_benchmark_dir
         )
 }
