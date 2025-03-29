@@ -1,4 +1,7 @@
-"""Test variant metrics."""
+"""
+Test variant benchmark diagnostic metrics:
+concordance, sensitivity, precision, F1 score, confidence intervals
+"""
 
 import pytest
 
