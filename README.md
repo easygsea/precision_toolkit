@@ -19,15 +19,14 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
 1. Clone the repository:
    ```bash
    git clone https://github.com/easygsea/clinical_tools.git
-   cd clinical_tools
    ```
 
-2. Run specific workflows. Example:
+2. Run specific workflow(s). Example:
    ```bash
-   nextflow run main.nf --workflows concordance \
-       --truth_dir truth_vcfs/ \
-       --query_dir query_vcfs/ \
-       --variant_concordance_engine happy \
+   nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
+       --truth_dir <path/to/truth_vcfs/> \
+       --query_dir <path/to/query_vcfs/> \
+       --variant_benchmark_engine happy \
        --output_dir output_clinical_tools
    ```
 
@@ -40,9 +39,9 @@ Using containerized tools:
 
 2. Run specific tools. Example:
    ```bash
-   apptainer exec -B <data_path> /path/to/clinical_tools_latest.sif curate-variant-concordance-manually -h
+   apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
    ```
-   See official [singularity exec](https://docs.sylabs.io/guides/latest/user-guide/cli/singularity_exec.html) manual for guidance on calling commands within a container.
+   See official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for guidance on calling commands within a container.
 
 # Contents
 
