@@ -3,11 +3,11 @@
 Manually curate variant concordance results.
 
 Usage:
-    curate-variant-concordance-manually --input <input_file>
+    manual-variant-concordance-curation --input <input_file>
     --curation <curation_criteria> --output_prefix <output_prefix>
 
 Example:
-    curate-variant-concordance-manually --input concordance.csv
+    manual-variant-concordance-curation --input concordance.csv
     --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" "SNP:PASS:FP:20"
     --output_prefix manually_curated_concordance
 """
@@ -19,10 +19,10 @@ import pandas as pd
 
 from clinical_tools.core.constants import NameMapper
 from clinical_tools.core.metrics.variant import ConcordanceMetrics, VariantCallMetrics
-from clinical_tools.render.variant_concordance import (
-    export_concordance_to_csv,
-    export_concordance_to_markdown,
-    export_concordance_to_word,
+from clinical_tools.render.diagnostic_metrics import (
+    export_diagnostic_metrics_to_csv,
+    export_diagnostic_metrics_to_markdown,
+    export_diagnostic_metrics_to_word,
 )
 
 
@@ -42,7 +42,7 @@ def validate_curation_format(curation: str) -> bool:
         _, _, metric, count = curation.split(":")
         int(count)
         if metric not in {"TP", "FN", "FP"}:
-            raise ValueError(f"Invalid metric: {metric}")
+            raise ValueError(f"Invalid metric: {metric}. Must be TP, FN, or FP.")
         return True
     except ValueError as e:
         raise ValueError(f"Invalid curation format: {e}")
@@ -66,7 +66,7 @@ def main():
         "information and recompute statistics."
     )
     parser.add_argument(
-        "--input", required=True, help="Raw concordance summary table (CSV format)."
+        "--input", required=True, help="Input concordance summary table (CSV format)."
     )
     parser.add_argument(
         "--curation",
@@ -136,16 +136,18 @@ def main():
     summary_text = "Manually curated variant concordance summary."
 
     # Export using the output prefix
-    export_concordance_to_csv(df, f"{args.output_prefix}.csv")
-    export_concordance_to_markdown(
-        df,
+    export_diagnostic_metrics_to_csv(df, f"{args.output_prefix}.csv")
+    export_diagnostic_metrics_to_markdown(
+        [df],
         f"{args.output_prefix}.md",
+        metric_types=["concordance"],
         headings="Manually Curated Variant Concordance",
         summaries=summary_text,
     )
-    export_concordance_to_word(
-        df,
+    export_diagnostic_metrics_to_word(
+        [df],
         f"{args.output_prefix}.docx",
+        metric_types=["concordance"],
         headings="Manually Curated Variant Concordance",
         summaries=summary_text,
     )
