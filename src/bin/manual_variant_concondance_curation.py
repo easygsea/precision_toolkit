@@ -18,39 +18,15 @@ import logging
 
 import pandas as pd
 
-from clinical_tools.core.constants import NameMapper
+from clinical_tools.core.macros.curation.variant import (
+    export_curation_results,
+    update_metrics,
+    validate_curation_format,
+)
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     ConcordanceTPMethod,
-    VariantCallMetrics,
 )
-from clinical_tools.render.diagnostic_metrics import (
-    export_diagnostic_metrics_to_csv,
-    export_diagnostic_metrics_to_markdown,
-    export_diagnostic_metrics_to_word,
-)
-
-
-def validate_curation_format(curation: str) -> bool:
-    """Validate manual curation input format.
-
-    Args:
-        curation: Manual curation input in format type:filter:metric:count
-
-    Returns:
-        True if format is valid
-
-    Raises:
-        ValueError: If format is invalid
-    """
-    try:
-        _, _, metric, count = curation.split(":")
-        int(count)
-        if metric not in {"TP", "FN", "FP"}:
-            raise ValueError(f"Invalid metric: {metric}. Must be TP, FN, or FP.")
-        return True
-    except ValueError as e:
-        raise ValueError(f"Invalid curation format: {e}")
 
 
 def main():
@@ -104,67 +80,17 @@ def main():
     # Validate manual curation input before processing
     try:
         for curation in curations:
-            validate_curation_format(curation)
+            validate_curation_format(curation, valid_metrics=["TP", "FN", "FP"])
     except ValueError as e:
         logging.error(f"Invalid curation format: {e}")
         raise
 
-    # Update counts based on manual input
+    # Update counts and recalculate metrics
     for curation in curations:
-        variant_type, filter_type, metric, count = curation.split(":")
-        count = int(count)
+        df = update_metrics(df, curation, ConcordanceMetrics, args.tp_method)
 
-        try:
-            metric_full = NameMapper.get_full_name(metric)
-        except ValueError as e:
-            logging.error(e)
-            raise
-
-        mask = (df["Variant Type"] == variant_type) & (
-            df["Variant Filter"] == filter_type
-        )
-
-        df.loc[mask, metric_full] = count
-
-        metrics = VariantCallMetrics(
-            VariantType=variant_type,
-            VariantCallFilter=filter_type,
-            TruthTotal=df.loc[mask, "True Positive"].sum()
-            + df.loc[mask, "False Negative"].sum(),
-            TruthTP=df.loc[mask, "True Positive"].sum(),
-            TruthFN=df.loc[mask, "False Negative"].sum(),
-            QueryTotal=df.loc[mask, "True Positive"].sum()
-            + df.loc[mask, "False Positive"].sum(),
-            QueryTP=df.loc[mask, "True Positive"].sum(),
-            QueryFP=df.loc[mask, "False Positive"].sum(),
-        )
-
-        analysis = ConcordanceMetrics(metrics, tp_method=args.tp_method)
-        concordance = analysis.concordance
-        ci_lower, ci_upper = analysis.confidence_interval()
-
-        df.loc[mask, "Concordance"] = concordance
-        df.loc[mask, "CI Lower"] = ci_lower
-        df.loc[mask, "CI Upper"] = ci_upper
-
-    summary_text = "Manually curated variant concordance summary."
-
-    # Export using the output prefix
-    export_diagnostic_metrics_to_csv(df, f"{args.output_prefix}.csv")
-    export_diagnostic_metrics_to_markdown(
-        [df],
-        f"{args.output_prefix}.md",
-        metric_types=["concordance"],
-        headings="Manually Curated Variant Concordance",
-        summaries=summary_text,
-    )
-    export_diagnostic_metrics_to_word(
-        [df],
-        f"{args.output_prefix}.docx",
-        metric_types=["concordance"],
-        headings="Manually Curated Variant Concordance",
-        summaries=summary_text,
-    )
+    # Export results
+    export_curation_results(df, args.output_prefix, "concordance")
 
 
 if __name__ == "__main__":
