@@ -5,9 +5,9 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: tests/integration/data/
+        exclude: .*/data/ # Ignore files in any data/ directory
       - id: end-of-file-fixer
-        exclude: tests/integration/data/
+        exclude: .*/data/ # Ignore files in any data/ directory
 
   - repo: https://github.com/PyCQA/isort
     rev: 6.0.0

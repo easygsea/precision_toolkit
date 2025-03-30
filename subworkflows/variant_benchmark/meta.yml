@@ -1,0 +1,76 @@
+name: variant_benchmark
+description: |
+  Compare truth and query VCF files using either the hap.py or witty.er engine to
+  generate diagnostic metrics including concordance, sensitivity, precision, and F1 score.
+keywords:
+  - variant benchmarking
+  - hap.py
+  - witty.er
+  - VCF
+  - diagnostic metrics
+  - clinical validation
+input:
+  - name: truth_vcfs
+    description: Directory containing truth VCF files
+    type: directory
+    required: true
+  - name: query_vcfs
+    description: Directory containing query VCF files
+    type: directory
+    required: true
+  - name: genome_ref
+    description: Reference genome FASTA file
+    type: file
+    required: true
+  - name: variant_benchmark_engine
+    description: Analysis engine to use (happy or wittyer)
+    type: string
+    default: happy
+    choices: [happy, wittyer]
+  - name: happy_options
+    description: Additional options for hap.py
+    type: string
+    default: "--write-vcf --write-counts"
+  - name: wittyer_options
+    description: Additional options for witty.er
+    type: string
+    default: "--evaluationMode CrossTypeAndSimpleCounting --includedFilters='' --percentDistance=0.3 --bpDistance=5000"
+  - name: spurious_variants_vcf
+    description: VCF file containing spurious variants to exclude
+    type: file
+    required: false
+  - name: collapse
+    description: Collapse option for bcftools isec
+    type: string
+    default: none
+    choices: [none, both, all, some]
+  - name: skip_raw
+    description: Skip raw analysis (requires spurious_variants_vcf)
+    type: boolean
+    default: false
+  - name: diagnostic_metrics
+    description: List of diagnostic metrics to calculate
+    type: string
+    default: "concordance sensitivity precision f1_score"
+parameters:
+  - name: output_dir
+    description: Directory to store output files
+    type: string
+    default: "output_clinical_tools"
+  - name: variant_benchmark_dir
+    description: Directory for variant benchmark outputs
+    type: string
+    default: "variant_benchmark"
+output:
+  - name: raw_summary
+    description: Raw variant benchmark summary files
+    type: directory
+    path: "output_clinical_tools/variant_benchmark/raw"
+  - name: curated_summary
+    description: Curated variant benchmark summary files (after spurious variant filtering)
+    type: directory
+    path: "output_clinical_tools/variant_benchmark/curated"
+  - name: diagnostic_metrics_summary
+    description: Diagnostic metrics reports including concordance, sensitivity, precision, and F1 score
+    type: file
+    path: "output_clinical_tools/variant_benchmark/*.csv|*.md|*.docx"
