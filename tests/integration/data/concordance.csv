@@ -1,0 +1,2 @@
+Variant Type,Variant Filter,True Positive,False Negative,False Positive,Concordance,CI Lower,CI Upper
+SNP,PASS,80,20,10,0.7273,0.6374,0.8018
