@@ -68,6 +68,7 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
     - `manual-variant-concordance-curation`
     - `manual-sensitivity-curation`
     - `manual-precision-curation`
+    - `manual-f1-score-curation`
 
 ## Resource Optimization and High-Performance Computing
 
