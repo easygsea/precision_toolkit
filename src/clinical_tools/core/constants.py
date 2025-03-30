@@ -3,7 +3,7 @@
 from enum import StrEnum
 from typing import Literal
 
-DiagnosticMetricType = Literal["concordance", "sensitivity", "precision"]
+DiagnosticMetricType = Literal["concordance", "sensitivity", "precision", "f1_score"]
 
 
 class VariantConcordanceEngine(StrEnum):

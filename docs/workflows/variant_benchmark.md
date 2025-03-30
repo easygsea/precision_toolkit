@@ -1,6 +1,8 @@
-# Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision)
+# Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)
 
-The variant benchmark module compares variant calls between truth and query VCF files using either [hap.py](https://github.com/Illumina/hap.py) or [witty.er](https://github.com/EBIvariation/witty.er), and calculates diagnostic metrics including concordance, sensitivity, and precision. By default, all metrics are calculated.
+The variant benchmark module compares variant calls between truth and query VCF files using either [hap.py](https://github.com/Illumina/hap.py) or [witty.er](https://github.com/EBIvariation/witty.er), and calculates diagnostic metrics including concordance, sensitivity, precision, and F1 score.
+
+By default, all metrics, and their confidence intervals (CIs) wherever applicable, are calculated.
 
 
 ## Quick Start
@@ -80,7 +82,7 @@ nextflow run main.nf \
 - `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy` or `wittyer`, default: `happy`)
 
 **Optional Parameters:**
-- `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision'). Multiple values must be passed as a quoted space-separated list
+- `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
 - `--genome_ref`: Reference genome FASTA file (required for hap.py)
 - `--output_dir`: Base output directory (default: `output_clinical_tools`)
 - `--variant_benchmark_dir`: Subdirectory for variant benchmark results (default: `variant_benchmark`)

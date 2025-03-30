@@ -118,6 +118,28 @@ def generate_diagnostic_metrics_table(
                 ci_upper,
             ) in results.items()
         ]
+    elif metric_type == "f1_score":
+        columns = [
+            "Variant Type",
+            "Variant Filter",
+            "Sensitivity",
+            "Precision",
+            "F1 Score",
+        ]
+        data = [
+            {
+                "Variant Type": variant_type,
+                "Variant Filter": variant_filter,
+                "Sensitivity": sensitivity,
+                "Precision": precision,
+                "F1 Score": f1_score,
+            }
+            for (variant_type, variant_filter), (
+                sensitivity,
+                precision,
+                f1_score,
+            ) in results.items()
+        ]
     else:
         raise ValueError(f"Unsupported metric type: {metric_type}")
 
@@ -139,8 +161,14 @@ def format_diagnostic_metrics_table(
         New DataFrame with formatted columns
     """
     formatted_df = df.copy()
-    metric_col = metric_type.capitalize()
-    for col in [metric_col, "CI Lower", "CI Upper"]:
+    metric_col = "F1 Score" if metric_type == "f1_score" else metric_type.capitalize()
+    # Only format CI columns if they exist
+    cols_to_format = [metric_col]
+    if metric_type == "f1_score":
+        cols_to_format.extend(["Sensitivity", "Precision"])
+    if "CI Lower" in df.columns and "CI Upper" in df.columns:
+        cols_to_format.extend(["CI Lower", "CI Upper"])
+    for col in cols_to_format:
         formatted_df[col] = formatted_df[col].apply(format_percentage)
     return formatted_df
 

@@ -10,7 +10,7 @@ Usage:
 Example:
     summarize-diagnostic-metrics --engine happy --raw-files A.raw.summary.csv
     B.raw.summary.csv --curated-files A.curated.summary.csv B.curated.summary.csv
-    --prefix diagnostic_metrics --metrics concordance sensitivity precision
+    --prefix diagnostic_metrics --metrics concordance sensitivity precision f1_score
     --tp-method min
 """
 
@@ -80,10 +80,12 @@ def main():
         "-m",
         "--metrics",
         nargs="+",
-        choices=["concordance", "sensitivity", "precision"],
-        default=["concordance", "sensitivity", "precision"],
+        choices=["concordance", "sensitivity", "precision", "f1_score"],
+        default=["concordance", "sensitivity", "precision", "f1_score"],
         help="Metrics to compute. Multiple metrics separated by spaces. "
-        "Options: concordance, sensitivity, precision. Default is all metrics.",
+        "Options: concordance, sensitivity, precision, f1_score. Default is all "
+        "metrics. When F1 score is selected, both sensitivity and precision are "
+        "automatically computed.",
     )
 
     args = parser.parse_args()
@@ -120,11 +122,12 @@ def main():
         )
 
         for metric in args.metrics:
+            metric_name = "F1 score" if metric == "f1_score" else metric
             raw_table = generate_diagnostic_metrics_table(raw_results[metric], metric)
             raw_tables.append(raw_table)
-            raw_headings.append(f"Raw {metric.capitalize()}")
+            raw_headings.append(f"Raw {metric_name.capitalize()}")
             raw_summaries.append(
-                f"This table summarizes the raw {metric} of variant calls."
+                f"This table summarizes the raw {metric_name} of variant calls."
             )
             initial_metric_types.append(metric)
 
@@ -142,13 +145,14 @@ def main():
         )
 
         for metric in args.metrics:
+            metric_name = "F1 score" if metric == "f1_score" else metric
             curated_table = generate_diagnostic_metrics_table(
                 curated_results[metric], metric
             )
             curated_tables.append(curated_table)
-            curated_headings.append(f"Curated {metric.capitalize()}")
+            curated_headings.append(f"Curated {metric_name.capitalize()}")
             curated_summaries.append(
-                f"This table summarizes the curated {metric} of variant calls."
+                f"This table summarizes the curated {metric_name} of variant calls."
             )
             initial_metric_types.append(metric)
 

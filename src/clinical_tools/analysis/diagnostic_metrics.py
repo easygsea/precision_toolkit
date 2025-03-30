@@ -10,6 +10,7 @@ from clinical_tools.core.constants import (
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     ConcordanceTPMethod,
+    F1ScoreMetrics,
     PrecisionMetrics,
     SensitivityMetrics,
     VariantCallMetrics,
@@ -272,6 +273,34 @@ def _compute_precision_and_ci_for_group(
     return (total_query_tp, total_query_fp, precision, ci_lower, ci_upper)
 
 
+def compute_f1_score(
+    metrics: list[VariantCallMetrics],
+) -> dict[tuple[str, str], tuple[float, float, float]]:
+    """
+    Calculate F1 score from sensitivity and precision for grouped metrics.
+
+    Args:
+        metrics: Sequence of parsed metrics across samples
+
+    Returns:
+        Dictionary mapping (variant_type, filter) to tuple of:
+            sensitivity: Sensitivity value between 0 and 1
+            precision: Precision value between 0 and 1
+            f1_score: F1 score value between 0 and 1
+    """
+    precision_results = compute_precision_and_ci(metrics)
+    sensitivity_results = compute_sensitivity_and_ci(metrics)
+
+    f1_scores = {}
+    for key in precision_results.keys():
+        sensitivity = sensitivity_results[key][2]
+        precision = precision_results[key][2]
+        f1_metrics = F1ScoreMetrics(sensitivity=sensitivity, precision=precision)
+        f1_scores[key] = (sensitivity, precision, f1_metrics.f1_score)
+
+    return f1_scores
+
+
 def process_diagnostic_metrics(
     file_paths: Sequence[str],
     data_type: VariantConcordanceEngine,
@@ -295,6 +324,7 @@ def process_diagnostic_metrics(
                 metric, ci_lower, ci_upper)
             precision: Dict mapping (variant_type, filter) to (tp, fp,
                 metric, ci_lower, ci_upper)
+            f1_score: Dict mapping (variant_type, filter) to (f1_score)
     """
     metrics_data = load_data_from_files(file_paths, data_type=data_type)
 
@@ -311,5 +341,7 @@ def process_diagnostic_metrics(
             result["sensitivity"] = compute_sensitivity_and_ci(metrics_data)
         elif metric_type == "precision":
             result["precision"] = compute_precision_and_ci(metrics_data)
+        elif metric_type == "f1_score":
+            result["f1_score"] = compute_f1_score(metrics_data)
 
     return result

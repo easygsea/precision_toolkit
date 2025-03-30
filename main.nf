@@ -20,7 +20,7 @@ def helpMessage() {
     Workflow Overview
     ====================
     Available Workflows:
-        variant_benchmark    Run variant benchmark for diagnostic metrics (concordance, sensitivity, precision)
+        variant_benchmark    Run variant benchmark diagnostic metrics (concordance, sensitivity, precision, f1_score)
         (more workflows to come...)
 
     ====================
@@ -33,7 +33,7 @@ def helpMessage() {
             --variant_benchmark_engine  Analysis engine: 'happy' or 'wittyer' (default: happy)
 
         Optional Parameters:
-            --diagnostic_metrics     Diagnostic metrics to calculate (default: 'concordance sensitivity precision'). Multiple values must be passed as a quoted space-separated list
+            --diagnostic_metrics     Diagnostic metrics to calculate (default: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
             --genome_ref             Reference genome FASTA (required for happy)
             --output_dir             Base output directory (default: output_clinical_tools)
             --variant_benchmark_dir  Subdirectory for variant benchmark results (default: variant_benchmark)
