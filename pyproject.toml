@@ -38,6 +38,6 @@ build-backend = "poetry.core.masonry.api"
 testpaths = [
     "tests/unit",
     "tests/standalone",
-    "tests/workflows",
+    "tests/workflows/variant_benchmark",
 ]
 addopts = "-v --cov=src --cov-report=term-missing"

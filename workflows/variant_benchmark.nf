@@ -9,7 +9,7 @@ enum VariantConcordanceEngine {
 
 // Diagnostic metrics enum
 enum DiagnosticMetrics {
-    concordance, sensitivity, precision
+    concordance, sensitivity, precision, f1_score
 }
 
 // Concordance TP method enum

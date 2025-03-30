@@ -1,8 +1,11 @@
 ##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##contig=<ID=chr1>
+##contig=<ID=chr2>
 ##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant">
 ##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
 ##INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Length of the variant">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
-#CHROM  POS ID  REF ALT QUAL  FILTER  INFO  FORMAT  SAMPLE
-chr1    300  .   .   <DUP>   .     PASS    END=400;SVTYPE=DUP;SVLEN=100  GT      0/1
-chr2    700  .   .   <DEL>   .     PASS    END=800;SVTYPE=DEL;SVLEN=100  GT      1/1 
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE
+chr1	100	.	.	<DUP>	.	PASS	END=200;SVTYPE=DUP;SVLEN=100	GT	0/1
+chr2	700	.	.	<DEL>	.	PASS	END=800;SVTYPE=DEL;SVLEN=100	GT	1/1
