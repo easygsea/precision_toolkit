@@ -16,7 +16,7 @@ process exclude_spurious_variants {
     # Check and compress original VCF if needed
     if [[ ${original_vcf} != *.gz ]]; then
         bgzip -c ${original_vcf} > ${original_vcf}.gz
-        original_vcf=${original_vcf}.gz
+        mv ${original_vcf}.gz ${original_vcf}
     fi
 
     # Index original VCF if needed

@@ -12,7 +12,8 @@ Small variant benchmark:
 nextflow run main.nf \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
---variant_benchmark_engine happy
+--variant_benchmark_engine happy \
+--genome_ref <path/to/genome_ref>
 ```
 
 Large variant benchmark:
@@ -29,6 +30,7 @@ nextflow run main.nf \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine happy \
+--genome_ref <path/to/genome_ref> \
 --spurious_variants_vcf <path/to/spurious_variants_vcf>
 ```
 
@@ -47,6 +49,7 @@ nextflow run main.nf \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine happy \
+--genome_ref <path/to/genome_ref> \
 --diagnostic_metrics "sensitivity precision" \
 --happy_options "--write-vcf --write-counts --pass-only"
 ```
@@ -80,10 +83,10 @@ nextflow run main.nf \
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
 - `--query_dir`: The directory containing query VCF files (the test or experimental dataset). These must be named as <sample>.query.vcf or <sample>.query.vcf.gz.
 - `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy` or `wittyer`, default: `happy`)
+- `--genome_ref`: Required for hap.py: Reference genome FASTA file
 
 **Optional Parameters:**
 - `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
-- `--genome_ref`: Reference genome FASTA file (required for hap.py)
 - `--output_dir`: Base output directory (default: `output_clinical_tools`)
 - `--variant_benchmark_dir`: Subdirectory for variant benchmark results (default: `variant_benchmark`)
 - `--happy_options`: Additional options for hap.py analysis
