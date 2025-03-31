@@ -1,6 +1,6 @@
 # Clinical Genomics Assay Development & Validation Tools
 
-This software suite streamlines clinical genomics assay development and validation with automated analysis pipelines, result summarization, and report generation. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
+**Clinical Tools** is a software suite that provides robust CI/CD workflows and tools for developing and validating clinical genomics assays. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
 
 ## Supported Architectures
 
@@ -42,6 +42,41 @@ Using containerized tools:
    apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
    ```
    See official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for guidance on calling commands within a container.
+
+## Demo Data
+
+Clinical Tools are rigorously tested at both unit and integration levels. Integration tests, covering workflows and standalone utilities, concurrently provide demos:
+
+[Workflows Tests as Demos](./tests/workflows)
+
+Example:
+[Variant Benchmark Tests](./tests/workflows/test_variant_benchmark.yml)
+Demo of benchmarking small variant calls and calculating variant concordance, sensitivity, precision, confidence intervals, and F1 score reported to 1 decimal place:
+```bash
+nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
+    --variant_benchmark_engine happy \
+    --truth_dir <path/to/clinical_tools>/tests_data/snv_truth_vcfs \
+    --query_dir <path/to/clinical_tools>/tests_data/snv_query_vcfs \
+    --genome_ref <path/to/clinical_tools>/tests_data/genome.fa \
+    --decimals 1 \
+    --output_dir tests_variant_benchmark_happy_raw
+```
+
+[Standalone Utilities Tests as Demos](./tests/standalone_utilities)
+
+Example:
+[Manual Diagnostic Metrics Curation Tests](./tests/standalone_utilities/test_manual_curation.py)
+Demo of manual sensitivity curation:
+```bash
+apptainer exec \
+    -B <path/to/clinical_tools> \
+    </path/to/clinical_tools_latest.sif> \
+    manual-sensitivity-curation \
+    --input <path/to/clinical_tools>/tests/standalone/data/sensitivity.csv \
+    --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" \
+    --output_prefix manually_curated_sensitivity
+```
+
 
 # Contents
 
