@@ -5,7 +5,8 @@ from typing import Literal
 
 DiagnosticMetricType = Literal["concordance", "sensitivity", "precision", "f1_score"]
 
-DEFAULT_DECIMALS = 1
+DEFAULT_DECIMALS = 2
+
 
 class VariantConcordanceEngine(StrEnum):
     """Supported variant concordance analysis engines."""

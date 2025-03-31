@@ -47,6 +47,7 @@ def helpMessage() {
                                      - 'truth': Use truth set's TP count
                                      - 'query': Use query set's TP count
                                      - 'min': Use minimum of truth and query TP counts (default)
+            --decimals               Number of decimal places in rendered output (default: 2)
 
     ====================
     Resource Management

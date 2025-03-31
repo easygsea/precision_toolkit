@@ -2,6 +2,7 @@
 
 from clinical_tools.core.constants import DEFAULT_DECIMALS
 
+
 def format_percentage(x: int | float, decimals: int = DEFAULT_DECIMALS) -> str:
     """
     Convert number to percentage string.

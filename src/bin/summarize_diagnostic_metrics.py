@@ -21,9 +21,9 @@ import pandas as pd
 
 from clinical_tools.analysis.diagnostic_metrics import process_diagnostic_metrics
 from clinical_tools.core.constants import (
+    DEFAULT_DECIMALS,
     DiagnosticMetricType,
     VariantConcordanceEngine,
-    DEFAULT_DECIMALS,
 )
 from clinical_tools.core.metrics.variant import ConcordanceTPMethod
 from clinical_tools.render.diagnostic_metrics import (
@@ -94,7 +94,7 @@ def main():
         "--decimals",
         type=int,
         default=DEFAULT_DECIMALS,
-        help=f"Number of decimal places to show in formatted percentages. Default is {DEFAULT_DECIMALS}.",
+        help=f"Decimal places in rendered output. Default: {DEFAULT_DECIMALS}.",
     )
 
     args = parser.parse_args()

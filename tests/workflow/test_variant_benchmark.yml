@@ -2,109 +2,109 @@
   command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_happy_raw
   files:
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/raw/happy/sample1.raw.summary.csv
-      md5sum: a051aa7ef4594ad32bf193d192d41cee
+      md5sum: f8ea5d6058e1630b4c550799ff1458e5
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/raw/happy/sample2.raw.summary.csv
-      md5sum: be10cc1e75e4a1d10d82bfe97f948590
+      md5sum: 691a7d8bd9565f0b12b32ce75821777a
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
-      md5sum: 5475889b0ce4adb9ca18bc22be9f2d5a
+      md5sum: 4ce37b63bc6f9020cbb18bd26540bc88
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
-      md5sum: 47488c5af3cc765938529d1dbd63154a
+      md5sum: c502fb8d6466e8123d9bb494271b1222
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw_precision.csv
-      md5sum: 478e48fed7007f237040c670edca98cd
+      md5sum: 37a8174687212f11647da3e55b60abc8
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
-      md5sum: ef1039caa08253eb48ca60be54b2747c
+      md5sum: 0f2bad7f096e2b73e7029ab82bf930d8
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw.md
-      md5sum: ed8b78e6e528855b05d13308775e56aa
+      md5sum: 98ab1ecd3827bfe71dc6c814d32eb8b2
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw.docx
-  
-- name: variant_benchmark_happy_raw_decimals
-  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_happy_raw_decimals --decimals 2
+
+- name: variant_benchmark_happy_raw_decimals1
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_happy_raw_decimals1 --decimals 1
   files:
-    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/raw/happy/sample1.raw.summary.csv
-      md5sum: a051aa7ef4594ad32bf193d192d41cee
-    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/raw/happy/sample2.raw.summary.csv
-      md5sum: be10cc1e75e4a1d10d82bfe97f948590
-    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
-      md5sum: 5475889b0ce4adb9ca18bc22be9f2d5a
-    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
-      md5sum: 47488c5af3cc765938529d1dbd63154a
-    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw_precision.csv
-      md5sum: 478e48fed7007f237040c670edca98cd
-    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
-      md5sum: ef1039caa08253eb48ca60be54b2747c
-    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw.md
-      md5sum: 0dab431913a057f5d2beccc7242333cb
-    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw.docx
+    - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/raw/happy/sample1.raw.summary.csv
+      md5sum: f8ea5d6058e1630b4c550799ff1458e5
+    - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/raw/happy/sample2.raw.summary.csv
+      md5sum: 691a7d8bd9565f0b12b32ce75821777a
+    - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
+      md5sum: 4ce37b63bc6f9020cbb18bd26540bc88
+    - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
+      md5sum: c502fb8d6466e8123d9bb494271b1222
+    - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw_precision.csv
+      md5sum: 37a8174687212f11647da3e55b60abc8
+    - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
+      md5sum: 0f2bad7f096e2b73e7029ab82bf930d8
+    - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw.md
+      md5sum: 344f90e97d7c5eaf8f97416ec8d57847
+    - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw.docx
 
 - name: variant_benchmark_happy_raw_selected_metrics
   command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --diagnostic_metrics "concordance f1_score" --output_dir tests_variant_benchmark_happy_raw_selected_metrics
   files:
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/raw/happy/sample1.raw.summary.csv
-      md5sum: a051aa7ef4594ad32bf193d192d41cee
+      md5sum: f8ea5d6058e1630b4c550799ff1458e5
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/raw/happy/sample2.raw.summary.csv
-      md5sum: be10cc1e75e4a1d10d82bfe97f948590
+      md5sum: 691a7d8bd9565f0b12b32ce75821777a
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
-      md5sum: 5475889b0ce4adb9ca18bc22be9f2d5a
+      md5sum: 4ce37b63bc6f9020cbb18bd26540bc88
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
-      md5sum: 47488c5af3cc765938529d1dbd63154a
+      md5sum: c502fb8d6466e8123d9bb494271b1222
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw_precision.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw.md
-      md5sum: 6dfb20bc8e52746a530e1faa2b80017b
+      md5sum: 76414a280e3379f56973c4a7f1c0b55a
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw.docx
 
 - name: variant_benchmark_happy_exclude_spurious
   command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --spurious_variants_vcf tests_data/spurious_snv.vcf --output_dir tests_variant_benchmark_happy_exclude_spurious
   files:
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/curated/happy/sample1.curated.summary.csv
-      md5sum: a051aa7ef4594ad32bf193d192d41cee
+      md5sum: f8ea5d6058e1630b4c550799ff1458e5
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/curated/happy/sample2.curated.summary.csv
-      md5sum: be10cc1e75e4a1d10d82bfe97f948590
+      md5sum: 691a7d8bd9565f0b12b32ce75821777a
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/raw/happy/sample1.raw.summary.csv
-      md5sum: a051aa7ef4594ad32bf193d192d41cee
+      md5sum: f8ea5d6058e1630b4c550799ff1458e5
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/raw/happy/sample2.raw.summary.csv
-      md5sum: be10cc1e75e4a1d10d82bfe97f948590
+      md5sum: 691a7d8bd9565f0b12b32ce75821777a
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_curated_concordance.csv
-      md5sum: 5475889b0ce4adb9ca18bc22be9f2d5a
+      md5sum: 4ce37b63bc6f9020cbb18bd26540bc88
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_curated_f1_score.csv
-      md5sum: 47488c5af3cc765938529d1dbd63154a
+      md5sum: c502fb8d6466e8123d9bb494271b1222
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_curated_precision.csv
-      md5sum: 478e48fed7007f237040c670edca98cd
+      md5sum: 37a8174687212f11647da3e55b60abc8
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_curated_sensitivity.csv
-      md5sum: ef1039caa08253eb48ca60be54b2747c
+      md5sum: 0f2bad7f096e2b73e7029ab82bf930d8
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
-      md5sum: 5475889b0ce4adb9ca18bc22be9f2d5a
+      md5sum: 4ce37b63bc6f9020cbb18bd26540bc88
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
-      md5sum: 47488c5af3cc765938529d1dbd63154a
+      md5sum: c502fb8d6466e8123d9bb494271b1222
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_raw_precision.csv
-      md5sum: 478e48fed7007f237040c670edca98cd
+      md5sum: 37a8174687212f11647da3e55b60abc8
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
-      md5sum: ef1039caa08253eb48ca60be54b2747c
+      md5sum: 0f2bad7f096e2b73e7029ab82bf930d8
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_combined.md
-      md5sum: 92001f237878a4a0faf07a6380ec3ea0
+      md5sum: 42e1cea76f4373e0737568a3f150db10
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_combined.docx
 
 - name: variant_benchmark_happy_exclude_spurious_skip_raw
   command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --spurious_variants_vcf tests_data/spurious_snv.vcf --skip_raw --output_dir tests_variant_benchmark_happy_exclude_spurious_skip_raw
   files:
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/curated/happy/sample1.curated.summary.csv
-      md5sum: a051aa7ef4594ad32bf193d192d41cee
+      md5sum: f8ea5d6058e1630b4c550799ff1458e5
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/curated/happy/sample2.curated.summary.csv
-      md5sum: be10cc1e75e4a1d10d82bfe97f948590
+      md5sum: 691a7d8bd9565f0b12b32ce75821777a
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/raw/happy/sample1.raw.summary.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/raw/happy/sample2.raw.summary.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated_concordance.csv
-      md5sum: 5475889b0ce4adb9ca18bc22be9f2d5a
+      md5sum: 4ce37b63bc6f9020cbb18bd26540bc88
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated_f1_score.csv
-      md5sum: 47488c5af3cc765938529d1dbd63154a
+      md5sum: c502fb8d6466e8123d9bb494271b1222
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated_precision.csv
-      md5sum: 478e48fed7007f237040c670edca98cd
+      md5sum: 37a8174687212f11647da3e55b60abc8
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated_sensitivity.csv
-      md5sum: ef1039caa08253eb48ca60be54b2747c
+      md5sum: 0f2bad7f096e2b73e7029ab82bf930d8
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
@@ -114,7 +114,7 @@
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated.md
-      md5sum: 04fd806dc7bfdd1c6baec7fe6f2070fd
+      md5sum: 3ce2e18dff0a30c493516170710998e6
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated.docx
 
 - name: variant_benchmark_wittyer_raw
@@ -133,7 +133,7 @@
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_sensitivity.csv
       md5sum: 248cf15ae7f8c0a769fe7d44e1b5cf63
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw.md
-      md5sum: 18bc10e302e280052263f8b64d99d095
+      md5sum: e6182fa3ee34dfc5fe95f6005ae1c402
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw.docx
 
 - name: variant_benchmark_wittyer_exclude_spurious
@@ -164,7 +164,7 @@
     - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_raw_sensitivity.csv
       md5sum: 248cf15ae7f8c0a769fe7d44e1b5cf63
     - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_combined.md
-      md5sum: 88544f59e0dbe1f7191f6ff30d25a887
+      md5sum: ce49c7e60c17089c4354cd6745a5f2b7
     - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_combined.docx
 
 - name: variant_benchmark_wittyer_exclude_spurious_skip_raw
@@ -195,5 +195,5 @@
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_sensitivity.csv
       should_exist: false
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_curated.md
-      md5sum: 0c1ce184a579f45f028bca4cfa03055b
+      md5sum: e3acfd5d643b7afd70eb1dc720a7cbd2
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_curated.docx

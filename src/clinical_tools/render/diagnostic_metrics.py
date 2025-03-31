@@ -148,7 +148,9 @@ def generate_diagnostic_metrics_table(
 
 
 def format_diagnostic_metrics_table(
-    df: pd.DataFrame, metric_type: DiagnosticMetricType, decimals: int = DEFAULT_DECIMALS
+    df: pd.DataFrame,
+    metric_type: DiagnosticMetricType,
+    decimals: int = DEFAULT_DECIMALS,
 ) -> pd.DataFrame:
     """
     Format the metric and confidence interval columns as percentages.
@@ -170,7 +172,9 @@ def format_diagnostic_metrics_table(
     if "CI Lower" in df.columns and "CI Upper" in df.columns:
         cols_to_format.extend(["CI Lower", "CI Upper"])
     for col in cols_to_format:
-        formatted_df[col] = formatted_df[col].apply(format_percentage, decimals=decimals)
+        formatted_df[col] = formatted_df[col].apply(
+            format_percentage, decimals=decimals
+        )
     return formatted_df
 
 
