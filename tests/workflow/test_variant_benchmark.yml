@@ -16,6 +16,25 @@
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw.md
       md5sum: ed8b78e6e528855b05d13308775e56aa
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw.docx
+  
+- name: variant_benchmark_happy_raw_decimals
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_happy_raw_decimals --decimals 2
+  files:
+    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/raw/happy/sample1.raw.summary.csv
+      md5sum: a051aa7ef4594ad32bf193d192d41cee
+    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/raw/happy/sample2.raw.summary.csv
+      md5sum: be10cc1e75e4a1d10d82bfe97f948590
+    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
+      md5sum: 5475889b0ce4adb9ca18bc22be9f2d5a
+    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
+      md5sum: 47488c5af3cc765938529d1dbd63154a
+    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw_precision.csv
+      md5sum: 478e48fed7007f237040c670edca98cd
+    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
+      md5sum: ef1039caa08253eb48ca60be54b2747c
+    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw.md
+      md5sum: 0dab431913a057f5d2beccc7242333cb
+    - path: tests_variant_benchmark_happy_raw_decimals/variant_benchmark/diagnostic_metrics_happy_raw.docx
 
 - name: variant_benchmark_happy_raw_selected_metrics
   command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --diagnostic_metrics "concordance f1_score" --output_dir tests_variant_benchmark_happy_raw_selected_metrics

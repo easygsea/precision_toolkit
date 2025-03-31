@@ -169,6 +169,7 @@ workflow variant_benchmark_workflow {
             summary_files_curated,
             params.diagnostic_metrics,
             params.concordance_tp,
-            params.variant_benchmark_dir
+            params.variant_benchmark_dir,
+            params.decimals
         )
 }

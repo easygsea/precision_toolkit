@@ -5,11 +5,11 @@ Manually curate sensitivity results.
 Usage:
     manual-sensitivity-curation --input <input_file>
     --curation <curation_criteria> --output_prefix <output_prefix>
-
+    --decimals <decimals>
 Example:
     manual-sensitivity-curation --input sensitivity.csv
     --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50"
-    --output_prefix manually_curated_sensitivity
+    --output_prefix manually_curated_sensitivity --decimals 1
 """
 
 import argparse
@@ -17,6 +17,7 @@ import logging
 
 import pandas as pd
 
+from clinical_tools.core.constants import DEFAULT_DECIMALS
 from clinical_tools.core.macros.curation.variant import (
     export_curation_results,
     update_metrics,
@@ -43,7 +44,7 @@ def main():
         "information and recompute statistics. Example: "
         "manual-sensitivity-curation --input sensitivity.csv "
         "--curation SNP:PASS:TP:100 'SNP:PASS:FN:50' "
-        "--output_prefix manually_curated_sensitivity"
+        "--output_prefix manually_curated_sensitivity --decimals 1"
     )
     parser.add_argument(
         "--input", required=True, help="Input sensitivity summary table (CSV format)."
@@ -59,6 +60,12 @@ def main():
         "--output_prefix",
         default="manually_curated_sensitivity",
         help="Prefix for output files.",
+    )
+    parser.add_argument(
+        "--decimals",
+        type=int,
+        default=DEFAULT_DECIMALS,
+        help=f"Number of decimal places for percentages (default: {DEFAULT_DECIMALS}).",
     )
 
     args = parser.parse_args()
@@ -80,7 +87,7 @@ def main():
         df = update_metrics(df, curation, SensitivityMetrics)
 
     # Export results
-    export_curation_results(df, args.output_prefix, "sensitivity")
+    export_curation_results(df, args.output_prefix, "sensitivity", args.decimals)
 
 
 if __name__ == "__main__":

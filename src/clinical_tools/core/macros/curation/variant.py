@@ -5,7 +5,7 @@ from typing import Literal
 
 import pandas as pd
 
-from clinical_tools.core.constants import NameMapper
+from clinical_tools.core.constants import DEFAULT_DECIMALS, NameMapper
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     F1ScoreMetrics,
@@ -149,6 +149,7 @@ def export_curation_results(
     df: pd.DataFrame,
     output_prefix: str,
     metric_type: Literal["concordance", "sensitivity", "precision", "f1_score"],
+    decimals: int = DEFAULT_DECIMALS,
 ) -> None:
     """
     Export results to CSV, Markdown, and Word formats.
@@ -168,6 +169,7 @@ def export_curation_results(
         metric_types=[metric_type],
         headings=f"Manually Curated {metric_name.capitalize()}",
         summaries=summary_text,
+        decimals=decimals,
     )
     export_diagnostic_metrics_to_word(
         [df],
@@ -175,4 +177,5 @@ def export_curation_results(
         metric_types=[metric_type],
         headings=f"Manually Curated {metric_name.capitalize()}",
         summaries=summary_text,
+        decimals=decimals,
     )

@@ -14,25 +14,25 @@ process exclude_spurious_variants {
     script:
     """
     # Check and compress original VCF if needed
-    if [[ ${original_vcf} != *.gz ]]; then
-        bgzip -c ${original_vcf} > ${original_vcf}.gz
-        mv ${original_vcf}.gz ${original_vcf}
+    if [[ "${original_vcf}" != *.gz ]]; then
+        bgzip -c "${original_vcf}" > "${original_vcf}.gz"
+        mv "${original_vcf}.gz" "${original_vcf}"
     fi
 
     # Index original VCF if needed
-    if [[ ! -f ${original_vcf}.tbi ]]; then
-        tabix -p vcf ${original_vcf}
+    if [[ ! -f "${original_vcf}.tbi" ]]; then
+        tabix -p vcf "${original_vcf}"
     fi
 
     # Normalize and decompose multiallelic variants in original VCF
-    bcftools norm -m -any ${original_vcf} -o normalized_original.vcf.gz
+    bcftools norm -m -any "${original_vcf}" -o normalized_original.vcf.gz
 
     # Index normalized original VCF
     tabix -p vcf normalized_original.vcf.gz
 
     # Perform variant exclusion using bcftools isec on normalized VCFs
-    bcftools isec --collapse ${collapse} --complement --write 1 --output-type z \
-        --output ${sampleName}.${label}.no_spurious.vcf.gz normalized_original.vcf.gz ${normalized_spurious_vcf}
+    bcftools isec --collapse "${collapse}" --complement --write 1 --output-type z \
+        --output "${sampleName}.${label}.no_spurious.vcf.gz" normalized_original.vcf.gz "${normalized_spurious_vcf}"
     """
 }
 
@@ -55,14 +55,14 @@ process run_happy {
 
     script:
     """
-    export HGREF=${genome_ref}
+    export HGREF="${genome_ref}"
     mkdir -p scratch_happy
 
     /opt/hap.py/bin/hap.py \
-    ${truth_vcf} \
-    ${query_vcf} \
-    -r ${genome_ref} \
-    -o ${sampleName}.${label} \
+    "${truth_vcf}" \
+    "${query_vcf}" \
+    -r "${genome_ref}" \
+    -o "${sampleName}.${label}" \
     --engine=vcfeval \
     --scratch-prefix scratch_happy \
     ${happy_options}
@@ -88,8 +88,8 @@ process run_wittyer {
     script:
     PREFIX = "${sampleName}.${label}"
     """
-    witty.er -i ${query_vcf} -t ${truth_vcf} -o ${PREFIX} ${wittyer_options}
-    mv ${PREFIX}/Wittyer.Stats.json ${PREFIX}/${PREFIX}.Wittyer.Stats.json
+    witty.er -i "${query_vcf}" -t "${truth_vcf}" -o "${PREFIX}" ${wittyer_options}
+    mv "${PREFIX}/Wittyer.Stats.json" "${PREFIX}/${PREFIX}.Wittyer.Stats.json"
     """
 }
 
@@ -103,6 +103,7 @@ process summarize_diagnostic_metrics {
     val diagnostic_metrics
     val concordance_tp
     val output_dir
+    val decimals
 
     output:
     path("${PREFIX}*"), emit: variant_benchmark_summary
@@ -111,10 +112,11 @@ process summarize_diagnostic_metrics {
     PREFIX = "diagnostic_metrics"
     """
     summarize-diagnostic-metrics --metrics ${diagnostic_metrics} \
-        --engine ${variant_benchmark_engine} \
+        --engine "${variant_benchmark_engine}" \
         ${(raw_variant_benchmark_outputs != []) ? "--raw-files " + raw_variant_benchmark_outputs.collect().join(' ') : ""} \
         ${(curated_variant_benchmark_outputs != []) ? "--curated-files " + curated_variant_benchmark_outputs.collect().join(' ') : ""} \
-        --tp-method ${concordance_tp} \
-        --prefix ${PREFIX}
+        --tp-method "${concordance_tp}" \
+        --prefix "${PREFIX}" \
+        --decimals ${decimals}
     """
 }

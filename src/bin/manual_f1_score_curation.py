@@ -5,11 +5,11 @@ Manually curate F1 score results.
 Usage:
     manual-f1-score-curation --input <input_file>
     --curation <curation_criteria> --output_prefix <output_prefix>
-
+    --decimals <decimals>
 Example:
     manual-f1-score-curation --input f1_score.csv
     --curation "SNP:PASS:sensitivity:0.95" "SNP:PASS:precision:0.90"
-    --output_prefix manually_curated_f1_score
+    --output_prefix manually_curated_f1_score --decimals 1
 """
 
 import argparse
@@ -17,6 +17,7 @@ import logging
 
 import pandas as pd
 
+from clinical_tools.core.constants import DEFAULT_DECIMALS
 from clinical_tools.core.macros.curation.variant import (
     export_curation_results,
     update_metrics,
@@ -43,7 +44,7 @@ def main():
         "information and recompute statistics. Example: "
         "manual-f1-score-curation --input f1_score.csv "
         "--curation 'SNP:PASS:sensitivity:0.95' 'SNP:PASS:precision:0.90' "
-        "--output_prefix manually_curated_f1_score"
+        "--output_prefix manually_curated_f1_score --decimals 1"
     )
     parser.add_argument(
         "--input", required=True, help="Input F1 score summary table (CSV format)."
@@ -59,6 +60,12 @@ def main():
         "--output_prefix",
         default="manually_curated_f1_score",
         help="Prefix for output files.",
+    )
+    parser.add_argument(
+        "--decimals",
+        type=int,
+        default=DEFAULT_DECIMALS,
+        help=f"Number of decimal places for percentages (default: {DEFAULT_DECIMALS}).",
     )
 
     args = parser.parse_args()
@@ -88,7 +95,7 @@ def main():
         df = update_metrics(df, curation, F1ScoreMetrics)
 
     # Export results
-    export_curation_results(df, args.output_prefix, "f1_score")
+    export_curation_results(df, args.output_prefix, "f1_score", args.decimals)
 
 
 if __name__ == "__main__":

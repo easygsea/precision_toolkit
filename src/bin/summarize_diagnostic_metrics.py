@@ -6,12 +6,13 @@ Usage:
     summarize-diagnostic-metrics --engine <engine> --raw-files <raw_files>
     --curated-files <curated_files> --prefix <prefix> --metrics <metrics>
     --tp-method <concordance true positive method: truth, query, or min>
+    --decimals <number of decimal places>
 
 Example:
     summarize-diagnostic-metrics --engine happy --raw-files A.raw.summary.csv
     B.raw.summary.csv --curated-files A.curated.summary.csv B.curated.summary.csv
     --prefix diagnostic_metrics --metrics concordance sensitivity precision f1_score
-    --tp-method min
+    --tp-method min --decimals 1
 """
 
 import argparse
@@ -22,6 +23,7 @@ from clinical_tools.analysis.diagnostic_metrics import process_diagnostic_metric
 from clinical_tools.core.constants import (
     DiagnosticMetricType,
     VariantConcordanceEngine,
+    DEFAULT_DECIMALS,
 )
 from clinical_tools.core.metrics.variant import ConcordanceTPMethod
 from clinical_tools.render.diagnostic_metrics import (
@@ -86,6 +88,13 @@ def main():
         "Options: concordance, sensitivity, precision, f1_score. Default is all "
         "metrics. When F1 score is selected, both sensitivity and precision are "
         "automatically computed.",
+    )
+    parser.add_argument(
+        "-d",
+        "--decimals",
+        type=int,
+        default=DEFAULT_DECIMALS,
+        help=f"Number of decimal places to show in formatted percentages. Default is {DEFAULT_DECIMALS}.",
     )
 
     args = parser.parse_args()
@@ -193,6 +202,7 @@ def main():
         final_metric_types,
         headings=headings,
         summaries=summaries,
+        decimals=args.decimals,
     )
     export_diagnostic_metrics_to_word(
         tables,
@@ -200,6 +210,7 @@ def main():
         final_metric_types,
         headings=headings,
         summaries=summaries,
+        decimals=args.decimals,
     )
 
 
