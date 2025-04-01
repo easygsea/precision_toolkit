@@ -17,6 +17,11 @@ enum ConcordanceTPMethod {
     truth, query, min
 }
 
+// hap.py engine enum
+enum HappyEngine {
+    vcfeval, xcmp, scmp_distance, scmp_somatic
+}
+
 // Function to validate engine selection
 def validate_engine_selection(engine) {
     def valid_engines = VariantConcordanceEngine.values()*.toString()
@@ -40,6 +45,25 @@ def validate_metrics_selection(metrics) {
     }
 }
 
+// Function to validate hap.py engine selection
+def validate_happy_engine(engine) {
+    def valid_engines = HappyEngine.values()*.toString()
+    def normalized_engine = engine.replace('-', '_')
+    if (engine.contains('_')) {
+        throw new IllegalArgumentException(
+            "Invalid 'happy_engine': ${engine}. " +
+            "Engine name cannot contain underscores. " +
+            "Valid options are: ${valid_engines.join(', ')}"
+        )
+    }
+    if (!(normalized_engine in valid_engines)) {
+        throw new IllegalArgumentException(
+            "Invalid 'happy_engine': ${engine}. " +
+            "Valid options are: ${valid_engines.join(', ')}"
+        )
+    }
+}
+
 // Function to validate TP method selection
 def validate_tp_method(tp) {
     def valid_tp_methods = ConcordanceTPMethod.values()*.toString()
@@ -57,6 +81,7 @@ include { variant_benchmark_workflow } from '../subworkflows/variant_benchmark/m
 workflow variant_benchmark {
     validate_engine_selection(params.variant_benchmark_engine)
     validate_metrics_selection(params.diagnostic_metrics)
+    validate_happy_engine(params.happy_engine)
     validate_tp_method(params.concordance_tp)
     variant_benchmark_workflow()
 }

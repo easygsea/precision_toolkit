@@ -45,6 +45,7 @@ process run_happy {
     tuple val(sampleName), path(truth_vcf), path(query_vcf)
     path genome_ref
     path genome_fai
+    val happy_engine
     val happy_options
     val output_dir
     val label
@@ -63,7 +64,7 @@ process run_happy {
     "${query_vcf}" \
     -r "${genome_ref}" \
     -o "${sampleName}.${label}" \
-    --engine=vcfeval \
+    --engine=${happy_engine} \
     --scratch-prefix scratch_happy \
     ${happy_options}
     """

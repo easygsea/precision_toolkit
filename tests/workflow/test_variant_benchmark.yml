@@ -197,3 +197,19 @@
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_curated.md
       md5sum: e3acfd5d643b7afd70eb1dc720a7cbd2
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_curated.docx
+
+- name: variant_benchmark_happy_xcmp
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --happy_engine xcmp --output_dir tests_variant_benchmark_happy_xcmp
+  files:
+    - path: tests_variant_benchmark_happy_xcmp/variant_benchmark/raw/happy/sample1.raw.summary.csv
+      md5sum: f8ea5d6058e1630b4c550799ff1458e5
+    - path: tests_variant_benchmark_happy_xcmp/variant_benchmark/raw/happy/sample2.raw.summary.csv
+      md5sum: 691a7d8bd9565f0b12b32ce75821777a
+
+- name: variant_benchmark_happy_scmp_somatic
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --happy_engine scmp-somatic --output_dir tests_variant_benchmark_happy_scmp_somatic
+  files:
+    - path: tests_variant_benchmark_happy_scmp_somatic/variant_benchmark/raw/happy/sample1.raw.summary.csv
+      md5sum: 2d5406585c96cbbce87a0a301381051a
+    - path: tests_variant_benchmark_happy_scmp_somatic/variant_benchmark/raw/happy/sample2.raw.summary.csv
+      md5sum: 7cdf17bd1316fca2b074f53542a6a51e

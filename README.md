@@ -51,7 +51,7 @@ Clinical Tools are rigorously tested at both unit and integration levels. Integr
 
 Example:
 [Variant Benchmark Tests](./tests/workflows/test_variant_benchmark.yml)
-Demo of benchmarking small variant calls and calculating variant concordance, sensitivity, precision, confidence intervals, and F1 score reported to 1 decimal place:
+Demo of benchmarking small variant calls across multiple samples and calculating variant concordance, sensitivity, precision, confidence intervals, and F1 score reported to 1 decimal place:
 ```bash
 nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
     --variant_benchmark_engine happy \
@@ -97,7 +97,7 @@ The pipeline's architecture supports execution across various computing environm
 The manual is detailed in the [docs](./docs/README.md) directory, including:
 
 - [Workflows](./docs/README.md#workflows)
-  - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision)](./docs/workflows/variant_benchmark.md)
+  - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
 - [Standalone Utilities](./docs/README.md#standalone-utilities)
   - [Manual Diagnostic Metrics Curation](./docs/standalone_utilities/standalone_utilities.md#manual-diagnostic-metrics-curation)
     - `manual-variant-concordance-curation`

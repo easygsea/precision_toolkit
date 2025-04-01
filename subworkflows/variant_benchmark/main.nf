@@ -124,6 +124,7 @@ workflow variant_benchmark_workflow {
                     vcf_pairs,
                     genome_ref_path,
                     genome_fai_path,
+                    params.happy_engine,
                     params.happy_options,
                     "${params.variant_benchmark_dir}/raw",
                     "raw"
@@ -136,6 +137,7 @@ workflow variant_benchmark_workflow {
                     curated_vcf_pairs,
                     genome_ref_path,
                     genome_fai_path,
+                    params.happy_engine,
                     params.happy_options,
                     "${params.variant_benchmark_dir}/curated",
                     "curated"

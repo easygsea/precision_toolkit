@@ -37,6 +37,7 @@ def helpMessage() {
             --diagnostic_metrics     Diagnostic metrics to calculate (default: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
             --output_dir             Base output directory (default: output_clinical_tools)
             --variant_benchmark_dir  Subdirectory for variant benchmark results (default: variant_benchmark)
+            --happy_engine           hap.py engine to use (default: vcfeval) Options: vcfeval, xcmp, scmp-distance, scmp-somatic
             --happy_options          Additional options for hap.py
             --wittyer_options        Additional options for witty.er
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
