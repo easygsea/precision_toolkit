@@ -22,6 +22,11 @@ enum HappyEngine {
     vcfeval, xcmp, scmp_distance, scmp_somatic
 }
 
+// Confidence interval method enum
+enum ConfidenceIntervalMethod {
+    wilson, agresti_coull, beta, jeffreys, wald
+}
+
 // Function to validate engine selection
 def validate_engine_selection(engine) {
     def valid_engines = VariantConcordanceEngine.values()*.toString()
@@ -75,6 +80,17 @@ def validate_tp_method(tp) {
     }
 }
 
+// Function to validate confidence interval method
+def validate_ci_method(method) {
+    def valid_methods = ConfidenceIntervalMethod.values()*.toString()
+    if (!(method in valid_methods)) {
+        throw new IllegalArgumentException(
+            "Invalid 'confidence_interval_method': ${method}. " +
+            "Valid options are: ${valid_methods.join(', ')}"
+        )
+    }
+}
+
 // Include the variant benchmark subworkflow
 include { variant_benchmark_workflow } from '../subworkflows/variant_benchmark/main'
 
@@ -83,5 +99,6 @@ workflow variant_benchmark {
     validate_metrics_selection(params.diagnostic_metrics)
     validate_happy_engine(params.happy_engine)
     validate_tp_method(params.concordance_tp)
+    validate_ci_method(params.ci_method)
     variant_benchmark_workflow()
 }

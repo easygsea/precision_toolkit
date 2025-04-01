@@ -1,0 +1,3 @@
+Variant Type,Variant Filter,TP,FP,FN
+SNP,PASS,90,5,3
+INDEL,PASS,45,3,1

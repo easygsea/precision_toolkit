@@ -213,3 +213,22 @@
       md5sum: 2d5406585c96cbbce87a0a301381051a
     - path: tests_variant_benchmark_happy_scmp_somatic/variant_benchmark/raw/happy/sample2.raw.summary.csv
       md5sum: 7cdf17bd1316fca2b074f53542a6a51e
+
+- name: variant_benchmark_happy_agresti_coull
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --ci_method agresti_coull --output_dir tests_variant_benchmark_happy_agresti_coull
+  files:
+    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/raw/happy/sample1.raw.summary.csv
+      md5sum: f8ea5d6058e1630b4c550799ff1458e5
+    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/raw/happy/sample2.raw.summary.csv
+      md5sum: 691a7d8bd9565f0b12b32ce75821777a
+    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
+      md5sum: 17ed88f67455e0f0bdd8314f8b3f4cd3
+    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
+      md5sum: c502fb8d6466e8123d9bb494271b1222
+    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw_precision.csv
+      md5sum: 109b04b95bebbc5d5ba3b7ffe5dee81f
+    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
+      md5sum: 81c78400095e0a5472fbad3f32401750
+    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw.md
+      md5sum: 690684281495ad6ffc0ff76ba5c20e98
+    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw.docx

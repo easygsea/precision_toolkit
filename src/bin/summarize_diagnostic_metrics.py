@@ -7,6 +7,7 @@ Usage:
     --curated-files <curated_files> --prefix <prefix> --metrics <metrics>
     --tp-method <concordance true positive method: truth, query, or min>
     --decimals <number of decimal places>
+    --ci-method <confidence interval method>
 
 Example:
     summarize-diagnostic-metrics --engine happy --raw-files A.raw.summary.csv
@@ -26,6 +27,9 @@ from clinical_tools.core.constants import (
     VariantConcordanceEngine,
 )
 from clinical_tools.core.metrics.variant import ConcordanceTPMethod
+from clinical_tools.core.statistics.proportion import (
+    ProportionConfidenceIntervalMethod,
+)
 from clinical_tools.render.diagnostic_metrics import (
     export_diagnostic_metrics_to_csv,
     export_diagnostic_metrics_to_markdown,
@@ -96,6 +100,13 @@ def main():
         default=DEFAULT_DECIMALS,
         help=f"Decimal places in rendered output. Default: {DEFAULT_DECIMALS}.",
     )
+    parser.add_argument(
+        "--ci-method",
+        choices=[method.value for method in ProportionConfidenceIntervalMethod],
+        default=ProportionConfidenceIntervalMethod.WILSON.value,
+        help="Statistical method for confidence interval calculation. Options: "
+        f"{', '.join(method.value for method in ProportionConfidenceIntervalMethod)}",
+    )
 
     args = parser.parse_args()
 
@@ -128,6 +139,7 @@ def main():
             data_type=args.engine,
             tp_method=args.tp_method,
             metrics=args.metrics,
+            ci_method=args.ci_method,
         )
 
         for metric in args.metrics:
@@ -151,6 +163,7 @@ def main():
             data_type=args.engine,
             tp_method=args.tp_method,
             metrics=args.metrics,
+            ci_method=args.ci_method,
         )
 
         for metric in args.metrics:
@@ -203,6 +216,7 @@ def main():
         headings=headings,
         summaries=summaries,
         decimals=args.decimals,
+        ci_method=args.ci_method,
     )
     export_diagnostic_metrics_to_word(
         tables,
@@ -211,6 +225,7 @@ def main():
         headings=headings,
         summaries=summaries,
         decimals=args.decimals,
+        ci_method=args.ci_method,
     )
 
 
