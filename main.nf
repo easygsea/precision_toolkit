@@ -49,7 +49,7 @@ def helpMessage() {
                                      - 'query': Use query set's TP count
                                      - 'min': Use minimum of truth and query TP counts (default)
             --decimals               Number of decimal places in rendered output (default: 2)
-            --ci_method              Confidence interval method (default: wilson) Options: wilson, agresti_coull, beta, jeffreys, wald
+            --ci_method              Confidence interval method (default: wilson) Options: agresti_coull, beta, binom_test, jeffreys, normal, wilson
             --ci_level               Confidence level for confidence intervals (default: 0.95)
 
     ====================

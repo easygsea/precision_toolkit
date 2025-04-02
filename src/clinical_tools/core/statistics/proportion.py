@@ -12,11 +12,12 @@ from clinical_tools.core.constants import DEFAULT_CI_LEVEL
 class ProportionConfidenceIntervalMethod(StrEnum):
     """Supported methods for calculating proportion confidence intervals."""
 
-    WILSON = "wilson"
     AGRESTI_COULL = "agresti_coull"
     BETA = "beta"
+    BINOMIAL_TEST = "binomial_test"
     JEFFREYS = "jeffreys"
-    WALD = "wald"
+    NORMAL = "normal"
+    WILSON = "wilson"
 
 
 class ProportionConfidenceInterval:
