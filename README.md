@@ -51,13 +51,15 @@ Clinical Tools are rigorously tested at both unit and integration levels. Integr
 
 Example:
 [Variant Benchmark Tests](./tests/workflows/test_variant_benchmark.yml)
-Demo of benchmarking small variant calls across multiple samples and calculating variant concordance, sensitivity, precision, confidence intervals, and F1 score reported to 1 decimal place:
+Demo of customized benchmarking small variant calls across multiple samples and calculating variant concordance, sensitivity, precision, confidence intervals (Jeffreys method, 99% CI; default: Wilson method, 95% CI), and F1 score reported to 1 (default: 2) decimal place:
 ```bash
 nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
     --variant_benchmark_engine happy \
     --truth_dir <path/to/clinical_tools>/tests_data/snv_truth_vcfs \
     --query_dir <path/to/clinical_tools>/tests_data/snv_query_vcfs \
     --genome_ref <path/to/clinical_tools>/tests_data/genome.fa \
+    --ci_method "jeffreys" \
+    --ci_level 0.99 \
     --decimals 1 \
     --output_dir tests_variant_benchmark_happy_raw_decimals1
 ```

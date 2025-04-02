@@ -97,6 +97,8 @@ nextflow run main.nf \
 - `--skip_raw`: Skip raw analysis (only available when `spurious_variants_vcf` is provided)
 - `--concordance_tp`: Method for defining TP in concordance calculation. Available options: `truth` (use truth set's TP count), `query` (use query set's TP count), `min` (use minimum of truth and query TP counts, default)
 - `--decimals`: Number of decimal places in rendered output (default: 2)
+- `--ci_method`: Confidence interval method (default: `wilson`) Options: `wilson`, `agresti_coull`, `beta`, `jeffreys`, `wald`
+- `--ci_level`: Confidence level for confidence intervals (default: 0.95)
 
 **Official Parameter References:**
 - [hap.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/happy.md#command-line-options)

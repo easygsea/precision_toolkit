@@ -22,6 +22,7 @@ import pandas as pd
 
 from clinical_tools.analysis.diagnostic_metrics import process_diagnostic_metrics
 from clinical_tools.core.constants import (
+    DEFAULT_CI_LEVEL,
     DEFAULT_DECIMALS,
     DiagnosticMetricType,
     VariantConcordanceEngine,
@@ -107,6 +108,13 @@ def main():
         help="Statistical method for confidence interval calculation. Options: "
         f"{', '.join(method.value for method in ProportionConfidenceIntervalMethod)}",
     )
+    parser.add_argument(
+        "--ci-level",
+        type=float,
+        default=DEFAULT_CI_LEVEL,
+        help="Confidence level for confidence intervals (default: "
+        f"{DEFAULT_CI_LEVEL}).",
+    )
 
     args = parser.parse_args()
 
@@ -140,6 +148,7 @@ def main():
             tp_method=args.tp_method,
             metrics=args.metrics,
             ci_method=args.ci_method,
+            ci_level=args.ci_level,
         )
 
         for metric in args.metrics:
@@ -164,6 +173,7 @@ def main():
             tp_method=args.tp_method,
             metrics=args.metrics,
             ci_method=args.ci_method,
+            ci_level=args.ci_level,
         )
 
         for metric in args.metrics:
@@ -216,7 +226,6 @@ def main():
         headings=headings,
         summaries=summaries,
         decimals=args.decimals,
-        ci_method=args.ci_method,
     )
     export_diagnostic_metrics_to_word(
         tables,
@@ -225,7 +234,6 @@ def main():
         headings=headings,
         summaries=summaries,
         decimals=args.decimals,
-        ci_method=args.ci_method,
     )
 
 

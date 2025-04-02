@@ -172,6 +172,7 @@ workflow variant_benchmark_workflow {
             params.diagnostic_metrics,
             params.concordance_tp,
             params.ci_method,
+            params.ci_level,
             params.variant_benchmark_dir,
             params.decimals
         )

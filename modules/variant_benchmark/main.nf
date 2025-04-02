@@ -103,7 +103,8 @@ process summarize_diagnostic_metrics {
     path curated_variant_benchmark_outputs
     val diagnostic_metrics
     val concordance_tp
-    val confidence_interval_method
+    val ci_method
+    val ci_level
     val output_dir
     val decimals
 
@@ -118,7 +119,8 @@ process summarize_diagnostic_metrics {
         ${(raw_variant_benchmark_outputs != []) ? "--raw-files " + raw_variant_benchmark_outputs.collect().join(' ') : ""} \
         ${(curated_variant_benchmark_outputs != []) ? "--curated-files " + curated_variant_benchmark_outputs.collect().join(' ') : ""} \
         --tp-method "${concordance_tp}" \
-        --ci-method "${confidence_interval_method}" \
+        --ci-method "${ci_method}" \
+        --ci-level ${ci_level} \
         --prefix "${PREFIX}" \
         --decimals ${decimals}
     """

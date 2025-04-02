@@ -8,9 +8,6 @@ import pandas as pd
 from clinical_tools.core.constants import DEFAULT_DECIMALS, DiagnosticMetricType
 from clinical_tools.core.format import format_percentage
 from clinical_tools.core.helpers import assemble_exports
-from clinical_tools.core.statistics.proportion import (
-    ProportionConfidenceIntervalMethod,
-)
 from clinical_tools.core.writers.markdown import populate_markdown, save_markdown
 from clinical_tools.core.writers.table import pandas_to_csv
 from clinical_tools.core.writers.word import (
@@ -154,9 +151,6 @@ def format_diagnostic_metrics_table(
     df: pd.DataFrame,
     metric_type: DiagnosticMetricType,
     decimals: int = DEFAULT_DECIMALS,
-    ci_method: ProportionConfidenceIntervalMethod = (
-        ProportionConfidenceIntervalMethod.WILSON
-    ),
 ) -> pd.DataFrame:
     """
     Format the metric and confidence interval columns as percentages.
@@ -165,7 +159,6 @@ def format_diagnostic_metrics_table(
         df: The metrics DataFrame to format
         metric_type: Type of metric being processed (DiagnosticMetricType)
         decimals: Number of decimal places for percentages
-        ci_method: Confidence interval method (ProportionConfidenceIntervalMethod)
 
     Returns:
         New DataFrame with formatted columns
@@ -203,9 +196,6 @@ def export_diagnostic_metrics_to_markdown(
     headings: list[str] | str | None = None,
     summaries: list[str] | str | None = None,
     decimals: int = DEFAULT_DECIMALS,
-    ci_method: ProportionConfidenceIntervalMethod = (
-        ProportionConfidenceIntervalMethod.WILSON
-    ),
 ) -> None:
     """
     Export one or more diagnostic metrics DataFrames to Markdown file.
@@ -219,7 +209,6 @@ def export_diagnostic_metrics_to_markdown(
         summaries: Optional summary(s) to add before table(s). If multiple
         DataFrames, should be a list of summaries matching DataFrame count.
         decimals: Number of decimal places for percentages
-        ci_method: Confidence interval method (ProportionConfidenceIntervalMethod)
 
     """
     dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
@@ -232,7 +221,9 @@ def export_diagnostic_metrics_to_markdown(
     all_content = []
     for i, df in enumerate(dfs):
         formatted_df = format_diagnostic_metrics_table(
-            typing.cast(pd.DataFrame, df), metric_types[i], decimals, ci_method
+            typing.cast(pd.DataFrame, df),
+            metric_types[i],
+            decimals,
         )
         heading = headings[i] if headings else None
         summary = summaries[i] if summaries else None
@@ -251,9 +242,6 @@ def export_diagnostic_metrics_to_word(
     headings: list[str] | str | None = None,
     summaries: list[str] | str | None = None,
     decimals: int = DEFAULT_DECIMALS,
-    ci_method: ProportionConfidenceIntervalMethod = (
-        ProportionConfidenceIntervalMethod.WILSON
-    ),
 ) -> None:
     """
     Export one or more diagnostic metrics DataFrames to Word file.
@@ -267,7 +255,6 @@ def export_diagnostic_metrics_to_word(
         summaries: Optional summary(s) to add before table(s). If multiple
         DataFrames, should be a list of summaries matching DataFrame count.
         decimals: Number of decimal places for percentages
-        ci_method: Confidence interval method (ProportionConfidenceIntervalMethod)
 
     """
     dfs, headings, summaries = assemble_exports(dfs, headings, summaries)
@@ -282,7 +269,9 @@ def export_diagnostic_metrics_to_word(
     # Process each DataFrame and add to Word document
     for i, df in enumerate(dfs):
         formatted_df = format_diagnostic_metrics_table(
-            typing.cast(pd.DataFrame, df), metric_types[i], decimals, ci_method
+            typing.cast(pd.DataFrame, df),
+            metric_types[i],
+            decimals,
         )
         heading = headings[i] if headings else None
         summary = summaries[i] if summaries else None

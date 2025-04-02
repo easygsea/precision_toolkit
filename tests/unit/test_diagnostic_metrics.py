@@ -261,13 +261,14 @@ def test_f1_score(
 
 
 @pytest.mark.parametrize(
-    "truth_total, truth_tp, truth_fn, ci_method, expected_ci",
+    "truth_total, truth_tp, truth_fn, ci_method, ci_level, expected_ci",
     [
         (
             100,
             90,
             10,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.826, 0.945),
         ),  # Normal case
         (
@@ -275,6 +276,7 @@ def test_f1_score(
             0,
             100,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.0, 0.037),
         ),  # Zero TP
         (
@@ -282,6 +284,7 @@ def test_f1_score(
             0,
             0,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.0, 0.0),
         ),  # Zero totals
         (
@@ -289,6 +292,7 @@ def test_f1_score(
             100,
             0,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.964, 1.0),
         ),  # Perfect match
         (
@@ -296,6 +300,7 @@ def test_f1_score(
             90,
             10,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.824, 0.946),
         ),  # Normal case agresti coull
         (
@@ -303,6 +308,7 @@ def test_f1_score(
             0,
             100,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.0, 0.0444),
         ),  # Zero TP agresti coull
         (
@@ -310,6 +316,7 @@ def test_f1_score(
             0,
             0,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.0, 0.0),
         ),  # Zero totals agresti coull
         (
@@ -317,8 +324,25 @@ def test_f1_score(
             100,
             0,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.956, 1.0),
         ),  # Perfect match agresti coull
+        (
+            100,
+            90,
+            10,
+            ProportionConfidenceIntervalMethod.WILSON,
+            0.99,
+            (0.796, 0.954),
+        ),  # Normal case with 99% CI
+        (
+            100,
+            90,
+            10,
+            ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.99,
+            (0.793, 0.958),
+        ),  # Normal case agresti coull with 99% CI
     ],
     ids=[
         "normal_case",
@@ -329,6 +353,8 @@ def test_f1_score(
         "zero_tp_agresti_coull",
         "zero_totals_agresti_coull",
         "perfect_match_agresti_coull",
+        "normal_case_99ci",
+        "normal_case_agresti_coull_99ci",
     ],
 )
 def test_confidence_interval_sensitivity(
@@ -336,6 +362,7 @@ def test_confidence_interval_sensitivity(
     truth_tp: int,
     truth_fn: int,
     ci_method: ProportionConfidenceIntervalMethod,
+    ci_level: float,
     expected_ci: tuple[float, float],
 ) -> None:
     """
@@ -343,11 +370,11 @@ def test_confidence_interval_sensitivity(
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
-    2. Calculate confidence interval for sensitivity using specified interval method.
+    2. Calculate confidence interval for sensitivity.
     3. Verify the confidence interval matches the expected values.
 
     Expected Behavior:
-    - Confidence interval should be calculated using specified interval method
+    - Confidence interval should be calculated
     - Confidence interval should match the pre-calculated expected values
     - Values should be within 0 and 1
     """
@@ -362,20 +389,24 @@ def test_confidence_interval_sensitivity(
         QueryFP=10,
     )
     sensitivity_metrics = SensitivityMetrics(metrics)
-    ci_lower, ci_upper = sensitivity_metrics.confidence_interval(method=ci_method)
+    ci_lower, ci_upper = sensitivity_metrics.confidence_interval(
+        method=ci_method,
+        ci_level=ci_level,
+    )
     assert ci_lower == pytest.approx(expected_ci[0], abs=0.001)
     assert ci_upper == pytest.approx(expected_ci[1], abs=0.001)
     assert 0 <= ci_lower <= ci_upper <= 1
 
 
 @pytest.mark.parametrize(
-    "query_total, query_tp, query_fp, ci_method, expected_ci",
+    "query_total, query_tp, query_fp, ci_method, ci_level, expected_ci",
     [
         (
             120,
             90,
             30,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.665, 0.819),
         ),  # Normal case
         (
@@ -383,6 +414,7 @@ def test_confidence_interval_sensitivity(
             0,
             120,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.0, 0.031),
         ),  # Zero TP
         (
@@ -390,6 +422,7 @@ def test_confidence_interval_sensitivity(
             0,
             0,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.0, 0.0),
         ),  # Zero totals
         (
@@ -397,6 +430,7 @@ def test_confidence_interval_sensitivity(
             120,
             0,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.969, 1.0),
         ),  # Perfect match
         (
@@ -404,6 +438,7 @@ def test_confidence_interval_sensitivity(
             90,
             30,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.665, 0.819),
         ),  # Normal case
         (
@@ -411,6 +446,7 @@ def test_confidence_interval_sensitivity(
             0,
             120,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.0, 0.0373),
         ),  # Zero TP
         (
@@ -418,6 +454,7 @@ def test_confidence_interval_sensitivity(
             0,
             0,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.0, 0.0),
         ),  # Zero totals
         (
@@ -425,8 +462,25 @@ def test_confidence_interval_sensitivity(
             120,
             0,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.963, 1.0),
         ),  # Perfect match
+        (
+            120,
+            90,
+            30,
+            ProportionConfidenceIntervalMethod.WILSON,
+            0.99,
+            (0.637, 0.837),
+        ),  # Normal case with 99% CI
+        (
+            120,
+            90,
+            30,
+            ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.99,
+            (0.636, 0.838),
+        ),  # Normal case agresti coull with 99% CI
     ],
     ids=[
         "normal_case",
@@ -437,6 +491,8 @@ def test_confidence_interval_sensitivity(
         "zero_tp_agresti_coull",
         "zero_totals_agresti_coull",
         "perfect_match_agresti_coull",
+        "normal_case_99ci",
+        "normal_case_agresti_coull_99ci",
     ],
 )
 def test_confidence_interval_precision(
@@ -444,6 +500,7 @@ def test_confidence_interval_precision(
     query_tp: int,
     query_fp: int,
     ci_method: ProportionConfidenceIntervalMethod,
+    ci_level: float,
     expected_ci: tuple[float, float],
 ) -> None:
     """
@@ -451,11 +508,11 @@ def test_confidence_interval_precision(
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
-    2. Calculate confidence interval for precision using specified interval method.
+    2. Calculate confidence interval for precision.
     3. Verify the confidence interval matches the expected values.
 
     Expected Behavior:
-    - Confidence interval should be calculated using specified interval method
+    - Confidence interval should be calculated
     - Confidence interval should match the pre-calculated expected values
     - Values should be within 0 and 1
     """
@@ -470,7 +527,10 @@ def test_confidence_interval_precision(
         QueryFP=query_fp,
     )
     precision_metrics = PrecisionMetrics(metrics)
-    ci_lower, ci_upper = precision_metrics.confidence_interval(method=ci_method)
+    ci_lower, ci_upper = precision_metrics.confidence_interval(
+        method=ci_method,
+        ci_level=ci_level,
+    )
     assert ci_lower == pytest.approx(expected_ci[0], abs=0.001)
     assert ci_upper == pytest.approx(expected_ci[1], abs=0.001)
     assert 0 <= ci_lower <= ci_upper <= 1
@@ -480,7 +540,7 @@ def test_confidence_interval_precision(
     (
         "truth_total, truth_tp, truth_fn, "
         "query_total, query_tp, query_fp, "
-        "ci_method, expected_ci"
+        "ci_method, ci_level, expected_ci"
     ),
     [
         (
@@ -491,6 +551,7 @@ def test_confidence_interval_precision(
             90,
             30,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.608, 0.765),
         ),  # Normal case
         (
@@ -501,6 +562,7 @@ def test_confidence_interval_precision(
             0,
             120,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.0, 0.0172),
         ),  # Zero TP
         (
@@ -511,6 +573,7 @@ def test_confidence_interval_precision(
             0,
             0,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.0, 0.0),
         ),  # Zero totals
         (
@@ -521,6 +584,7 @@ def test_confidence_interval_precision(
             100,
             0,
             ProportionConfidenceIntervalMethod.WILSON,
+            0.95,
             (0.963, 1.0),
         ),  # Perfect match
         (
@@ -531,6 +595,7 @@ def test_confidence_interval_precision(
             90,
             30,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.608, 0.765),
         ),  # Normal case
         (
@@ -541,6 +606,7 @@ def test_confidence_interval_precision(
             0,
             120,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.0, 0.0207),
         ),  # Zero TP
         (
@@ -551,6 +617,7 @@ def test_confidence_interval_precision(
             0,
             0,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.0, 0.0),
         ),  # Zero totals
         (
@@ -561,8 +628,31 @@ def test_confidence_interval_precision(
             100,
             0,
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.95,
             (0.9556, 1.0),
         ),  # Perfect match
+        (
+            100,
+            90,
+            10,
+            120,
+            90,
+            30,
+            ProportionConfidenceIntervalMethod.WILSON,
+            0.99,
+            (0.581, 0.785),
+        ),  # Normal case with 99% CI
+        (
+            100,
+            90,
+            10,
+            120,
+            90,
+            30,
+            ProportionConfidenceIntervalMethod.AGRESTI_COULL,
+            0.99,
+            (0.58, 0.786),
+        ),  # Normal case agresti coull with 99% CI
     ],
     ids=[
         "normal_case",
@@ -573,6 +663,8 @@ def test_confidence_interval_precision(
         "zero_tp_agresti_coull",
         "zero_totals_agresti_coull",
         "perfect_match_agresti_coull",
+        "normal_case_99ci",
+        "normal_case_agresti_coull_99ci",
     ],
 )
 def test_confidence_interval_concordance(
@@ -583,6 +675,7 @@ def test_confidence_interval_concordance(
     query_tp: int,
     query_fp: int,
     ci_method: ProportionConfidenceIntervalMethod,
+    ci_level: float,
     expected_ci: tuple[float, float],
 ) -> None:
     """
@@ -590,11 +683,11 @@ def test_confidence_interval_concordance(
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
-    2. Calculate confidence interval for concordance using specified interval method.
+    2. Calculate confidence interval for concordance.
     3. Verify the confidence interval matches the expected values.
 
     Expected Behavior:
-    - Confidence interval should be calculated using specified interval method
+    - Confidence interval should be calculated
     - Confidence interval should match the pre-calculated expected values
     - Values should be within 0 and 1
     """
@@ -611,7 +704,10 @@ def test_confidence_interval_concordance(
     concordance_metrics = ConcordanceMetrics(
         metrics, tp_method=ConcordanceTPMethod.MinTP.value
     )
-    ci_lower, ci_upper = concordance_metrics.confidence_interval(method=ci_method)
+    ci_lower, ci_upper = concordance_metrics.confidence_interval(
+        method=ci_method,
+        ci_level=ci_level,
+    )
     assert ci_lower == pytest.approx(expected_ci[0], abs=0.001)
     assert ci_upper == pytest.approx(expected_ci[1], abs=0.001)
     assert 0 <= ci_lower <= ci_upper <= 1

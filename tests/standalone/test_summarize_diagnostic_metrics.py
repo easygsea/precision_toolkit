@@ -67,6 +67,8 @@ def test_summarize_diagnostic_metrics(
             "min",
             "--ci-method",
             ProportionConfidenceIntervalMethod.WILSON.value,
+            "--ci-level",
+            "0.99",
             "--decimals",
             str(DEFAULT_DECIMALS),
         ],

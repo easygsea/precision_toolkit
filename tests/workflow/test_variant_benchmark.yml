@@ -217,10 +217,6 @@
 - name: variant_benchmark_happy_agresti_coull
   command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --ci_method agresti_coull --output_dir tests_variant_benchmark_happy_agresti_coull
   files:
-    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/raw/happy/sample1.raw.summary.csv
-      md5sum: f8ea5d6058e1630b4c550799ff1458e5
-    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/raw/happy/sample2.raw.summary.csv
-      md5sum: 691a7d8bd9565f0b12b32ce75821777a
     - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
       md5sum: 17ed88f67455e0f0bdd8314f8b3f4cd3
     - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
@@ -232,3 +228,18 @@
     - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw.md
       md5sum: 690684281495ad6ffc0ff76ba5c20e98
     - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw.docx
+
+- name: variant_benchmark_happy_99ci
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --ci_level 0.99 --output_dir tests_variant_benchmark_happy_99ci
+  files:
+    - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
+      md5sum: e033b9e84a7ff7045c84f518e5e6fda9
+    - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
+      md5sum: c502fb8d6466e8123d9bb494271b1222
+    - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw_precision.csv
+      md5sum: 92e999864cf5f7de4c801081ca584f9e
+    - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
+      md5sum: c367166c16ed55db34ce205e81f80687
+    - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw.md
+      md5sum: 31cb3db7f6e590015145a0fde43ca992
+    - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw.docx
