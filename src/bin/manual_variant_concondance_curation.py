@@ -5,12 +5,14 @@ Manually curate variant concordance results.
 Usage:
     manual-variant-concordance-curation --input <input_file>
     --curation <curation_criteria> --tp-method <tp_method>
-    --output_prefix <output_prefix> --decimals <decimals>
+    --output-prefix <output_prefix> --decimals <decimals>
+    --ci-method <ci_method> --ci-level <ci_level>
 
 Example:
     manual-variant-concordance-curation --input concordance.csv
     --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" "SNP:PASS:FP:20"
-    --tp-method min --output_prefix manually_curated_concordance --decimals 1
+    --tp-method min --output-prefix manually_curated_concordance --decimals 1
+    --ci-method wilson --ci-level 0.95
 """
 
 import argparse
@@ -18,7 +20,11 @@ import logging
 
 import pandas as pd
 
-from clinical_tools.core.constants import DEFAULT_DECIMALS
+from clinical_tools.core.constants import (
+    DEFAULT_CI_LEVEL,
+    DEFAULT_CI_METHOD,
+    DEFAULT_DECIMALS,
+)
 from clinical_tools.core.macros.curation.variant import (
     export_curation_results,
     update_metrics,
@@ -27,6 +33,9 @@ from clinical_tools.core.macros.curation.variant import (
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     ConcordanceTPMethod,
+)
+from clinical_tools.core.statistics.proportion import (
+    ProportionConfidenceIntervalMethod,
 )
 
 
@@ -48,7 +57,8 @@ def main():
         "information and recompute statistics. Example: "
         "manual-variant-concordance-curation --input concordance.csv "
         "--curation 'SNP:PASS:TP:100' 'SNP:PASS:FN:50' 'SNP:PASS:FP:20' "
-        "--tp-method min --output_prefix manually_curated_concordance --decimals 1"
+        "--tp-method min --output-prefix manually_curated_concordance --decimals 1 "
+        "--ci-method wilson --ci-level 0.95"
     )
     parser.add_argument(
         "--input", required=True, help="Input concordance summary table (CSV format)."
@@ -64,10 +74,11 @@ def main():
         "--tp-method",
         choices=[method.value for method in ConcordanceTPMethod],
         default=ConcordanceTPMethod.MinTP.value,
-        help="TP method in concordance: 'truth', 'query', or 'min' (default).",
+        help=f"TP method in concordance (default: {ConcordanceTPMethod.MinTP.value}).",
     )
     parser.add_argument(
-        "--output_prefix",
+        "--output-prefix",
+        type=str,
         default="manually_curated_concordance",
         help="Prefix for output files.",
     )
@@ -76,6 +87,21 @@ def main():
         type=int,
         default=DEFAULT_DECIMALS,
         help=f"Number of decimal places for percentages (default: {DEFAULT_DECIMALS}).",
+    )
+    parser.add_argument(
+        "--ci-method",
+        type=str,
+        choices=[method.value for method in ProportionConfidenceIntervalMethod],
+        default=DEFAULT_CI_METHOD,
+        help="Statistical method for confidence interval calculation "
+        f"(default: {DEFAULT_CI_METHOD}).",
+    )
+    parser.add_argument(
+        "--ci-level",
+        type=float,
+        default=DEFAULT_CI_LEVEL,
+        help="Confidence level for confidence intervals (default: "
+        f"{DEFAULT_CI_LEVEL}).",
     )
 
     args = parser.parse_args()
@@ -94,7 +120,14 @@ def main():
 
     # Update counts and recalculate metrics
     for curation in curations:
-        df = update_metrics(df, curation, ConcordanceMetrics, args.tp_method)
+        df = update_metrics(
+            df,
+            curation,
+            ConcordanceMetrics,
+            args.tp_method,
+            args.ci_method,
+            args.ci_level,
+        )
 
     # Export results
     export_curation_results(df, args.output_prefix, "concordance", args.decimals)

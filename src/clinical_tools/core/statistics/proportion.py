@@ -6,7 +6,9 @@ from statsmodels.stats.proportion import (  # type: ignore[import-untyped]
     proportion_confint,
 )
 
-from clinical_tools.core.constants import DEFAULT_CI_LEVEL
+from clinical_tools.core.constants import (
+    DEFAULT_CI_LEVEL,
+)
 
 
 class ProportionConfidenceIntervalMethod(StrEnum):

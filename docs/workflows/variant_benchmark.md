@@ -262,5 +262,7 @@ Example usage:
 apptainer exec -B <data_path> <path/to/clinical_tools_latest.sif> manual-sensitivity-curation \
 --input diagnostic_metrics_happy_curated_sensitivity.csv \
 --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" \
---output_prefix final_sensitivity
+--ci-method wilson \
+--ci-level 0.95 \
+--output-prefix final_sensitivity
 ```

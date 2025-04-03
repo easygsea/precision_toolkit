@@ -7,6 +7,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from clinical_tools.core.constants import (  # type: ignore[import-not-found]
+    DEFAULT_CI_LEVEL,
+    DEFAULT_CI_METHOD,
+)
+
 
 @pytest.fixture
 def test_data_dir():
@@ -40,8 +45,12 @@ def test_manual_concordance_curation(test_data_dir, manual_curation_scripts):
                 str(input_file),
                 "--curation",
                 *curation,
-                "--output_prefix",
+                "--output-prefix",
                 str(output_prefix),
+                "--ci-method",
+                DEFAULT_CI_METHOD,
+                "--ci-level",
+                str(DEFAULT_CI_LEVEL),
             ],
             check=True,
         )
@@ -82,8 +91,12 @@ def test_manual_sensitivity_curation(test_data_dir, manual_curation_scripts):
                 str(input_file),
                 "--curation",
                 *curation,
-                "--output_prefix",
+                "--output-prefix",
                 str(output_prefix),
+                "--ci-method",
+                DEFAULT_CI_METHOD,
+                "--ci-level",
+                str(DEFAULT_CI_LEVEL),
             ],
             check=True,
         )
@@ -123,8 +136,12 @@ def test_manual_precision_curation(test_data_dir, manual_curation_scripts):
                 str(input_file),
                 "--curation",
                 *curation,
-                "--output_prefix",
+                "--output-prefix",
                 str(output_prefix),
+                "--ci-method",
+                DEFAULT_CI_METHOD,
+                "--ci-level",
+                str(DEFAULT_CI_LEVEL),
             ],
             check=True,
         )
@@ -164,7 +181,7 @@ def test_manual_f1_score_curation(test_data_dir, manual_curation_scripts):
                 str(input_file),
                 "--curation",
                 *curation,
-                "--output_prefix",
+                "--output-prefix",
                 str(output_prefix),
             ],
             check=True,

@@ -4,12 +4,12 @@ Manually curate F1 score results.
 
 Usage:
     manual-f1-score-curation --input <input_file>
-    --curation <curation_criteria> --output_prefix <output_prefix>
+    --curation <curation_criteria> --output-prefix <output_prefix>
     --decimals <decimals>
 Example:
     manual-f1-score-curation --input f1_score.csv
     --curation "SNP:PASS:sensitivity:0.95" "SNP:PASS:precision:0.90"
-    --output_prefix manually_curated_f1_score --decimals 1
+    --output-prefix manually_curated_f1_score --decimals 1
 """
 
 import argparse
@@ -17,7 +17,11 @@ import logging
 
 import pandas as pd
 
-from clinical_tools.core.constants import DEFAULT_DECIMALS
+from clinical_tools.core.constants import (
+    DEFAULT_CI_LEVEL,
+    DEFAULT_CI_METHOD,
+    DEFAULT_DECIMALS,
+)
 from clinical_tools.core.macros.curation.variant import (
     export_curation_results,
     update_metrics,
@@ -44,7 +48,7 @@ def main():
         "information and recompute statistics. Example: "
         "manual-f1-score-curation --input f1_score.csv "
         "--curation 'SNP:PASS:sensitivity:0.95' 'SNP:PASS:precision:0.90' "
-        "--output_prefix manually_curated_f1_score --decimals 1"
+        "--output-prefix manually_curated_f1_score --decimals 1"
     )
     parser.add_argument(
         "--input", required=True, help="Input F1 score summary table (CSV format)."
@@ -57,7 +61,8 @@ def main():
         help="Manual curation (type:filter:metric:value).",
     )
     parser.add_argument(
-        "--output_prefix",
+        "--output-prefix",
+        type=str,
         default="manually_curated_f1_score",
         help="Prefix for output files.",
     )
@@ -67,7 +72,6 @@ def main():
         default=DEFAULT_DECIMALS,
         help=f"Number of decimal places for percentages (default: {DEFAULT_DECIMALS}).",
     )
-
     args = parser.parse_args()
     df = pd.read_csv(args.input)
 
@@ -92,7 +96,13 @@ def main():
 
     # Update metrics using update_metrics function
     for curation in curations:
-        df = update_metrics(df, curation, F1ScoreMetrics)
+        df = update_metrics(
+            df,
+            curation,
+            F1ScoreMetrics,
+            DEFAULT_CI_METHOD,
+            DEFAULT_CI_LEVEL,
+        )
 
     # Export results
     export_curation_results(df, args.output_prefix, "f1_score", args.decimals)

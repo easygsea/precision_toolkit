@@ -76,7 +76,7 @@ apptainer exec \
     manual-sensitivity-curation \
     --input <path/to/clinical_tools>/tests/standalone/data/sensitivity.csv \
     --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" \
-    --output_prefix manually_curated_sensitivity
+    --output-prefix manually_curated_sensitivity
 ```
 
 

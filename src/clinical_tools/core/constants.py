@@ -3,10 +3,11 @@
 from enum import StrEnum
 from typing import Literal
 
-DiagnosticMetricType = Literal["concordance", "sensitivity", "precision", "f1_score"]
+DEFAULT_CI_LEVEL: float = 0.95
+DEFAULT_CI_METHOD: str = "wilson"
+DEFAULT_DECIMALS: int = 2
 
-DEFAULT_DECIMALS = 2
-DEFAULT_CI_LEVEL = 0.95
+DiagnosticMetricType = Literal["concordance", "sensitivity", "precision", "f1_score"]
 
 
 class VariantConcordanceEngine(StrEnum):

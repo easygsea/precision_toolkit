@@ -5,13 +5,20 @@ from typing import Literal
 
 import pandas as pd
 
-from clinical_tools.core.constants import DEFAULT_DECIMALS, NameMapper
+from clinical_tools.core.constants import (
+    DEFAULT_CI_LEVEL,
+    DEFAULT_DECIMALS,
+    NameMapper,
+)
 from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     F1ScoreMetrics,
     PrecisionMetrics,
     SensitivityMetrics,
     VariantCallMetrics,
+)
+from clinical_tools.core.statistics.proportion import (
+    ProportionConfidenceIntervalMethod,
 )
 from clinical_tools.render.diagnostic_metrics import (
     export_diagnostic_metrics_to_csv,
@@ -47,7 +54,14 @@ def validate_curation_format(curation: str, valid_metrics: list[str]) -> bool:
 
 
 def update_metrics(
-    df: pd.DataFrame, curation: str, metric_class: type, tp_method: str | None = None
+    df: pd.DataFrame,
+    curation: str,
+    metric_class: type,
+    tp_method: str | None = None,
+    ci_method: ProportionConfidenceIntervalMethod = (
+        ProportionConfidenceIntervalMethod.WILSON
+    ),
+    ci_level: float = DEFAULT_CI_LEVEL,
 ) -> pd.DataFrame:
     """
     Update metrics in the DataFrame based on manual curation.
@@ -130,7 +144,10 @@ def update_metrics(
         metric_value = getattr(
             analysis, metric_class.__name__.lower().replace("metrics", "")
         )
-        ci_lower, ci_upper = analysis.confidence_interval()
+        ci_lower, ci_upper = analysis.confidence_interval(
+            method=ci_method,
+            ci_level=ci_level,
+        )
         df.loc[mask, "CI Lower"] = ci_lower
         df.loc[mask, "CI Upper"] = ci_upper
 

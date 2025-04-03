@@ -4,12 +4,13 @@ Manually curate sensitivity results.
 
 Usage:
     manual-sensitivity-curation --input <input_file>
-    --curation <curation_criteria> --output_prefix <output_prefix>
-    --decimals <decimals>
+    --curation <curation_criteria> --output-prefix <output_prefix>
+    --decimals <decimals> --ci-method <ci_method> --ci-level <ci_level>
 Example:
     manual-sensitivity-curation --input sensitivity.csv
     --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50"
-    --output_prefix manually_curated_sensitivity --decimals 1
+    --output-prefix manually_curated_sensitivity --decimals 1
+    --ci-method wilson --ci-level 0.95
 """
 
 import argparse
@@ -17,13 +18,20 @@ import logging
 
 import pandas as pd
 
-from clinical_tools.core.constants import DEFAULT_DECIMALS
+from clinical_tools.core.constants import (
+    DEFAULT_CI_LEVEL,
+    DEFAULT_CI_METHOD,
+    DEFAULT_DECIMALS,
+)
 from clinical_tools.core.macros.curation.variant import (
     export_curation_results,
     update_metrics,
     validate_curation_format,
 )
 from clinical_tools.core.metrics.variant import SensitivityMetrics
+from clinical_tools.core.statistics.proportion import (
+    ProportionConfidenceIntervalMethod,
+)
 
 
 def main():
@@ -44,7 +52,8 @@ def main():
         "information and recompute statistics. Example: "
         "manual-sensitivity-curation --input sensitivity.csv "
         "--curation SNP:PASS:TP:100 'SNP:PASS:FN:50' "
-        "--output_prefix manually_curated_sensitivity --decimals 1"
+        "--output-prefix manually_curated_sensitivity --decimals 1 "
+        "--ci-method wilson --ci-level 0.95"
     )
     parser.add_argument(
         "--input", required=True, help="Input sensitivity summary table (CSV format)."
@@ -57,7 +66,8 @@ def main():
         help="Manual curation (type:filter:metric:count).",
     )
     parser.add_argument(
-        "--output_prefix",
+        "--output-prefix",
+        type=str,
         default="manually_curated_sensitivity",
         help="Prefix for output files.",
     )
@@ -66,6 +76,21 @@ def main():
         type=int,
         default=DEFAULT_DECIMALS,
         help=f"Number of decimal places for percentages (default: {DEFAULT_DECIMALS}).",
+    )
+    parser.add_argument(
+        "--ci-method",
+        type=str,
+        choices=[method.value for method in ProportionConfidenceIntervalMethod],
+        default=DEFAULT_CI_METHOD,
+        help="Statistical method for confidence interval calculation "
+        f"(default: {DEFAULT_CI_METHOD}).",
+    )
+    parser.add_argument(
+        "--ci-level",
+        type=float,
+        default=DEFAULT_CI_LEVEL,
+        help="Confidence level for confidence intervals (default: "
+        f"{DEFAULT_CI_LEVEL}).",
     )
 
     args = parser.parse_args()
@@ -84,7 +109,13 @@ def main():
 
     # Update counts and recalculate metrics
     for curation in curations:
-        df = update_metrics(df, curation, SensitivityMetrics)
+        df = update_metrics(
+            df,
+            curation,
+            SensitivityMetrics,
+            ci_method=args.ci_method,
+            ci_level=args.ci_level,
+        )
 
     # Export results
     export_curation_results(df, args.output_prefix, "sensitivity", args.decimals)
