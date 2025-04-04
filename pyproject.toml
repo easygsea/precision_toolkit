@@ -25,7 +25,7 @@ pytest-xdist = "3.6.1"
 
 [tool.poetry.scripts]
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
-manual-variant-concordance-curation = "bin.manual_variant_concondance_curation:main"
+manual-variant-concordance-curation = "bin.manual_variant_concordance_curation:main"
 manual-sensitivity-curation = "bin.manual_sensitivity_curation:main"
 manual-precision-curation = "bin.manual_precision_curation:main"
 manual-f1-score-curation = "bin.manual_f1_score_curation:main"
