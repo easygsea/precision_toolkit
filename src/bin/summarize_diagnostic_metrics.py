@@ -8,12 +8,13 @@ Usage:
     --tp-method <concordance true positive method: truth, query, or min>
     --decimals <number of decimal places>
     --ci-method <confidence interval method>
+    --ci-level <confidence level>
 
 Example:
     summarize-diagnostic-metrics --engine happy --raw-files A.raw.summary.csv
     B.raw.summary.csv --curated-files A.curated.summary.csv B.curated.summary.csv
     --prefix diagnostic_metrics --metrics concordance sensitivity precision f1_score
-    --tp-method min --decimals 1
+    --tp-method min --decimals 1 --ci-method wilson --ci-level 0.95
 """
 
 import argparse
