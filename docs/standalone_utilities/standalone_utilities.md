@@ -20,4 +20,4 @@ apptainer exec <path/to/clinical_tools_latest.sif> manual-precision-curation -h
 apptainer exec <path/to/clinical_tools_latest.sif> manual-f1-score-curation -h
 ```
 
-Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#variant-benchmark-manual-curation) manual.
+Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
