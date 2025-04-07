@@ -139,6 +139,7 @@ The pipeline supports automatic filtering of known spurious variants using [bcft
 
 **VCF File Preparation:**
 1. **File Format**: Must be a valid VCF file. Example format:
+
 Small variants:
 ```
 ##fileformat=VCFv4.2
