@@ -16,16 +16,18 @@ process exclude_spurious_variants {
     # Check and compress original VCF if needed
     if [[ "${original_vcf}" != *.gz ]]; then
         bgzip -c "${original_vcf}" > "${original_vcf}.gz"
-        mv "${original_vcf}.gz" "${original_vcf}"
+        compressed_vcf="${original_vcf}.gz"
+    else
+        compressed_vcf="${original_vcf}"
     fi
 
     # Index original VCF if needed
-    if [[ ! -f "${original_vcf}.tbi" ]]; then
-        tabix -p vcf "${original_vcf}"
+    if [[ ! -f "\${compressed_vcf}.tbi" ]]; then
+        tabix -p vcf "\${compressed_vcf}"
     fi
 
     # Normalize and decompose multiallelic variants in original VCF
-    bcftools norm -m -any "${original_vcf}" -o normalized_original.vcf.gz
+    bcftools norm -m -any "\${compressed_vcf}" -o normalized_original.vcf.gz
 
     # Index normalized original VCF
     tabix -p vcf normalized_original.vcf.gz
