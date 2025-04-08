@@ -92,7 +92,7 @@ nextflow run main.nf \
 - `--happy_engine`: hap.py engine to use (default: `vcfeval`) Options: `vcfeval`, `xcmp`, `scmp-distance`, `scmp-somatic`. Note: `vcfeval` mode only evaluates PASS variants as hap.py does not support `vcfeval --all-records`.
 - `--happy_options`: Additional hap.py options (default: `--write-vcf --write-counts`). Must quote the string and use = to assign the value.
 - `--wittyer_options`: Additional witty.er options (default: auto-generated from parameters below). Must quote the string and use = to assign the value.
-- `--evaluationMode`: witty.er parameter: Evaluation mode (default: `CrossTypeAndSimpleCounting`) Options: `CrossTypeAndSimpleCounting`, `SimpleCounting`, `Default`
+- `--evaluationMode`: witty.er parameter: Evaluation mode (default: `CrossTypeAndSimpleCounting`) Options: `CrossTypeAndSimpleCounting`, `SimpleCounting`, `GenotypeMatching`. Note that GenotypeMatching corresponds to the Default option in witty.er documentation https://github.com/Illumina/witty.er/issues/25
 - `--includedFilters`: witty.er parameter: Comma separated list. Only variants contain these filters will be considered. Empty string ('') will include all filters (default: '')
 - `--percentDistance`: witty.er parameter: Maximum allowed distance between truth and query boundaries as fraction of SV length (default: 0.3)
 - `--bpDistance`: witty.er parameter: Maximum allowed distance between truth and query boundaries in base pairs (default: 5000)
