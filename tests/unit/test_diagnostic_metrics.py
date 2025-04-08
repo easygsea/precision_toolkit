@@ -343,6 +343,38 @@ def test_f1_score(
             0.99,
             (0.793, 0.958),
         ),  # Normal case agresti coull with 99% CI
+        (
+            100,
+            90,
+            10,
+            ProportionConfidenceIntervalMethod.BETA,
+            0.95,
+            (0.824, 0.951),
+        ),  # Normal case beta
+        (
+            100,
+            90,
+            10,
+            ProportionConfidenceIntervalMethod.BINOMIAL_TEST,
+            0.95,
+            (0.826, 0.947),
+        ),  # Normal case binomial test
+        (
+            100,
+            90,
+            10,
+            ProportionConfidenceIntervalMethod.JEFFREYS,
+            0.95,
+            (0.830, 0.947),
+        ),  # Normal case jeffreys
+        (
+            100,
+            90,
+            10,
+            ProportionConfidenceIntervalMethod.NORMAL,
+            0.95,
+            (0.841, 0.959),
+        ),  # Normal case normal
     ],
     ids=[
         "normal_case",
@@ -355,6 +387,10 @@ def test_f1_score(
         "perfect_match_agresti_coull",
         "normal_case_99ci",
         "normal_case_agresti_coull_99ci",
+        "normal_case_beta",
+        "normal_case_binomial_test",
+        "normal_case_jeffreys",
+        "normal_case_normal",
     ],
 )
 def test_confidence_interval_sensitivity(
