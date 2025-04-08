@@ -38,8 +38,12 @@ def helpMessage() {
             --output_dir             Base output directory (default: output_clinical_tools)
             --variant_benchmark_dir  Subdirectory for variant benchmark results (default: variant_benchmark)
             --happy_engine           hap.py engine to use (default: vcfeval) Options: vcfeval, xcmp, scmp-distance, scmp-somatic
-            --happy_options          Additional options for hap.py
-            --wittyer_options        Additional options for witty.er
+            --happy_options          Additional hap.py options (default: '--write-vcf --write-counts')
+            --wittyer_options        Additional witty.er options (default: auto-generated from parameters below)
+            --evaluationMode         witty.er parameter: Evaluation mode (default: CrossTypeAndSimpleCounting) Options: CrossTypeAndSimpleCounting, SimpleCounting, Default
+            --includedFilters        witty.er parameter: Comma separated list. Only variants contain these filters will be considered. Empty string ('') will include all filters (default: '')
+            --percentDistance        witty.er parameter: Maximum allowed distance between truth and query boundaries as fraction of SV length (default: 0.3)
+            --bpDistance             witty.er parameter: Maximum allowed distance between truth and query boundaries in base pairs (default: 5000)
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
             --collapse               Collapse option for bcftools isec (default: 'none')
             --skip_raw               Skip raw analysis (only available when spurious_variants_vcf is provided)
