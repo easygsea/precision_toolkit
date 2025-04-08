@@ -24,7 +24,7 @@ enum HappyEngine {
 
 // Confidence interval method enum
 enum ConfidenceIntervalMethod {
-    wilson, agresti_coull, beta, jeffreys, wald
+    agresti_coull, beta, binom_test, jeffreys, normal, wilson
 }
 
 // Function to validate engine selection

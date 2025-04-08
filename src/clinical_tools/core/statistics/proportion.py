@@ -16,7 +16,7 @@ class ProportionConfidenceIntervalMethod(StrEnum):
 
     AGRESTI_COULL = "agresti_coull"
     BETA = "beta"
-    BINOMIAL_TEST = "binomial_test"
+    BINOMIAL_TEST = "binom_test"
     JEFFREYS = "jeffreys"
     NORMAL = "normal"
     WILSON = "wilson"
