@@ -107,7 +107,7 @@ def test_manual_sensitivity_curation(test_data_dir):
         assert row["Variant Filter"] == "PASS"
         assert row["True Positive"] == 100
         assert row["False Negative"] == 50
-        assert row["Sensitivity"] == pytest.approx(0.6666666666666666, abs=0.0001)
+        assert row["Sensitivity"] == pytest.approx(0.66667, abs=0.0001)
         assert row["CI Lower"] == pytest.approx(0.58789, abs=0.0001)
         assert row["CI Upper"] == pytest.approx(0.73711, abs=0.0001)
 
@@ -153,9 +153,9 @@ def test_manual_precision_curation(test_data_dir):
         assert row["Variant Filter"] == "PASS"
         assert row["True Positive"] == 100
         assert row["False Positive"] == 50
-        assert row["Precision"] == pytest.approx(0.666667, abs=0.0001)
-        assert row["CI Lower"] == pytest.approx(0.587897, abs=0.0001)
-        assert row["CI Upper"] == pytest.approx(0.737112, abs=0.0001)
+        assert row["Precision"] == pytest.approx(0.66667, abs=0.0001)
+        assert row["CI Lower"] == pytest.approx(0.58789, abs=0.0001)
+        assert row["CI Upper"] == pytest.approx(0.73712, abs=0.0001)
 
 
 def test_manual_f1_score_curation(test_data_dir):
@@ -195,4 +195,4 @@ def test_manual_f1_score_curation(test_data_dir):
         assert row["Variant Filter"] == "PASS"
         assert row["Sensitivity"] == pytest.approx(0.95, abs=0.0001)
         assert row["Precision"] == pytest.approx(0.90, abs=0.0001)
-        assert row["F1 Score"] == pytest.approx(0.924324, abs=0.0001)
+        assert row["F1 Score"] == pytest.approx(0.92432, abs=0.0001)
