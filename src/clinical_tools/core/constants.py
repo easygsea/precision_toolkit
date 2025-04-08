@@ -1,13 +1,19 @@
 """Constants for the clinical tools package."""
 
 from enum import StrEnum
-from typing import Literal
 
 DEFAULT_CI_LEVEL: float = 0.95
 DEFAULT_CI_METHOD: str = "wilson"
 DEFAULT_DECIMALS: int = 2
 
-DiagnosticMetricType = Literal["concordance", "sensitivity", "precision", "f1_score"]
+
+class DiagnosticMetricType(StrEnum):
+    """Supported diagnostic metric types."""
+
+    CONCORDANCE = "concordance"
+    SENSITIVITY = "sensitivity"
+    PRECISION = "precision"
+    F1_SCORE = "f1_score"
 
 
 class VariantConcordanceEngine(StrEnum):

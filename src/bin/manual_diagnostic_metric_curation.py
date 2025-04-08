@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-Manually curate precision results.
+Manually curate a diagnostic metric.
 
 Usage:
-    manual-precision-curation --input <input_file>
-    --curation <curation_criteria> --output-prefix <output_prefix>
-    --decimals <decimals> --ci-method <ci_method> --ci-level <ci_level>
+    manual-diagnostic-metric-curation metric --input <input_file>
+    --curation <curation_criteria> --tp-method <tp_method>
+    --output-prefix <output_prefix> --decimals <decimals>
+    --ci-method <ci_method> --ci-level <ci_level>
+
 Example:
-    manual-precision-curation --input precision.csv
-    --curation "SNP:PASS:TP:100" "SNP:PASS:FP:50"
-    --output-prefix manually_curated_precision --decimals 1
+    manual-diagnostic-metric-curation concordance --input metric.csv
+    --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" "SNP:PASS:FP:20"
+    --tp-method min --output-prefix manually_curated_concordance --decimals 1
     --ci-method wilson --ci-level 0.95
 """
 
@@ -22,13 +24,16 @@ from clinical_tools.core.constants import (
     DEFAULT_CI_LEVEL,
     DEFAULT_CI_METHOD,
     DEFAULT_DECIMALS,
+    DiagnosticMetricType,
 )
 from clinical_tools.core.macros.curation.variant import (
     export_curation_results,
     update_metrics,
     validate_curation_format,
 )
-from clinical_tools.core.metrics.variant import PrecisionMetrics
+from clinical_tools.core.metrics.variant import (
+    ConcordanceTPMethod,
+)
 from clinical_tools.core.statistics.proportion import (
     ProportionConfidenceIntervalMethod,
 )
@@ -36,9 +41,9 @@ from clinical_tools.core.statistics.proportion import (
 
 def main():
     """
-    Manually curate precision summary results.
+    Manually curate a diagnostic metric.
 
-    This script reads a CSV file containing precision summary, updates
+    This script reads a CSV file containing a diagnostic metric, updates
     specified statistics based on user input, and then exports the results.
 
     Args:
@@ -48,15 +53,21 @@ def main():
         None
     """
     parser = argparse.ArgumentParser(
-        description="Curate precision from an existing table with count "
+        description="Curate diagnostic metrics from an existing table with count "
         "information and recompute statistics. Example: "
-        "manual-precision-curation --input precision.csv "
-        "--curation 'SNP:PASS:TP:100' 'SNP:PASS:FP:50' "
-        "--output-prefix manually_curated_precision --decimals 1 "
+        "manual-diagnostic-metric-curation concordance --input metric.csv "
+        "--curation 'SNP:PASS:TP:100' 'SNP:PASS:FN:50' 'SNP:PASS:FP:20' "
+        "--tp-method min --output-prefix manually_curated_concordance --decimals 1 "
         "--ci-method wilson --ci-level 0.95"
     )
     parser.add_argument(
-        "--input", required=True, help="Input precision summary table (CSV format)."
+        "metric",
+        choices=DiagnosticMetricType,
+        type=DiagnosticMetricType,
+        help="Diagnostic metric to curate.",
+    )
+    parser.add_argument(
+        "--input", required=True, help="Input concordance summary table (CSV format)."
     )
     parser.add_argument(
         "--curation",
@@ -66,9 +77,14 @@ def main():
         help="Manual curation (type:filter:metric:count).",
     )
     parser.add_argument(
+        "--tp-method",
+        choices=[method.value for method in ConcordanceTPMethod],
+        default=ConcordanceTPMethod.MinTP.value,
+        help=f"TP method in concordance (default: {ConcordanceTPMethod.MinTP.value}).",
+    )
+    parser.add_argument(
         "--output-prefix",
         type=str,
-        default="manually_curated_precision",
         help="Prefix for output files.",
     )
     parser.add_argument(
@@ -92,16 +108,34 @@ def main():
         help="Confidence level for confidence intervals (default: "
         f"{DEFAULT_CI_LEVEL}).",
     )
+
     args = parser.parse_args()
+
+    # Set conditional requirements after parsing
+    if args.metric == DiagnosticMetricType.CONCORDANCE:
+        parser.set_defaults(tp_method=args.tp_method)
+    elif args.metric == DiagnosticMetricType.F1_SCORE:
+        parser.set_defaults(ci_method=None, ci_level=None)
+
+    # Set default output prefix if not provided
+    if not args.output_prefix:
+        args.output_prefix = f"manually_curated_{args.metric}"
+
     df = pd.read_csv(args.input)
 
     # Flatten the list of curation criteria
     curations = [item for sublist in args.curation for item in sublist]
 
     # Validate manual curation input before processing
+    valid_metrics = {
+        "concordance": ["TP", "FN", "FP"],
+        "sensitivity": ["TP", "FN"],
+        "precision": ["TP", "FP"],
+        "f1_score": ["sensitivity", "precision"],
+    }[args.metric]
     try:
         for curation in curations:
-            validate_curation_format(curation, valid_metrics=["TP", "FP"])
+            validate_curation_format(curation, valid_metrics=valid_metrics)
     except ValueError as e:
         logging.error(f"Invalid curation format: {e}")
         raise
@@ -111,13 +145,14 @@ def main():
         df = update_metrics(
             df,
             curation,
-            PrecisionMetrics,
-            ci_method=args.ci_method,
-            ci_level=args.ci_level,
+            args.metric,
+            args.tp_method,
+            args.ci_method,
+            args.ci_level,
         )
 
     # Export results
-    export_curation_results(df, args.output_prefix, "precision", args.decimals)
+    export_curation_results(df, args.output_prefix, args.metric, args.decimals)
 
 
 if __name__ == "__main__":

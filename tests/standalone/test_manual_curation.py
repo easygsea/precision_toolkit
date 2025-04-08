@@ -19,18 +19,7 @@ def test_data_dir():
     return Path(__file__).parent / "data"
 
 
-@pytest.fixture
-def manual_curation_scripts():
-    """Fixture for the manual curation scripts."""
-    return {
-        "concordance": "manual-variant-concordance-curation",
-        "sensitivity": "manual-sensitivity-curation",
-        "precision": "manual-precision-curation",
-        "f1_score": "manual-f1-score-curation",
-    }
-
-
-def test_manual_concordance_curation(test_data_dir, manual_curation_scripts):
+def test_manual_concordance_curation(test_data_dir):
     """Test manual concordance curation."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = test_data_dir / "concordance.csv"
@@ -40,7 +29,8 @@ def test_manual_concordance_curation(test_data_dir, manual_curation_scripts):
         # Run the script
         subprocess.run(
             [
-                manual_curation_scripts["concordance"],
+                "manual-diagnostic-metric-curation",
+                "concordance",
                 "--input",
                 str(input_file),
                 "--curation",
@@ -76,7 +66,7 @@ def test_manual_concordance_curation(test_data_dir, manual_curation_scripts):
         assert row["CI Upper"] == pytest.approx(0.65947, abs=0.0001)
 
 
-def test_manual_sensitivity_curation(test_data_dir, manual_curation_scripts):
+def test_manual_sensitivity_curation(test_data_dir):
     """Test manual sensitivity curation."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = test_data_dir / "sensitivity.csv"
@@ -86,7 +76,8 @@ def test_manual_sensitivity_curation(test_data_dir, manual_curation_scripts):
         # Run the script
         subprocess.run(
             [
-                manual_curation_scripts["sensitivity"],
+                "manual-diagnostic-metric-curation",
+                "sensitivity",
                 "--input",
                 str(input_file),
                 "--curation",
@@ -121,7 +112,7 @@ def test_manual_sensitivity_curation(test_data_dir, manual_curation_scripts):
         assert row["CI Upper"] == pytest.approx(0.73711, abs=0.0001)
 
 
-def test_manual_precision_curation(test_data_dir, manual_curation_scripts):
+def test_manual_precision_curation(test_data_dir):
     """Test manual precision curation."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = test_data_dir / "precision.csv"
@@ -131,7 +122,8 @@ def test_manual_precision_curation(test_data_dir, manual_curation_scripts):
         # Run the script
         subprocess.run(
             [
-                manual_curation_scripts["precision"],
+                "manual-diagnostic-metric-curation",
+                "precision",
                 "--input",
                 str(input_file),
                 "--curation",
@@ -166,7 +158,7 @@ def test_manual_precision_curation(test_data_dir, manual_curation_scripts):
         assert row["CI Upper"] == pytest.approx(0.737112, abs=0.0001)
 
 
-def test_manual_f1_score_curation(test_data_dir, manual_curation_scripts):
+def test_manual_f1_score_curation(test_data_dir):
     """Test manual F1 score curation."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = test_data_dir / "f1_score.csv"
@@ -176,7 +168,8 @@ def test_manual_f1_score_curation(test_data_dir, manual_curation_scripts):
         # Run the script
         subprocess.run(
             [
-                manual_curation_scripts["f1_score"],
+                "manual-diagnostic-metric-curation",
+                "f1_score",
                 "--input",
                 str(input_file),
                 "--curation",

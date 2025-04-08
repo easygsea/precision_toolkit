@@ -1,23 +1,17 @@
 # Standalone Utilities
 
-- [Manual Diagnostic Metrics Curation](#manual-diagnostic-metrics-curation)
+- [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
 
-## Manual Diagnostic Metrics Curation
+## Manual Diagnostic Metric Curation
 
-We provide three tools to manually curate diagnostic metrics after the variant benchmark (diagnostic metrics) workflow has been run.
+We provide a handy tool to manually curate a diagnostic metric (concordance, sensitivity, precision, or f1_score) after the variant benchmark (diagnostic metrics) workflow has been run.
 
-- `manual-variant-concordance-curation`
-- `manual-sensitivity-curation`
-- `manual-precision-curation`
-- `manual-f1-score-curation`
+- `manual-diagnostic-metric-curation`
 
 To view the help message, run:
 
 ```bash
-apptainer exec <path/to/clinical_tools_latest.sif> manual-variant-concordance-curation -h
-apptainer exec <path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
-apptainer exec <path/to/clinical_tools_latest.sif> manual-precision-curation -h
-apptainer exec <path/to/clinical_tools_latest.sif> manual-f1-score-curation -h
+apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-curation -h
 ```
 
 Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.

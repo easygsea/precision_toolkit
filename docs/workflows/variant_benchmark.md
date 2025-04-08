@@ -264,7 +264,8 @@ In some cases, manual curation of variant benchmark results is necessary, for ex
 
 Example usage:
 ```bash
-apptainer exec -B <data_path> <path/to/clinical_tools_latest.sif> manual-sensitivity-curation \
+apptainer exec -B <data_path> <path/to/clinical_tools_latest.sif> \
+manual-diagnostic-metric-curation sensitivity \
 --input diagnostic_metrics_happy_curated_sensitivity.csv \
 --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" \
 --ci-method wilson \
