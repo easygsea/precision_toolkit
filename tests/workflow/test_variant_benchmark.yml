@@ -136,6 +136,12 @@
       md5sum: e6182fa3ee34dfc5fe95f6005ae1c402
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw.docx
 
+- name: variant_benchmark_wittyer_options
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine wittyer --truth_dir tests_data/cnv_truth_vcfs --query_dir tests_data/cnv_query_vcfs --output_dir tests_variant_benchmark_wittyer_options --percentDistance 0
+  files:
+    - path: tests_variant_benchmark_wittyer_options/variant_benchmark/diagnostic_metrics_wittyer_raw.md
+      md5sum: ac57d94a86549f1231f9a89ad631ab7c
+
 - name: variant_benchmark_wittyer_exclude_spurious
   command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine wittyer --truth_dir tests_data/cnv_truth_vcfs --query_dir tests_data/cnv_query_vcfs --spurious_variants_vcf tests_data/spurious_cnv.vcf --output_dir tests_variant_benchmark_wittyer_exclude_spurious
   files:

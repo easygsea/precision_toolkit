@@ -90,8 +90,10 @@ process run_wittyer {
 
     script:
     PREFIX = "${sampleName}.${label}"
+    // CDI-90 workaround: clean witty.er invalid options
+    def clean_options = wittyer_options.replaceAll('--evaluationMode=Default|--evaluationMode=d|--em=Default|--em=d', '')
     """
-    witty.er -i "${query_vcf}" -t "${truth_vcf}" -o "${PREFIX}" ${wittyer_options}
+    witty.er -i "${query_vcf}" -t "${truth_vcf}" -o "${PREFIX}" ${clean_options}
     mv "${PREFIX}/Wittyer.Stats.json" "${PREFIX}/${PREFIX}.Wittyer.Stats.json"
     """
 }
