@@ -1,4 +1,4 @@
-"""Integration tests for converion of multi sample VCF files."""
+"""Integration tests for conversion of multi sample VCF files."""
 
 import subprocess
 import tempfile
@@ -67,7 +67,7 @@ def test_data_dir():
 def test_two_sample_vcf_conversion(test_data_dir):
     """Test conversion of two-sample VCF file."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        input_file = test_data_dir / "two.sample.vcf"
+        input_file = test_data_dir / "two_sample.vcf"
         output_prefix = Path(tmpdir) / "multi_sample_vcf_conversion"
 
         subprocess.run(
@@ -92,9 +92,8 @@ def test_two_sample_vcf_conversion(test_data_dir):
         df_sample2 = pd.read_csv(
             output_sample2, comment="#", sep="\t", header=None, names=SAMPLE2_HEADER
         )
-        print(df_sample1)
-        rows, _ = df_sample1.shape
-        assert rows == 1
+        rows = df_sample1.shape[0]
+        assert rows == 1, "Expected one row in sample 1 and sample 2 output"
 
         sample1_data = df_sample1.iloc[0]
         for idx, header in enumerate(SAMPLE1_HEADER):

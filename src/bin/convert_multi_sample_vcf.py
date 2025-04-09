@@ -24,7 +24,7 @@ CONSTANT_FIELDS = [
 ]
 
 
-def parse_file(input_file_path: Path) -> tuple[list[str], list[str], pd.DataFrame]:
+def parse_file(input_file_path: Path) -> tuple[list[str], pd.DataFrame]:
     """
     Parse the multi sample vcf file and converts into a pandas dataframe.
 
@@ -49,7 +49,7 @@ def parse_file(input_file_path: Path) -> tuple[list[str], list[str], pd.DataFram
     df = pd.read_csv(
         input_file_path, comment="#", sep="\t", header=None, names=header_line
     )
-    return info_lines, header_line, df
+    return info_lines, df
 
 
 def write_file(info_header: list[str], df: pd.DataFrame, output_location: Path) -> None:
@@ -98,7 +98,7 @@ def main():
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True)
 
-    info_header, columns, multi_df = parse_file(input_file)
+    info_header, multi_df = parse_file(input_file)
     write_file(info_header, multi_df, args.output_folder)
 
 
