@@ -26,6 +26,7 @@ pytest-xdist = "3.6.1"
 [tool.poetry.scripts]
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
 manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
+convert-multi-sample-vcf = "bin.convert_multi_sample_vcf:main"
 
 [build-system]
 requires = ["poetry-core"]

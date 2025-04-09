@@ -24,7 +24,7 @@ CONSTANT_FIELDS = [
 ]
 
 
-def parse_file(input_file_path: str) -> tuple[list[str], list[str], pd.DataFrame]:
+def parse_file(input_file_path: Path) -> tuple[list[str], list[str], pd.DataFrame]:
     """
     Parse the multi sample vcf file and converts into a pandas dataframe.
 

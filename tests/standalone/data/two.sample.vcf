@@ -1,0 +1,5 @@
+##fileformat=VCFv4.2
+##WARNING: To comply with VCF format specifications, metadata descriptions are required. Some header metadata fields have been skipped in this file.
+#CHROM	POS	REF	ALT	ID	QUAL	FILTER	INFO	FORMAT	SAMPLE1	SAMPLE2
+chr11	118339396	.	<DUP>	.	.	PASS	GENE=ABC;cHGVS=c.0000_0000_ABC;END=00001234;CN=4.0	LIBRARY:POOL:GT	F00:AA000:.	.
+chr11	118339396	.	<DUP>	.	.	PASS	GENE=ABC;cHGVS=c.0000_0000_DEF;END=56780000;CN=2.5	LIBRARY:POOL:GT	.	F01:AA001:.
