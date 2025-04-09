@@ -7,7 +7,7 @@ Usage:
 """
 
 import argparse
-import os
+from pathlib import Path
 
 import pandas as pd
 
@@ -29,33 +29,30 @@ def parse_file(input_file_path: str) -> tuple[list[str], list[str], pd.DataFrame
     Parse the multi sample vcf file and converts into a pandas dataframe.
 
     Args:
-        input_file_path - path to the multi sample VCF file
+        input_file_path: path to the multi sample VCF file
 
     Returns:
-        info_lines - header lines in the beginning of the VCF file
-        header_line - line containing all the headers including the identifiers
-        df - pandas DataFrame containing the sample information
+        info_lines: header lines in the beginning of the VCF file
+        header_line: line containing all the headers including the identifiers
+        df: pandas DataFrame containing the sample information
 
     """
-    data = []
-    info_lines = []
+    info_lines: list[str] = []
     with open(input_file_path, "r") as vcf_file:
-        for lines in vcf_file:
-            for line in lines.split("\n"):
-                if line[:2] == "##":
-                    info_lines.append(line)
-                elif line[:6] == "#CHROM":
-                    header_line = line.split("\t")
-                else:
-                    data_line = line.split("\t")
-                    if line[0] != "":
-                        data.append(data_line)
+        for line in vcf_file:
+            if line.startswith("##"):
+                info_lines.append(line.strip())
+            elif line.startswith("#CHROM"):
+                header_line = line.strip().split("\t")
+                break
 
-    df = pd.DataFrame(data, columns=header_line)
+    df = pd.read_csv(
+        input_file_path, comment="#", sep="\t", header=None, names=header_line
+    )
     return info_lines, header_line, df
 
 
-def write_file(info_header: list[str], df: pd.DataFrame, output_location: str) -> None:
+def write_file(info_header: list[str], df: pd.DataFrame, output_location: Path) -> None:
     """
     Write individual samples to respective file in the output location.
 
@@ -67,11 +64,7 @@ def write_file(info_header: list[str], df: pd.DataFrame, output_location: str) -
     Returns:
         None, but writes to files in the output directory
     """
-    identifiers = [
-        identifier
-        for identifier in df.columns.tolist()
-        if identifier not in CONSTANT_FIELDS
-    ]
+    identifiers = [col for col in df.columns if col not in CONSTANT_FIELDS]
     for identifier in identifiers:
         single_df = df[df[identifier] != "."]
         single_df = single_df.drop(
@@ -100,7 +93,8 @@ def main():
 
     args = parser.parse_args()
     input_file = args.input_vcf
-    os.mkdir(args.output_folder)
+    output_folder = Path(args.output_folder)
+    output_folder.mkdir(exist_ok=True)
 
     info_header, columns, multi_df = parse_file(input_file)
     write_file(info_header, multi_df, args.output_folder)
