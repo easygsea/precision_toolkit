@@ -9,6 +9,6 @@ process generate_fai {
 
     script:
     """
-    samtools faidx ${genome_ref}
+    samtools faidx "${genome_ref}"
     """
 }

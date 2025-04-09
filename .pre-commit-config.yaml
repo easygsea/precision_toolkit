@@ -5,7 +5,9 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^tests/.*/data/|^tests_data/
       - id: end-of-file-fixer
+        exclude: ^tests/.*/data/|^tests_data/
 
   - repo: https://github.com/PyCQA/isort
     rev: 6.0.0

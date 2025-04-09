@@ -1,13 +1,15 @@
 """Formatting utilities."""
 
+from clinical_tools.core.constants import DEFAULT_DECIMALS
 
-def format_percentage(x: int | float, decimals: int = 1) -> str:
+
+def format_percentage(x: int | float, decimals: int = DEFAULT_DECIMALS) -> str:
     """
     Convert number to percentage string.
 
     Args:
         x: Number to convert
-        decimals: Decimal places to show
+        decimals: Decimal places to show (default: DEFAULT_DECIMALS)
 
     Returns:
         Formatted percentage string

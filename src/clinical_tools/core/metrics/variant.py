@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import StrEnum
 
+from clinical_tools.core.constants import DEFAULT_CI_LEVEL
 from clinical_tools.core.statistics.proportion import (
     ProportionConfidenceInterval,
     ProportionConfidenceIntervalMethod,
@@ -101,6 +102,7 @@ class SensitivityMetrics(BaseVariantCallMetrics):
         method: ProportionConfidenceIntervalMethod = (
             ProportionConfidenceIntervalMethod.WILSON
         ),
+        ci_level: float = DEFAULT_CI_LEVEL,
         **kwargs,
     ) -> tuple[float, float]:
         """
@@ -108,6 +110,7 @@ class SensitivityMetrics(BaseVariantCallMetrics):
 
         Args:
             method: Statistical method for CI calculation.
+            ci_level: Confidence level for CI calculation.
             **kwargs: Additional parameters for the method.
 
         Returns:
@@ -117,6 +120,7 @@ class SensitivityMetrics(BaseVariantCallMetrics):
             successes=self.metrics.TruthTP,
             total=self.metrics.TruthTotal,
             method=method,
+            ci_level=ci_level,
             **kwargs,
         )
 
@@ -140,6 +144,7 @@ class PrecisionMetrics(BaseVariantCallMetrics):
         method: ProportionConfidenceIntervalMethod = (
             ProportionConfidenceIntervalMethod.WILSON
         ),
+        ci_level: float = DEFAULT_CI_LEVEL,
         **kwargs,
     ) -> tuple[float, float]:
         """
@@ -147,6 +152,7 @@ class PrecisionMetrics(BaseVariantCallMetrics):
 
         Args:
             method: Statistical method for CI calculation.
+            ci_level: Confidence level for CI calculation.
             **kwargs: Additional parameters for the method.
 
         Returns:
@@ -156,6 +162,7 @@ class PrecisionMetrics(BaseVariantCallMetrics):
             successes=self.metrics.QueryTP,
             total=self.metrics.QueryTotal,
             method=method,
+            ci_level=ci_level,
             **kwargs,
         )
 
@@ -207,6 +214,7 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         method: ProportionConfidenceIntervalMethod = (
             ProportionConfidenceIntervalMethod.WILSON
         ),
+        ci_level: float = DEFAULT_CI_LEVEL,
         **kwargs,
     ) -> tuple[float, float]:
         """
@@ -214,6 +222,7 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
 
         Args:
             method: Statistical method for CI calculation.
+            ci_level: Confidence level for CI calculation.
             **kwargs: Additional parameters for the method.
 
         Returns:
@@ -223,6 +232,7 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
             successes=self._get_selected_tp(),
             total=self._get_total_calls(),
             method=method,
+            ci_level=ci_level,
             **kwargs,
         )
 

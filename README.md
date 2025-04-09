@@ -1,6 +1,6 @@
 # Clinical Genomics Assay Development & Validation Tools
 
-This software suite streamlines clinical genomics assay development and validation with automated analysis pipelines, result summarization, and report generation. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
+**Clinical Tools** is a software suite that provides robust CI/CD workflows and tools for developing and validating clinical genomics assays. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
 
 ## Supported Architectures
 
@@ -12,22 +12,21 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 - Nextflow (>=24.10.3)
 - Apptainer (>=1.3.1) or Singularity (>=3.8.7)
 
-Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3.15 htslib 1.21 (bgzip tabix) witty.er 0.5.2.0 Python 3.11.7 samtools 1.21
+Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3.15 htslib 1.21 (bgzip tabix) witty.er 0.5.2.0 Python 3.11.7 RTG Tools 3.12.1 samtools 1.21
 
 ## Quick Start
 
 1. Clone the repository:
    ```bash
    git clone https://github.com/easygsea/clinical_tools.git
-   cd clinical_tools
    ```
 
-2. Run specific workflows. Example:
+2. Run specific workflow(s). Example:
    ```bash
-   nextflow run main.nf --workflows concordance \
-       --truth_dir truth_vcfs/ \
-       --query_dir query_vcfs/ \
-       --variant_concordance_engine happy \
+   nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
+       --truth_dir <path/to/truth_vcfs/> \
+       --query_dir <path/to/query_vcfs/> \
+       --variant_benchmark_engine happy \
        --output_dir output_clinical_tools
    ```
 
@@ -40,9 +39,46 @@ Using containerized tools:
 
 2. Run specific tools. Example:
    ```bash
-   apptainer exec -B <data_path> /path/to/clinical_tools_latest.sif curate-variant-concordance-manually -h
+   apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
    ```
-   See official [singularity exec](https://docs.sylabs.io/guides/latest/user-guide/cli/singularity_exec.html) manual for guidance on calling commands within a container.
+   See official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for guidance on calling commands within a container.
+
+## Demo Data
+
+Clinical Tools are rigorously tested at both unit and integration levels. Integration tests, covering workflows and standalone utilities, concurrently provide demos:
+
+[Workflows Tests as Demos](./tests/workflows)
+
+Example:
+[Variant Benchmark Tests](./tests/workflows/test_variant_benchmark.yml)
+Demo of customized benchmarking small variant calls across multiple samples and calculating variant concordance, sensitivity, precision, confidence intervals (Jeffreys method, 99% CI; default: Wilson method, 95% CI), and F1 score reported to 1 (default: 2) decimal place:
+```bash
+nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
+    --variant_benchmark_engine happy \
+    --truth_dir <path/to/clinical_tools>/tests_data/snv_truth_vcfs \
+    --query_dir <path/to/clinical_tools>/tests_data/snv_query_vcfs \
+    --genome_ref <path/to/clinical_tools>/tests_data/genome.fa \
+    --ci_method "jeffreys" \
+    --ci_level 0.99 \
+    --decimals 1 \
+    --output_dir tests_variant_benchmark_happy_raw_decimals1
+```
+
+[Standalone Utilities Tests as Demos](./tests/standalone_utilities)
+
+Example:
+[Manual Diagnostic Metrics Curation Tests](./tests/standalone_utilities/test_manual_curation.py)
+Demo of manual sensitivity curation:
+```bash
+apptainer exec \
+    -B <path/to/clinical_tools> \
+    </path/to/clinical_tools_latest.sif> \
+    manual-sensitivity-curation \
+    --input <path/to/clinical_tools>/tests/standalone/data/sensitivity.csv \
+    --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" \
+    --output-prefix manually_curated_sensitivity
+```
+
 
 # Contents
 
@@ -63,9 +99,10 @@ The pipeline's architecture supports execution across various computing environm
 The manual is detailed in the [docs](./docs/README.md) directory, including:
 
 - [Workflows](./docs/README.md#workflows)
-  - [Variant Concordance](./docs/workflows/variant_concordance.md)
+  - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
 - [Standalone Utilities](./docs/README.md#standalone-utilities)
-  - [Curate Variant Concordance Manually](./docs/standalone_utilities/standalone_utilities.md#curate-variant-concordance-manually)
+  - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/standalone_utilities.md#manual-diagnostic-metric-curation)
+    - `manual-diagnostic-metric-curation`
 
 ## Resource Optimization and High-Performance Computing
 

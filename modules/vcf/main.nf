@@ -7,7 +7,7 @@ process bgzip_vcf {
 
     script:
     """
-    bgzip -c ${original_vcf} > ${original_vcf}.gz
+    bgzip -c "${original_vcf}" > "${original_vcf}.gz"
     """
 }
 
@@ -20,7 +20,7 @@ process index_vcf {
 
     script:
     """
-    tabix -p vcf ${gzipped_vcf}
+    tabix -p vcf "${gzipped_vcf}"
     """
 }
 
@@ -37,6 +37,6 @@ process normalize_vcf {
     script:
     """
     # Normalize VCF
-    bcftools norm -m -any ${vcf} -o ${vcf}.normalized.vcf.gz
+    bcftools norm -m -any "${vcf}" -o "${vcf}.normalized.vcf.gz"
     """
 }

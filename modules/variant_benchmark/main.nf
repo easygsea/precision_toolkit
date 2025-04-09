@@ -14,25 +14,27 @@ process exclude_spurious_variants {
     script:
     """
     # Check and compress original VCF if needed
-    if [[ ${original_vcf} != *.gz ]]; then
-        bgzip -c ${original_vcf} > ${original_vcf}.gz
-        original_vcf=${original_vcf}.gz
+    if [[ "${original_vcf}" != *.gz ]]; then
+        bgzip -c "${original_vcf}" > "${original_vcf}.gz"
+        compressed_vcf="${original_vcf}.gz"
+    else
+        compressed_vcf="${original_vcf}"
     fi
 
     # Index original VCF if needed
-    if [[ ! -f ${original_vcf}.tbi ]]; then
-        tabix -p vcf ${original_vcf}
+    if [[ ! -f "\${compressed_vcf}.tbi" ]]; then
+        tabix -p vcf "\${compressed_vcf}"
     fi
 
     # Normalize and decompose multiallelic variants in original VCF
-    bcftools norm -m -any ${original_vcf} -o normalized_original.vcf.gz
+    bcftools norm -m -any "\${compressed_vcf}" -o normalized_original.vcf.gz
 
     # Index normalized original VCF
     tabix -p vcf normalized_original.vcf.gz
 
     # Perform variant exclusion using bcftools isec on normalized VCFs
-    bcftools isec --collapse ${collapse} --complement --write 1 --output-type z \
-        --output ${sampleName}.${label}.no_spurious.vcf.gz normalized_original.vcf.gz ${normalized_spurious_vcf}
+    bcftools isec --collapse "${collapse}" --complement --write 1 --output-type z \
+        --output "${sampleName}.${label}.no_spurious.vcf.gz" normalized_original.vcf.gz "${normalized_spurious_vcf}"
     """
 }
 
@@ -45,6 +47,7 @@ process run_happy {
     tuple val(sampleName), path(truth_vcf), path(query_vcf)
     path genome_ref
     path genome_fai
+    val happy_engine
     val happy_options
     val output_dir
     val label
@@ -55,15 +58,15 @@ process run_happy {
 
     script:
     """
-    export HGREF=${genome_ref}
+    export HGREF="${genome_ref}"
     mkdir -p scratch_happy
 
     /opt/hap.py/bin/hap.py \
-    ${truth_vcf} \
-    ${query_vcf} \
-    -r ${genome_ref} \
-    -o ${sampleName}.${label} \
-    --engine=vcfeval \
+    "${truth_vcf}" \
+    "${query_vcf}" \
+    -r "${genome_ref}" \
+    -o "${sampleName}.${label}" \
+    --engine=${happy_engine} \
     --scratch-prefix scratch_happy \
     ${happy_options}
     """
@@ -87,32 +90,42 @@ process run_wittyer {
 
     script:
     PREFIX = "${sampleName}.${label}"
+    // CDI-90 workaround: clean witty.er invalid options
+    def clean_options = wittyer_options.replaceAll('--evaluationMode=Default|--evaluationMode=d|--em=Default|--em=d', '')
     """
-    witty.er -i ${query_vcf} -t ${truth_vcf} -o ${PREFIX} ${wittyer_options}
-    mv ${PREFIX}/Wittyer.Stats.json ${PREFIX}/${PREFIX}.Wittyer.Stats.json
+    witty.er -i "${query_vcf}" -t "${truth_vcf}" -o "${PREFIX}" ${clean_options}
+    mv "${PREFIX}/Wittyer.Stats.json" "${PREFIX}/${PREFIX}.Wittyer.Stats.json"
     """
 }
 
-process summarize_variant_concordance {
+process summarize_diagnostic_metrics {
     publishDir "${params.output_dir}/${output_dir ?: ''}", mode: 'copy'
 
     input:
-    val variant_concordance_engine
-    path raw_concordance_outputs
-    path curated_concordance_outputs
+    val variant_benchmark_engine
+    path raw_variant_benchmark_outputs
+    path curated_variant_benchmark_outputs
+    val diagnostic_metrics
     val concordance_tp
+    val ci_method
+    val ci_level
     val output_dir
+    val decimals
 
     output:
-    path("${PREFIX}*"), emit: variant_concordance_summary
+    path("${PREFIX}*"), emit: variant_benchmark_summary
 
     script:
-    PREFIX = "variant_concordance"
+    PREFIX = "diagnostic_metrics"
     """
-    summarize-variant-concordance --engine ${variant_concordance_engine} \
-        ${(raw_concordance_outputs != []) ? "--raw-files " + raw_concordance_outputs.collect().join(' ') : ""} \
-        ${(curated_concordance_outputs != []) ? "--curated-files " + curated_concordance_outputs.collect().join(' ') : ""} \
-        --tp-method ${concordance_tp} \
-        --prefix ${PREFIX}
+    summarize-diagnostic-metrics --metrics ${diagnostic_metrics} \
+        --engine "${variant_benchmark_engine}" \
+        ${(raw_variant_benchmark_outputs != []) ? "--raw-files " + raw_variant_benchmark_outputs.collect().join(' ') : ""} \
+        ${(curated_variant_benchmark_outputs != []) ? "--curated-files " + curated_variant_benchmark_outputs.collect().join(' ') : ""} \
+        --tp-method "${concordance_tp}" \
+        --ci-method "${ci_method}" \
+        --ci-level ${ci_level} \
+        --prefix "${PREFIX}" \
+        --decimals ${decimals}
     """
 }

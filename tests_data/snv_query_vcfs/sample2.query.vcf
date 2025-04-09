@@ -1,0 +1,21 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##FILTER=<ID=LowQUAL,Description="Quality below 20">
+##contig=<ID=chr1>
+##contig=<ID=chr2>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=AF,Number=1,Type=Float,Description="Allele Frequency">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE2
+chr1	3	.	ACG	G	.	PASS	.	GT:AF	0/1:0.5
+chr1	5	.	GTA	G	.	PASS	.	GT:AF	0/1:0.5
+chr1	15	.	G	T	.	PASS	.	GT:AF	1/1:0.99
+chr1	22	.	C	G	.	PASS	.	GT:AF	1/1:1.0
+chr1	32	.	T	G	.	PASS	.	GT:AF	0/1:0.55
+chr1	42	.	C	A	.	PASS	.	GT:AF	0/1:0.45
+chr1	52	.	T	A	.	PASS	.	GT:AF	1/1:0.98
+chr2	2	.	G	A	.	PASS	.	GT:AF	1/1:0.99
+chr2	12	.	C	G	.	PASS	.	GT:AF	0/1:0.53
+chr2	25	.	A	G	.	PASS	.	GT:AF	1/1:1.0
+chr2	32	.	C	A	.	PASS	.	GT:AF	0/1:0.43
+chr2	42	.	T	A	.	PASS	.	GT:AF	0/1:0.46
+chr2	52	.	C	G	.	PASS	.	GT:AF	0/1:0.52

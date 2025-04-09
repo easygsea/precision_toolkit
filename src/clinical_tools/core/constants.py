@@ -2,6 +2,19 @@
 
 from enum import StrEnum
 
+DEFAULT_CI_LEVEL: float = 0.95
+DEFAULT_CI_METHOD: str = "wilson"
+DEFAULT_DECIMALS: int = 2
+
+
+class DiagnosticMetricType(StrEnum):
+    """Supported diagnostic metric types."""
+
+    CONCORDANCE = "concordance"
+    SENSITIVITY = "sensitivity"
+    PRECISION = "precision"
+    F1_SCORE = "f1_score"
+
 
 class VariantConcordanceEngine(StrEnum):
     """Supported variant concordance analysis engines."""
@@ -14,10 +27,10 @@ class NameMapper:
     """Class to hold abbreviations and full names."""
 
     NAME_MAP = {
-        "TP": "True Positives",
-        "FP": "False Positives",
-        "TN": "True Negatives",
-        "FN": "False Negatives",
+        "TP": "True Positive",
+        "FP": "False Positive",
+        "TN": "True Negative",
+        "FN": "False Negative",
     }
 
     @staticmethod
