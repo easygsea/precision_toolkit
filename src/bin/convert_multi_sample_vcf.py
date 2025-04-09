@@ -83,7 +83,9 @@ def main():
     Returns:
         None, modifies the output directory
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Convert multi-sample VCF files into a folder of single-sample VCFs"
+    )
     parser.add_argument(
         "--input-vcf", required=True, help="Path to the multi sample VCF"
     )

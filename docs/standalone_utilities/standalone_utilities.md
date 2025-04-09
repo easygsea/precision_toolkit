@@ -15,3 +15,7 @@ apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-cura
 ```
 
 Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
+
+## Convert Multi-Sample VCF File into Single-Sample VCF files
+
+The `convert_multi_sample_vcf` tool allows to convert multi-sample VCF file into a folder of multiple single-sample VCFs for better analysis of each individual sample.
