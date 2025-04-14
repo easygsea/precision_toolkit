@@ -19,18 +19,9 @@ include {
     summarize_diagnostic_metrics
 } from '../../modules/variant_benchmark/main'
 
-// Function to build VCF pair channels
-// This function creates a channel of tuples containing sample name, truth VCF, and query VCF
-def build_vcf_pair_channels(truth_dir, query_dir) {
-    return Channel
-        .fromPath("${truth_dir}/*.{vcf,vcf.gz}")
-        .map { truth_vcf ->
-            def sampleName = truth_vcf.getName().replaceFirst(/\..*$/, "")
-            def query_vcf = file("${query_dir}/${sampleName}.*.vcf.gz") ?:
-                            file("${query_dir}/${sampleName}.*.vcf")
-            return tuple(sampleName, truth_vcf, query_vcf)
-        }
-}
+include {
+    build_vcf_pair_channels
+} from '../../modules/utils/main'
 
 // Function to handle spurious variants processing
 def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
