@@ -24,6 +24,7 @@ def helpMessage() {
     Available Workflows:
         variant_benchmark    Run variant benchmark diagnostic metrics (concordance, sensitivity, precision, f1_score)
         signal_correlation   Run signal (e.g. VAF, log-ratio) correlation analysis
+        target_evaluation    Run target evaluation to generate per-base coverage, MAPQ, and BASEQ metrics for target space
         (more workflows to come...)
 
     ====================
@@ -75,6 +76,19 @@ def helpMessage() {
             --ylim            y-axis limits for the figure (default: "", auto-fit). Example usage: --ylim="0 1"
             --show_regression Whether to show the regression line and equation (default: false)
             --filter_source   FILTER column to use for coloring ('', 'truth', or 'query') (default: '')
+
+    Target Evaluation Workflow:
+        Mandatory:
+            --bams_dir                  Directory including bam files
+            --targets_bed               BED file of genomic targets
+
+        Optional:
+            --mapq_threshold                Minimum acceptable first quartile (Q1) of the MAPQ scores of mapped reads
+                                            per base,default is 30
+            --baseq_threshold               Minimum acceptable first quartile (Q1) of the BASEQ scores of mapped reads
+                                            per base, default is 30
+            --normalize_to_mean_coverage    Bam files will be normalized to the provided mean coverage
+            --coverage_threshold            Coverage threshold per base, default is 25
 
     ====================
     Resource Management
