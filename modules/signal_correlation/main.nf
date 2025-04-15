@@ -34,14 +34,16 @@ process plot_signal_correlation {
     publishDir "${params.output_dir}/signal_correlation", mode: 'copy'
 
     input:
+    val truth_signal_name
+    val query_signal_name
     path truth_signal_files
     path query_signal_files
 
     output:
-    path("signal_correlation.png"), emit: signal_correlation_plot
+    path("correlation_*.png"), emit: signal_correlation_plot
 
     script:
-    def output_file = "signal_correlation.png"
+    def output_file = "correlation_${truth_signal_name}_${query_signal_name}.png"
     """
     plot-signal-correlation \
     --truth-signal ${truth_signal_files} \

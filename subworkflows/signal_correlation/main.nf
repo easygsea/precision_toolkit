@@ -13,6 +13,8 @@ workflow signal_correlation_workflow {
 
     // Combine signals and calculate correlation
     plot_signal_correlation(
+        params.truth_signal,
+        params.query_signal,
         extracted_signals.truth_signal.collect(),
         extracted_signals.query_signal.collect()
     )
