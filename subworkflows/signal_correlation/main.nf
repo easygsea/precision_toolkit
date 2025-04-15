@@ -18,6 +18,7 @@ workflow signal_correlation_workflow {
         extracted_signals.truth_signal.collect(),
         extracted_signals.query_signal.collect(),
         params.xlim,
-        params.ylim
+        params.ylim,
+        params.show_regression
     )
 }

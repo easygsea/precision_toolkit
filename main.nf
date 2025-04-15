@@ -61,12 +61,13 @@ def helpMessage() {
 
     Signal Correlation Workflow:
         Mandatory Parameters:
-            --truth_dir     Directory containing truth VCF files (must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz)
-            --query_dir     Directory containing query VCF files (must be named as <sample>.query.vcf or <sample>.query.vcf.gz)
-            --truth_signal  Signal name from the truth VCF files e.g. VAF AF LR
-            --query_signal  Signal name from the query VCF files e.g. VAF AF LR
-            --xlim          x-axis limits for the figure (default: "", auto-fit)
-            --ylim          y-axis limits for the figure (default: "", auto-fit)
+            --truth_dir       Directory containing truth VCF files (must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz)
+            --query_dir       Directory containing query VCF files (must be named as <sample>.query.vcf or <sample>.query.vcf.gz)
+            --truth_signal    Signal name from the truth VCF files e.g. VAF AF LR
+            --query_signal    Signal name from the query VCF files e.g. VAF AF LR
+            --xlim            x-axis limits for the figure (default: "", auto-fit)
+            --ylim            y-axis limits for the figure (default: "", auto-fit)
+            --show_regression Whether to show the regression line and equation (default: false)
 
     ====================
     Resource Management

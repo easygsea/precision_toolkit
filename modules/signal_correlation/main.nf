@@ -40,6 +40,7 @@ process plot_signal_correlation {
     path query_signal_files
     val xlim
     val ylim
+    val show_regression
 
     output:
     path("correlation_*.png"), emit: signal_correlation_plot
@@ -48,12 +49,14 @@ process plot_signal_correlation {
     def output_file = "correlation_${truth_signal_name}_${query_signal_name}.png"
     def xlim_arg = xlim == "" ? "" : "--xlim ${xlim}"
     def ylim_arg = ylim == "" ? "" : "--ylim ${ylim}"
+    def regression_arg = show_regression ? "--show-regression" : ""
     """
     plot-signal-correlation \
     --truth-signal ${truth_signal_files} \
     --query-signal ${query_signal_files} \
     --output ${output_file} \
     ${xlim_arg} \
-    ${ylim_arg}
+    ${ylim_arg} \
+    ${regression_arg}
     """
 }

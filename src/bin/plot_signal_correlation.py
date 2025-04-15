@@ -114,7 +114,7 @@ def calculate_correlation(signal_df: pd.DataFrame) -> tuple[float, float]:
 def plot_signal_correlation(
     signal_df: pd.DataFrame,
     output_file: Path,
-    show_correlation: bool = False,
+    show_regression: bool = False,
     title: str = "Signal Correlation",
     figsize: tuple[int, int] = (10, 10),
     xlim: tuple[float, float] | None = None,
@@ -126,8 +126,7 @@ def plot_signal_correlation(
     Args:
         signal_df: DataFrame with merged signals.
         output_file: Path to save the output figure.
-        show_correlation: Whether to display correlation statistics and regression
-            line.
+        show_regression: Whether to display the regression line.
         title: Title for the plot.
         figsize: Figure dimensions.
         xlim: Optional tuple of (min, max) for x-axis range.
@@ -142,7 +141,7 @@ def plot_signal_correlation(
     # Create base scatter plot
     plt.scatter(signal_df[truth_col], signal_df[query_col], alpha=0.5, s=50)
 
-    if show_correlation:
+    if show_regression:
         # Calculate correlation and p-value
         corr, p_value = calculate_correlation(signal_df)
 
@@ -207,10 +206,10 @@ def main() -> None:
         help="Path to save the output figure.",
     )
     parser.add_argument(
-        "-s",
-        "--show-correlation",
+        "-r",
+        "--show-regression",
         action="store_true",
-        help="Show correlation statistics and regression line.",
+        help="Show regression line and equation.",
     )
     parser.add_argument(
         "-T",
@@ -323,7 +322,7 @@ def main() -> None:
     plot_signal_correlation(
         signal_df,
         output_figure,
-        show_correlation=args.show_correlation,
+        show_regression=args.show_regression,
         title=args.title,
         figsize=figsize,
         xlim=xlim,
