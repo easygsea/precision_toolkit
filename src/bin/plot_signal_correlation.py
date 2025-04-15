@@ -251,8 +251,12 @@ def main() -> None:
     ylim = tuple(args.ylim) if args.ylim else None
 
     # Dynamically handle file(s) and folder inputs
-    if (len(truth_signal) == 1 and len(query_signal) == 1 and 
-        truth_signal[0].is_dir() and query_signal[0].is_dir()):
+    if (
+        len(truth_signal) == 1
+        and len(query_signal) == 1
+        and truth_signal[0].is_dir()
+        and query_signal[0].is_dir()
+    ):
         # Get all signal files from folders
         truth_signal_files = sorted(truth_signal[0].glob("*.tsv"))
         query_signal_files = sorted(query_signal[0].glob("*.tsv"))

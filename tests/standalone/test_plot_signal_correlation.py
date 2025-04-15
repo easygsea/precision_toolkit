@@ -4,9 +4,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-import pandas as pd
 import pytest
-from scipy import stats
 
 
 @pytest.fixture

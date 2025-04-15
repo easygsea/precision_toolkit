@@ -3,6 +3,8 @@
 nextflow.enable.dsl=2
 
 include { variant_benchmark } from './workflows/variant_benchmark'
+include { signal_correlation } from './workflows/signal_correlation'
+
 def helpMessage() {
     log.info"""
     =========================================
@@ -14,13 +16,14 @@ def helpMessage() {
     ====================
 
     Basic Usage:
-        nextflow run main.nf --workflows variant_benchmark [options]
+        nextflow run main.nf --workflows variant_benchmark,signal_correlation [options]
 
     ====================
     Workflow Overview
     ====================
     Available Workflows:
         variant_benchmark    Run variant benchmark diagnostic metrics (concordance, sensitivity, precision, f1_score)
+        signal_correlation   Run signal (e.g. VAF, log-ratio) correlation analysis
         (more workflows to come...)
 
     ====================
@@ -56,6 +59,13 @@ def helpMessage() {
             --ci_method              Confidence interval method (default: wilson) Options: agresti_coull, beta, binom_test, jeffreys, normal, wilson
             --ci_level               Confidence level for confidence intervals (default: 0.95)
 
+    Signal Correlation Workflow:
+        Mandatory Parameters:
+            --truth_dir   Directory containing truth VCF files (must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz)
+            --query_dir   Directory containing query VCF files (must be named as <sample>.query.vcf or <sample>.query.vcf.gz)
+            --truth_signal  Signal name from the truth VCF files e.g. VAF AF LR
+            --query_signal  Signal name from the query VCF files e.g. VAF AF LR
+
     ====================
     Resource Management
     ====================
@@ -72,11 +82,13 @@ def helpMessage() {
     ====================
     Example Commands
     ====================
-    Basic Variant Benchmark:
-        nextflow run main.nf --workflows variant_benchmark \\
+    Variant Benchmark with Signal Correlation:
+        nextflow run main.nf --workflows variant_benchmark,signal_correlation \\
             --truth_dir truth_vcfs/ \\
             --query_dir query_vcfs/ \\
             --variant_benchmark_engine happy \\
+            --truth_signal VAF \\
+            --query_signal AF \\
             --output_dir output_clinical_tools
 
     Variant Benchmark with Spurious Variant Exclusion and hap.py options:
@@ -160,7 +172,7 @@ workflow {
         exit 0
     } else {
         def workflowList = params.workflows.split(',').collect { it.trim() }
-        def validWorkflows = ['variant_benchmark']
+        def validWorkflows = ['variant_benchmark', 'signal_correlation']
 
         // Validate user-selected workflows
         def invalidWorkflows = workflowList - validWorkflows
