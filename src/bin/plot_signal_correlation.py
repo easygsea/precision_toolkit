@@ -30,6 +30,16 @@ import pandas as pd
 import seaborn as sns
 from scipy import stats
 
+from clinical_tools.core.format import convert_to_float
+
+
+def identify_raw_signal_columns(signal_df: pd.DataFrame) -> list[str]:
+    """Identify signal column names from the raw signal DataFrame."""
+    signal_cols = [
+        col for col in signal_df.columns if col not in ["CHROM", "POS", "REF", "ALT"]
+    ]
+    return signal_cols
+
 
 def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.DataFrame:
     """
@@ -45,12 +55,21 @@ def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.Data
     truth_signal_df = pd.read_csv(truth_signal_file, sep="\t", header=0)
     query_signal_df = pd.read_csv(query_signal_file, sep="\t", header=0)
 
+    truth_signal_cols = identify_raw_signal_columns(truth_signal_df)
+    query_signal_cols = identify_raw_signal_columns(query_signal_df)
+
+    # Auto convert % values to float
+    for col in truth_signal_cols:
+        truth_signal_df[col] = truth_signal_df[col].apply(convert_to_float)
+    for col in query_signal_cols:
+        query_signal_df[col] = query_signal_df[col].apply(convert_to_float)
+
     # Add suffixes to distinguish columns after merge
     truth_signal_df = truth_signal_df.rename(
-        columns=lambda x: f"{x}_TRUTH" if x not in ["CHROM", "POS", "REF", "ALT"] else x
+        columns=lambda x: f"{x}_TRUTH" if x in truth_signal_cols else x
     )
     query_signal_df = query_signal_df.rename(
-        columns=lambda x: f"{x}_QUERY" if x not in ["CHROM", "POS", "REF", "ALT"] else x
+        columns=lambda x: f"{x}_QUERY" if x in query_signal_cols else x
     )
     merged_df = pd.merge(
         truth_signal_df,

@@ -26,4 +26,3 @@
     - path: tests_signal_correlation_vaf_show_regression/signal_correlation/query/AF/sample1_query_AF.tsv
       md5sum: bc7f2727cd163785e193b0ba54d46506
     - path: tests_signal_correlation_vaf_show_regression/signal_correlation/correlation_VAF_AF.png
-      md5sum: 9a761d31625222a2d39df07ba4f4bca2

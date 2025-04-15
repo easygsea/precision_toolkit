@@ -18,14 +18,18 @@ process extract_signal {
     def truth_output = "${truth_output_folder}/${sampleName}_truth_${truth_signal_name}.tsv"
     def query_output = "${query_output_folder}/${sampleName}_query_${query_signal_name}.tsv"
     """
-    # Extract signals from VCFs
+    # Normalize VCFs to split multialleles
+    bcftools norm -m- "${truth_vcf}" -o "${truth_vcf}.norm.vcf"
+    bcftools norm -m- "${query_vcf}" -o "${query_vcf}.norm.vcf"
+
+    # Extract signals from normalized VCFs
     mkdir -p "${truth_output_folder}"
     echo -e "CHROM\\tPOS\\tREF\\tALT\\t${truth_signal_name}" > "${truth_output}"
-    bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t[ %${truth_signal_name}]\\n' "${truth_vcf}" >> "${truth_output}"
+    bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t[%${truth_signal_name}]\\n' "${truth_vcf}.norm.vcf" >> "${truth_output}"
 
     mkdir -p "${query_output_folder}"
     echo -e "CHROM\\tPOS\\tREF\\tALT\\t${query_signal_name}" > "${query_output}"
-    bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t[ %${query_signal_name}]\\n' "${query_vcf}" >> "${query_output}"
+    bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t[%${query_signal_name}]\\n' "${query_vcf}.norm.vcf" >> "${query_output}"
     """
 }
 

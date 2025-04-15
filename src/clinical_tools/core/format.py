@@ -29,3 +29,8 @@ def format_percentage(x: int | float, decimals: int = DEFAULT_DECIMALS) -> str:
         raise ValueError("Decimals must be a non-negative integer.")
 
     return f"{x * 100:.{decimals}f}%"
+
+
+def convert_to_float(x: str | float) -> float:
+    """Convert string to float."""
+    return float(x.strip("%")) / 100 if isinstance(x, str) else x
