@@ -1,9 +1,19 @@
 - name: signal_correlation_vaf
   command: nextflow run main.nf --workflows signal_correlation --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --truth_signal VAF --query_signal AF --output_dir tests_signal_correlation_vaf
   files:
-    - path: tests_signal_correlation_vaf/signal_correlation/signal_correlation.png
-      md5sum: 691a7d8bd9565f0b12b32ce75821777a
-    - path: tests_signal_correlation_vaf/signal_correlation/signals/truth/sample1_truth_VAF.tsv
-      md5sum: 691a7d8bd9565f0b12b32ce75821777a
-    - path: tests_signal_correlation_vaf/signal_correlation/signals/query/sample1_query_AF.tsv
-      md5sum: 691a7d8bd9565f0b12b32ce75821777a
+    - path: tests_signal_correlation_vaf/signal_correlation/truth/VAF/sample1_truth_VAF.tsv
+      md5sum: 2397618a46af2114f47ea188b0d88ec6
+    - path: tests_signal_correlation_vaf/signal_correlation/query/AF/sample1_query_AF.tsv
+      md5sum: bc7f2727cd163785e193b0ba54d46506
+    - path: tests_signal_correlation_vaf/signal_correlation/correlation_VAF_AF.png
+      md5sum: 836f2493c1cc64b8fb90ddb20f8f2514
+
+- name: signal_correlation_vaf_xlim_ylim
+  command: nextflow run main.nf --workflows signal_correlation --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --truth_signal VAF --query_signal AF --xlim "0 1" --ylim "0 1" --output_dir tests_signal_correlation_vaf_xlim_ylim
+  files:
+    - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/truth/VAF/sample1_truth_VAF.tsv
+      md5sum: 2397618a46af2114f47ea188b0d88ec6
+    - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/query/AF/sample1_query_AF.tsv
+      md5sum: bc7f2727cd163785e193b0ba54d46506
+    - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/correlation_VAF_AF.png
+      md5sum: e87e69be2fcf61622e6d5191f49f2a25
