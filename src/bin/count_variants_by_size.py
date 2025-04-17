@@ -16,12 +16,12 @@ import argparse
 
 from clinical_tools.analysis.vcf import count_variants_by_size
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description="Count variants by size in a VCF file."
     )
     parser.add_argument(
-        "vcf-file",
+        "vcf",
         type=str,
         help="Path to the VCF file",
     )
@@ -42,8 +42,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     counts = count_variants_by_size(
-        args.vcf_file, args.size_stratification, args.count_occurrences
+        args.vcf, args.size_stratification, args.count_occurrences
     )
 
     for size_range, count in counts.items():
         print(f"{size_range}: {count}")
+
+if __name__ == "__main__":
+    main()

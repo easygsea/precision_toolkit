@@ -25,17 +25,17 @@ def count_variants_by_size(
         if i == 0:
             size_ranges.append(str(size_points[i]))
         else:
-            size_ranges.append(f"{size_points[i-1] + 1}-{size_points[i]}")
+            size_ranges.append(f"{size_points[i - 1] + 1}-{size_points[i]}")
     size_ranges.append(f">{size_points[-1]}")
 
     size_counts = {range: 0 for range in size_ranges}
 
     with pysam.VariantFile(vcf_file) as vcf:
         for record in vcf:
-            ref_len = len(record.ref)
+            ref_len = len(record.ref) if record.ref != "." else 0
             for alt in record.alts:
-                alt_len = len(alt)
-                variant_size = abs(ref_len - alt_len)
+                alt_len = len(alt) if alt != "." else 0
+                variant_size = abs(ref_len - alt_len) + 1
 
                 # Calculate occurrence count for multi-sample VCF
                 occurrence_count = 1
@@ -46,13 +46,15 @@ def count_variants_by_size(
                         if sample["GT"] != (None, None)
                     )
 
-                if variant_size == 1:
+                if variant_size == 0:
+                    size_counts[str(size_points[0])] += occurrence_count
+                elif variant_size == 1:
                     size_counts[str(size_points[0])] += occurrence_count
                 else:
                     found_range = False
                     for i in range(1, len(size_points)):
-                        if size_points[i-1] < variant_size <= size_points[i]:
-                            size_range = f"{size_points[i-1] + 1}-{size_points[i]}"
+                        if size_points[i - 1] < variant_size <= size_points[i]:
+                            size_range = f"{size_points[i - 1] + 1}-{size_points[i]}"
                             size_counts[size_range] += occurrence_count
                             found_range = True
                             break
