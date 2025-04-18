@@ -9,7 +9,7 @@ Usage:
 Arguments:
     vcf: Path to the VCF file
     size-stratification: Size stratification points (e.g., 1 25 50)
-    count-occurrences: If True, count each variant by its occurrences in multi-sample VCF
+    count-occurrences: Count variant occurrences in multi-sample VCF
 
 Example Output:
     1: 200
@@ -22,7 +22,18 @@ import argparse
 
 from clinical_tools.analysis.vcf import count_variants_by_size
 
+
 def main():
+    """Count variants by size in a VCF file.
+
+    Args:
+        vcf: Path to the VCF file
+        size-stratification: Size stratification points (default: [1, 25, 49, 999])
+        count-occurrences: Count variant occurrences in multi-sample VCFs
+
+    Returns:
+        Standard output with size ranges and counts
+    """
     parser = argparse.ArgumentParser(
         description="Count variants by size in a VCF file."
     )
@@ -53,6 +64,7 @@ def main():
 
     for size_range, count in counts.items():
         print(f"{size_range}: {count}")
+
 
 if __name__ == "__main__":
     main()
