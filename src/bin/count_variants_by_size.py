@@ -10,6 +10,12 @@ Arguments:
     vcf: Path to the VCF file
     size-stratification: Size stratification points (e.g., 1 25 50)
     count-occurrences: If True, count each variant by its occurrences in multi-sample VCF
+
+Example Output:
+    1: 200
+    2-25: 25
+    26-50: 2
+    >50: 0
 """
 
 import argparse
