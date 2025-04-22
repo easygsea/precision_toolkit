@@ -33,4 +33,15 @@ def format_percentage(x: int | float, decimals: int = DEFAULT_DECIMALS) -> str:
 
 def convert_to_float(x: str | float) -> float:
     """Convert string to float."""
-    return float(x.strip("%")) / 100 if isinstance(x, str) else x
+    if isinstance(x, str) and x.endswith("%"):
+        stripped = x.strip("%")
+        if stripped == "." or stripped == "":
+            return 0.0
+        return float(stripped) / 100
+    elif isinstance(x, float):
+        return x
+    else:
+        try:
+            return float(x)
+        except ValueError as e:
+            raise ValueError(f"Cannot convert '{x}' to float") from e

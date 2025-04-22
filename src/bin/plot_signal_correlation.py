@@ -17,6 +17,7 @@ plot-signal-correlation
 --truth-signal truth_vaf.tsv
 --query-signal query_vaf.tsv
 --output-figure vaf_correlation.png
+--output-table vaf_correlation.tsv
 --xlim 0 1
 --ylim 0 1
 ```
@@ -219,10 +220,16 @@ def main() -> None:
         help="Path to the query signal file(s) or their containing folder.",
     )
     parser.add_argument(
-        "-o",
+        "-of",
         "--output-figure",
         default="signal_correlation.png",
-        help="Path to save the output figure.",
+        help="Path to save the output scatter plot.",
+    )
+    parser.add_argument(
+        "-ot",
+        "--output-table",
+        default="signal_correlation.tsv",
+        help="Path to save the table for the scatter plot.",
     )
     parser.add_argument(
         "-r",
@@ -336,6 +343,9 @@ def main() -> None:
                     f"{query_signal}."
                 )
             signal_df["SAMPLE"] = truth_signal.with_suffix("").stem.split("_")[0]
+
+    # Save signal table
+    signal_df.to_csv(args.output_table, sep="\t", index=False)
 
     # Generate correlation figure
     plot_signal_correlation(

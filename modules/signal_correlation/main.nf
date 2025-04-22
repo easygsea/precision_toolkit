@@ -48,17 +48,21 @@ process plot_signal_correlation {
 
     output:
     path("correlation_*.png"), emit: signal_correlation_plot
+    path("correlation_*.tsv"), emit: signal_correlation_table
 
     script:
-    def output_file = "correlation_${truth_signal_name}_${query_signal_name}.png"
+    def output_figure = "correlation_${truth_signal_name}_${query_signal_name}.png"
+    def output_table = "correlation_${truth_signal_name}_${query_signal_name}.tsv"
     def xlim_arg = xlim == "" ? "" : "--xlim ${xlim}"
     def ylim_arg = ylim == "" ? "" : "--ylim ${ylim}"
     def regression_arg = show_regression ? "--show-regression" : ""
     """
+    export MPLCONFIGDIR=\$(mktemp -d)
     plot-signal-correlation \
     --truth-signal ${truth_signal_files} \
     --query-signal ${query_signal_files} \
-    --output ${output_file} \
+    --output-figure ${output_figure} \
+    --output-table ${output_table} \
     ${xlim_arg} \
     ${ylim_arg} \
     ${regression_arg}
