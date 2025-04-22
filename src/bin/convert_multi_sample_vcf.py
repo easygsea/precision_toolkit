@@ -25,6 +25,20 @@ CONSTANT_FIELDS = [
 ]
 
 
+def get_empty_format(format_line: str) -> str:
+    """
+    Get an empty version of the format for VCF.
+
+    Args:
+        format_line: reference format
+
+    Returns:
+        empty version of the format
+    """
+    dots_list = ["." for i in format_line.split(":")]
+    return ":".join(dots_list)
+
+
 def parse_file(input_file_path: Path) -> tuple[list[str], pd.DataFrame]:
     """
     Parse the multi sample vcf file and converts into a pandas dataframe.
@@ -73,8 +87,9 @@ def write_file(
         None, but writes to files in the output directory
     """
     identifiers = [col for col in df.columns if col not in CONSTANT_FIELDS]
+    empty_format = get_empty_format(df.iloc[0]["FORMAT"])
     for identifier in identifiers:
-        single_df = df[df[identifier] != "."]
+        single_df = df[(df[identifier] != empty_format) & (df[identifier] != ".")]
         single_df = single_df.drop(
             columns=[item for item in identifiers if item != identifier]
         )
