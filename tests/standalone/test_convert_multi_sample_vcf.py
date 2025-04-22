@@ -40,9 +40,9 @@ SAMPLE1_DATA = [
     ".",
     ".",
     "PASS",
-    "GENE=ABC;cHGVS=c.0000_0000_ABC;END=00001234;CN=4.0",
-    "LIBRARY:POOL:GT",
-    "F00:AA000:.",
+    "GENE=ABC;cHGVS=c.0000_0000_ABC;END=00001234",
+    "LIBRARY:POOL:CN:GT",
+    "F00:AA000:4:1/0",
 ]
 SAMPLE2_DATA = [
     "chr11",
@@ -52,9 +52,9 @@ SAMPLE2_DATA = [
     ".",
     ".",
     "PASS",
-    "GENE=ABC;cHGVS=c.0000_0000_DEF;END=56780000;CN=2.5",
-    "LIBRARY:POOL:GT",
-    "F01:AA001:.",
+    "GENE=ABC;cHGVS=c.0000_0000_DEF;END=56780000",
+    "LIBRARY:POOL:CN:GT",
+    "F01:AA001:5:1/1",
 ]
 
 
@@ -73,16 +73,17 @@ def test_two_sample_vcf_conversion(test_data_dir):
         subprocess.run(
             [
                 "convert-multi-sample-vcf",
-                "--input-vcf",
                 str(input_file),
-                "--output-folder",
+                "-o",
                 str(output_prefix),
+                "--suffix",
+                "truth",
             ],
             check=True,
         )
 
-        output_sample1 = output_prefix / "SAMPLE1.vcf"
-        output_sample2 = output_prefix / "SAMPLE2.vcf"
+        output_sample1 = output_prefix / "SAMPLE1.truth.vcf"
+        output_sample2 = output_prefix / "SAMPLE2.truth.vcf"
         assert output_sample1.exists()
         assert output_sample2.exists()
 

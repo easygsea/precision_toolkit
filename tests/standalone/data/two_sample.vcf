@@ -1,5 +1,12 @@
 ##fileformat=VCFv4.2
-##WARNING: To comply with VCF format specifications, metadata descriptions are required. Some header metadata fields have been skipped in this file.
+##FILTER=<ID=PASS,Description="All filters passed">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record">
+##INFO=<ID=GENE,Number=A,Type=String,Description="Gene name">
+##INFO=<ID=cHGVS,Number=A,Type=String,Description="HGVS c. nomenclature: variant in a coding DNA sequence">
+##FORMAT=<ID=LIBRARY,Number=1,Type=String,Description="Library name">
+##FORMAT=<ID=POOL,Number=1,Type=String,Description="Pool name"
+##FORMAT=<ID=CN,Number=1,Type=Integer,Description="Predicted copy number of the CNV observation (from ONCOCNV)">
+##FORMAT=<ID=GT,Number=A,Type=String,Description="Genotype">
 #CHROM	POS	REF	ALT	ID	QUAL	FILTER	INFO	FORMAT	SAMPLE1	SAMPLE2
-chr11	118339396	.	<DUP>	.	.	PASS	GENE=ABC;cHGVS=c.0000_0000_ABC;END=00001234;CN=4.0	LIBRARY:POOL:GT	F00:AA000:.	.
-chr11	118339396	.	<DUP>	.	.	PASS	GENE=ABC;cHGVS=c.0000_0000_DEF;END=56780000;CN=2.5	LIBRARY:POOL:GT	.	F01:AA001:.
+chr11	118339396	.	<DUP>	.	.	PASS	GENE=ABC;cHGVS=c.0000_0000_ABC;END=00001234	LIBRARY:POOL:CN:GT	F00:AA000:4:1/0	.
+chr11	118339396	.	<DUP>	.	.	PASS	GENE=ABC;cHGVS=c.0000_0000_DEF;END=56780000	LIBRARY:POOL:CN:GT	.	F01:AA001:5:1/1
