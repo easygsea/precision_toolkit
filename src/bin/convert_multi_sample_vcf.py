@@ -7,6 +7,7 @@ Usage:
 """
 
 import argparse
+import gzip
 from pathlib import Path
 
 import pandas as pd
@@ -38,13 +39,17 @@ def parse_file(input_file_path: Path) -> tuple[list[str], pd.DataFrame]:
 
     """
     info_lines: list[str] = []
-    with open(input_file_path, "r") as vcf_file:
-        for line in vcf_file:
-            if line.startswith("##"):
-                info_lines.append(line.strip())
-            elif line.startswith("#CHROM"):
-                header_line = line.strip().split("\t")
-                break
+    if input_file_path.suffix == ".gz":
+        file = gzip.open(input_file_path, "rt")
+    else:
+        file = open(input_file_path, "r")
+
+    for line in file:
+        if line.startswith("##"):
+            info_lines.append(line.strip())
+        elif line.startswith("#CHROM"):
+            header_line = line.strip().split("\t")
+            break
 
     df = pd.read_csv(
         input_file_path, comment="#", sep="\t", header=None, names=header_line
@@ -106,7 +111,7 @@ def main():
     )
 
     args = parser.parse_args()
-    input_file = args.input_vcf
+    input_file = Path(args.input_vcf)
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True)
     file_suffix = args.suffix
