@@ -39,8 +39,7 @@ def get_empty_format(format_line: str) -> str:
         >>> get_empty_format("GT:AD:DP")
         '.:.:.'
     """
-    dots_list = ["." for i in format_line.split(":")]
-    return ":".join(dots_list)
+    return ":".join("." * len(format_line.split(":")))
 
 
 def parse_file(input_file_path: Path) -> tuple[list[str], pd.DataFrame]:
