@@ -34,6 +34,10 @@ def get_empty_format(format_line: str) -> str:
 
     Returns:
         empty version of the format
+
+    Example:
+        >>> get_empty_format("GT:AD:DP")
+        '.:.:.'
     """
     dots_list = ["." for i in format_line.split(":")]
     return ":".join(dots_list)
