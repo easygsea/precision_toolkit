@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Count variants by size in a VCF file.
+Count variants by size in a VCF file or folder of VCF files.
 
 Usage:
-    count_variants_by_size.py <vcf> [--size-stratification <size-stratification>...]
+    count_variants_by_size.py <input_path> [--size-stratification <size-stratification>...]
     [--count-occurrences]
 
 Arguments:
-    vcf: Path to the VCF file
+    input_path: Path to the VCF file or folder containing VCF files
     size-stratification: Size stratification points (e.g., 1 25 50)
     count-occurrences: Count variant occurrences in multi-sample VCF
 
@@ -19,15 +19,16 @@ Example Output:
 """
 
 import argparse
+from pathlib import Path
 
 from clinical_tools.analysis.vcf import count_variants_by_size
 
 
 def main():
-    """Count variants by size in a VCF file.
+    """Count variants by size in a VCF file or folder of VCF files.
 
     Args:
-        vcf: Path to the VCF file
+        input_path: Path to the VCF file or folder containing VCF files
         size-stratification: Size stratification points (default: [1, 25, 49, 999])
         count-occurrences: Count variant occurrences in multi-sample VCFs
 
@@ -35,12 +36,12 @@ def main():
         Standard output with size ranges and counts
     """
     parser = argparse.ArgumentParser(
-        description="Count variants by size in a VCF file."
+        description="Count variants by size in a VCF file or folder of VCF files."
     )
     parser.add_argument(
-        "vcf",
+        "input_path",
         type=str,
-        help="Path to the VCF file",
+        help="Path to the VCF file or folder containing VCF files",
     )
     parser.add_argument(
         "-s",
@@ -58,13 +59,33 @@ def main():
     )
     args = parser.parse_args()
 
-    counts = count_variants_by_size(
-        args.vcf, args.size_stratification, args.count_occurrences
-    )
-
-    for size_range, count in counts.items():
-        print(f"{size_range}: {count}")
-
+    input_path = Path(args.input_path)
+    if not input_path.exists():
+        raise FileNotFoundError(f"Input path {input_path} does not exist")
+        
+    if input_path.is_file():
+        all_counts = count_variants_by_size(
+            input_path, args.size_stratification, args.count_occurrences
+        )
+        for size_range, count in all_counts.items():
+            print(f"{size_range}: {count}")
+    elif input_path.is_dir():
+        all_counts = {}
+        for vcf_file in input_path.glob("*.vcf"):
+            print(f"\nProcessing {vcf_file.name}:")
+            counts = count_variants_by_size(
+                vcf_file, args.size_stratification, args.count_occurrences
+            )
+            for size_range, count in counts.items():
+                print(f"{size_range}: {count}")
+                all_counts[size_range] = all_counts.get(size_range, 0) + count
+        
+        if all_counts:
+            print("\nTotal counts across all VCF files:")
+            for size_range, count in all_counts.items():
+                print(f"{size_range}: {count}")
+    else:
+        raise ValueError(f"Input path {input_path} is neither a file nor a directory")
 
 if __name__ == "__main__":
     main()
