@@ -4,6 +4,7 @@ nextflow.enable.dsl=2
 
 include { variant_benchmark } from './workflows/variant_benchmark'
 include { signal_correlation } from './workflows/signal_correlation'
+include { target_evaluation } from './workflows/target_evaluation'
 
 def helpMessage() {
     log.info"""
@@ -78,11 +79,11 @@ def helpMessage() {
             --filter_source   FILTER column to use for coloring ('', 'truth', or 'query') (default: '')
 
     Target Evaluation Workflow:
-        Mandatory:
+        Mandatory Parameters:
             --bams_dir                  Directory including bam files
             --targets_bed               BED file of genomic targets
 
-        Optional:
+        Optional Parameters:
             --mapq_threshold                Minimum acceptable first quartile (Q1) of the MAPQ scores of mapped reads
                                             per base,default is 30
             --baseq_threshold               Minimum acceptable first quartile (Q1) of the BASEQ scores of mapped reads
@@ -202,7 +203,7 @@ workflow {
         exit 0
     } else {
         def workflowList = params.workflows.split(',').collect { it.trim() }
-        def validWorkflows = ['variant_benchmark', 'signal_correlation']
+        def validWorkflows = ['variant_benchmark', 'signal_correlation', 'gene_target_evaluation']
 
         // Validate user-selected workflows
         def invalidWorkflows = workflowList - validWorkflows
