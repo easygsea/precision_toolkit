@@ -22,7 +22,6 @@ Example usage is provided in the [Variant Benchmark](../workflows/variant_benchm
 
 The `convert-multi-sample-vcf` tool allows to convert multi-sample VCF file into a folder of multiple single-sample VCFs for better analysis of each individual sample.
 
-
 Usage
 ```commandline
 convert-multi-sample-vcf <PATH/TO/VCF> --output-folder <OUTPUT NAME> (--suffix <SUFFIX FOR OUTPUT FILES>)
