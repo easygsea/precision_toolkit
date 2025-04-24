@@ -1,11 +1,10 @@
 """Analyze VCF files."""
 
 import pysam
-from pathlib import Path
 
 
 def count_variants_by_size(
-    vcf_file: str | Path, size_stratification: list[int], count_occurrences: bool = False
+    vcf_file: str, size_stratification: list[int], count_occurrences: bool = False
 ) -> dict[str, int]:
     """Count variants by size in a VCF file.
 

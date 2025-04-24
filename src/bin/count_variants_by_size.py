@@ -3,7 +3,7 @@
 Count variants by size in a VCF file or folder of VCF files.
 
 Usage:
-    count_variants_by_size.py <input_path> [--size-stratification <size-stratification>...]
+    count_variants_by_size.py <input_path> [--size-stratification <size>...]
     [--count-occurrences]
 
 Arguments:
@@ -62,7 +62,7 @@ def main():
     input_path = Path(args.input_path)
     if not input_path.exists():
         raise FileNotFoundError(f"Input path {input_path} does not exist")
-        
+
     if input_path.is_file():
         all_counts = count_variants_by_size(
             input_path, args.size_stratification, args.count_occurrences
@@ -71,7 +71,10 @@ def main():
             print(f"{size_range}: {count}")
     elif input_path.is_dir():
         all_counts = {}
-        for vcf_file in input_path.glob("*.vcf"):
+        vcf_files = list(input_path.glob("*.vcf"))
+        num_files = len(vcf_files)
+
+        for vcf_file in vcf_files:
             print(f"\nProcessing {vcf_file.name}:")
             counts = count_variants_by_size(
                 vcf_file, args.size_stratification, args.count_occurrences
@@ -79,13 +82,17 @@ def main():
             for size_range, count in counts.items():
                 print(f"{size_range}: {count}")
                 all_counts[size_range] = all_counts.get(size_range, 0) + count
-        
+
         if all_counts:
-            print("\nTotal counts across all VCF files:")
+            print(
+                f"\nTotal counts across {num_files} VCF "
+                f"file{'s' if num_files != 1 else ''}:"
+            )
             for size_range, count in all_counts.items():
                 print(f"{size_range}: {count}")
     else:
-        raise ValueError(f"Input path {input_path} is neither a file nor a directory")
+        raise ValueError(f"{input_path} is not a file or directory")
+
 
 if __name__ == "__main__":
     main()
