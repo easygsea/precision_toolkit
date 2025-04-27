@@ -133,7 +133,7 @@ def calculate_correlation(signal_df: pd.DataFrame) -> tuple[float, float]:
 
 def plot_signal_correlation(
     signal_df: pd.DataFrame,
-    output_file: Path,
+    output_filename: str,
     show_regression: bool = False,
     title: str = "Signal Correlation",
     figsize: tuple[int, int] = (10, 10),
@@ -196,7 +196,8 @@ def plot_signal_correlation(
 
     # Save figure with high resolution
     plt.tight_layout()
-    plt.savefig(output_file, dpi=300, bbox_inches="tight")
+    plt.savefig(f"{output_filename}.png", dpi=300, bbox_inches="tight")
+    plt.savefig(f"{output_filename}.pdf", dpi=300, bbox_inches="tight", useDingbats=False)
     plt.close()
 
 
@@ -220,16 +221,10 @@ def main() -> None:
         help="Path to the query signal file(s) or their containing folder.",
     )
     parser.add_argument(
-        "-of",
-        "--output-figure",
-        default="signal_correlation.png",
-        help="Path to save the output scatter plot.",
-    )
-    parser.add_argument(
-        "-ot",
-        "--output-table",
-        default="signal_correlation.tsv",
-        help="Path to save the table for the scatter plot.",
+        "-o",
+        "--output-filename",
+        default="signal_correlation",
+        help="Base filename (no extension) for scatter plot and table.",
     )
     parser.add_argument(
         "-r",
@@ -270,7 +265,9 @@ def main() -> None:
     # Convert arguments to appropriate types
     truth_signal = [Path(path) for path in args.truth_signal]
     query_signal = [Path(path) for path in args.query_signal]
-    output_figure = Path(args.output_figure)
+    output_filename = args.output_filename
+    output_figure = f"{output_filename}.png"
+    output_table = f"{output_filename}.tsv"
     figsize = tuple(args.figsize)
     xlim = tuple(args.xlim) if args.xlim else None
     ylim = tuple(args.ylim) if args.ylim else None
@@ -345,7 +342,7 @@ def main() -> None:
             signal_df["SAMPLE"] = truth_signal.with_suffix("").stem.split("_")[0]
 
     # Save signal table
-    signal_df.to_csv(args.output_table, sep="\t", index=False)
+    signal_df.to_csv(output_table, sep="\t", index=False)
 
     # Generate correlation figure
     plot_signal_correlation(
