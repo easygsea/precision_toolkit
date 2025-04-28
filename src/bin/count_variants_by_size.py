@@ -49,7 +49,7 @@ def main():
         nargs="+",
         type=int,
         default=[1, 25, 49, 999],
-        help="Size stratification points (e.g., 1 25 49 999)",
+        help="Size stratification points (default: 1 25 49 999)",
     )
     parser.add_argument(
         "-c",
@@ -63,9 +63,12 @@ def main():
     if not input_path.exists():
         raise FileNotFoundError(f"Input path {input_path} does not exist")
 
+    if any(size < 1 for size in args.size_stratification):
+        raise ValueError("Size stratification points must be positive integers")
+
     if input_path.is_file():
         all_counts = count_variants_by_size(
-            input_path, args.size_stratification, args.count_occurrences
+            input_path, sorted(args.size_stratification), args.count_occurrences
         )
         for size_range, count in all_counts.items():
             print(f"{size_range}: {count}")
