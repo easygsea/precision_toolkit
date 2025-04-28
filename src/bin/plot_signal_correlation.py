@@ -29,6 +29,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from matplotlib.backends.backend_pdf import PdfPages
 from scipy import stats
 
 from clinical_tools.core.format import convert_to_float
@@ -197,7 +198,11 @@ def plot_signal_correlation(
     # Save figure with high resolution
     plt.tight_layout()
     plt.savefig(f"{output_filename}.png", dpi=300, bbox_inches="tight")
-    plt.savefig(f"{output_filename}.pdf", dpi=300, bbox_inches="tight", useDingbats=False)
+
+    # Save PDF with proper vector graphics
+    with PdfPages(f"{output_filename}.pdf") as pdf:
+        pdf.savefig(bbox_inches="tight", dpi=300)
+
     plt.close()
 
 
@@ -266,7 +271,6 @@ def main() -> None:
     truth_signal = [Path(path) for path in args.truth_signal]
     query_signal = [Path(path) for path in args.query_signal]
     output_filename = args.output_filename
-    output_figure = f"{output_filename}.png"
     output_table = f"{output_filename}.tsv"
     figsize = tuple(args.figsize)
     xlim = tuple(args.xlim) if args.xlim else None
@@ -347,7 +351,7 @@ def main() -> None:
     # Generate correlation figure
     plot_signal_correlation(
         signal_df,
-        output_figure,
+        output_filename,
         show_regression=args.show_regression,
         title=args.title,
         figsize=figsize,
