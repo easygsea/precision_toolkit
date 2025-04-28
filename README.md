@@ -103,6 +103,10 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
 - [Standalone Utilities](./docs/README.md#standalone-utilities)
   - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/standalone_utilities.md#manual-diagnostic-metric-curation)
     - `manual-diagnostic-metric-curation`
+  - [Convert Multi-Sample VCF File into Single-Sample VCF files](./docs/standalone_utilities/standalone_utilities.md#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
+    - `convert-multi-sample-vcf`
+  - [Count Variants By Size](./docs/standalone_utilities/standalone_utilities.md#count-variants-by-size)
+    - `count-variants-by-size`
 
 ## Resource Optimization and High-Performance Computing
 

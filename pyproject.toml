@@ -10,6 +10,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
+pysam = "0.22.1"
 python = "3.11.7"
 python-docx = "1.1.2"
 pandas = "2.2.3"
@@ -27,6 +28,7 @@ pytest-xdist = "3.6.1"
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
 manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
 convert-multi-sample-vcf = "bin.convert_multi_sample_vcf:main"
+count-variants-by-size = "bin.count_variants_by_size:main"
 
 [build-system]
 requires = ["poetry-core"]
