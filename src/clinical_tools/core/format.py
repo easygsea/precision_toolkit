@@ -31,8 +31,19 @@ def format_percentage(x: int | float, decimals: int = DEFAULT_DECIMALS) -> str:
     return f"{x * 100:.{decimals}f}%"
 
 
-def convert_to_float(x: str | float) -> float:
-    """Convert string to float."""
+def parse_percentage_and_float(x: str | float) -> float:
+    """
+    Convert a string percentage or float-like value to float.
+
+    Args:
+        x: String with optional '%' or a float.
+
+    Returns:
+        Float value (e.g., '45%' -> 0.45, 0.45 -> 0.45).
+
+    Raises:
+        ValueError: If input cannot be converted to float.
+    """
     if isinstance(x, str) and x.endswith("%"):
         stripped = x.strip("%")
         if stripped == "." or stripped == "":

@@ -32,7 +32,7 @@ import seaborn as sns
 from matplotlib.backends.backend_pdf import PdfPages
 from scipy import stats
 
-from clinical_tools.core.format import convert_to_float
+from clinical_tools.core.format import parse_percentage_and_float
 
 
 def identify_raw_signal_columns(signal_df: pd.DataFrame) -> list[str]:
@@ -62,9 +62,9 @@ def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.Data
 
     # Auto convert % values to float
     for col in truth_signal_cols:
-        truth_signal_df[col] = truth_signal_df[col].apply(convert_to_float)
+        truth_signal_df[col] = truth_signal_df[col].apply(parse_percentage_and_float)
     for col in query_signal_cols:
-        query_signal_df[col] = query_signal_df[col].apply(convert_to_float)
+        query_signal_df[col] = query_signal_df[col].apply(parse_percentage_and_float)
 
     # Add suffixes to distinguish columns after merge
     truth_signal_df = truth_signal_df.rename(
