@@ -7,6 +7,7 @@ This manual provides complete documentation for Clinical Tools, including:
 ## Workflows
 
 - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./workflows/variant_benchmark.md)
+- [Signal Correlation](./workflows/signal_correlation.md)
 
 ## Standalone Utilities
 
