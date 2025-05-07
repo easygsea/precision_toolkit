@@ -18,18 +18,18 @@ def test_plot_signal_correlation_basic(test_data_dir):
     with tempfile.TemporaryDirectory() as tmpdir:
         truth_signal_file = test_data_dir / "vaf" / "truth" / "sample1_truth_vaf.tsv"
         query_signal_file = test_data_dir / "vaf" / "query" / "sample1_query_vaf.tsv"
-        output_figure = Path(tmpdir) / "test_vaf_correlation_basic.png"
+        output_filename = Path(tmpdir) / "test_vaf_correlation_basic"
 
         # Run the script
-        result = subprocess.run(
+        subprocess.run(
             [
                 "plot-signal-correlation",
                 "--truth-signal",
                 str(truth_signal_file),
                 "--query-signal",
                 str(query_signal_file),
-                "--output-figure",
-                str(output_figure),
+                "--output-filename",
+                str(output_filename),
             ],
             check=True,
             capture_output=True,
@@ -37,7 +37,6 @@ def test_plot_signal_correlation_basic(test_data_dir):
         )
 
         # Check that the output plot file was created
-        assert output_figure.exists(), "Output figure was not created."
-
-        # Verify correlation is not shown in output
-        assert "Pearson r = " not in result.stdout, "Unexpected correlation output"
+        assert output_filename.with_suffix(".png").exists()
+        assert output_filename.with_suffix(".pdf").exists()
+        assert output_filename.with_suffix(".tsv").exists()
