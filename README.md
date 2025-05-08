@@ -100,6 +100,7 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
 
 - [Workflows](./docs/README.md#workflows)
   - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
+  - [Signal Correlation](./docs/workflows/signal_correlation.md)
 - [Standalone Utilities](./docs/README.md#standalone-utilities)
   - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/standalone_utilities.md#manual-diagnostic-metric-curation)
     - `manual-diagnostic-metric-curation`
