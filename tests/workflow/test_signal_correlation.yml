@@ -8,6 +8,16 @@
     - path: tests_signal_correlation_vaf/signal_correlation/correlation_VAF_AF.png
       md5sum: 836f2493c1cc64b8fb90ddb20f8f2514
 
+- name: signal_correlation_vaf_spurious
+  command: nextflow run main.nf --workflows signal_correlation --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --truth_signal VAF --query_signal AF --spurious_variants_vcf tests_data/spurious_snv.vcf --output_dir tests_signal_correlation_vaf_spurious
+  files:
+    - path: tests_signal_correlation_vaf_spurious/signal_correlation/truth/VAF/sample1_truth_VAF.tsv
+      md5sum: 73160ba1a150a18922e52f4cf5f787c3
+    - path: tests_signal_correlation_vaf_spurious/signal_correlation/query/AF/sample1_query_AF.tsv
+      md5sum: 0bd9a0f801b6aa9472e248b7360a4e76
+    - path: tests_signal_correlation_vaf_spurious/signal_correlation/correlation_VAF_AF.png
+      md5sum: d6495695eb739918f505bdf1a3ab483b
+
 - name: signal_correlation_vaf_xlim_ylim
   command: nextflow run main.nf --workflows signal_correlation --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --truth_signal VAF --query_signal AF --xlim "0 1" --ylim "0 1" --output_dir tests_signal_correlation_vaf_xlim_ylim
   files:
