@@ -203,7 +203,7 @@ workflow {
         exit 0
     } else {
         def workflowList = params.workflows.split(',').collect { it.trim() }
-        def validWorkflows = ['variant_benchmark', 'signal_correlation', 'gene_target_evaluation']
+        def validWorkflows = ['variant_benchmark', 'signal_correlation', 'target_evaluation']
 
         // Validate user-selected workflows
         def invalidWorkflows = workflowList - validWorkflows

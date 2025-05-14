@@ -1,42 +1,26 @@
-process subset_bam {
-    tag "${sampleName}"
+process build_per_base_bed {
+    publishDir "${params.bams_dir}/target_eval_results"
 
     input:
-    tuple val(sampleName), path(original_vcf)
-    path(bam_file)
-    path(bed_file)
-
+        path bed_file
+        val panel
     output:
-    tuple val(sampleName), path("${sampleName}.${label}.no_spurious.vcf.gz"), emit: target_subset_bam
-    path(OUT), emit:
+        path "$OUT", emit: per_base_bed
 
     script:
-    OUT="${bam_file}.target_subset.bam"
+    OUT="${publishDir}/${params.targets_bed}.per-base.bed"
     """
-        bedtools intersect -wa -a ${bed_file} -b ${bam_file} > $OUT
+    build_per_base_bed ${params.targets_bed} $OUT
     """
 }
 
-process get_mapq_from_bam {
-    tag "${meta.RGSM}"
-    publishDir "${meta.target_eval_directory}/per_base_metrics", mode: 'copy'
 
-    script:
-    OUT-"${meta.RGSM}.mapq"
-    """
-        samtools view -F 2048 ${bam_file} | cut -f1,5 > $OUT
-    """
-    //ignore chimeric reads
-}
-
-process get_baseq {
-
-}
+//process get_baseq {}
 
 process measure_per_base_depth {
-    container params.clinical_utils_container
-    tag "${meta.RGSM}.${variant_type}"
-    cpus 16
+    //container params.clinical_utils_container
+    //tag "${meta.RGSM}.${variant_type}"
+    //cpus 16
     publishDir "${meta.panel_output}/QC", mode: 'copy'
     label "track_panel_process"
     input:
@@ -67,4 +51,4 @@ process score_coverage {
     """
 }
 
-process generate_metrics_tracts{}
+//process generate_metrics_tracts{}
