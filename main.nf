@@ -65,7 +65,7 @@ def helpMessage() {
             --query_dir       Directory containing query VCF files (must be named as <sample>.query.vcf or <sample>.query.vcf.gz)
             --truth_signal    Signal name from the truth VCF files e.g. VAF AF LR
             --query_signal    Signal name from the query VCF files e.g. VAF AF LR
-        
+
         Optional Parameters:
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
             --collapse               Collapse option for bcftools isec (default: 'none')
