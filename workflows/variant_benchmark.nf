@@ -27,6 +27,15 @@ enum ConfidenceIntervalMethod {
     agresti_coull, beta, binom_test, jeffreys, normal, wilson
 }
 
+def validate_genome_ref(genome_ref) {
+    if (!file(genome_ref).exists()) {
+        throw new IllegalArgumentException(
+            "Invalid 'genome_ref': ${genome_ref}. " +
+            "File does not exist."
+        )
+    }
+}
+
 // Function to validate engine selection
 def validate_engine_selection(engine) {
     def valid_engines = VariantConcordanceEngine.values()*.toString()
@@ -100,5 +109,8 @@ workflow variant_benchmark {
     validate_happy_engine(params.happy_engine)
     validate_tp_method(params.concordance_tp)
     validate_ci_method(params.ci_method)
+    if (params.variant_benchmark_engine in ['happy', 'sompy']) {
+        validate_genome_ref(params.genome_ref)
+    }
     variant_benchmark_workflow()
 }
