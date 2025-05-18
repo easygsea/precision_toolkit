@@ -114,6 +114,6 @@ RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~
     update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1 && \
     python -m pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir ./*.whl && \
-    python2.7 -m pip install bx-python --no-binary bx-python && \
+    python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python && \
     rm ./*.whl && \
     rm -rf /tmp/*
