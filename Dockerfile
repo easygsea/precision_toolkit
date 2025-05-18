@@ -47,7 +47,7 @@ WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
 RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${PSUTIL_VERSION}" && \
-    pip uninstall --y cryptography cvxopt idna lxml numexpr pillow pip py pyxdg pycrypto setuptools && \
+    pip uninstall --y bx-python cryptography cvxopt idna lxml numexpr pillow pip py pyxdg pycrypto setuptools && \
     apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends  \
     apt-transport-https \
@@ -114,5 +114,6 @@ RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~
     update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1 && \
     python -m pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir ./*.whl && \
+    python2.7 -m pip install bx-python --no-binary bx-python && \
     rm ./*.whl && \
     rm -rf /tmp/*
