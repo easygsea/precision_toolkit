@@ -200,6 +200,9 @@ For example, when spurious_variants_vcf is supplied:
         │   │   ├── summary.csv # hap.py statistics per sample
         │   │   ├── vcf.gz      # Detailed variant-level reports e.g. TP FN FP
         │   │   ├── ...         # Additional hap.py reports
+        │   ├── sompy/          # som.py reports if using sompy engine
+        │   │   ├── stats.csv   # som.py statistics per sample
+        │   │   ├── scratch_sompy/ # scratch reports detailing TP/FN/FP calls
         │   └── wittyer/        # witty.er reports if using wittyer engine
         │       ├── sample1/    # Sample-specific reports
         │       │   ├── Wittyer.Stats.json  # Summary statistics in JSON format
@@ -214,6 +217,9 @@ For example, when spurious_variants_vcf is supplied:
         │   │   ├── summary.csv
         │   │   ├── vcf.gz
         │   │   ├── ...
+        │   ├── sompy/
+        │   │   ├── stats.csv
+        │   │   ├── scratch_sompy/
         │   └── wittyer/
         │       ├── sample1/
         │       │   ├── Wittyer.Stats.json

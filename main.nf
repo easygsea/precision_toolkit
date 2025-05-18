@@ -136,11 +136,15 @@ def helpMessage() {
     └── <variant_benchmark_engine>/
         ├── raw/            # Raw engine reports
         │   ├── happy/      # hap.py raw reports if using happy engine
+        │   ├── sompy/      # som.py raw reports if using sompy engine
+        │   │   ├── scratch_sompy/ # scratch reports detailing TP/FN/FP calls
         │   └── wittyer/    # witty.er raw reports if using wittyer engine
         │       ├── sample1/
         │       └── sample2/
         ├── curated/        # Curated engine reports (after spurious variant filtering)
         │   ├── happy/      # hap.py curated reports if using happy engine
+        │   ├── sompy/      # som.py curated reports if using sompy engine
+        │   │   ├── scratch_sompy/ # scratch reports detailing TP/FN/FP calls
         │   └── wittyer/    # witty.er curated reports if using wittyer engine
         │       ├── sample1/
         │       └── sample2/
