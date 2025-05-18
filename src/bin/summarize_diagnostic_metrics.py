@@ -59,7 +59,7 @@ def main():
         "--engine",
         choices=[engine.value for engine in VariantConcordanceEngine],
         required=True,
-        help="Engine output format: 'happy' or 'wittyer'.",
+        help="Engine output format: 'happy', 'sompy', or 'wittyer'.",
     )
     parser.add_argument(
         "-f",

@@ -33,8 +33,8 @@ def helpMessage() {
         Mandatory Parameters:
             --truth_dir   Directory containing truth VCF files (must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz)
             --query_dir   Directory containing query VCF files (must be named as <sample>.query.vcf or <sample>.query.vcf.gz)
-            --variant_benchmark_engine  Analysis engine: 'happy' or 'wittyer' (default: happy)
-            --genome_ref  Required for happy: Reference genome FASTA
+            --variant_benchmark_engine  Analysis engine: 'happy', 'sompy', or 'wittyer' (default: happy)
+            --genome_ref  Required for happy and sompy: Reference genome FASTA
 
         Optional Parameters:
             --diagnostic_metrics     Diagnostic metrics to calculate (default: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
@@ -42,6 +42,7 @@ def helpMessage() {
             --variant_benchmark_dir  Subdirectory for variant benchmark results (default: variant_benchmark)
             --happy_engine           hap.py engine to use (default: vcfeval) Options: vcfeval, xcmp, scmp-distance, scmp-somatic. Note: vcfeval mode only evaluates PASS variants.
             --happy_options          Additional hap.py options (default: '--write-vcf --write-counts'). Must quote the string and use = to assign the value.
+            --sompy_options          Additional som.py options (default: '--include-nonpass'). Must quote the string and use = to assign the value.
             --wittyer_options        Additional witty.er options (default: auto-generated from parameters below). Must quote the string and use = to assign the value.
             --evaluationMode         witty.er parameter: Evaluation mode (default: CrossTypeAndSimpleCounting) Options: CrossTypeAndSimpleCounting, SimpleCounting, GenotypeMatching
             --includedFilters        witty.er parameter: Comma separated list. Only variants contain these filters will be considered. Empty string ('') will include all filters (default: '')

@@ -82,8 +82,8 @@ nextflow run main.nf \
 **Required Parameters:**
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
 - `--query_dir`: The directory containing query VCF files (the test or experimental dataset). These must be named as <sample>.query.vcf or <sample>.query.vcf.gz.
-- `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy` or `wittyer`, default: `happy`)
-- `--genome_ref`: Required for hap.py: Reference genome FASTA file
+- `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, or `wittyer`, default: `happy`)
+- `--genome_ref`: Required for hap.py and som.py: Reference genome FASTA file
 
 **Optional Parameters:**
 - `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
@@ -91,6 +91,7 @@ nextflow run main.nf \
 - `--variant_benchmark_dir`: Subdirectory for variant benchmark results (default: `variant_benchmark`)
 - `--happy_engine`: hap.py engine to use (default: `vcfeval`) Options: `vcfeval`, `xcmp`, `scmp-distance`, `scmp-somatic`. Note: `vcfeval` mode only evaluates PASS variants as hap.py does not support `vcfeval --all-records`.
 - `--happy_options`: Additional hap.py options (default: `--write-vcf --write-counts`). Must quote the string and use = to assign the value.
+- `--sompy_options`: Additional som.py options (default: `--include-nonpass`). Must quote the string and use = to assign the value.
 - `--wittyer_options`: Additional witty.er options (default: auto-generated from parameters below). Must quote the string and use = to assign the value.
 - `--evaluationMode`: witty.er parameter: Evaluation mode (default: `CrossTypeAndSimpleCounting`) Options: `CrossTypeAndSimpleCounting`, `SimpleCounting`, `GenotypeMatching`. Note that GenotypeMatching corresponds to the Default option in witty.er documentation https://github.com/Illumina/witty.er/issues/25
 - `--includedFilters`: witty.er parameter: Comma separated list. Only variants contain these filters will be considered. Empty string ('') will include all filters (default: '')
@@ -116,6 +117,10 @@ nextflow run main.nf \
    - You are working with small variants (SNPs, indels <50bp)
    - Your reference genome is well-defined and available
 
+2. **Use som.py when:**
+   - You are analyzing somatic variants (e.g. tumor-normal pairs)
+   - You need to normalize variant representations before comparison
+
 2. **Use witty.er when:**
    - You are analyzing structural variants or large indels (>50bp)
    - You need faster processing times for complex variant analysis
@@ -126,15 +131,15 @@ nextflow run main.nf \
 
 **Key Differences:**
 
-| Feature            | hap.py                     | witty.er                   |
-|--------------------|----------------------------|----------------------------|
-| Variant Size       | Small variants (SNPs, indels) | Large variants (SVs, CNVs) |
-| Matching Precision | Exact position/allele      | Fuzzy matching             |
-| Speed              | Slower for small variants  | Faster for large variants  |
-| Scalability        | Medium                     | High                       |
-| Filtering          | Basic                      | Advanced by size/type      |
-| Reference Genome   | Required                   | Optional                   |
-| Best Use Case      | Small variants, precision | Large variants, throughput |
+| Feature            | hap.py                     | som.py                     | witty.er                   |
+|--------------------|----------------------------|----------------------------|----------------------------|
+| Variant Size       | Small variants (SNPs, indels) | Small variants (SNPs, indels) | Large variants (SVs, CNVs) |
+| Matching Precision | Exact position/allele      | Normalized representation  | Fuzzy matching             |
+| Speed              | Slower for small variants  | Similar to hap.py          | Faster for large variants  |
+| Scalability        | Medium                     | Medium                     | High                       |
+| Filtering          | Basic                      | Basic                      | Advanced by size/type      |
+| Reference Genome   | Required                   | Optional                   | Optional                   |
+| Best Use Case      | Small variants, precision | Somatic variants, precision | Large variants, throughput |
 
 
 ### Spurious Variant Filtering

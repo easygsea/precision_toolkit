@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 // Variant concordance analysis engine enum
 enum VariantConcordanceEngine {
-    happy, wittyer
+    happy, sompy, wittyer
 }
 
 // Diagnostic metrics enum

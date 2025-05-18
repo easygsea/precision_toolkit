@@ -32,6 +32,37 @@ process run_happy {
     """
 }
 
+process run_sompy {
+    label "dynamic_resource"
+    tag "${sampleName}"
+    publishDir "${params.output_dir}/${output_dir ?: ''}/sompy", mode: 'copy'
+
+    input:
+    tuple val(sampleName), path(truth_vcf), path(query_vcf)
+    path genome_ref
+    path genome_fai
+    val sompy_options
+    val output_dir
+    val label
+
+    output:
+    path("*.stats.csv"), emit: sompy_summary
+    path("${sampleName}*"), emit: sompy_outputs
+
+    script:
+    PREFIX = "${sampleName}.${label}"
+    """
+    export HGREF="${genome_ref}"
+
+    /opt/hap.py/bin/som.py \
+    ${truth_vcf} \
+    ${query_vcf} \
+    -r "${genome_ref}" \
+    -o "${PREFIX}" \
+    ${sompy_options}
+    """
+}
+
 process run_wittyer {
     label "dynamic_resource"
     tag "${sampleName}"

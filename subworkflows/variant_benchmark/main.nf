@@ -5,6 +5,8 @@ include {
 include {
     run_happy as run_happy_raw
     run_happy as run_happy_curated
+    run_sompy as run_sompy_raw
+    run_sompy as run_sompy_curated
     run_wittyer as run_wittyer_raw
     run_wittyer as run_wittyer_curated
     summarize_diagnostic_metrics
@@ -79,6 +81,40 @@ workflow variant_benchmark_workflow {
                     "${params.variant_benchmark_dir}/curated",
                     "curated"
                 ).happy_summary.collect()
+            }
+        } else if (params.variant_benchmark_engine == "sompy") {
+            if (!params.genome_ref) error "genome_ref parameter is required for sompy engine"
+
+            def genome_ref_path = file(params.genome_ref)
+
+            // Check if .fai index file exists, if not generate it
+            def genome_fai_path = file("${params.genome_ref}.fai")
+            if (!genome_fai_path.exists()) {
+                genome_fai_path = generate_fai(genome_ref_path).genome_fai
+            }
+
+            // Only run raw analysis if skip_raw is false
+            if (!params.skip_raw) {
+                summary_files = run_sompy_raw(
+                    vcf_pairs,
+                    genome_ref_path,
+                    genome_fai_path,
+                    params.sompy_options,
+                    "${params.variant_benchmark_dir}/raw",
+                    "raw"
+                ).sompy_summary.collect()
+            }
+
+            // If spurious variants VCF is provided, run sompy on curated VCFs
+            if (params.spurious_variants_vcf) {
+                summary_files_curated = run_sompy_curated(
+                    curated_vcf_pairs,
+                    genome_ref_path,
+                    genome_fai_path,
+                    params.sompy_options,
+                    "${params.variant_benchmark_dir}/curated",
+                    "curated"
+                ).sompy_summary.collect()
             }
         } else if (params.variant_benchmark_engine == "wittyer") {
             // Only run raw analysis if skip_raw is false
