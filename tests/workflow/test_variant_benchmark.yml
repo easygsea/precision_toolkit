@@ -120,8 +120,8 @@
 - name: variant_benchmark_sompy_raw
   command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine sompy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_sompy_raw
   files:
-    - path: tests_variant_benchmark_sompy_raw/variant_benchmark/raw/sompy/sample1.raw.stats.csv
-      md5sum: 14e331a41a727492ca0b8e2cd9a90150
+    - path: tests_variant_benchmark_sompy_raw/variant_benchmark/diagnostic_metrics_sompy_raw_concordance.csv
+      md5sum: f9c7c3fa74f18ccc8af8a2af7c014f4a
 
 
 - name: variant_benchmark_wittyer_raw
