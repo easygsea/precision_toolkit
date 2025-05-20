@@ -47,7 +47,8 @@ process plot_signal_correlation {
     val show_regression
 
     output:
-    path("correlation_*.png"), emit: signal_correlation_plot
+    path("correlation_*.png"), emit: signal_correlation_png
+    path("correlation_*.pdf"), emit: signal_correlation_pdf
     path("correlation_*.tsv"), emit: signal_correlation_table
 
     script:

@@ -3,15 +3,6 @@ include {
 } from '../../modules/fasta/main'
 
 include {
-    bgzip_vcf
-    index_vcf as index_spurious_variants_original_vcf
-    index_vcf as index_spurious_variants_normalized_vcf
-    normalize_vcf
-} from '../../modules/vcf/main'
-
-include {
-    exclude_spurious_variants as exclude_spurious_variants_truth
-    exclude_spurious_variants as exclude_spurious_variants_query
     run_happy as run_happy_raw
     run_happy as run_happy_curated
     run_wittyer as run_wittyer_raw
@@ -21,53 +12,8 @@ include {
 
 include {
     build_vcf_pair_channels
+    process_spurious_variants
 } from '../../modules/utils/main'
-
-// Function to handle spurious variants processing
-def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
-    def spurious_variants_vcf = file(spurious_variants_vcf_path)
-    if (!spurious_variants_vcf.exists()) error "Input file not found, please check: ${spurious_variants_vcf}"
-
-    // Check and compress spurious variants VCF
-    def spurious_variants_vcf_gz = spurious_variants_vcf.toString().endsWith('.gz') ?
-        spurious_variants_vcf : file("${spurious_variants_vcf}.gz")
-    if (!spurious_variants_vcf_gz.exists()) {
-        spurious_variants_vcf_gz = bgzip_vcf(file(spurious_variants_vcf)).gzipped_vcf
-    }
-
-    // Check and index spurious variants VCF
-    def spurious_variants_vcf_tbi = file("${spurious_variants_vcf_gz}.tbi")
-    if (!spurious_variants_vcf_tbi.exists()) {
-        spurious_variants_vcf_tbi = index_spurious_variants_original_vcf(spurious_variants_vcf_gz).indexed_vcf
-    }
-
-    // Normalize spurious variants VCF
-    def normalized_spurious_variants_vcf = normalize_vcf(spurious_variants_vcf_gz, spurious_variants_vcf_tbi).normalized_vcf
-
-    // Index normalized spurious variants VCF
-    def normalized_spurious_variants_vcf_tbi = index_spurious_variants_normalized_vcf(normalized_spurious_variants_vcf).indexed_vcf
-
-    def truth_vcfs = vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, truth_vcf) }
-    def query_vcfs = vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, query_vcf) }
-
-    def no_spurious_truth = exclude_spurious_variants_truth(
-        truth_vcfs,
-        normalized_spurious_variants_vcf,
-        normalized_spurious_variants_vcf_tbi,
-        "truth",
-        collapse
-    ).no_spurious_vcf
-
-    def no_spurious_query = exclude_spurious_variants_query(
-        query_vcfs,
-        normalized_spurious_variants_vcf,
-        normalized_spurious_variants_vcf_tbi,
-        "query",
-        collapse
-    ).no_spurious_vcf
-
-    return no_spurious_truth.join(no_spurious_query)
-}
 
 // Main variant benchmark workflow
 workflow variant_benchmark_workflow {

@@ -4,7 +4,7 @@ The signal correlation workflow extracts signal values (e.g. VAF, AF, LR) from t
 
 ## Quick Start
 
-VAF/AF correlation with regression line:
+VAF/AF correlation with regression line, excluding spurious variants:
 ```bash
 nextflow run main.nf \
 --workflows signal_correlation \
@@ -12,6 +12,7 @@ nextflow run main.nf \
 --query_dir <path/to/query_vcf_dir> \
 --truth_signal VAF \
 --query_signal AF \
+--spurious_variants_vcf <path/to/spurious_variants_vcf> \
 --xlim="0 1" \
 --ylim="0 1" \
 --show_regression true
@@ -26,6 +27,8 @@ nextflow run main.nf \
 - `--query_signal`: The signal to extract from the query VCF files.
 
 **Optional Parameters:**
+- `--spurious_variants_vcf`: The VCF file containing spurious variants to exclude.
+- `--collapse`: The collapse option for bcftools isec.
 - `--xlim`: The x-axis limits. Example usage: --xlim="0 1"
 - `--ylim`: The y-axis limits. Example usage: --ylim="0 1"
 - `--show_regression`: Show the regression line.
