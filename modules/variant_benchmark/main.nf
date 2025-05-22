@@ -48,10 +48,10 @@ process run_sompy {
     output:
     path("*.stats.csv"), emit: sompy_summary
     path("${sampleName}*"), emit: sompy_outputs
-    path("scratch_sompy/*"), emit: sompy_scratch
 
     script:
     PREFIX = "${sampleName}.${label}"
+    SCRATCH_DIR = "${PREFIX}.scratch_sompy"
     """
     export HGREF="${genome_ref}"
 
@@ -60,7 +60,7 @@ process run_sompy {
     ${query_vcf} \
     -r "${genome_ref}" \
     -o "${PREFIX}" \
-    --scratch-prefix scratch_sompy \
+    --scratch-prefix ${SCRATCH_DIR} \
     --keep-scratch \
     ${sompy_options}
     """
