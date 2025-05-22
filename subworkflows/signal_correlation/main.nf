@@ -34,6 +34,7 @@ workflow signal_correlation_workflow {
         extracted_signals.query_signal.collect(),
         params.xlim,
         params.ylim,
-        params.show_regression
+        params.show_regression,
+        params.filter_source
     )
 }

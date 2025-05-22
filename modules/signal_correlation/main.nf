@@ -24,12 +24,12 @@ process extract_signal {
 
     # Extract signals from normalized VCFs
     mkdir -p "${truth_output_folder}"
-    echo -e "CHROM\\tPOS\\tREF\\tALT\\t${truth_signal_name}" > "${truth_output}"
-    bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t[%${truth_signal_name}]\\n' "${truth_vcf}.norm.vcf" >> "${truth_output}"
+    echo -e "CHROM\\tPOS\\tREF\\tALT\\tFILTER\\t${truth_signal_name}" > "${truth_output}"
+    bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t%FILTER\\t[%${truth_signal_name}]\\n' "${truth_vcf}.norm.vcf" >> "${truth_output}"
 
     mkdir -p "${query_output_folder}"
-    echo -e "CHROM\\tPOS\\tREF\\tALT\\t${query_signal_name}" > "${query_output}"
-    bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t[%${query_signal_name}]\\n' "${query_vcf}.norm.vcf" >> "${query_output}"
+    echo -e "CHROM\\tPOS\\tREF\\tALT\\tFILTER\\t${query_signal_name}" > "${query_output}"
+    bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t%FILTER\\t[%${query_signal_name}]\\n' "${query_vcf}.norm.vcf" >> "${query_output}"
     """
 }
 
@@ -45,6 +45,7 @@ process plot_signal_correlation {
     val xlim
     val ylim
     val show_regression
+    val filter_source
 
     output:
     path("correlation_*.png"), emit: signal_correlation_png
@@ -56,6 +57,7 @@ process plot_signal_correlation {
     def xlim_arg = xlim == "" ? "" : "--xlim ${xlim}"
     def ylim_arg = ylim == "" ? "" : "--ylim ${ylim}"
     def regression_arg = show_regression ? "--show-regression" : ""
+    def filter_source_arg = filter_source == "" ? "" : "--filter-source ${filter_source}"
     """
     export MPLCONFIGDIR=\$(mktemp -d)
     plot-signal-correlation \
@@ -64,6 +66,7 @@ process plot_signal_correlation {
     --output-filename ${output_filename} \
     ${xlim_arg} \
     ${ylim_arg} \
-    ${regression_arg}
+    ${regression_arg} \
+    ${filter_source_arg}
     """
 }
