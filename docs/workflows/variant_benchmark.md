@@ -83,7 +83,7 @@ nextflow run main.nf \
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
 - `--query_dir`: The directory containing query VCF files (the test or experimental dataset). These must be named as <sample>.query.vcf or <sample>.query.vcf.gz.
 - `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, or `wittyer`, default: `happy`)
-- `--genome_ref`: Required for hap.py and som.py: Reference genome FASTA file
+- `--genome_ref`: Required for hap.py: Reference genome FASTA file
 
 **Optional Parameters:**
 - `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
@@ -135,11 +135,11 @@ nextflow run main.nf \
 |--------------------|----------------------------|----------------------------|----------------------------|
 | Variant Size       | Small variants (SNPs, indels) | Small variants (SNPs, indels) | Large variants (SVs, CNVs) |
 | Matching Precision | Exact position/allele      | Normalized representation  | Fuzzy matching             |
-| Speed              | Slower for small variants  | Similar to hap.py          | Faster for large variants  |
+| Speed              | Slower for small variants  | Faster than hap.py          | Faster for large variants  |
 | Scalability        | Medium                     | Medium                     | High                       |
 | Filtering          | Basic                      | Basic                      | Advanced by size/type      |
 | Reference Genome   | Required                   | Optional                   | Optional                   |
-| Best Use Case      | Small variants, precision | Somatic variants, precision | Large variants, throughput |
+| Best Use Case      | Small variants, germline | Small variants, somatic | Large variants, throughput |
 
 
 ### Spurious Variant Filtering
