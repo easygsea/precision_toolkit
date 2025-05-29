@@ -33,7 +33,7 @@ def helpMessage() {
         Mandatory Parameters:
             --truth_dir   Directory containing truth VCF files (must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz)
             --query_dir   Directory containing query VCF files (must be named as <sample>.query.vcf or <sample>.query.vcf.gz)
-            --variant_benchmark_engine  Analysis engine: 'happy' or 'wittyer' (default: happy)
+            --variant_benchmark_engine  Analysis engine: 'happy', 'sompy', or 'wittyer' (default: happy)
             --genome_ref  Required for happy: Reference genome FASTA
 
         Optional Parameters:
@@ -42,6 +42,7 @@ def helpMessage() {
             --variant_benchmark_dir  Subdirectory for variant benchmark results (default: variant_benchmark)
             --happy_engine           hap.py engine to use (default: vcfeval) Options: vcfeval, xcmp, scmp-distance, scmp-somatic. Note: vcfeval mode only evaluates PASS variants.
             --happy_options          Additional hap.py options (default: '--write-vcf --write-counts'). Must quote the string and use = to assign the value.
+            --sompy_options          Additional som.py options (default: '--include-nonpass'). Must quote the string and use = to assign the value.
             --wittyer_options        Additional witty.er options (default: auto-generated from parameters below). Must quote the string and use = to assign the value.
             --evaluationMode         witty.er parameter: Evaluation mode (default: CrossTypeAndSimpleCounting) Options: CrossTypeAndSimpleCounting, SimpleCounting, GenotypeMatching
             --includedFilters        witty.er parameter: Comma separated list. Only variants contain these filters will be considered. Empty string ('') will include all filters (default: '')
@@ -72,6 +73,7 @@ def helpMessage() {
             --xlim            x-axis limits for the figure (default: "", auto-fit). Example usage: --xlim="0 1"
             --ylim            y-axis limits for the figure (default: "", auto-fit). Example usage: --ylim="0 1"
             --show_regression Whether to show the regression line and equation (default: false)
+            --filter_source   FILTER column to use for coloring ('', 'truth', or 'query') (default: '')
 
     ====================
     Resource Management
@@ -135,11 +137,15 @@ def helpMessage() {
     └── <variant_benchmark_engine>/
         ├── raw/            # Raw engine reports
         │   ├── happy/      # hap.py raw reports if using happy engine
+        │   ├── sompy/      # som.py raw reports if using sompy engine
+        │   │   ├── scratch_sompy/ # scratch reports detailing TP/FN/FP calls
         │   └── wittyer/    # witty.er raw reports if using wittyer engine
         │       ├── sample1/
         │       └── sample2/
         ├── curated/        # Curated engine reports (after spurious variant filtering)
         │   ├── happy/      # hap.py curated reports if using happy engine
+        │   ├── sompy/      # som.py curated reports if using sompy engine
+        │   │   ├── scratch_sompy/ # scratch reports detailing TP/FN/FP calls
         │   └── wittyer/    # witty.er curated reports if using wittyer engine
         │       ├── sample1/
         │       └── sample2/

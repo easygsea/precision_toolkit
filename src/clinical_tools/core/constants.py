@@ -20,6 +20,7 @@ class VariantConcordanceEngine(StrEnum):
     """Supported variant concordance analysis engines."""
 
     HAPPY = "happy"
+    SOMPY = "sompy"
     WITTYER = "wittyer"
 
 

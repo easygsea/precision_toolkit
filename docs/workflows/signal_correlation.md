@@ -32,3 +32,4 @@ nextflow run main.nf \
 - `--xlim`: The x-axis limits. Example usage: --xlim="0 1"
 - `--ylim`: The y-axis limits. Example usage: --ylim="0 1"
 - `--show_regression`: Show the regression line.
+- `--filter_source`: The FILTER column to use for coloring ('', 'truth', or 'query').

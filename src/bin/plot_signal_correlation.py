@@ -34,11 +34,15 @@ from scipy import stats
 
 from clinical_tools.core.format import parse_percentage_and_float
 
+CONSTANT_COLUMNS = ["CHROM", "POS", "REF", "ALT"]
+
 
 def identify_raw_signal_columns(signal_df: pd.DataFrame) -> list[str]:
     """Identify signal column names from the raw signal DataFrame."""
     signal_cols = [
-        col for col in signal_df.columns if col not in ["CHROM", "POS", "REF", "ALT"]
+        col
+        for col in signal_df.columns
+        if col not in CONSTANT_COLUMNS and col != "FILTER"
     ]
     return signal_cols
 
@@ -68,15 +72,15 @@ def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.Data
 
     # Add suffixes to distinguish columns after merge
     truth_signal_df = truth_signal_df.rename(
-        columns=lambda x: f"{x}_TRUTH" if x in truth_signal_cols else x
+        columns=lambda x: f"{x}_TRUTH" if x not in CONSTANT_COLUMNS else x
     )
     query_signal_df = query_signal_df.rename(
-        columns=lambda x: f"{x}_QUERY" if x in query_signal_cols else x
+        columns=lambda x: f"{x}_QUERY" if x not in CONSTANT_COLUMNS else x
     )
     merged_df = pd.merge(
         truth_signal_df,
         query_signal_df,
-        on=["CHROM", "POS", "REF", "ALT"],
+        on=CONSTANT_COLUMNS,
     )
 
     return merged_df
@@ -95,8 +99,16 @@ def identify_signal_columns(signal_df: pd.DataFrame) -> tuple[str, str]:
     Raises:
         ValueError: If truth or query columns cannot be identified.
     """
-    truth_cols = [col for col in signal_df.columns if col.endswith("_TRUTH")]
-    query_cols = [col for col in signal_df.columns if col.endswith("_QUERY")]
+    truth_cols = [
+        col
+        for col in signal_df.columns
+        if col.endswith("_TRUTH") and not col.startswith("FILTER")
+    ]
+    query_cols = [
+        col
+        for col in signal_df.columns
+        if col.endswith("_QUERY") and not col.startswith("FILTER")
+    ]
 
     if not truth_cols or not query_cols:
         raise ValueError(
@@ -140,6 +152,7 @@ def plot_signal_correlation(
     figsize: tuple[int, int] = (10, 10),
     xlim: tuple[float, float] | None = None,
     ylim: tuple[float, float] | None = None,
+    filter_source: str = "",
 ) -> None:
     """
     Generate a scatter plot with optional correlation statistics.
@@ -152,6 +165,7 @@ def plot_signal_correlation(
         figsize: Figure dimensions.
         xlim: Optional tuple of (min, max) for x-axis range.
         ylim: Optional tuple of (min, max) for y-axis range.
+        filter_source: FILTER column to use for coloring ('', 'truth', or 'query').
     """
     truth_col, query_col = identify_signal_columns(signal_df)
 
@@ -159,8 +173,27 @@ def plot_signal_correlation(
     plt.figure(figsize=figsize)
     sns.set_style("whitegrid")
 
-    # Create base scatter plot
-    plt.scatter(signal_df[truth_col], signal_df[query_col], alpha=0.5, s=50)
+    # Create base scatter plot with optional coloring by filter
+    if filter_source.lower() == "truth" and "FILTER_TRUTH" in signal_df.columns:
+        sns.scatterplot(
+            data=signal_df,
+            x=truth_col,
+            y=query_col,
+            hue="FILTER_TRUTH",
+            alpha=0.5,
+            s=50,
+        )
+    elif filter_source.lower() == "query" and "FILTER_QUERY" in signal_df.columns:
+        sns.scatterplot(
+            data=signal_df,
+            x=truth_col,
+            y=query_col,
+            hue="FILTER_QUERY",
+            alpha=0.5,
+            s=50,
+        )
+    else:
+        plt.scatter(signal_df[truth_col], signal_df[query_col], alpha=0.5, s=50)
 
     if show_regression:
         # Calculate correlation and p-value
@@ -265,6 +298,13 @@ def main() -> None:
         nargs=2,
         help="Y-axis limits (min max).",
     )
+    parser.add_argument(
+        "-fs",
+        "--filter-source",
+        choices=["", "truth", "query"],
+        default="",
+        help="FILTER column to use for coloring ('', 'truth', or 'query').",
+    )
     args = parser.parse_args()
 
     # Convert arguments to appropriate types
@@ -357,6 +397,7 @@ def main() -> None:
         figsize=figsize,
         xlim=xlim,
         ylim=ylim,
+        filter_source=args.filter_source,
     )
 
 
