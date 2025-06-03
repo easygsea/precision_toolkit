@@ -1,6 +1,6 @@
 process get_per_base_stats {
     label "dynamic_resource"
-    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+    publishDir "${params.bams_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
@@ -12,8 +12,8 @@ process get_per_base_stats {
     script:
     OUT="${in_bam}.mpileup.parsed"
     """
-    samtools mpileup -A -a -x --min-BQ 10 --min-MQ 1 --output-MQ --positions ${TARGET_BED} ${IN_BAM} | \
-    gawk -v OFS='\t' 'function ord(c,i) { for(i=0;i<256;i++){if (sprintf("%c", i) == c) return i} return -1 } \
+    samtools mpileup -A -a -x --min-BQ 10 --min-MQ 1 --output-MQ --positions ${targets_bed} ${in_bam} | \
+    gawk -v OFS='\\t' 'function ord(c,i) { for(i=0;i<256;i++){if (sprintf("%c", i) == c) return i} return -1 } \
     { total_non_del=\$4; del_index = index(\$5, "*"); \
       while(del_index!=0) { \
         total_non_del--;  \
@@ -35,6 +35,7 @@ process get_per_tract_stats {
 
     input:
     path(targets_bed)
+    path(parsed_bam)
 
     output:
     path(OUT)
@@ -62,10 +63,11 @@ process check_all_bases_outputted {
 
     output:
 
+
     script:
     """
-    total_bases=$(awk '{sum+=(\$3-\$2)} END {print sum}' ${TARGET_BED})
-    parsed_bases=$(wc -l ${IN_BAM}.mpileup.parsed.labelled.per-base|cut -d" " -f1)
+    total_bases=\$(awk '{sum+=(\$3-\$2)} END {print sum}' ${targets_bed})
+    parsed_bases=\$(wc -l ${in_bam}.mpileup.parsed.labelled.per-base|cut -d" " -f1)
     if [ \$total_bases -eq \$parsed_bases ]; then
         echo "Assertion passed: all bases accounted for \${total_bases}=\${parsed_bases}"
     else

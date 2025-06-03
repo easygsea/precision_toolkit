@@ -20,19 +20,34 @@ workflow gene_target_evaluation_workflow {
         if (!file("${params.targets_bed}").exists()) error "Target bed not found: ${params.targets_bed}"
         if (!file(params.bams_dir).exists()) error "Bams dir not found: ${params.bams_dir}"
 
-        bams_channel = channel.fromPath("${params.bams_dir}/*.bam").view()
-        //can use checkIfExists to output error for empty directory
+        //parse this to have only the file name ( to be passed into create new files in work directory)
+        bams_channel = channel.fromPath("${params.bams_dir}/*.bam")
+                              .view{item -> "Old item: $item"}
+                              .map{item -> [item.toString().split('/')[-1], item]}
+                              .view{item -> "Current item: $item"}
+                              .view{item -> params.targets_bed.toString().split('/').reverse()[0]}
 
+        targets_bed_name = params.targets_bed.toString().split('/').reverse()[0]
+        System.out.println(params.targets_bed)
+
+        //Option a: using mpileup
         if (params.tool == "mpileup") {
             get_per_base_stats(params.targets_bed, bams_channel)
-            get_per_tract_stats(params.targets_bed)
-
+            get_per_tract_stats(params.targets_bed, get_per_base_stats.out.parsed_bam)
         }
 
+        //Option b: using samtools depth
         else {
+            def bams_per_base_bed
             // check for existing per-base bed file
-            if (!file("${params.targets_bed}.per-base.bed")){
-                build_per_base_bed(params.targets_bed) }
+            //move this if statement to the process, so that the emitted is the same.
+            if (!file("${params.targets_bed}.per-base.bed").exists()) { build_per_base_bed(params.targets_bed, targets_bed_name) }
+            else {build_per_base_bed.out.per_base_bed}
+
+            bams_channel.view(item -> "Current_item $item")
+
+
+            //if(!file("${bams_channel}")) {}
              //get_per_base()
                 //gather_bam
                 //gather_bed
