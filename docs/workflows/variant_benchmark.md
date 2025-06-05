@@ -107,6 +107,7 @@ nextflow run main.nf \
 
 **Official Parameter References:**
 - [hap.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/happy.md#command-line-options)
+- [som.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/sompy.md)
 - [witty.er parameters](https://github.com/EBIvariation/witty.er/wiki/Configuration-Parameters)
 
 
@@ -264,8 +265,11 @@ This table summarizes the curated sensitivity of variant calls.
 | SNP            | PASS             |            1337 |                0 | 100.0%        | 99.7%      | 100.0%     |
 ```
 
-For more defails on hap.py and witty.er outputs:
+Note that som.py does not report a filter column, so the `Variant Filter` column is always set to `NA`.
+
+For more defails on hap.py, som.py, and witty.er outputs:
 - [hap.py output documentation](https://github.com/Illumina/hap.py?tab=readme-ov-file#happy)
+- [som.py output documentation](https://github.com/Illumina/hap.py?tab=readme-ov-file#sompy)
 - [witty.er output documentation](https://github.com/Illumina/witty.er?tab=readme-ov-file#outputs)
 
 
