@@ -107,6 +107,7 @@ nextflow run main.nf \
 
 **Official Parameter References:**
 - [hap.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/happy.md#command-line-options)
+- [som.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/sompy.md)
 - [witty.er parameters](https://github.com/EBIvariation/witty.er/wiki/Configuration-Parameters)
 
 
