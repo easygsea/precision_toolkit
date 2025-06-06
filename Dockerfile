@@ -117,3 +117,6 @@ RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~
     python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python && \
     rm ./*.whl && \
     rm -rf /tmp/*
+
+# CDI-158 fix som.py inconsistency issue
+RUN sed -i 's~True,  # pass_only~not args.inc_nonpass,~' /opt/hap.py/bin/som.py
