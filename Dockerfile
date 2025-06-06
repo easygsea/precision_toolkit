@@ -3,6 +3,7 @@ ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
 ARG JOBLIB_VERSION=0.14.1
+ARG NEXTFLOW_VERSION=24.10.3
 ARG POETRY_VERSION=2.0.1
 ARG PSUTIL_VERSION=6.1.1
 ARG PYTHON_VERSION=3.11.7
@@ -41,6 +42,7 @@ FROM mgibio/hap.py:v${HAPPY_VERSION}
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
 ARG JOBLIB_VERSION
+ARG NEXTFLOW_VERSION
 ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
 WORKDIR /app
@@ -52,6 +54,7 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     apt-get install -y --no-install-recommends  \
     apt-transport-https \
     build-essential \
+    curl \
     libbz2-dev \
     libdb5.3-dev \
     libexpat1-dev \
@@ -63,7 +66,9 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     libreadline-dev \
     libsqlite3-dev \
     libssl-dev \
+    openjdk-17-jdk \
     software-properties-common \
+    unzip \
     wget \
     zlib1g-dev && \
     wget --quiet "https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb" && \
@@ -82,6 +87,9 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
     cd ../.. && rm -rf htslib-* samtools-* bcftools-* && \
+    # Build Nextflow
+    wget --quiet "https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow" && \
+    chmod 755 /usr/local/bin/nextflow && \
     # Build samtools
     wget --quiet "https://github.com/samtools/samtools/releases/download/${HTSLIB_VERSION}/samtools-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "samtools-${HTSLIB_VERSION}.tar.bz2" && \
