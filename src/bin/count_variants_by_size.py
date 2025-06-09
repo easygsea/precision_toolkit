@@ -74,7 +74,7 @@ def main():
             print(f"{size_range}: {count}")
     elif input_path.is_dir():
         all_counts = {}
-        vcf_files = list(input_path.glob("*.vcf"))
+        vcf_files = [f for f in input_path.glob("*.vcf*") if f.suffix in (".vcf", ".gz")]
         num_files = len(vcf_files)
 
         for vcf_file in vcf_files:
