@@ -51,9 +51,13 @@ WORKDIR /app
 RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${PSUTIL_VERSION}" && \
     pip uninstall --y bx-python cryptography cvxopt idna lxml numexpr pillow pip py pyxdg pycrypto setuptools && \
     apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends software-properties-common && \
+    add-apt-repository ppa:ubuntu-toolchain-r/test && \
     apt-get install -y --no-install-recommends  \
     apt-transport-https \
     build-essential \
+    gcc-10 \
+    g++-10 \
     curl \
     libbz2-dev \
     libdb5.3-dev \
@@ -71,6 +75,7 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     unzip \
     wget \
     zlib1g-dev && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 && \
     wget --quiet "https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb" && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && apt-get install -y --no-install-recommends "dotnet-sdk-${DOTNET_VERSION}" && \
