@@ -6,7 +6,7 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:/projects/clingenetics/software/too
 TESTING_DEVELOPMENT_DIRECTORY=$1
 
 cd "${TESTING_DEVELOPMENT_DIRECTORY}"
-source bin/activate
-cd pr_check
+source venv/bin/activate
+cd clinical_tools
 
 pre-commit run --all-files

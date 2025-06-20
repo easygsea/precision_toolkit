@@ -8,7 +8,7 @@ BRANCH_NAME=$3
 
 rm -rfv "${TESTING_DEPLOYMENT_DIRECTORY}"
 git clone -b "${BRANCH_NAME}" "${REPOSITORY_URL}" \
-  "${TESTING_DEPLOYMENT_DIRECTORY}"/pr_check
-cd "${TESTING_DEPLOYMENT_DIRECTORY}"/pr_check
+  "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
+cd "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
 VERSION=$(sed -nr "s|^version\s*=\s*\"([^\"]+)\"|\1|p" pyproject.toml)
-echo "VERSION=${VERSION}" > pr_check_version.txt
+echo "VERSION=${VERSION}" > clinical_tools_version.txt

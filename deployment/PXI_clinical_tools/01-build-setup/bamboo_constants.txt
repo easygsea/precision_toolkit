@@ -1,0 +1,2 @@
+UNIQUE_IDENTIFIER=CLINICAL_TOOLS_main
+TESTING_DEPLOYMENT_DIRECTORY=/projects/gsc_clinical_dev/deployment/PXI_clinical_tools/CLINICAL_TOOLS_main

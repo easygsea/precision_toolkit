@@ -47,6 +47,7 @@ ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
 WORKDIR /app
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
 RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${PSUTIL_VERSION}" && \
     pip uninstall --y bx-python cryptography cvxopt idna lxml numexpr pillow pip py pyxdg pycrypto setuptools && \
@@ -92,15 +93,14 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
     cd ../.. && rm -rf htslib-* samtools-* bcftools-* && \
-    # Build Nextflow
-    wget --quiet "https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow" && \
-    chmod 755 /usr/local/bin/nextflow && \
     # Build samtools
     wget --quiet "https://github.com/samtools/samtools/releases/download/${HTSLIB_VERSION}/samtools-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "samtools-${HTSLIB_VERSION}.tar.bz2" && \
     cd "samtools-${HTSLIB_VERSION}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
+    # Install Nextflow
+    wget -qO- "https://get.nextflow.io" | bash && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" && \
     tar -xzf "Python-${PYTHON_VERSION}.tgz" && \
