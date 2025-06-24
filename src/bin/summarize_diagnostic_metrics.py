@@ -156,7 +156,7 @@ def main():
         )
 
         for metric in args.metrics:
-            metric_name = "F1 score" if metric == "f1_score" else metric
+            metric_name = "F1 Score" if metric == "f1_score" else metric
             raw_table = generate_diagnostic_metrics_table(raw_results[metric], metric)
             raw_tables.append(raw_table)
             raw_headings.append(f"Raw {metric_name.capitalize()}")
@@ -171,7 +171,7 @@ def main():
 
             print(metric_name.capitalize())
             # Append raw result to all data CSV
-            raw_all_data_table = raw_table.set_index("Variant Type").add_suffix(f"_{metric_name.capitalize()}") if raw_all_data_table.empty else raw_all_data_table.join(raw_table.set_index("Variant Type").add_suffix(f"_{metric_name.capitalize()}"), on="Variant Type")
+            raw_all_data_table = raw_table.set_index("Variant Type").add_suffix(f"_{metric_name.title()}") if raw_all_data_table.empty else raw_all_data_table.join(raw_table.set_index("Variant Type").add_suffix(f"_{metric_name.title()}"), on="Variant Type")
 
         # Export combined stats curated CSV
         export_diagnostic_metrics_to_csv(raw_all_data_table, f"{args.prefix}_{args.engine}_raw_all_data.csv")
@@ -204,7 +204,7 @@ def main():
             export_diagnostic_metrics_to_csv(curated_table, curated_csv_output)
 
             # Append raw result to all data CSV
-            curated_all_data_table = curated_table.set_index("Variant Type").add_suffix(f"_{metric_name.capitalize()}") if curated_all_data_table.empty else curated_all_data_table.join(curated_table.set_index("Variant Type"), on="Variant Type", rsuffix=f"_{metric_name.capitalize()}")
+            curated_all_data_table = curated_table.set_index("Variant Type").add_suffix(f"_{metric_name.title()}") if curated_all_data_table.empty else curated_all_data_table.join(curated_table.set_index("Variant Type").add_suffix(f"_{metric_name.title()}"), on="Variant Type")
 
         # Export combined stats curated CSV
         export_diagnostic_metrics_to_csv(curated_all_data_table, f"{args.prefix}_{args.engine}_curated_all_data.csv")
