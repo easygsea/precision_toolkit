@@ -46,7 +46,7 @@ def test_summarize_diagnostic_metrics(
     output_csvs = [
         output_prefix.with_name(f"{output_prefix.name}_happy_{prefix}_{metric}.csv")
         for prefix in ["raw", "curated"]
-        for metric in ["concordance", "sensitivity", "precision", "f1_score"]
+        for metric in ["concordance", "sensitivity", "precision", "f1_score", "all_data"]
     ]
     output_md = output_prefix.with_name(f"{output_prefix.name}_happy_combined.md")
     output_docx = output_prefix.with_name(f"{output_prefix.name}_happy_combined.docx")
@@ -93,3 +93,4 @@ def test_summarize_diagnostic_metrics(
             .title()
         )
         assert metric in df.columns
+        assert False
