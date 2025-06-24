@@ -141,6 +141,8 @@ def main():
     raw_summaries: list[str] = []
     curated_summaries: list[str] = []
     initial_metric_types: list[DiagnosticMetricType] = []
+    raw_all_data_table = pd.DataFrame()
+    curated_all_data_table = pd.DataFrame()
 
     # Process raw VCF comparisons
     if args.raw_files:
@@ -166,6 +168,13 @@ def main():
             # Export raw results to CSV
             raw_csv_output = f"{args.prefix}_{args.engine}_raw_{metric}.csv"
             export_diagnostic_metrics_to_csv(raw_table, raw_csv_output)
+
+            print(metric_name.capitalize())
+            # Append raw result to all data CSV
+            raw_all_data_table = raw_table.set_index("Variant Type").add_suffix(f"_{metric_name.capitalize()}") if raw_all_data_table.empty else raw_all_data_table.join(raw_table.set_index("Variant Type").add_suffix(f"_{metric_name.capitalize()}"), on="Variant Type")
+
+        # Export combined stats curated CSV
+        export_diagnostic_metrics_to_csv(raw_all_data_table, f"{args.prefix}_{args.engine}_raw_all_data.csv")
 
     # Process curated VCF comparisons if provided
     if args.curated_files:
@@ -193,6 +202,12 @@ def main():
             # Export curated results to CSV
             curated_csv_output = f"{args.prefix}_{args.engine}_curated_{metric}.csv"
             export_diagnostic_metrics_to_csv(curated_table, curated_csv_output)
+
+            # Append raw result to all data CSV
+            curated_all_data_table = curated_table.set_index("Variant Type").add_suffix(f"_{metric_name.capitalize()}") if curated_all_data_table.empty else curated_all_data_table.join(curated_table.set_index("Variant Type"), on="Variant Type", rsuffix=f"_{metric_name.capitalize()}")
+
+        # Export combined stats curated CSV
+        export_diagnostic_metrics_to_csv(curated_all_data_table, f"{args.prefix}_{args.engine}_curated_all_data.csv")
 
     # Combine tables in desired order
     tables: list[pd.DataFrame] = []
