@@ -13,6 +13,7 @@ source venv/bin/activate
 cd clinical_tools/
 
 set +e
-apptainer exec $APPTAINER_IMAGE python -m pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standalone.xml
+apptainer exec "$APPTAINER_IMAGE" python -m pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standalone.xml
 
+sed -i 's~container = "quay.io/easygsea/clinical_tools:latest"~container = "file://'"${APPTAINER_IMAGE}"'"~' nextflow.config
 pytest tests/workflow/ --junit-xml=test_results_workflow.xml

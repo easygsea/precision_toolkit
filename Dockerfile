@@ -47,7 +47,6 @@ ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
 WORKDIR /app
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
 RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${PSUTIL_VERSION}" && \
     pip uninstall --y bx-python cryptography cvxopt idna lxml numexpr pillow pip py pyxdg pycrypto setuptools && \
@@ -99,8 +98,6 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     cd "samtools-${HTSLIB_VERSION}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
-    # Install Nextflow
-    wget -qO- "https://get.nextflow.io" | bash && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" && \
     tar -xzf "Python-${PYTHON_VERSION}.tgz" && \
