@@ -86,7 +86,6 @@ Stage: runtime1
     libreadline-dev \
     libsqlite3-dev \
     libssl-dev \
-    openjdk-17-jdk \
     software-properties-common \
     wget \
     zlib1g-dev && \

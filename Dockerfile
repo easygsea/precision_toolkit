@@ -68,7 +68,6 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     libreadline-dev \
     libsqlite3-dev \
     libssl-dev \
-    openjdk-17-jdk \
     software-properties-common \
     unzip \
     wget \
