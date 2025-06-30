@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+
+####      BAMBOO INTERFACE CONFIGURATION       ####
+###    Hosts: gphost14                         ####
+###    Authentication type:                    ####
+###    Username: <YOUR_USERNAME>               ####
+###################################################
+
 export PATH="$PATH:/projects/gsc_clinical_dev/software/nextflow-24.10.3"
 export JAVA_HOME=/gsc/software/linux-x86_64-centos7/jdk-17.0.2
 export PATH=$JAVA_HOME/bin:$PATH

@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+####      BAMBOO INTERFACE CONFIGURATION       ####
+###    Hosts: dragen02                         ####
+###    Authentication type:                    ####
+###    Username: <YOUR_USERNAME>               ####
+###################################################
+
 set -euxo pipefail
 
 TESTING_DEPLOYMENT_DIRECTORY=$1

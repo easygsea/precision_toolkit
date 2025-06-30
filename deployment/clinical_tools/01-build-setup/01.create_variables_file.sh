@@ -13,4 +13,4 @@ UNIQUE_IDENTIFIER="${UNIQUE_IDENTIFIER//[.,\/-]/_}"
 echo "UNIQUE_IDENTIFIER=${UNIQUE_IDENTIFIER}
 TESTING_DEPLOYMENT_DIRECTORY=${BAMBOO_TMP_ROOT}/${UNIQUE_IDENTIFIER}" \
   > 02.inject_bamboo_variables.txt
-cat bamboo_constants.txt
+cat 02.inject_bamboo_variables.txt
