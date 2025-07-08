@@ -169,11 +169,11 @@ def main():
             raw_csv_output = f"{args.prefix}_{args.engine}_raw_{metric}.csv"
             export_diagnostic_metrics_to_csv(raw_table, raw_csv_output)
 
-            print(metric_name.capitalize())
             # Append raw result to all data CSV
             raw_all_data_table = raw_table.set_index("Variant Type").add_suffix(f"_{metric_name.title()}") if raw_all_data_table.empty else raw_all_data_table.join(raw_table.set_index("Variant Type").add_suffix(f"_{metric_name.title()}"), on="Variant Type")
 
         # Export combined stats curated CSV
+        raw_all_data_table = raw_all_data_table.rename_axis('Variant Type').reset_index()
         export_diagnostic_metrics_to_csv(raw_all_data_table, f"{args.prefix}_{args.engine}_raw_all_data.csv")
 
     # Process curated VCF comparisons if provided
@@ -207,6 +207,7 @@ def main():
             curated_all_data_table = curated_table.set_index("Variant Type").add_suffix(f"_{metric_name.title()}") if curated_all_data_table.empty else curated_all_data_table.join(curated_table.set_index("Variant Type").add_suffix(f"_{metric_name.title()}"), on="Variant Type")
 
         # Export combined stats curated CSV
+        curated_all_data_table = curated_all_data_table.rename_axis('Variant Type').reset_index()
         export_diagnostic_metrics_to_csv(curated_all_data_table, f"{args.prefix}_{args.engine}_curated_all_data.csv")
 
     # Combine tables in desired order

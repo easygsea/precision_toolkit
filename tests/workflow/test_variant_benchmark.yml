@@ -13,6 +13,8 @@
       md5sum: 5e1b288d20e20b5ae29cdfabc668bf5b
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       md5sum: a2226b1c6f484bb71f26e28223ea33ea
+    - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw_all_data.csv
+      md5sum: 789d4c075deccdcc7d7659446be34ac0
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw.md
       md5sum: 98ab1ecd3827bfe71dc6c814d32eb8b2
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw.docx
@@ -32,6 +34,8 @@
       md5sum: 5e1b288d20e20b5ae29cdfabc668bf5b
     - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       md5sum: a2226b1c6f484bb71f26e28223ea33ea
+    - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw_all_data.csv
+      md5sum: 789d4c075deccdcc7d7659446be34ac0
     - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw.md
       md5sum: 344f90e97d7c5eaf8f97416ec8d57847
     - path: tests_variant_benchmark_happy_raw_decimals1/variant_benchmark/diagnostic_metrics_happy_raw.docx
@@ -51,6 +55,8 @@
       should_exist: false
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       should_exist: false
+    - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw_all_data.csv
+      md5sum: a4186add84b218cd3516ab68fd385b0a
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw.md
       md5sum: 76414a280e3379f56973c4a7f1c0b55a
     - path: tests_variant_benchmark_happy_raw_selected_metrics/variant_benchmark/diagnostic_metrics_happy_raw.docx
@@ -74,6 +80,8 @@
       md5sum: 9b5876f494c02eeb7d40b9a767fb7eff
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_curated_sensitivity.csv
       md5sum: 73e0eb6816ae7a5923ebf9d1cb6c7e24
+    - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_curated_all_data.csv
+      md5sum: ec1c970dfc603e1676c67c0128205a9b
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
       md5sum: a69b4e362b83c45d4faa1128f373a110
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
@@ -82,6 +90,8 @@
       md5sum: 5e1b288d20e20b5ae29cdfabc668bf5b
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       md5sum: a2226b1c6f484bb71f26e28223ea33ea
+    - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_raw_all_data.csv
+      md5sum: 789d4c075deccdcc7d7659446be34ac0
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_combined.md
       md5sum: ffb72114c663a548acfcb7298c18e6b6
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_combined.docx
@@ -105,6 +115,8 @@
       md5sum: 9b5876f494c02eeb7d40b9a767fb7eff
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated_sensitivity.csv
       md5sum: 73e0eb6816ae7a5923ebf9d1cb6c7e24
+    - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated_all_data.csv
+      md5sum: ec1c970dfc603e1676c67c0128205a9b
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
@@ -112,6 +124,8 @@
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_precision.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
+      should_exist: false
+    - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_all_data.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated.md
       md5sum: 557ffd936f7e7c3f7a5b0663c3158a96
@@ -122,6 +136,8 @@
   files:
     - path: tests_variant_benchmark_sompy_raw/variant_benchmark/diagnostic_metrics_sompy_raw_concordance.csv
       md5sum: 79a45526039a3e8133288191e1f43124
+    - path: tests_variant_benchmark_sompy_raw/variant_benchmark/diagnostic_metrics_sompy_raw_all_data.csv
+      md5sum: a42d1670697c673b4aa729e9bb62c3ce
 
 
 - name: variant_benchmark_wittyer_raw
@@ -139,6 +155,8 @@
       md5sum: 971506e4c8c06c44d8f1079f92033039
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_sensitivity.csv
       md5sum: 61b82acf93c5c73149e3dc7f68c5c9c9
+    - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_all_data.csv
+      md5sum: ecc8dc2ded4fdc296f863bcd669ee611
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw.md
       md5sum: e6182fa3ee34dfc5fe95f6005ae1c402
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw.docx
@@ -168,6 +186,8 @@
       md5sum: 3230b4331b65f87ccef327fca7e715c3
     - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_curated_sensitivity.csv
       md5sum: 62f32632d7c956b95714fad385a01d7e
+    - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_curated_all_data.csv
+      md5sum: 76f856896b1569f8657adc210d0a254d
     - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_raw_concordance.csv
       md5sum: 14e331a41a727492ca0b8e2cd9a90150
     - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_raw_f1_score.csv
@@ -176,6 +196,8 @@
       md5sum: 971506e4c8c06c44d8f1079f92033039
     - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_raw_sensitivity.csv
       md5sum: 61b82acf93c5c73149e3dc7f68c5c9c9
+    - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_raw_all_data.csv
+      md5sum: ecc8dc2ded4fdc296f863bcd669ee611
     - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_combined.md
       md5sum: ce49c7e60c17089c4354cd6745a5f2b7
     - path: tests_variant_benchmark_wittyer_exclude_spurious/variant_benchmark/diagnostic_metrics_wittyer_combined.docx
@@ -199,6 +221,8 @@
       md5sum: 3230b4331b65f87ccef327fca7e715c3
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_curated_sensitivity.csv
       md5sum: 62f32632d7c956b95714fad385a01d7e
+    - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_curated_all_data.csv
+      md5sum: 76f856896b1569f8657adc210d0a254d
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_concordance.csv
       should_exist: false
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_f1_score.csv
@@ -206,6 +230,8 @@
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_precision.csv
       should_exist: false
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_sensitivity.csv
+      should_exist: false
+    - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_all_data.csv
       should_exist: false
     - path: tests_variant_benchmark_wittyer_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_wittyer_curated.md
       md5sum: e3acfd5d643b7afd70eb1dc720a7cbd2
@@ -238,6 +264,8 @@
       md5sum: dd1c25a17f589ba5ee8e461088dd6148
     - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       md5sum: a6c6d1ebab8bd9312c45ba7540c4079e
+    - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw_all_data.csv
+      md5sum: d0b29946ce31880b6a504c91adb09f32
     - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw.md
       md5sum: 690684281495ad6ffc0ff76ba5c20e98
     - path: tests_variant_benchmark_happy_agresti_coull/variant_benchmark/diagnostic_metrics_happy_raw.docx
@@ -253,6 +281,8 @@
       md5sum: 92e999864cf5f7de4c801081ca584f9e
     - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       md5sum: c367166c16ed55db34ce205e81f80687
+    - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw_all_data.csv
+      md5sum: 8297993e01255c73a4f2cdaf0a746f7b
     - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw.md
       md5sum: 31cb3db7f6e590015145a0fde43ca992
     - path: tests_variant_benchmark_happy_99ci/variant_benchmark/diagnostic_metrics_happy_raw.docx
