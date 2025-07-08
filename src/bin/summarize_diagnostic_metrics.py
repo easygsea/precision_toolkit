@@ -156,7 +156,7 @@ def main():
         )
 
         for metric in args.metrics:
-            metric_name = "F1 Score" if metric == "f1_score" else metric
+            metric_name = "F1 score" if metric == "f1_score" else metric
             raw_table = generate_diagnostic_metrics_table(raw_results[metric], metric)
             raw_tables.append(raw_table)
             raw_headings.append(f"Raw {metric_name.capitalize()}")
