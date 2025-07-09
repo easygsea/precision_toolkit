@@ -13,3 +13,97 @@ To run the default plan configuration, one has to define the following variables
 `POETRY_EXECUTABLE` - path to the local poetry executable\
 `PRODUCTION_ROOT` - path where clinical tools are deployed to\
 `PYTHON_EXECUTABLE` - path to the python executable, off of which the virtual environment is created
+
+
+# CI/CD Agent Instructions
+Below are the recommended instructions to launch the scripts saved in the deployment folder.
+
+### Build Setup
+- Local Script\
+This script copies the needed variables that are only available on the CI/CD agent, and saves them locally into the
+`02.inject_bamboo_variables.txt`
+```bash
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+BRANCH_NAME=$1
+BAMBOO_TMP_ROOT=$2
+
+CLINICAL_TOOLS_IDENTIFIER="CLINICAL_TOOLS"
+
+UNIQUE_IDENTIFIER="${CLINICAL_TOOLS_IDENTIFIER}_${BRANCH_NAME}"
+UNIQUE_IDENTIFIER="${UNIQUE_IDENTIFIER//[.,\/-]/_}"
+
+echo "UNIQUE_IDENTIFIER=${UNIQUE_IDENTIFIER}
+TESTING_DEPLOYMENT_DIRECTORY=${BAMBOO_TMP_ROOT}/${UNIQUE_IDENTIFIER}" \
+  >> 02.inject_bamboo_variables.txt
+cat 02.inject_bamboo_variables.txt
+```
+- Checkout from BitBucket
+```bash
+cd ${bamboo.BAMBOO_EXEC_ROOT}
+cd 01-build-setup/
+
+bash 03.checkout_from_bitbucket.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
+${bamboo.planRepository.repositoryUrl} \
+${bamboo.planRepository.branchName}
+```
+  -  Setup Poetry Environment
+```bash
+cd ${bamboo.BAMBOO_EXEC_ROOT}
+cd 01-build-setup/
+
+bash 04.poetry_environment.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
+${bamboo.PYTHON_EXECUTABLE} \
+${bamboo.POETRY_EXECUTABLE}
+```
+  - Build Apptainer Image
+```bash
+cd ${bamboo.BAMBOO_EXEC_ROOT}
+cd 01-build-setup/
+
+bash 05.build_apptainer_image.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} ${bamboo.APPTAINER_IMAGE}
+```
+### Run Unit Tests
+- Run Tests - SSH Task
+```bash
+cd ${bamboo.BAMBOO_EXEC_ROOT}
+cd 02-testing_and_linting/
+
+bash 01.run_unit_and_integration_tests.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} ${bamboo.APPTAINER_IMAGE}
+```
+- Move Test Results - Local Task
+```bash
+cp ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/test_results_unit_standalone.xml ${bamboo.build.working.directory}/test_results_unit_standalone.xml
+cp ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/test_results_workflow.xml ${bamboo.build.working.directory}/test_results_workflow.xml
+```
+- Analyze Test Results - JUnit Parser
+
+### Linting
+- Run Pre Commit - SSH Task
+```bash
+cd ${bamboo.BAMBOO_EXEC_ROOT}
+cd 02-testing_and_linting/
+
+bash 02.run_formatters_and_linters.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
+```
+### Clean Up
+- Remove Temporary Directory - SSH Task
+```bash
+cd ${bamboo.BAMBOO_TMP_ROOT}
+
+rm -rfv ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
+```
+### Deployment
+This stage is recommended to be manual, especially if the CI/CD agent is running the pipeline every time there is a commit.
+The main purpose of this stage is to build the container and copy it to the deployment folder.
+
+- Deploy - SSH Task
+```bash
+cd ${bamboo.BAMBOO_EXEC_ROOT}
+cd 04-deployment/
+
+bash 01-deploy.sh ${bamboo.planRepository.branchName} ${bamboo.planRepository.repositoryUrl} \
+    ${bamboo.PRODUCTION_ROOT}
+```

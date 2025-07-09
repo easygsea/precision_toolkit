@@ -2,8 +2,6 @@
 
 ####      BAMBOO INTERFACE CONFIGURATION       ####
 ###    Hosts: dragen02                         ####
-###    Authentication type:                    ####
-###    Username: <YOUR_USERNAME>               ####
 ###################################################
 
 set -euxo pipefail

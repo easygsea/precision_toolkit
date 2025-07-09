@@ -2,8 +2,6 @@
 
 ####      BAMBOO INTERFACE CONFIGURATION       ####
 ###    Hosts: gphost14                         ####
-###    Authentication type:                    ####
-###    Username: <YOUR_USERNAME>               ####
 ###################################################
 
 set -euxo pipefail

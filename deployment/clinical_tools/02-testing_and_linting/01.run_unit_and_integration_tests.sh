@@ -3,8 +3,6 @@
 
 ####      BAMBOO INTERFACE CONFIGURATION       ####
 ###    Hosts: gphost14                         ####
-###    Authentication type:                    ####
-###    Username: <YOUR_USERNAME>               ####
 ###################################################
 
 export PATH="$PATH:/projects/gsc_clinical_dev/software/nextflow-24.10.3"

@@ -3,8 +3,6 @@
 
 ####      BAMBOO INTERFACE CONFIGURATION       ####
 ###    Hosts: gphost14                         ####
-###    Authentication type:                    ####
-###    Username: <YOUR_USERNAME>               ####
 ###################################################
 
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:/projects/clingenetics/software/tools/python/Python-3.11.7/lib"
