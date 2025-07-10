@@ -51,7 +51,8 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends software-properties-common && \
     add-apt-repository ppa:ubuntu-toolchain-r/test && \
-    apt-get install -y --no-install-recommends  \
+    apt-get install -y --no-install-recommends \
+    gawk \
     apt-transport-https \
     build-essential \
     gcc-10 \
