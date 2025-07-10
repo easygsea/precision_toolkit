@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-####      BAMBOO INTERFACE CONFIGURATION       ####
-###    Hosts: gphost14                         ####
-###################################################
+########## BAMBOO INTERFACE CONFIGURATION ############
+####       Hosts: gphost14                        ####
+######################################################
 
 set -euxo pipefail
 

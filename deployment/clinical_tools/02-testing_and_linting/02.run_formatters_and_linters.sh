@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-
-####      BAMBOO INTERFACE CONFIGURATION       ####
-###    Hosts: gphost14                         ####
-###################################################
+########## BAMBOO INTERFACE CONFIGURATION ############
+####       Hosts: gphost14                        ####
+######################################################
 
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:/projects/clingenetics/software/tools/python/Python-3.11.7/lib"
 

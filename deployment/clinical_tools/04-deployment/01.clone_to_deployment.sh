@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-####      BAMBOO INTERFACE CONFIGURATION       ####
-###    Hosts: dragen02                         ####
-###################################################
+########## BAMBOO INTERFACE CONFIGURATION ############
+####       Hosts: dragen02                        ####
+######################################################
 
 set -euxo pipefail
 
