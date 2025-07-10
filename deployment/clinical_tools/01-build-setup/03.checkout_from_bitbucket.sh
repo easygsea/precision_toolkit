@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-########## BAMBOO INTERFACE CONFIGURATION ############
-####       Hosts: gphost14                        ####
-######################################################
-
 set -euxo pipefail
 
 TESTING_DEPLOYMENT_DIRECTORY=$1

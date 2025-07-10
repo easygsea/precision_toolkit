@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-########## BAMBOO INTERFACE CONFIGURATION ############
-####       Hosts: dragen02                        ####
-######################################################
-
 set -euxo pipefail
 
 # Clone the repository, move it into the deployment folder and build the apptainer image
