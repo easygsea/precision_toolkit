@@ -4,21 +4,24 @@
 ####       Hosts: gphost14                        ####
 ######################################################
 
-
-export PATH="$PATH:/projects/gsc_clinical_dev/software/nextflow-24.10.3"
-export JAVA_HOME=/gsc/software/linux-x86_64-centos7/jdk-17.0.2
-export PATH=$JAVA_HOME/bin:$PATH
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:/projects/clingenetics/software/tools/python/Python-3.11.7/lib"
+set -euxo pipefail
 
 TESTING_DEPLOYMENT_DIRECTORY=$1
 APPTAINER_IMAGE=$2
+NEXTFLOW_EXECUTABLE=$3
+JAVA_EXECUTABLE=$4
+
+export PATH="$PATH:${NEXTFLOW_EXECUTABLE}"
+export JAVA_HOME="${JAVA_EXECUTABLE}"
+export PATH=$JAVA_HOME/bin:$PATH
 
 cd "${TESTING_DEPLOYMENT_DIRECTORY}"
 source venv/bin/activate
 cd clinical_tools/
 
-set +e
+# Executing the python unit and standalone tests inside the container to avoid dependency conflicts with OS
 apptainer exec "${APPTAINER_IMAGE}" python -m pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standalone.xml
 
+# Replace the pointer to the remote image to the local one and run workflow tests with Nextflow pointing to the local image
 sed -i 's~container = "quay.io/easygsea/clinical_tools:latest"~container = "file://'"${APPTAINER_IMAGE}"'"~' nextflow.config
 pytest tests/workflow/ --junit-xml=test_results_workflow.xml

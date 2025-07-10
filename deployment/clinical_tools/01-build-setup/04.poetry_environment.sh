@@ -6,8 +6,6 @@
 
 set -euxo pipefail
 
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:/projects/clingenetics/software/tools/python/Python-3.11.7/lib"
-
 TESTING_DEPLOYMENT_DIRECTORY=$1
 PYTHON_EXECUTABLE=$2
 
@@ -15,6 +13,7 @@ cd "${TESTING_DEPLOYMENT_DIRECTORY}"
 # Ensures $@ is empty when calling source to avoid passing in unwanted parameters
 shift $#
 
+# Activates the virtual environment and installs the packages from the lock file
 "${PYTHON_EXECUTABLE}" -m venv venv
 source venv/bin/activate
 pip install --upgrade pip wheel

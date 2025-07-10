@@ -4,7 +4,7 @@
 ####       Hosts: gphost14                        ####
 ######################################################
 
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:/projects/clingenetics/software/tools/python/Python-3.11.7/lib"
+set -euxo pipefail
 
 TESTING_DEVELOPMENT_DIRECTORY=$1
 

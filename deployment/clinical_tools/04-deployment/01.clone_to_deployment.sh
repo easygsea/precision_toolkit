@@ -6,8 +6,7 @@
 
 set -euxo pipefail
 
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:/projects/clingenetics/software/tools/python/Python-3.11.7/lib"
-
+# Clone the repository, move it into the deployment folder and build the apptainer image
 function clone_and_deploy {
   cd "${PRODUCTION_ROOT}/clinical_tools"
   git clone --branch "${BRANCH_NAME}" "${REPOSITORY_URL}" tmp_dir
@@ -20,13 +19,13 @@ function clone_and_deploy {
     cd ..
     mkdir -p "${PRODUCTION_ROOT}/clinical_tools/${version}"
     mv tmp_dir/* "${PRODUCTION_ROOT}/clinical_tools/${version}/"
-    rm -rf tmp_dir/
     cd "${PRODUCTION_ROOT}/clinical_tools/${version}"
     apptainer build clinical_tools.sif apptainer.def
   fi
-
+  rm -rf tmp_dir/
 }
 
+# Get version defined in the pyproject.toml
 function get_version {
   version="$(
     sed --quiet '/^version =/{s/version = "\([^"]\+\)"/\1/;p}' pyproject.toml
@@ -40,7 +39,6 @@ function get_version {
   fi
   echo "${version}"
 }
-
 
 function main {
   declare -r \
