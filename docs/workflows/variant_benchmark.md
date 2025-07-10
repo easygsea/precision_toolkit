@@ -236,6 +236,8 @@ For example, when spurious_variants_vcf is supplied:
         ├── diagnostic_metrics_happy_curated_sensitivity.csv # Curated sensitivity in CSV
         ├── diagnostic_metrics_happy_raw_precision.csv       # Raw precision in CSV
         ├── diagnostic_metrics_happy_curated_precision.csv   # Curated precision in CSV
+        ├── diagnostic_metrics_happy_raw_all_data.csv        # Combined raw metrics in CSV
+        ├── diagnostic_metrics_happy_curated_all_data.csv    # Combined curated metrics in CSV
         ├── diagnostic_metrics_happy_combined.md             # Combined raw/curated diagnostic metrics in Markdown
         └── diagnostic_metrics_happy_combined.docx           # Combined raw/curated diagnostic metrics in Word
 ```
@@ -267,7 +269,7 @@ This table summarizes the curated sensitivity of variant calls.
 
 Note that som.py does not report a filter column, so the `Variant Filter` column is always set to `NA`.
 
-For more defails on hap.py, som.py, and witty.er outputs:
+For more details on hap.py, som.py, and witty.er outputs:
 - [hap.py output documentation](https://github.com/Illumina/hap.py?tab=readme-ov-file#happy)
 - [som.py output documentation](https://github.com/Illumina/hap.py?tab=readme-ov-file#sompy)
 - [witty.er output documentation](https://github.com/Illumina/witty.er?tab=readme-ov-file#outputs)
