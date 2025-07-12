@@ -147,6 +147,7 @@ workflow variant_benchmark_workflow {
             params.ci_method,
             params.ci_level,
             params.variant_benchmark_dir,
-            params.decimals
+            params.decimals,
+            params.include_all_data_csv
         )
 }

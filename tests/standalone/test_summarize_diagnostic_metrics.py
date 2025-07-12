@@ -75,6 +75,8 @@ def test_summarize_diagnostic_metrics(
             "0.99",
             "--decimals",
             str(DEFAULT_DECIMALS),
+            "--include-all-data-csv",
+            "true",
         ],
         check=True,
     )

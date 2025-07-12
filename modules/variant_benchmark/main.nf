@@ -105,6 +105,7 @@ process summarize_diagnostic_metrics {
     val ci_level
     val output_dir
     val decimals
+    val include_all_data_csv
 
     output:
     path("${PREFIX}*"), emit: variant_benchmark_summary
@@ -120,6 +121,7 @@ process summarize_diagnostic_metrics {
         --ci-method "${ci_method}" \
         --ci-level ${ci_level} \
         --prefix "${PREFIX}" \
-        --decimals ${decimals}
+        --decimals ${decimals} \
+        --include-all-data-csv "${include_all_data_csv}"
     """
 }

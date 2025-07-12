@@ -9,12 +9,14 @@ Usage:
     --decimals <number of decimal places>
     --ci-method <confidence interval method>
     --ci-level <confidence level>
+    --include_all-data-csv <"true" or "false">
 
 Example:
     summarize-diagnostic-metrics --engine happy --raw-files A.raw.summary.csv
     B.raw.summary.csv --curated-files A.curated.summary.csv B.curated.summary.csv
     --prefix diagnostic_metrics --metrics concordance sensitivity precision f1_score
     --tp-method min --decimals 1 --ci-method wilson --ci-level 0.95
+    --include_all-data-csv true
 """
 
 import argparse
@@ -117,6 +119,13 @@ def main():
         help="Confidence level for confidence intervals (default: "
         f"{DEFAULT_CI_LEVEL}).",
     )
+    parser.add_argument(
+        "--include-all-data-csv",
+        choices=["false", "true"],
+        default="false",
+        help="Option to output compiled csv for data wrangling/plotting (default: "
+        "false",
+    )
 
     args = parser.parse_args()
 
@@ -183,12 +192,13 @@ def main():
             )
 
         # Export combined stats curated CSV
-        raw_all_data_table = raw_all_data_table.rename_axis(
-            ["Variant Type", "Variant Filter"]
-        ).reset_index()
-        export_diagnostic_metrics_to_csv(
-            raw_all_data_table, f"{args.prefix}_{args.engine}_raw_all_data.csv"
-        )
+        if args.include_all_data_csv == "true":
+            raw_all_data_table = raw_all_data_table.rename_axis(
+                ["Variant Type", "Variant Filter"]
+            ).reset_index()
+            export_diagnostic_metrics_to_csv(
+                raw_all_data_table, f"{args.prefix}_{args.engine}_raw_all_data.csv"
+            )
 
     # Process curated VCF comparisons if provided
     if args.curated_files:
@@ -224,19 +234,21 @@ def main():
                 )
                 if curated_all_data_table.empty
                 else curated_all_data_table.join(
-                    curated_table.set_index(["Variant Type", "Variant Filter"]).add_suffix(
-                        f"_{metric_name.title()}"
-                    )
+                    curated_table.set_index(
+                        ["Variant Type", "Variant Filter"]
+                    ).add_suffix(f"_{metric_name.title()}")
                 )
             )
 
         # Export combined stats curated CSV
-        curated_all_data_table = curated_all_data_table.rename_axis(
-            ["Variant Type", "Variant Filter"]
-        ).reset_index()
-        export_diagnostic_metrics_to_csv(
-            curated_all_data_table, f"{args.prefix}_{args.engine}_curated_all_data.csv"
-        )
+        if args.include_all_data_csv == "true":
+            curated_all_data_table = curated_all_data_table.rename_axis(
+                ["Variant Type", "Variant Filter"]
+            ).reset_index()
+            export_diagnostic_metrics_to_csv(
+                curated_all_data_table,
+                f"{args.prefix}_{args.engine}_curated_all_data.csv",
+            )
 
     # Combine tables in desired order
     tables: list[pd.DataFrame] = []
