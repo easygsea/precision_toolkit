@@ -104,7 +104,7 @@ nextflow run main.nf \
 - `--decimals`: Number of decimal places in rendered output (default: 2).
 - `--ci_method`: Confidence interval method (default: `wilson`) Options: `agresti_coull`, `beta`, `binom_test`, `jeffreys`, `normal`, `wilson`.
 - `--ci_level`: Confidence level for confidence intervals (default: 0.95).
-pre co- `--include-all-data-csv`: Option to output compiled csv for data wrangling/plotting (default: false).
+- `--include-all-data-csv`: Option to output compiled csv for data wrangling/plotting (default: false).
 
 **Official Parameter References:**
 - [hap.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/happy.md#command-line-options)
