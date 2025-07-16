@@ -29,7 +29,7 @@ nextflow run main.nf \
 **Optional Parameters:**
 - `--spurious_variants_vcf`: The VCF file containing spurious variants to exclude.
 - `--collapse`: The collapse option for bcftools isec.
-- `--xlim`: The x-axis limits. Example usage: --xlim="0 1"
-- `--ylim`: The y-axis limits. Example usage: --ylim="0 1"
+- `--xlim`: The x-axis limits. Example usage: --xlim="0 1".
+- `--ylim`: The y-axis limits. Example usage: --ylim="0 1".
 - `--show_regression`: Show the regression line.
 - `--filter_source`: The FILTER column to use for coloring ('', 'truth', or 'query').

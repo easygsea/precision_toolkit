@@ -50,7 +50,7 @@ def helpMessage() {
             --bpDistance             witty.er parameter: Maximum allowed distance between truth and query boundaries in base pairs (default: 5000)
             --spurious_variants_vcf  VCF file containing spurious variants to exclude
             --collapse               Collapse option for bcftools isec (default: 'none')
-            --skip_raw               Skip raw analysis (only available when spurious_variants_vcf is provided)
+            --skip_raw               Skip raw analysis (only available when spurious_variants_vcf is provided) (flag)
             --concordance_tp         Method for defining TP in concordance calculation
                                      Available options:
                                      - 'truth': Use truth set's TP count
@@ -59,6 +59,7 @@ def helpMessage() {
             --decimals               Number of decimal places in rendered output (default: 2)
             --ci_method              Confidence interval method (default: wilson) Options: agresti_coull, beta, binom_test, jeffreys, normal, wilson
             --ci_level               Confidence level for confidence intervals (default: 0.95)
+            --include_all_data_csv   Option to output compiled csv for data wrangling/plotting (flag)
 
     Signal Correlation Workflow:
         Mandatory Parameters:

@@ -9,12 +9,14 @@ Usage:
     --decimals <number of decimal places>
     --ci-method <confidence interval method>
     --ci-level <confidence level>
+    --include_all-data-csv <"true" or "false">
 
 Example:
     summarize-diagnostic-metrics --engine happy --raw-files A.raw.summary.csv
     B.raw.summary.csv --curated-files A.curated.summary.csv B.curated.summary.csv
     --prefix diagnostic_metrics --metrics concordance sensitivity precision f1_score
     --tp-method min --decimals 1 --ci-method wilson --ci-level 0.95
+    --include_all-data-csv true
 """
 
 import argparse
@@ -39,6 +41,36 @@ from clinical_tools.render.diagnostic_metrics import (
     export_diagnostic_metrics_to_word,
     generate_diagnostic_metrics_table,
 )
+
+
+def generate_all_data_csv(
+    tables_list: list[pd.DataFrame], metrics_list: list[str]
+) -> pd.DataFrame:
+    """Generate and return a large dataframe containing data from all metric tables."""
+    # Initialize all data table
+    all_data_table = pd.DataFrame()
+
+    # Append each metric table to all data table
+    for table, metric in zip(tables_list, metrics_list):
+        metric_name = "F1 score" if metric == "f1_score" else metric
+
+        all_data_table = (
+            table.set_index(["Variant Type", "Variant Filter"]).add_suffix(
+                f"_{metric_name.title()}"
+            )
+            if all_data_table.empty
+            else all_data_table.join(
+                table.set_index(["Variant Type", "Variant Filter"]).add_suffix(
+                    f"_{metric_name.title()}"
+                )
+            )
+        )
+
+    # Reset index and return table
+    all_data_table = all_data_table.rename_axis(
+        ["Variant Type", "Variant Filter"]
+    ).reset_index()
+    return all_data_table
 
 
 def main():
@@ -117,6 +149,13 @@ def main():
         help="Confidence level for confidence intervals (default: "
         f"{DEFAULT_CI_LEVEL}).",
     )
+    parser.add_argument(
+        "--include-all-data-csv",
+        choices=["false", "true"],
+        default="false",
+        help="Option to output compiled csv for data wrangling/plotting (default: "
+        "false",
+    )
 
     args = parser.parse_args()
 
@@ -167,6 +206,13 @@ def main():
             raw_csv_output = f"{args.prefix}_{args.engine}_raw_{metric}.csv"
             export_diagnostic_metrics_to_csv(raw_table, raw_csv_output)
 
+        # Generate and export raw all_data_csv if option selected
+        if args.include_all_data_csv == "true":
+            raw_all_data_table = generate_all_data_csv(raw_tables, args.metrics)
+            export_diagnostic_metrics_to_csv(
+                raw_all_data_table, f"{args.prefix}_{args.engine}_raw_all_data.csv"
+            )
+
     # Process curated VCF comparisons if provided
     if args.curated_files:
         curated_results = process_diagnostic_metrics(
@@ -193,6 +239,14 @@ def main():
             # Export curated results to CSV
             curated_csv_output = f"{args.prefix}_{args.engine}_curated_{metric}.csv"
             export_diagnostic_metrics_to_csv(curated_table, curated_csv_output)
+
+        # Generate and export curated all_data_csv if option selected
+        if args.include_all_data_csv == "true":
+            curated_all_data_table = generate_all_data_csv(curated_tables, args.metrics)
+            export_diagnostic_metrics_to_csv(
+                curated_all_data_table,
+                f"{args.prefix}_{args.engine}_curated_all_data.csv",
+            )
 
     # Combine tables in desired order
     tables: list[pd.DataFrame] = []

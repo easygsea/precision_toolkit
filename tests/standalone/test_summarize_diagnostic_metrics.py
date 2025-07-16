@@ -48,6 +48,10 @@ def test_summarize_diagnostic_metrics(
         for prefix in ["raw", "curated"]
         for metric in ["concordance", "sensitivity", "precision", "f1_score"]
     ]
+    output_all_data_csvs = [
+        output_prefix.with_name(f"{output_prefix.name}_happy_{prefix}_all_data.csv")
+        for prefix in ["raw", "curated"]
+    ]
     output_md = output_prefix.with_name(f"{output_prefix.name}_happy_combined.md")
     output_docx = output_prefix.with_name(f"{output_prefix.name}_happy_combined.docx")
 
@@ -71,6 +75,8 @@ def test_summarize_diagnostic_metrics(
             "0.99",
             "--decimals",
             str(DEFAULT_DECIMALS),
+            "--include-all-data-csv",
+            "true",
         ],
         check=True,
     )
@@ -78,6 +84,8 @@ def test_summarize_diagnostic_metrics(
     # Check that output files were created
     for output_csv in output_csvs:
         assert output_csv.exists()
+    for output_all_data_csv in output_all_data_csvs:
+        assert output_all_data_csv.exists()
     assert output_md.exists()
     assert output_docx.exists()
 

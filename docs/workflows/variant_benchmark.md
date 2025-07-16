@@ -82,8 +82,8 @@ nextflow run main.nf \
 **Required Parameters:**
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
 - `--query_dir`: The directory containing query VCF files (the test or experimental dataset). These must be named as <sample>.query.vcf or <sample>.query.vcf.gz.
-- `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, or `wittyer`, default: `happy`)
-- `--genome_ref`: Required for hap.py: Reference genome FASTA file
+- `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, or `wittyer`, default: `happy`).
+- `--genome_ref`: Required for hap.py: Reference genome FASTA file.
 
 **Optional Parameters:**
 - `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
@@ -93,17 +93,18 @@ nextflow run main.nf \
 - `--happy_options`: Additional hap.py options (default: `--write-vcf --write-counts`). Must quote the string and use = to assign the value.
 - `--sompy_options`: Additional som.py options (default: `--include-nonpass`). Must quote the string and use = to assign the value.
 - `--wittyer_options`: Additional witty.er options (default: auto-generated from parameters below). Must quote the string and use = to assign the value.
-- `--evaluationMode`: witty.er parameter: Evaluation mode (default: `CrossTypeAndSimpleCounting`) Options: `CrossTypeAndSimpleCounting`, `SimpleCounting`, `GenotypeMatching`. Note that GenotypeMatching corresponds to the Default option in witty.er documentation https://github.com/Illumina/witty.er/issues/25
-- `--includedFilters`: witty.er parameter: Comma separated list. Only variants contain these filters will be considered. Empty string ('') will include all filters (default: '')
-- `--percentDistance`: witty.er parameter: Maximum allowed distance between truth and query boundaries as fraction of SV length (default: 0.3)
-- `--bpDistance`: witty.er parameter: Maximum allowed distance between truth and query boundaries in base pairs (default: 5000)
-- `--spurious_variants_vcf`: VCF file containing spurious variants to exclude
+- `--evaluationMode`: witty.er parameter: Evaluation mode (default: `CrossTypeAndSimpleCounting`) Options: `CrossTypeAndSimpleCounting`, `SimpleCounting`, `GenotypeMatching`. Note that GenotypeMatching corresponds to the Default option in witty.er documentation https://github.com/Illumina/witty.er/issues/25.
+- `--includedFilters`: witty.er parameter: Comma separated list. Only variants contain these filters will be considered. Empty string ('') will include all filters (default: '').
+- `--percentDistance`: witty.er parameter: Maximum allowed distance between truth and query boundaries as fraction of SV length (default: 0.3).
+- `--bpDistance`: witty.er parameter: Maximum allowed distance between truth and query boundaries in base pairs (default: 5000).
+- `--spurious_variants_vcf`: VCF file containing spurious variants to exclude.
 - `--collapse`: Collapse option for bcftools isec (default: `none`).
-- `--skip_raw`: Skip raw analysis (only available when `spurious_variants_vcf` is provided)
-- `--concordance_tp`: Method for defining TP in concordance calculation. Available options: `truth` (use truth set's TP count), `query` (use query set's TP count), `min` (use minimum of truth and query TP counts, default)
-- `--decimals`: Number of decimal places in rendered output (default: 2)
-- `--ci_method`: Confidence interval method (default: `wilson`) Options: `agresti_coull`, `beta`, `binom_test`, `jeffreys`, `normal`, `wilson`
-- `--ci_level`: Confidence level for confidence intervals (default: 0.95)
+- `--skip_raw`: Skip raw analysis (only available when `spurious_variants_vcf` is provided).
+- `--concordance_tp`: Method for defining TP in concordance calculation. Available options: `truth` (use truth set's TP count), `query` (use query set's TP count), `min` (use minimum of truth and query TP counts, default).
+- `--decimals`: Number of decimal places in rendered output (default: 2).
+- `--ci_method`: Confidence interval method (default: `wilson`) Options: `agresti_coull`, `beta`, `binom_test`, `jeffreys`, `normal`, `wilson`.
+- `--ci_level`: Confidence level for confidence intervals (default: 0.95).
+- `--include-all-data-csv`: Option to output compiled csv for data wrangling/plotting (default: false).
 
 **Official Parameter References:**
 - [hap.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/happy.md#command-line-options)
@@ -236,6 +237,8 @@ For example, when spurious_variants_vcf is supplied:
         ├── diagnostic_metrics_happy_curated_sensitivity.csv # Curated sensitivity in CSV
         ├── diagnostic_metrics_happy_raw_precision.csv       # Raw precision in CSV
         ├── diagnostic_metrics_happy_curated_precision.csv   # Curated precision in CSV
+        ├── diagnostic_metrics_happy_raw_all_data.csv        # Combined raw metrics in CSV
+        ├── diagnostic_metrics_happy_curated_all_data.csv    # Combined curated metrics in CSV
         ├── diagnostic_metrics_happy_combined.md             # Combined raw/curated diagnostic metrics in Markdown
         └── diagnostic_metrics_happy_combined.docx           # Combined raw/curated diagnostic metrics in Word
 ```
@@ -267,7 +270,7 @@ This table summarizes the curated sensitivity of variant calls.
 
 Note that som.py does not report a filter column, so the `Variant Filter` column is always set to `NA`.
 
-For more defails on hap.py, som.py, and witty.er outputs:
+For more details on hap.py, som.py, and witty.er outputs:
 - [hap.py output documentation](https://github.com/Illumina/hap.py?tab=readme-ov-file#happy)
 - [som.py output documentation](https://github.com/Illumina/hap.py?tab=readme-ov-file#sompy)
 - [witty.er output documentation](https://github.com/Illumina/witty.er?tab=readme-ov-file#outputs)

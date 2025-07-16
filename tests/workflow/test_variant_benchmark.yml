@@ -1,5 +1,5 @@
 - name: variant_benchmark_happy_raw
-  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_happy_raw
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_happy_raw --include_all_data_csv
   files:
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/raw/happy/sample1.raw.summary.csv
       md5sum: f8ea5d6058e1630b4c550799ff1458e5
@@ -13,6 +13,8 @@
       md5sum: 5e1b288d20e20b5ae29cdfabc668bf5b
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       md5sum: a2226b1c6f484bb71f26e28223ea33ea
+    - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw_all_data.csv
+      md5sum: 2bd3c4670be32439ef23db6842454028
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw.md
       md5sum: 98ab1ecd3827bfe71dc6c814d32eb8b2
     - path: tests_variant_benchmark_happy_raw/variant_benchmark/diagnostic_metrics_happy_raw.docx
@@ -87,7 +89,7 @@
     - path: tests_variant_benchmark_happy_exclude_spurious/variant_benchmark/diagnostic_metrics_happy_combined.docx
 
 - name: variant_benchmark_happy_exclude_spurious_skip_raw
-  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --spurious_variants_vcf tests_data/spurious_snv.vcf --skip_raw --output_dir tests_variant_benchmark_happy_exclude_spurious_skip_raw
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine happy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --spurious_variants_vcf tests_data/spurious_snv.vcf --skip_raw --output_dir tests_variant_benchmark_happy_exclude_spurious_skip_raw --include_all_data_csv
   files:
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/curated/happy/sample1.curated.summary.csv
       md5sum: afc6065ec9d4173e2ff0e832adfa9fc3
@@ -105,6 +107,8 @@
       md5sum: 9b5876f494c02eeb7d40b9a767fb7eff
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated_sensitivity.csv
       md5sum: 73e0eb6816ae7a5923ebf9d1cb6c7e24
+    - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated_all_data.csv
+      md5sum: 1bc4d9cc0e3240ff3bd9fc3ea40cd626
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_concordance.csv
       should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_f1_score.csv
@@ -113,19 +117,23 @@
       should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_sensitivity.csv
       should_exist: false
+    - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_raw_all_data.csv
+      should_exist: false
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated.md
       md5sum: 557ffd936f7e7c3f7a5b0663c3158a96
     - path: tests_variant_benchmark_happy_exclude_spurious_skip_raw/variant_benchmark/diagnostic_metrics_happy_curated.docx
 
 - name: variant_benchmark_sompy_raw
-  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine sompy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_sompy_raw
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine sompy --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_sompy_raw --include_all_data_csv
   files:
     - path: tests_variant_benchmark_sompy_raw/variant_benchmark/diagnostic_metrics_sompy_raw_concordance.csv
       md5sum: 79a45526039a3e8133288191e1f43124
+    - path: tests_variant_benchmark_sompy_raw/variant_benchmark/diagnostic_metrics_sompy_raw_all_data.csv
+      md5sum: a944b832b05c95a3a5b070f155aa8364
 
 
 - name: variant_benchmark_wittyer_raw
-  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine wittyer --truth_dir tests_data/cnv_truth_vcfs --query_dir tests_data/cnv_query_vcfs --output_dir tests_variant_benchmark_wittyer_raw
+  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine wittyer --truth_dir tests_data/cnv_truth_vcfs --query_dir tests_data/cnv_query_vcfs --output_dir tests_variant_benchmark_wittyer_raw --include_all_data_csv
   files:
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/raw/wittyer/sample1.raw/sample1.raw.Wittyer.Stats.json
       md5sum: c4d37bf21dde174dc50512158d7b3f32
@@ -139,6 +147,8 @@
       md5sum: 971506e4c8c06c44d8f1079f92033039
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_sensitivity.csv
       md5sum: 61b82acf93c5c73149e3dc7f68c5c9c9
+    - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw_all_data.csv
+      md5sum: b6e7b36da8e6b6bdb0e3fe072df54499
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw.md
       md5sum: e6182fa3ee34dfc5fe95f6005ae1c402
     - path: tests_variant_benchmark_wittyer_raw/variant_benchmark/diagnostic_metrics_wittyer_raw.docx
