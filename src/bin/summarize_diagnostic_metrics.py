@@ -43,6 +43,36 @@ from clinical_tools.render.diagnostic_metrics import (
 )
 
 
+def generate_all_data_csv(
+    tables_list: list[pd.DataFrame], metrics_list: list[str]
+) -> pd.DataFrame:
+    """Generate and return a large dataframe containing data from all metric tables."""
+    # Initialize all data table
+    all_data_table = pd.DataFrame()
+
+    # Append each metric table to all data table
+    for table, metric in zip(tables_list, metrics_list):
+        metric_name = "F1 score" if metric == "f1_score" else metric
+
+        all_data_table = (
+            table.set_index(["Variant Type", "Variant Filter"]).add_suffix(
+                f"_{metric_name.title()}"
+            )
+            if all_data_table.empty
+            else all_data_table.join(
+                table.set_index(["Variant Type", "Variant Filter"]).add_suffix(
+                    f"_{metric_name.title()}"
+                )
+            )
+        )
+
+    # Reset index and return table
+    all_data_table = all_data_table.rename_axis(
+        ["Variant Type", "Variant Filter"]
+    ).reset_index()
+    return all_data_table
+
+
 def main():
     """
     Summarize and compute diagnostic metrics from VCF comparisons.
@@ -150,8 +180,6 @@ def main():
     raw_summaries: list[str] = []
     curated_summaries: list[str] = []
     initial_metric_types: list[DiagnosticMetricType] = []
-    raw_all_data_table = pd.DataFrame()
-    curated_all_data_table = pd.DataFrame()
 
     # Process raw VCF comparisons
     if args.raw_files:
@@ -178,24 +206,9 @@ def main():
             raw_csv_output = f"{args.prefix}_{args.engine}_raw_{metric}.csv"
             export_diagnostic_metrics_to_csv(raw_table, raw_csv_output)
 
-            # Append raw result to all data CSV
-            raw_all_data_table = (
-                raw_table.set_index(["Variant Type", "Variant Filter"]).add_suffix(
-                    f"_{metric_name.title()}"
-                )
-                if raw_all_data_table.empty
-                else raw_all_data_table.join(
-                    raw_table.set_index(["Variant Type", "Variant Filter"]).add_suffix(
-                        f"_{metric_name.title()}"
-                    )
-                )
-            )
-
-        # Export combined stats curated CSV
+        # Generate and export raw all_data_csv if option selected
         if args.include_all_data_csv == "true":
-            raw_all_data_table = raw_all_data_table.rename_axis(
-                ["Variant Type", "Variant Filter"]
-            ).reset_index()
+            raw_all_data_table = generate_all_data_csv(raw_tables, args.metrics)
             export_diagnostic_metrics_to_csv(
                 raw_all_data_table, f"{args.prefix}_{args.engine}_raw_all_data.csv"
             )
@@ -227,24 +240,9 @@ def main():
             curated_csv_output = f"{args.prefix}_{args.engine}_curated_{metric}.csv"
             export_diagnostic_metrics_to_csv(curated_table, curated_csv_output)
 
-            # Append raw result to all data CSV
-            curated_all_data_table = (
-                curated_table.set_index(["Variant Type", "Variant Filter"]).add_suffix(
-                    f"_{metric_name.title()}"
-                )
-                if curated_all_data_table.empty
-                else curated_all_data_table.join(
-                    curated_table.set_index(
-                        ["Variant Type", "Variant Filter"]
-                    ).add_suffix(f"_{metric_name.title()}")
-                )
-            )
-
-        # Export combined stats curated CSV
+        # Generate and export curated all_data_csv if option selected
         if args.include_all_data_csv == "true":
-            curated_all_data_table = curated_all_data_table.rename_axis(
-                ["Variant Type", "Variant Filter"]
-            ).reset_index()
+            curated_all_data_table = generate_all_data_csv(curated_tables, args.metrics)
             export_diagnostic_metrics_to_csv(
                 curated_all_data_table,
                 f"{args.prefix}_{args.engine}_curated_all_data.csv",
