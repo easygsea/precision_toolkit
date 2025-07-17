@@ -16,7 +16,6 @@ Stage: witty_er_builder
     cd Wittyer && \
     dotnet publish . -c Release
 
-
 Bootstrap: docker
 From: python:{{ PYTHON_VERSION }}-slim-bookworm
 Stage: clinical_tools_builder
@@ -51,6 +50,7 @@ Stage: runtime1
     PSUTIL_VERSION=6.1.1
     PYTHON_VERSION=3.11.7
     NEXTFLOW_VERSION=24.10.3
+    BEDOPS_VERSION=2.4.41
 
 %files from witty_er_builder
     /opt/witty.er/Wittyer/ /witty.er
@@ -112,6 +112,12 @@ Stage: runtime1
     cd "samtools-{{HTSLIB_VERSION}}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
+    # Build bedops
+    wget --quiet "https://github.com/bedops/bedops/releases/download/v{{BEDOPS_VERSION}}/bedops_linux_x86_64-v{{BEDOPS_VERSION}}.tar.bz2" && \
+    mkdir "bedops_linux_x86_64-v{{BEDOPS_VERSION}}" && \
+    tar -jxf "bedops_linux_x86_64-v{{BEDOPS_VERSION}}.tar.bz2" -C "bedops_linux_x86_64-v{{BEDOPS_VERSION}}" && \
+    cp bedops_linux_x86_64-v{{BEDOPS_VERSION}}/bin/* /opt/hap.py/bin/ && \
+    rm -rf bedops_linux_x86_64-v{{BEDOPS_VERSION}}* && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/{{ PYTHON_VERSION }}/Python-{{ PYTHON_VERSION }}.tgz" && \
     tar -xzf "Python-{{ PYTHON_VERSION }}.tgz" && \

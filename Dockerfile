@@ -7,6 +7,7 @@ ARG POETRY_VERSION=2.0.1
 ARG PSUTIL_VERSION=6.1.1
 ARG PYTHON_VERSION=3.11.7
 ARG WITTYER_VERSION=0.5.2
+ARG BEDOPS_VERSION=2.4.41
 
 # Stage 1: Build witty.er from source
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS witty_er_builder
@@ -43,6 +44,7 @@ ARG HTSLIB_VERSION
 ARG JOBLIB_VERSION
 ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
+ARG BEDOPS_VERSION
 WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
@@ -53,6 +55,7 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     add-apt-repository ppa:ubuntu-toolchain-r/test && \
     apt-get install -y --no-install-recommends \
     gawk \
+    bedtools \
     apt-transport-https \
     build-essential \
     gcc-10 \
@@ -96,6 +99,13 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     cd "samtools-${HTSLIB_VERSION}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
+    cd ../.. && rm -rf htslib-* samtools-* bcftools-* && \
+    # Build bedops
+    wget --quiet "https://github.com/bedops/bedops/releases/download/v${BEDOPS_VERSION}/bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2" && \
+    mkdir "bedops_linux_x86_64-v${BEDOPS_VERSION}" && \
+    tar -jxf "bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2" -C "bedops_linux_x86_64-v${BEDOPS_VERSION}" && \
+    cp bedops_linux_x86_64-v${BEDOPS_VERSION}/bin/* /opt/hap.py/bin/ && \
+    rm -rf bedops_linux_x86_64-v${BEDOPS_VERSION}* && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" && \
     tar -xzf "Python-${PYTHON_VERSION}.tgz" && \
