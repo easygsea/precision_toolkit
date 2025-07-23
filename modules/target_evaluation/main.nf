@@ -1,61 +1,46 @@
-process build_per_base_bed {
-    publishDir "${params.bams_dir}/target_eval_results", mode: 'copy'
+process get_per_tract_stats {
+    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
-    path(targets_bed_path)
-    val(targets_bed_name)
+    path(targets_bed)
+    path(labelled_pileup)
 
     output:
-        path "$OUT", emit: per_base_bed
+    path(OUT), emit: per_tract
 
     script:
-    OUT="${targets_bed_name}.per-base.bed"
-    //cant find this script (check out we did it before in CDI-30 ticket)
+    OUT="${labelled_pileup.baseName}.tract_aggregated.txt"
     """
-    build_per_base_bed ${targets_bed_path} > $OUT
+    #get per-tract stats
+    bedtools groupby -i ${labelled_pileup} -g 1,8 -c 3,4,6 -o mean > ${OUT}
     """
+    //ignore chimeric reads?
 }
 
-process index_bam_file {
-    publishDir "${params.bams_dir}/target_eval_results", mode: 'copy'
+process filter_low_scoring_bases {
+
+    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
-    [val(bed_file_name), path(bed_file_path)]
-    //path bam_file
+    path(labelled_pileup)
+    val(cov_threshold)
+    val(bq_threshold)
+    val(mq_threshold)
 
     output:
-    path bam_file.bai
+    path(OUT), emit: scored
 
     script:
+    OUT="${labelled_pileup.baseName}.scored.txt"
     """
-    samtools index ${bam_file}
-    """
-
-}
-
-process measure_per_base_depth {
-    container params.clinical_utils_container
-    publishDir "${params.bams_dir}/target_eval_results", mode: 'copy'
-    cpus 16
-    //label "track_panel_process"
-    //tag "${meta.RGSM}.${variant_type}"
-
-    input:
-        path(bam_file),
-        path(bai_file),
-        path(bed_file)
-
-    output:
-        path(OUT), emit: perbase_cov_bed
-
-    script:
-    OUT="${bam_file}.perbasecoverage.txt"
-    """
-    samtools depth --min-BQ 10 --min-MQ 1 -a -b ${bed_file} -@ ${task.cpus} ${bam_file} > $OUT
+    awk -v OFS='\\t' '{if (\$3>=${cov_threshold} && \$5>=${bq_threshold} && \$7>=${mq_threshold}) {print \$0,"PASSED"} \
+    else {print \$0,"FAILED"} }' ${labelled_pileup} > ${OUT}
     """
 
 }
 
+
+//not used
 process score_coverage {
 
     input:
@@ -71,4 +56,5 @@ process score_coverage {
     """
 }
 
+//process generate_summary_per_library {}
 //process generate_metrics_tracts{}

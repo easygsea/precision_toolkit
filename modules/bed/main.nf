@@ -1,5 +1,4 @@
 process sort_bed {
-    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path bed_file

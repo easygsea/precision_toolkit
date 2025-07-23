@@ -1,70 +1,92 @@
 include {
-    build_per_base_bed
-    measure_per_base_depth
-    //gather_bed
+    get_per_tract_stats
     //filter_low_scoring_tracts
+    filter_low_scoring_bases
 } from '../../modules/target_evaluation/main'
 
-//mpileup tool
+//bedmap tool (not currently being developed)
+include {
+    build_per_base_bed
+    convert_bam_to_bed
+    get_per_base_depth
+    get_per_base_stats_with_bedmap as extract_per_base_mapq_with_bedmap
+    get_per_base_stats_with_bedmap as extract_per_base_baseq_with_bedmap
+    convert_to_baseq_scores
+} from '../../modules/target_evaluation/bedmap'
+
 include {
     get_per_base_stats
-    get_per_tract_stats
+    add_tract_labels
 } from '../../modules/target_evaluation/mpileup'
 
-params.tool = "main"
+include { index_bam_file as index_bam_files } from '../../modules/bam/main'
+include { sort_bed } from '../../modules/bed/main'
+
+//TODO: delete
+params.tool = "mpileup"
+
+//TODO: valid input checks function
+// def verify_input() {
+//     if (!file("${params.targets_bed}").exists()) error "Target bed not found: ${params.targets_bed}"
+//     if (!file(params.bams_dir).exists()) error "Bams dir not found: ${params.bams_dir}"
+// }
 
 // Main variant gene target evaluation workflow
 workflow gene_target_evaluation_workflow {
     main:
+
         // Validate input directories/files
-        if (!file("${params.targets_bed}").exists()) error "Target bed not found: ${params.targets_bed}"
-        if (!file(params.bams_dir).exists()) error "Bams dir not found: ${params.bams_dir}"
+        //if (!file("${params.targets_bed}").exists()) error "Target bed not found: ${params.targets_bed}"
+        //if (!file(params.bams_dir).exists()) error "Bams dir not found: ${params.bams_dir}"
 
-        //parse this to have only the file name ( to be passed into create new files in work directory)
-        bams_channel = channel.fromPath("${params.bams_dir}/*.bam")
-                              .view{item -> "Old item: $item"}
-                              .map{item -> [item.toString().split('/')[-1], item]}
-                              .view{item -> "Current item: $item"}
-                              .view{item -> params.targets_bed.toString().split('/').reverse()[0]}
+        //build channel with bam files
+        bam_ch = channel.fromPath(params.bams_dir)
+        //bam_ch = channel.fromPath("${params.bams_dir}/*.bam")
+        bam_ch.view{item -> "BAMS_CH: $item"}
+        //todo: del
+        println "TARGETS BED: ${params.targets_bed}"
 
-        targets_bed_name = params.targets_bed.toString().split('/').reverse()[0]
-        System.out.println(params.targets_bed)
+
+        // 0. Setup
+        sort_bed(file(params.targets_bed))
+        index_bam_files(bam_ch)
 
         //Option a: using mpileup
         if (params.tool == "mpileup") {
-            get_per_base_stats(params.targets_bed, bams_channel)
-            get_per_tract_stats(params.targets_bed, get_per_base_stats.out.parsed_bam)
+            get_per_base_stats(sort_bed.out.sorted_bed, bam_ch)
+            add_tract_labels(sort_bed.out.sorted_bed, get_per_base_stats.out.parsed_pileup)
         }
+        //Option b: using samtools depth (not currently in development -- ignore)
+        else { }
 
-        //Option b: using samtools depth
-        else {
-            def bams_per_base_bed
-            // check for existing per-base bed file
-            //move this if statement to the process, so that the emitted is the same.
-            if (!file("${params.targets_bed}.per-base.bed").exists()) { build_per_base_bed(params.targets_bed, targets_bed_name) }
-            else {build_per_base_bed.out.per_base_bed}
-
-            bams_channel.view(item -> "Current_item $item")
-
-
-            //if(!file("${bams_channel}")) {}
-             //get_per_base()
-                //gather_bam
-                //gather_bed
-        }
-
-        //after files are compiled, do compiling
-        //filter_low_scoring_tracts()
+        //after files are compiled, score bases on thresholds
+        filter_low_scoring_bases (
+            add_tract_labels.out.labelled_pileup,
+            params.coverage_threshold,
+            params.baseq_threshold,
+            params.mapq_threshold
+        )
+        //aggregate per tract
+        get_per_tract_stats(
+            sort_bed.out.sorted_bed,
+            add_tract_labels.out.labelled_pileup
+        )
+        //tract thresholds different from per base?
+//         filter_low_scoring_tracts(
+//             get_per_tract_stats.out.per_tract,
+//             params.coverage_threshold,
+//             params.baseq_threshold,
+//             params.mapq_threshold
+//         )
 
 
 
 
         """
-        --mapq_threshold                Minimum acceptable first quartile (Q1) of the MAPQ scores of mapped reads
-                                            per base,default is 30
-            --baseq_threshold               Minimum acceptable first quartile (Q1) of the BASEQ scores of mapped reads
-                                            per base, default is 30
-            --normalize_to_mean_coverage    Bam files will be normalized to the provided mean coverage
-            --coverage_threshold
+    coverage_threshold = 25 // minimum acceptable value for coverage per base
+    normalize_to_mean_coverage = null // If set, coverage will be normalized to match the provided mean
+    mapq_threshold = 30 // minimum acceptable first quartile (Q1) of the MAPQ scores of mapped reads per base
+    baseq_threshold = 30 // minimum acceptable first quartile (Q1) of the BASEQ scores of mapped reads per base
+
         """
 }
