@@ -1,4 +1,4 @@
-process get_per_tract_stats {
+process get_per_target_stats {
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
@@ -6,13 +6,13 @@ process get_per_tract_stats {
     path(labelled_pileup)
 
     output:
-    path(OUT), emit: per_tract
+    path(OUT), emit: per_target
 
     script:
-    OUT="${labelled_pileup.baseName}.tract_aggregated.txt"
+    OUT="${labelled_pileup.baseName}.target_aggregated.txt"
     """
-    #get per-tract stats
-    bedtools groupby -i ${labelled_pileup} -g 1,8 -c 3,4,6 -o mean > ${OUT}
+    #get per-target stats
+    bedtools groupby -i ${labelled_pileup} -g 1,8 -c 3,4,6 -o median > ${OUT}
     """
     //ignore chimeric reads?
 }
@@ -33,15 +33,14 @@ process filter_low_scoring_bases {
     script:
     OUT="${labelled_pileup.baseName}.scored.txt"
     """
-    awk -v OFS='\\t' '{if (\$3>=${cov_threshold} && \$5>=${bq_threshold} && \$7>=${mq_threshold}) {print \$0,"PASSED"} \
-    else {print \$0,"FAILED"} }' ${labelled_pileup} > ${OUT}
+    awk -v OFS='\\t' '{if (\$3>=${cov_threshold} && \$5>=${bq_threshold} && \$7>=${mq_threshold}) {print \$0,"PASS"} \
+    else {print \$0,"FAIL"} }' ${labelled_pileup} > ${OUT}
     """
 
 }
 
 
-//not used
-process score_coverage {
+process aggregate_per_base_across_libraries {
 
     input:
         path(bam_file)

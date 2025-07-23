@@ -3,7 +3,7 @@ process get_per_base_stats {
 
     // Current specs used here:
     // 1, output all positions in bed file
-    // 2. Min BQ of 10 consider BQ in calculations (ref old)
+    // 2. Min BQ of 10 consider BQ in calculations (ref old) (TODO: pass in values, with default here, caveat 0 for baseq in docs)
     // 3. Min MQ of 1 (ref old)
     // 4. -A count anomalous reads pairs -x turn off overlaps removal
     // 5. custom gawk to adjust for deletions & parse
@@ -17,7 +17,7 @@ process get_per_base_stats {
 
     script:
     OUT="${in_bam.baseName}.mpileup.per_base.parsed.txt"
-    //TODO: add header    NR==1 { print "#CHROM\\tPOS\\tCOV_MEAN\\tBASEQ_MEAN\\tBASEQ_Q1\\tMAPQ_MEAN\\tMAPQ_Q1" }
+    //TODO: add header    NR==1 { print "#CHROM\\tPOS\\tCOVERAGE\\tBASEQ_MED\\tBASEQ_Q1\\tMAPQ_MED\\tMAPQ_Q1" }
     """
     samtools mpileup -A -aa -x --min-BQ 10 --min-MQ 1 --output-MQ \
     --positions ${targets_bed} ${in_bam} | \
@@ -37,20 +37,23 @@ process get_per_base_stats {
         }; \
         baseQ=0; mapQ=0; baseQs[1]=0; mapQs[1]=0; \
         for(i=1;i<=\$4;i++) { \
-            baseChr=substr(\$6, i, 1); baseQs[i]=ord(baseChr)-33; baseQ+=baseQs[i]; \
-            mapChr=substr(\$7,i,1); mapQs[i]=ord(mapChr)-33; mapQ+=mapQs[i]; \
+            baseChr=substr(\$6, i, 1); baseQs[i]=ord(baseChr)-33; \
+            mapChr=substr(\$7,i,1); mapQs[i]=ord(mapChr)-33; \
         }; \
         asort(baseQs); asort(mapQs); \
+        median=int(total_non_del/2); \
         q1=int((total_non_del+3)/4); \
         if (total_non_del==-1) {print(\$1,\$2,0,0,0,0,0)} \
-        else {print(\$1,\$2,total_non_del,baseQ/total_non_del,baseQs[q1],mapQ/total_non_del,mapQs[q1]) }; \
+        else {print(\$1,\$2,total_non_del,baseQs[median],baseQs[q1],mapQs[median],mapQs[q1]) }; \
         delete baseQs; delete mapQs; \
     }' - > ${OUT}
     """
 }
+//        else {print(\$1,\$2,total_non_del,baseQ/total_non_del,baseQs[q1],mapQ/total_non_del,mapQs[q1]) }; \
 
-process add_tract_labels {
-    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+
+process add_target_labels {
+    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)

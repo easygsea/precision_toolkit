@@ -1,6 +1,6 @@
 include {
-    get_per_tract_stats
-    //filter_low_scoring_tracts
+    get_per_target_stats
+    //filter_low_scoring_targets
     filter_low_scoring_bases
 } from '../../modules/target_evaluation/main'
 
@@ -16,14 +16,11 @@ include {
 
 include {
     get_per_base_stats
-    add_tract_labels
+    add_target_labels
 } from '../../modules/target_evaluation/mpileup'
 
 include { index_bam_file as index_bam_files } from '../../modules/bam/main'
 include { sort_bed } from '../../modules/bed/main'
-
-//TODO: delete
-params.tool = "mpileup"
 
 //TODO: valid input checks function
 // def verify_input() {
@@ -34,10 +31,6 @@ params.tool = "mpileup"
 // Main variant gene target evaluation workflow
 workflow gene_target_evaluation_workflow {
     main:
-
-        // Validate input directories/files
-        //if (!file("${params.targets_bed}").exists()) error "Target bed not found: ${params.targets_bed}"
-        //if (!file(params.bams_dir).exists()) error "Bams dir not found: ${params.bams_dir}"
 
         //build channel with bam files
         bam_ch = channel.fromPath(params.bams_dir)
@@ -54,26 +47,26 @@ workflow gene_target_evaluation_workflow {
         //Option a: using mpileup
         if (params.tool == "mpileup") {
             get_per_base_stats(sort_bed.out.sorted_bed, bam_ch)
-            add_tract_labels(sort_bed.out.sorted_bed, get_per_base_stats.out.parsed_pileup)
+            add_target_labels(sort_bed.out.sorted_bed, get_per_base_stats.out.parsed_pileup)
         }
         //Option b: using samtools depth (not currently in development -- ignore)
         else { }
 
         //after files are compiled, score bases on thresholds
         filter_low_scoring_bases (
-            add_tract_labels.out.labelled_pileup,
+            add_target_labels.out.labelled_pileup,
             params.coverage_threshold,
             params.baseq_threshold,
             params.mapq_threshold
         )
-        //aggregate per tract
-        get_per_tract_stats(
+        //aggregate per target
+        get_per_target_stats(
             sort_bed.out.sorted_bed,
-            add_tract_labels.out.labelled_pileup
+            add_target_labels.out.labelled_pileup
         )
-        //tract thresholds different from per base?
-//         filter_low_scoring_tracts(
-//             get_per_tract_stats.out.per_tract,
+        //target thresholds different from per base?
+//         filter_low_scoring_targets(
+//             get_per_target_stats.out.per_target,
 //             params.coverage_threshold,
 //             params.baseq_threshold,
 //             params.mapq_threshold
