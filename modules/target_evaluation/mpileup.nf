@@ -52,29 +52,4 @@ process get_per_base_stats {
 //        else {print(\$1,\$2,total_non_del,baseQ/total_non_del,baseQs[q1],mapQ/total_non_del,mapQs[q1]) }; \
 
 
-process add_target_labels {
-    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
-
-    input:
-    path(targets_bed)
-    path(parsed_pileup)
-
-    output:
-    path(OUT), emit: labelled_pileup
-
-    script:
-    OUT="${parsed_pileup.baseName}.labelled.txt"
-
-    """
-    awk 'BEGIN{OFS="\t"} {print \$1, \$2-1, \$2, \$0}' ${parsed_pileup} | \
-    bedtools intersect -a - -b ${targets_bed} -wa -wb | \
-    cut -f4-10,14 > ${OUT}
-    """
-}
-
-/*     #label per base
-    awk 'BEGIN{OFS="\t"} {print \$1, \$2-1, \$2, \$0}' ${parsed_bam} | \
-    bedtools intersect -a - -b  ${targets_bed} -wa -wb | \
-    cut -f4-8,12 > ${TEMP} */
-
 

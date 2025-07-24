@@ -1,8 +1,19 @@
 include {
-    get_per_target_stats
-    //filter_low_scoring_targets
-    filter_low_scoring_bases
+    add_target_labels
+    get_per_target_aggregated_stats
+    generate_per_base_summary
+    score_output as score_bases_per_library
+    score_output as score_targets_per_library
+    score_output as score_bases_summary
+    // score base aggregated
 } from '../../modules/target_evaluation/main'
+
+include {
+    get_per_base_stats
+} from '../../modules/target_evaluation/mpileup'
+
+include { index_bam_file as index_bam_files } from '../../modules/bam/main'
+include { sort_bed } from '../../modules/bed/main'
 
 //bedmap tool (not currently being developed)
 include {
@@ -14,13 +25,6 @@ include {
     convert_to_baseq_scores
 } from '../../modules/target_evaluation/bedmap'
 
-include {
-    get_per_base_stats
-    add_target_labels
-} from '../../modules/target_evaluation/mpileup'
-
-include { index_bam_file as index_bam_files } from '../../modules/bam/main'
-include { sort_bed } from '../../modules/bed/main'
 
 //TODO: valid input checks function
 // def verify_input() {
@@ -32,47 +36,49 @@ include { sort_bed } from '../../modules/bed/main'
 workflow gene_target_evaluation_workflow {
     main:
 
-        //build channel with bam files
+        //build channel with bam files (requires input regex 'path/to/bams/dir/*.bam*')
         bam_ch = channel.fromPath(params.bams_dir)
-        //bam_ch = channel.fromPath("${params.bams_dir}/*.bam")
         bam_ch.view{item -> "BAMS_CH: $item"}
+
         //todo: del
         println "TARGETS BED: ${params.targets_bed}"
-
 
         // 0. Setup
         sort_bed(file(params.targets_bed))
         index_bam_files(bam_ch)
 
-        //Option a: using mpileup
+        //1.a Option a: using mpileup
         if (params.tool == "mpileup") {
             get_per_base_stats(sort_bed.out.sorted_bed, bam_ch)
             add_target_labels(sort_bed.out.sorted_bed, get_per_base_stats.out.parsed_pileup)
         }
-        //Option b: using samtools depth (not currently in development -- ignore)
-        else { }
+        //1.b Option b: using samtools depth (not currently in development -- ignore)
+        else {
+            // add_target_labels(sort_bed.out.sorted_bed, something.out.parsed_pileup)
+        }
 
-        //after files are compiled, score bases on thresholds
-        filter_low_scoring_bases (
+        // 2. Aggregate per target
+        get_per_target_aggregated_stats(
+            sort_bed.out.sorted_bed,
+            add_target_labels.out.labelled_pileup
+        )
+
+        //add_target_labels.out.labelled_pileup.collectFile(name: "test_combined_file.txt", storeDir: "${params.output_dir}/target_eval_results")
+        // 3. Aggregate per base across libraries
+        generate_per_base_summary (
+            add_target_labels.out.labelled_pileup.collectFile()
+        )
+
+        // 4. Score bases on thresholds
+        score_bases_per_library (
             add_target_labels.out.labelled_pileup,
             params.coverage_threshold,
             params.baseq_threshold,
             params.mapq_threshold
         )
-        //aggregate per target
-        get_per_target_stats(
-            sort_bed.out.sorted_bed,
-            add_target_labels.out.labelled_pileup
-        )
-        //target thresholds different from per base?
-//         filter_low_scoring_targets(
-//             get_per_target_stats.out.per_target,
-//             params.coverage_threshold,
-//             params.baseq_threshold,
-//             params.mapq_threshold
-//         )
-
-
+//         score_targets_per_library ()
+//         score_bases_summary ()
+// double check that the outputs are the same
 
 
         """
