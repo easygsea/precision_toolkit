@@ -4,14 +4,11 @@ include {
     generate_per_base_summary
     score_output as score_bases_per_library
     score_output as score_targets_per_library
-    score_output as score_bases_summary
-    // score base aggregated
+    score_output as score_per_base_summary
+    generate_visualization
 } from '../../modules/target_evaluation/main'
 
-include {
-    get_per_base_stats
-} from '../../modules/target_evaluation/mpileup'
-
+include { get_per_base_stats } from '../../modules/target_evaluation/mpileup'
 include { index_bam_file as index_bam_files } from '../../modules/bam/main'
 include { sort_bed } from '../../modules/bed/main'
 
@@ -36,55 +33,58 @@ include {
 workflow gene_target_evaluation_workflow {
     main:
 
-        //build channel with bam files (requires input regex 'path/to/bams/dir/*.bam*')
-        bam_ch = channel.fromPath(params.bams_dir)
-        bam_ch.view{item -> "BAMS_CH: $item"}
+    //build channel with bam files (requires input regex 'path/to/bams/dir/*.bam*')
+    bam_ch = channel.fromPath(params.bams_dir)
+    bam_ch.view{item -> "BAMS_CH: $item"}
 
-        //todo: del
-        println "TARGETS BED: ${params.targets_bed}"
+    //todo: del
+    println "TARGETS BED: ${params.targets_bed}"
 
-        // 0. Setup
-        sort_bed(file(params.targets_bed))
-        index_bam_files(bam_ch)
+    // 0. Setup
+    sort_bed(file(params.targets_bed))
+    index_bam_files(bam_ch)
 
-        //1.a Option a: using mpileup
-        if (params.tool == "mpileup") {
-            get_per_base_stats(sort_bed.out.sorted_bed, bam_ch)
-            add_target_labels(sort_bed.out.sorted_bed, get_per_base_stats.out.parsed_pileup)
-        }
-        //1.b Option b: using samtools depth (not currently in development -- ignore)
-        else {
-            // add_target_labels(sort_bed.out.sorted_bed, something.out.parsed_pileup)
-        }
+    //1.a Option a: using mpileup
+    if (params.tool == "mpileup") {
+        get_per_base_stats(sort_bed.out.sorted_bed, bam_ch)
+        add_target_labels(sort_bed.out.sorted_bed, get_per_base_stats.out.parsed_pileup)
+    }
+    //1.b Option b: using samtools depth (not currently in development -- ignore)
+    else {
+        // add_target_labels(sort_bed.out.sorted_bed, something.out.parsed_pileup)
+    }
 
-        // 2. Aggregate per target
-        get_per_target_aggregated_stats(
-            sort_bed.out.sorted_bed,
-            add_target_labels.out.labelled_pileup
-        )
+    // 2. Aggregate per target
+    get_per_target_aggregated_stats(
+        sort_bed.out.sorted_bed,
+        add_target_labels.out.labelled_pileup
+    )
 
-        //add_target_labels.out.labelled_pileup.collectFile(name: "test_combined_file.txt", storeDir: "${params.output_dir}/target_eval_results")
-        // 3. Aggregate per base across libraries
-        generate_per_base_summary (
-            add_target_labels.out.labelled_pileup.collectFile(name: "combined_labelled_pileups.txt", sort: true)
-        )
+    // 3. Aggregate per base across libraries
+    generate_per_base_summary (
+        add_target_labels.out.labelled_pileup
+            .collectFile(name: "combined_labelled_pileups.txt")
+    )
 
-        // 4. Score bases on thresholds
-        score_bases_per_library (
-            add_target_labels.out.labelled_pileup,
-            params.coverage_threshold,
-            params.baseq_threshold,
-            params.mapq_threshold
-        )
-        score_targets_per_library (
-            get_per_target_aggregated_stats.out.per_target_aggregated,
-            params.coverage_threshold,
-            params.baseq_threshold,
-            params.mapq_threshold
-        )
-//         score_targets_per_library ()
-//         score_bases_summary ()
-// double check that the outputs are the same
+    // 4. Score files on thresholds
+    score_bases_per_library (
+        add_target_labels.out.labelled_pileup,
+        params.coverage_threshold,
+        params.baseq_threshold,
+        params.mapq_threshold
+    )
+    score_targets_per_library (
+        get_per_target_aggregated_stats.out.per_target_aggregated,
+        params.coverage_threshold,
+        params.baseq_threshold,
+        params.mapq_threshold
+    )
+    score_per_base_summary (
+        generate_per_base_summary.out.all_libraries_per_base,
+        params.coverage_threshold,
+        params.baseq_threshold,
+        params.mapq_threshold
+    )
 
 
         """
@@ -92,6 +92,5 @@ workflow gene_target_evaluation_workflow {
     normalize_to_mean_coverage = null // If set, coverage will be normalized to match the provided mean
     mapq_threshold = 30 // minimum acceptable first quartile (Q1) of the MAPQ scores of mapped reads per base
     baseq_threshold = 30 // minimum acceptable first quartile (Q1) of the BASEQ scores of mapped reads per base
-
         """
 }

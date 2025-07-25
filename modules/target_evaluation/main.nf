@@ -34,6 +34,7 @@ process get_per_target_aggregated_stats {
     // Gets per-target stats (median of cov, q1 of baseq_q1, q1 of mapq_q1)
     // Example Output: chr1	NA	SDHB_NM_003000_EXON02	586	NA	40	NA	60	PASS
     // TODO: add headers
+    // TODO: ignore chimeric reads?
 
     """
     bedtools groupby -i ${labelled_pileup} -g 1,3 -c 4,5,6,7,8 -o collapse |
@@ -45,23 +46,26 @@ process get_per_target_aggregated_stats {
         delete coverages; delete baseQ1s; delete mapQ1s;
     }' - > ${OUT}
     """
-    //ignore chimeric reads?
 }
 
 process generate_per_base_summary {
-    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(combined_labelled_pileups)
 
     output:
     path(OUT), emit: all_libraries_per_base
-    path(combined_labelled_pileups)
 
     script:
-    OUT="all_libraries_per_base_median.txt"
+    OUT="summary_per_base_median.txt"
+    // Generates median of all bases within the target group
+    // Output Example: chr1	17371254	SDHB_NM_003000_EXON02	570	63	52	60	60
+    //TODO: add header
+    // per-base aggregate median of quartiles
     """
-    bedtools groupby -i ${combined_labelled_pileups} -g 1,2,3 -c 4,5,6,7,8 -o collapse > ${OUT}
+    sort -k1,1 -k2,2 -k3,3 ${combined_labelled_pileups} |
+    bedtools groupby -g 1,2,3 -c 4,5,6,7,8 -o median > ${OUT}
     """
 }
 
@@ -69,14 +73,14 @@ process score_output {
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
+    // Expected format: chr1	17371254	SDHB_NM_003000_EXON02	570	63	52	60	60
     path(labelled_pileup)
     val(cov_threshold)
     val(bq_threshold)
     val(mq_threshold)
 
     output:
-    path(OUT), emit: scored
-    //TODO: rmv emit if not needed
+    path(OUT)
 
     script:
     OUT="${labelled_pileup.baseName}.scored.txt"
@@ -88,7 +92,6 @@ process score_output {
             print \$0,"FAIL"}
     }' ${labelled_pileup} > ${OUT}
     """
-
 }
 
 
