@@ -1,5 +1,5 @@
 process add_target_labels {
-    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
@@ -10,17 +10,17 @@ process add_target_labels {
 
     script:
     OUT="${parsed_pileup.baseName}.labelled.txt"
+    // Example Output: chr1	17345374	SDHB_NM_003000_EXON08   506	63	63	60	60
 
     """
-    awk 'BEGIN{OFS="\t"} {print \$1, \$2-1, \$2, \$0}' ${parsed_pileup} | \
+    awk 'BEGIN{OFS="\\t"} {print \$1, \$2-1, \$2, \$0}' ${parsed_pileup} | \
     bedtools intersect -a - -b ${targets_bed} -wa -wb | \
-    cut -f4,5,14,6-10 > ${OUT}
-    # Output format: chr1	17345374	SDHB_NM_003000_EXON08   506	63	63	60	60
+    awk 'BEGIN {OFS="\\t"} {print \$4,\$5,\$14,\$6,\$7,\$8,\$9,\$10}' > ${OUT}
     """
 }
 
 process get_per_target_aggregated_stats {
-    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
@@ -31,10 +31,19 @@ process get_per_target_aggregated_stats {
 
     script:
     OUT="${labelled_pileup.baseName}.target_aggregated.txt"
+    // Gets per-target stats (median of cov, q1 of baseq_q1, q1 of mapq_q1)
+    // Example Output: chr1	NA	SDHB_NM_003000_EXON02	586	NA	40	NA	60	PASS
+    // TODO: add headers
+
     """
-    #get per-target stats (median of cov, median of baseq_q1, median of mapq_q1)
-    bedtools groupby -i ${labelled_pileup} -g 1,3 -c 4,5,6,7,8 -o median > ${OUT}
-    # Output format: chr1	17345374	SDHB_NM_003000_EXON08   506	63	63	60	60
+    bedtools groupby -i ${labelled_pileup} -g 1,3 -c 4,5,6,7,8 -o collapse |
+    awk 'BEGIN {OFS="\\t"} {
+        n = split(\$3, coverages, ","); split(\$5, baseQ1s, ","); split(\$7, mapQ1s, ",");
+        asort(coverages); asort(baseQ1s); asort(mapQ1s);
+        q1 = int((n + 3) / 4);
+        print (\$1, "NA", \$2, coverages[q1], "NA", baseQ1s[q1], "NA", mapQ1s[q1]);
+        delete coverages; delete baseQ1s; delete mapQ1s;
+    }' - > ${OUT}
     """
     //ignore chimeric reads?
 }
@@ -47,11 +56,12 @@ process generate_per_base_summary {
 
     output:
     path(OUT), emit: all_libraries_per_base
+    path(combined_labelled_pileups)
 
     script:
     OUT="all_libraries_per_base_median.txt"
     """
-    bedtools groupby -i ${combined_labelled_pileups} -g 1,2,3 -c 4,5,6,7,8 -o median > ${OUT}
+    bedtools groupby -i ${combined_labelled_pileups} -g 1,2,3 -c 4,5,6,7,8 -o collapse > ${OUT}
     """
 }
 
@@ -66,6 +76,7 @@ process score_output {
 
     output:
     path(OUT), emit: scored
+    //TODO: rmv emit if not needed
 
     script:
     OUT="${labelled_pileup.baseName}.scored.txt"

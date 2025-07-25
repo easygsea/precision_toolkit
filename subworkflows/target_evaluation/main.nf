@@ -66,12 +66,18 @@ workflow gene_target_evaluation_workflow {
         //add_target_labels.out.labelled_pileup.collectFile(name: "test_combined_file.txt", storeDir: "${params.output_dir}/target_eval_results")
         // 3. Aggregate per base across libraries
         generate_per_base_summary (
-            add_target_labels.out.labelled_pileup.collectFile()
+            add_target_labels.out.labelled_pileup.collectFile(name: "combined_labelled_pileups.txt", sort: true)
         )
 
         // 4. Score bases on thresholds
         score_bases_per_library (
             add_target_labels.out.labelled_pileup,
+            params.coverage_threshold,
+            params.baseq_threshold,
+            params.mapq_threshold
+        )
+        score_targets_per_library (
+            get_per_target_aggregated_stats.out.per_target_aggregated,
             params.coverage_threshold,
             params.baseq_threshold,
             params.mapq_threshold
