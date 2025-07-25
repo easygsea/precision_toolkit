@@ -86,6 +86,11 @@ workflow gene_target_evaluation_workflow {
         params.mapq_threshold
     )
 
+    // 5. Generate visualization per target
+    generate_visualization (
+        get_per_target_aggregated_stats.out.per_target_aggregated.collect(),
+        "target_eval_visual"
+    )
 
         """
     coverage_threshold = 25 // minimum acceptable value for coverage per base

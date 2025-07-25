@@ -94,6 +94,24 @@ process score_output {
     """
 }
 
+process generate_visualization {
+    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+
+    input:
+    // Expected format: chr1	17371254	SDHB_NM_003000_EXON02	570	63	52	60	60
+    path(input_files)
+    val(prefix)
+
+    output:
+    path(OUT)
+
+    script:
+    OUT="${prefix}_*"
+    """
+    plot_target_tracts --input-files ${input_files} -p ${prefix}
+    """
+
+}
 
 
 
