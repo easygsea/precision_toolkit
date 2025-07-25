@@ -1,3 +1,5 @@
+# TODO: ADD HEADER HERE
+
 import argparse
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -5,7 +7,7 @@ import matplotlib.colors
 import seaborn as sns
 import pandas as pd
 
-target_eval_output_dir = '/projects/gsc_clinical_scratch/cdu/git_repos/clinical_tools/target_evaluation_dragenWGS_all_20250722/target_eval_results'
+#target_eval_output_dir = '/projects/gsc_clinical_scratch/cdu/git_repos/clinical_tools/target_evaluation_dragenWGS_all_20250722/target_eval_results'
 headers=['CHROM', 'TRACT', 'COVERAGE', 'BASEQ_MEAN', 'BASEQ_Q1', 'MAPQ_MEAN', 'MAPQ_Q1']
 #headers=['CHROM', 'TRACT', 'COVERAGE', 'BASEQ_MEAN', 'MAPQ_MEAN']
 
@@ -14,8 +16,9 @@ def main():
     # read input
     #input_files = [Path(file) for file in glob.glob(target_eval_output_dir + '/F*.tract_aggregated.txt') ]
 
+    # Get input parameters
     parser = argparse.ArgumentParser(
-        description=("Summarize and compute diagnostic metrics from VCF comparisons.")
+        description=("Plot visualizations per-target region.")
     )
     parser.add_argument(
         "-i",
@@ -29,9 +32,28 @@ def main():
         default="target_eval",
         help="Prefix for output filenames. Default is 'target_eval'.",
     )
+    parser.add_argument(
+        "--coverage-threshold",
+        help="Coverage threshold to plot.",
+    )
+    parser.add_argument(
+        "--baseq-threshold",
+        help="BASEQ threshold to plot.",
+    )
+    parser.add_argument(
+        "--mapq-threshold",
+        nargs="+",
+        help="MAPQ threshold to plot.",
+    )
+
     args = parser.parse_args()
 
     input_files = [Path(file_path) for file_path in args.input_files]
+    thresholds = {
+        "COVERAGE": args.coverage_threshold,
+        "BASEQ_MEAN": args.baseq_threshold,
+        "MAPQ_MEAN": args.mapq_threshold
+    }
 
     # initialize figure
     fig = plt.figure(figsize=(120, 50))
@@ -61,6 +83,7 @@ def main():
             # plot graph
             print(colors[pool])
             plt.scatter(data=df, x='TRACT', y=metric, c=matplotlib.colors.rgb2hex(colors[pool]), label=pool)
+            plt.axhline(y=thresholds[metric], color='orange', linestyle='--', label='Threshold')
 
         # plot formatting
         plt.grid(axis='x')

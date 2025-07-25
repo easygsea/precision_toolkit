@@ -101,6 +101,9 @@ process generate_visualization {
     // Expected format: chr1	17371254	SDHB_NM_003000_EXON02	570	63	52	60	60
     path(input_files)
     val(prefix)
+    val(cov_threshold)
+    val(bq_threshold)
+    val(mq_threshold)
 
     output:
     path(OUT)
@@ -108,12 +111,15 @@ process generate_visualization {
     script:
     OUT="${prefix}_*"
     """
-    plot_target_tracts --input-files ${input_files} -p ${prefix}
+    plot_target_tracts \
+    --input-files ${input_files} \
+    --prefix ${prefix} \
+    --coverage-threshold ${cov_threshold} \
+    --baseq-threshold ${bq_threshold} \
+    --mapq-threshold ${mq_threshold} \
     """
 
 }
 
 
-
-//process generate_summary_per_library {}
 //process generate_metrics_tracts{}
