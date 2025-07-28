@@ -2,7 +2,7 @@ process index_bam_file {
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
-    path bam_file
+    tuple path(bam_file), val(pool)
 
     output:
     path OUT, emit: bam_index

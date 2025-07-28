@@ -1,5 +1,6 @@
 process get_per_base_stats {
     label "dynamic_resource"
+    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     // Current specs used here:
     // 1, output all positions in bed file
@@ -10,14 +11,14 @@ process get_per_base_stats {
 
     input:
     path(targets_bed)
-    path(in_bam)
+    tuple path(in_bam), val(pool_id)
 
     output:
     path(OUT), emit: parsed_pileup
+    // Example Output: chr1	17371254	570	63	52	60	60	IX00000
 
     script:
     OUT="${in_bam.baseName}.mpileup.per_base.parsed.txt"
-    //TODO: add header    NR==1 { print "#CHROM\\tPOS\\tCOVERAGE\\tBASEQ_MED\\tBASEQ_Q1\\tMAPQ_MED\\tMAPQ_Q1" }
     """
     samtools mpileup -A -aa -x --min-BQ 10 --min-MQ 1 --output-MQ \
     --positions ${targets_bed} ${in_bam} | \
@@ -26,6 +27,7 @@ process get_per_base_stats {
         for(i=0;i<256;i++){if (sprintf("%c", i) == c) return i} \
         return -10 \
     } \
+    BEGIN { print "#CHROM","POS","COVERAGE","BASEQ_MED","BASEQ_Q1","MAPQ_MED","MAPQ_Q1","POOL" } \
     { \
         total_non_del=\$4; del_index = index(\$5, "*"); \
         while(del_index!=0) { \
@@ -43,8 +45,8 @@ process get_per_base_stats {
         asort(baseQs); asort(mapQs); \
         median=int(total_non_del/2); \
         q1=int((total_non_del+3)/4); \
-        if (total_non_del==-1) {print(\$1,\$2,0,0,0,0,0)} \
-        else {print(\$1,\$2,total_non_del,baseQs[median],baseQs[q1],mapQs[median],mapQs[q1]) }; \
+        if (total_non_del==-1) {print(\$1,\$2,0,0,0,0,0,"${pool_id}")} \
+        else {print(\$1,\$2,total_non_del,baseQs[median],baseQs[q1],mapQs[median],mapQs[q1],"${pool_id}")} \
         delete baseQs; delete mapQs; \
     }' - > ${OUT}
     """

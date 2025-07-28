@@ -23,7 +23,7 @@ include {
 } from '../../modules/target_evaluation/bedmap'
 
 
-//TODO: valid input checks function
+// TODO: valid input checks function
 // def verify_input() {
 //     if (!file("${params.targets_bed}").exists()) error "Target bed not found: ${params.targets_bed}"
 //     if (!file(params.bams_dir).exists()) error "Bams dir not found: ${params.bams_dir}"
@@ -35,9 +35,14 @@ workflow gene_target_evaluation_workflow {
 
     //build channel with bam files (requires input regex 'path/to/bams/dir/*.bam*')
     bam_ch = channel.fromPath(params.bams_dir)
-    bam_ch.view{item -> "BAMS_CH: $item"}
+        .map{file_path ->
+            def matcher = file_path.toString() =~ /IX\d{5}/
+            def pool_id = matcher.find() ? matcher.group(0) : null
+            tuple (file_path, pool_id)
+        }
 
     //todo: del
+    bam_ch.view{item -> "BAMS_CH: $item"}
     println "TARGETS BED: ${params.targets_bed}"
 
     // 0. Setup
@@ -54,7 +59,7 @@ workflow gene_target_evaluation_workflow {
         // add_target_labels(sort_bed.out.sorted_bed, something.out.parsed_pileup)
     }
 
-    // 2. Aggregate per target
+    // 2. Aggregate per target (q1s)
     get_per_target_aggregated_stats(
         sort_bed.out.sorted_bed,
         add_target_labels.out.labelled_pileup
@@ -79,6 +84,7 @@ workflow gene_target_evaluation_workflow {
         params.baseq_threshold,
         params.mapq_threshold
     )
+    // Does this need to be scored?
     score_per_base_summary (
         generate_per_base_summary.out.all_libraries_per_base,
         params.coverage_threshold,
