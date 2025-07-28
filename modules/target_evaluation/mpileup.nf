@@ -14,7 +14,7 @@ process get_per_base_stats {
     tuple path(in_bam), val(pool_id)
 
     output:
-    path(OUT), emit: parsed_pileup
+    tuple path(OUT), val(pool_id), emit: parsed_pileup
     // Example Output: chr1	17371254	570	63	52	60	60	IX00000
 
     script:

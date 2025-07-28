@@ -34,7 +34,8 @@ workflow gene_target_evaluation_workflow {
     main:
 
     //build channel with bam files (requires input regex 'path/to/bams/dir/*.bam*')
-    bam_ch = channel.fromPath(params.bams_dir)
+    bam_ch = channel
+        .fromPath(params.bams_dir)
         .map{file_path ->
             def matcher = file_path.toString() =~ /IX\d{5}/
             def pool_id = matcher.find() ? matcher.group(0) : null

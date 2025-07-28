@@ -3,10 +3,10 @@ process add_target_labels {
 
     input:
     path(targets_bed)
-    path(parsed_pileup)
+    tuple path(parsed_pileup), val(pool_id)
 
     output:
-    path(OUT), emit: labelled_pileup
+    tuple path(OUT), val(pool_id), emit: labelled_pileup
 
     script:
     OUT="${parsed_pileup.baseName}.labelled.txt"
@@ -24,10 +24,10 @@ process get_per_target_aggregated_stats {
 
     input:
     path(targets_bed)
-    path(labelled_pileup)
+    tuple path(labelled_pileup), val(pool_id)
 
     output:
-    path(OUT), emit: per_target_aggregated
+    tuple path(OUT), val(pool_id), emit: per_target_aggregated
 
     script:
     OUT="${labelled_pileup.baseName}.target_aggregated.txt"
@@ -52,10 +52,10 @@ process generate_per_base_summary {
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
-    path(combined_labelled_pileups)
+    tuple path(combined_labelled_pileups), val(pool_id)
 
     output:
-    path(OUT), emit: all_libraries_per_base
+    tuple path(OUT), val(pool_id), emit: all_libraries_per_base
 
     script:
     OUT="summary_per_base_median.txt"
@@ -72,7 +72,7 @@ process score_output {
 
     input:
     // Expected format: chr1	17371254	SDHB_NM_003000_EXON02   IX00000	570	63	52	60	60
-    path(labelled_pileup)
+    tuple path(labelled_pileup), val(pool_id)
     val(cov_threshold)
     val(bq_threshold)
     val(mq_threshold)
@@ -97,7 +97,7 @@ process generate_visualization {
 
     input:
     // Expected format: chr1	17371254	SDHB_NM_003000_EXON02	570	63	52	60	60
-    path(input_files)
+    tuple path(input_files), val(pool_ids)
     val(prefix)
     val(cov_threshold)
     val(bq_threshold)
@@ -109,8 +109,9 @@ process generate_visualization {
     script:
     OUT="${prefix}_*"
     """
-    plot_target_tracts \
+    plot-target-tracts \
     --input-files ${input_files} \
+    --pool-ids ${pool_ids} \
     --prefix ${prefix} \
     --coverage-threshold ${cov_threshold} \
     --baseq-threshold ${bq_threshold} \
