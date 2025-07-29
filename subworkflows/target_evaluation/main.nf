@@ -42,7 +42,7 @@ workflow gene_target_evaluation_workflow {
             tuple (file_path, pool_id)
         }
 
-    //todo: del
+    // TODO: del
     bam_ch.view{item -> "BAMS_CH: $item"}
     println "TARGETS BED: ${params.targets_bed}"
 
@@ -69,23 +69,23 @@ workflow gene_target_evaluation_workflow {
     // 3. Aggregate per base across libraries
     generate_per_base_summary (
         add_target_labels.out.labelled_pileup
-            .collectFile(name: "combined_labelled_pileups.txt")
+            .collectFile(name: "combined_labelled_pileups.txt"){it[0]}
     )
 
     // 4. Score files on thresholds
     score_bases_per_library (
-        add_target_labels.out.labelled_pileup,
+        add_target_labels.out.labelled_pileup.map{it[0]},
         params.coverage_threshold,
         params.baseq_threshold,
         params.mapq_threshold
     )
     score_targets_per_library (
-        get_per_target_aggregated_stats.out.per_target_aggregated,
+        get_per_target_aggregated_stats.out.per_target_aggregated.map{it[0]},
         params.coverage_threshold,
         params.baseq_threshold,
         params.mapq_threshold
     )
-    // Does this need to be scored?
+    // TODO: Does it make sens to score this?
     score_per_base_summary (
         generate_per_base_summary.out.all_libraries_per_base,
         params.coverage_threshold,
@@ -93,10 +93,42 @@ workflow gene_target_evaluation_workflow {
         params.mapq_threshold
     )
 
+//     collected_ch = get_per_target_aggregated_stats.out.per_target_aggregated
+//         .toList()
+//         .map{ my_list ->
+//             def files = my_list.collect {it[0]}
+//             def pools = my_list.collect { it[1] }
+//             return [files, pools]
+//         }
+
+
+        get_per_target_aggregated_stats.out.per_target_aggregated
+            .collect(flat: false)
+            .view(items -> "OUTPUT: $items")
     // 5. Generate visualization per target
     if (params.visualize) {
+//         collected_ch= get_per_target_aggregated_stats.out.per_target_aggregated
+//         .map {x ->
+//             def file_names = x.collect { it -> it[0] }.join(' ')
+//             def pool_ids = x.collect { it -> it[1] }.join(' ')
+//             tuple (file_names, pool_ids)
+//         }
+//         collected_ch = get_per_target_aggregated_stats.out.per_target_aggregated
+//             .collect(flat: false)
+//             .map { it.transpose() }
+//             .map { files, pools -> tuple(files.join(' '), pools.join(' '))}
+// //         collected_ch = get_per_target_aggregated_stats.out.per_target_aggregated
+// //             .map{it[0]}
+// //             .collect()
+//         //.map{it[0]}.collect()
+//         collected_ch.view(item -> "CHANNEL: $item")
+
+        files_ch = get_per_target_aggregated_stats.out.per_target_aggregated.collect{it[0]}
+        pools_ch = get_per_target_aggregated_stats.out.per_target_aggregated.collect{it[1]}
+
         generate_visualization (
-            get_per_target_aggregated_stats.out.per_target_aggregated.collect(),
+            files_ch,
+            pools_ch,
             "target_eval_visual",
             params.coverage_threshold,
             params.baseq_threshold,
@@ -104,10 +136,6 @@ workflow gene_target_evaluation_workflow {
         )
     }
 
-        """
-    coverage_threshold = 25 // minimum acceptable value for coverage per base
-    normalize_to_mean_coverage = null // If set, coverage will be normalized to match the provided mean
-    mapq_threshold = 30 // minimum acceptable first quartile (Q1) of the MAPQ scores of mapped reads per base
-    baseq_threshold = 30 // minimum acceptable first quartile (Q1) of the BASEQ scores of mapped reads per base
-        """
+    // TODO: normalize_to_mean_coverage = null // If set, coverage will be normalized to match the provided mean
+
 }

@@ -52,10 +52,10 @@ process generate_per_base_summary {
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
-    tuple path(combined_labelled_pileups), val(pool_id)
+    path(combined_labelled_pileups)
 
     output:
-    tuple path(OUT), val(pool_id), emit: all_libraries_per_base
+    path(OUT), emit: all_libraries_per_base
 
     script:
     OUT="summary_per_base_median.txt"
@@ -72,7 +72,7 @@ process score_output {
 
     input:
     // Expected format: chr1	17371254	SDHB_NM_003000_EXON02   IX00000	570	63	52	60	60
-    tuple path(labelled_pileup), val(pool_id)
+    path(labelled_pileup)
     val(cov_threshold)
     val(bq_threshold)
     val(mq_threshold)
@@ -97,7 +97,10 @@ process generate_visualization {
 
     input:
     // Expected format: chr1	17371254	SDHB_NM_003000_EXON02	570	63	52	60	60
-    tuple path(input_files), val(pool_ids)
+//     tuple val(input_files), val(pool_ids)
+    //path input_files from file_channel.map{it[0]}.collect()
+    val(input_files)
+    val(pool_ids)
     val(prefix)
     val(cov_threshold)
     val(bq_threshold)

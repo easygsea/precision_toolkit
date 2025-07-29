@@ -86,10 +86,11 @@ def main():
         # TODO: improve title metric.split("_")[0]
         plt.xticks(rotation=90, ha='right')
         plt.tick_params(axis='x', which='major', labelsize=5)
-
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = dict(zip(labels, handles))
         plt.legend(by_label.values(), by_label.keys(), fontsize=32)
+
+        # save plot
         plt.savefig(f"{args.prefix}_{metric}.png")
         plt.clf()
 
