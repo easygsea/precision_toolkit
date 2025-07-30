@@ -7,7 +7,7 @@ import matplotlib.colors
 import seaborn as sns
 import pandas as pd
 
-headers=['CHROM','POS','TRACT','POOL','COVERAGE_MED','BASEQ_MED_MED','BASEQ_MED_Q1','MAPQ_MED_MED','MAPQ_MED_Q1']
+#TODO: del target_agg_headers=['CHROM','POS','TRACT','POOL','COVERAGE_Q1','BASEQ_Q1_MED','BASEQ_Q1_Q1','MAPQ_Q1_MED','MAPQ_Q1_Q1']
 
 def main():
 
@@ -34,15 +34,17 @@ def main():
     )
     parser.add_argument(
         "--coverage-threshold",
+        type=int,
         help="Coverage threshold to plot.",
     )
     parser.add_argument(
         "--baseq-threshold",
+        type=int,
         help="BASEQ threshold to plot.",
     )
     parser.add_argument(
         "--mapq-threshold",
-        nargs="+",
+        type=int,
         help="MAPQ threshold to plot.",
     )
 
@@ -51,9 +53,9 @@ def main():
     input_files = [Path(file_path) for file_path in args.input_files]
 
     thresholds = {
-        "COVERAGE_MED": args.coverage_threshold,
-        "BASEQ_MED_MED": args.baseq_threshold,
-        "MAPQ_MED_MED": args.mapq_threshold
+        "COVERAGE_Q1": args.coverage_threshold,
+        "BASEQ_Q1_Q1": args.baseq_threshold,
+        "MAPQ_Q1_Q1": args.mapq_threshold
     }
 
     # set pool colors
@@ -63,7 +65,7 @@ def main():
     # initialize figure
     fig = plt.figure(figsize=(120, 50))
 
-    for metric in ['COVERAGE_MED','BASEQ_MED_MED','MAPQ_MED_MED'] :
+    for metric in ['COVERAGE_Q1','BASEQ_Q1_Q1','MAPQ_Q1_Q1'] :
 
         for file,pool in zip(input_files,args.pool_ids):
 
@@ -73,8 +75,8 @@ def main():
             print(f"FILE {file.name}")
 
             # read data
-            df = pd.read_csv(file, sep='\t', header=None)
-            df.columns=headers
+            df = pd.read_csv(file, sep='\t', comment=None)
+            df.columns=[col.lstrip('#') for col in df.columns]
 
             # plot graph
             plt.scatter(data=df, x='TRACT', y=metric, c=matplotlib.colors.rgb2hex(colors[pool]), label=pool, alpha=0.8)
@@ -95,4 +97,3 @@ def main():
         plt.clf()
 
     print("done")
-

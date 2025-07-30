@@ -38,7 +38,12 @@ process get_per_target_aggregated_stats {
 
     """
     bedtools groupby -i ${labelled_pileup} -g 1,3,4 -c 5,7,9 -o collapse |
-    awk 'BEGIN {OFS="\\t"} {
+    awk -v OFS='\\t' '
+    BEGIN {
+        print "#CHROM","POS","TRACT","POOL","COVERAGE_Q1",\
+        "BASEQ_Q1_MED","BASEQ_Q1_Q1","MAPQ_Q1_MED","MAPQ_Q1_Q1";
+    }
+    {
         n=split(\$4, coverages, ","); split(\$5, baseQ1s, ","); split(\$6, mapQ1s, ",");
         asort(coverages); asort(baseQ1s); asort(mapQ1s);
         q1=int((n + 3) / 4);
@@ -83,11 +88,18 @@ process score_output {
     script:
     OUT="${labelled_pileup.baseName}.scored.txt"
     """
-    awk -v OFS='\\t' '{
+    awk -v OFS='\\t' '
+    /^#/ {
+        print \$0,"SCORE";
+        next;
+    }
+    {
         if (\$5>=${cov_threshold} && \$7>=${bq_threshold} && \$9>=${mq_threshold}) {
-            print \$0,"PASS"}
+            print \$0,"PASS";
+        }
         else {
-            print \$0,"FAIL"}
+            print \$0,"FAIL";
+        }
     }' ${labelled_pileup} > ${OUT}
     """
 }
@@ -97,9 +109,7 @@ process generate_visualization {
 
     input:
     // Expected format: chr1	17371254	SDHB_NM_003000_EXON02	570	63	52	60	60
-//     tuple val(input_files), val(pool_ids)
-    //path input_files from file_channel.map{it[0]}.collect()
-    val(input_files)
+    path(input_files)
     val(pool_ids)
     val(prefix)
     val(cov_threshold)
@@ -114,7 +124,7 @@ process generate_visualization {
     """
     plot-target-tracts \
     --input-files ${input_files} \
-    --pool-ids ${pool_ids} \
+    --pool-ids ${pool_ids.join(' ')} \
     --prefix ${prefix} \
     --coverage-threshold ${cov_threshold} \
     --baseq-threshold ${bq_threshold} \

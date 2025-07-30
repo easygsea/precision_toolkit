@@ -71,6 +71,7 @@ workflow gene_target_evaluation_workflow {
         add_target_labels.out.labelled_pileup
             .collectFile(name: "combined_labelled_pileups.txt"){it[0]}
     )
+    add_target_labels.out.labelled_pileup.view(item -> "PASTPAST: $item")
 
     // 4. Score files on thresholds
     score_bases_per_library (
@@ -93,42 +94,12 @@ workflow gene_target_evaluation_workflow {
         params.mapq_threshold
     )
 
-//     collected_ch = get_per_target_aggregated_stats.out.per_target_aggregated
-//         .toList()
-//         .map{ my_list ->
-//             def files = my_list.collect {it[0]}
-//             def pools = my_list.collect { it[1] }
-//             return [files, pools]
-//         }
-
-
-        get_per_target_aggregated_stats.out.per_target_aggregated
-            .collect(flat: false)
-            .view(items -> "OUTPUT: $items")
     // 5. Generate visualization per target
     if (params.visualize) {
-//         collected_ch= get_per_target_aggregated_stats.out.per_target_aggregated
-//         .map {x ->
-//             def file_names = x.collect { it -> it[0] }.join(' ')
-//             def pool_ids = x.collect { it -> it[1] }.join(' ')
-//             tuple (file_names, pool_ids)
-//         }
-//         collected_ch = get_per_target_aggregated_stats.out.per_target_aggregated
-//             .collect(flat: false)
-//             .map { it.transpose() }
-//             .map { files, pools -> tuple(files.join(' '), pools.join(' '))}
-// //         collected_ch = get_per_target_aggregated_stats.out.per_target_aggregated
-// //             .map{it[0]}
-// //             .collect()
-//         //.map{it[0]}.collect()
-//         collected_ch.view(item -> "CHANNEL: $item")
-
-        files_ch = get_per_target_aggregated_stats.out.per_target_aggregated.collect{it[0]}
-        pools_ch = get_per_target_aggregated_stats.out.per_target_aggregated.collect{it[1]}
 
         generate_visualization (
-            files_ch,
-            pools_ch,
+            get_per_target_aggregated_stats.out.per_target_aggregated.collect{it[0]},
+            get_per_target_aggregated_stats.out.per_target_aggregated.collect{it[1]},
             "target_eval_visual",
             params.coverage_threshold,
             params.baseq_threshold,
