@@ -96,7 +96,6 @@ workflow gene_target_evaluation_workflow {
 
     // 5. Generate visualization per target
     if (params.visualize) {
-
         generate_visualization (
             get_per_target_aggregated_stats.out.per_target_aggregated.collect{it[0]},
             get_per_target_aggregated_stats.out.per_target_aggregated.collect{it[1]},

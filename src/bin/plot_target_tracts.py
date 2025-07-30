@@ -7,8 +7,6 @@ import matplotlib.colors
 import seaborn as sns
 import pandas as pd
 
-#TODO: del target_agg_headers=['CHROM','POS','TRACT','POOL','COVERAGE_Q1','BASEQ_Q1_MED','BASEQ_Q1_Q1','MAPQ_Q1_MED','MAPQ_Q1_Q1']
-
 def main():
 
     # Get input parameters
@@ -69,11 +67,6 @@ def main():
 
         for file,pool in zip(input_files,args.pool_ids):
 
-            # TODO: delete print info
-            lib_name=file.name.split(sep='.',maxsplit=1)[0]
-            print(f"LIBRARY: {lib_name}")
-            print(f"FILE {file.name}")
-
             # read data
             df = pd.read_csv(file, sep='\t', comment=None)
             df.columns=[col.lstrip('#') for col in df.columns]
@@ -84,8 +77,7 @@ def main():
 
         # plot formatting
         plt.grid(axis='x')
-        plt.title(f"{metric} per tract", fontsize=64)
-        # TODO: improve title metric.split("_")[0]
+        plt.title(f"{metric} Q1 per tract", fontsize=64)
         plt.xticks(rotation=90, ha='right')
         plt.tick_params(axis='x', which='major', labelsize=5)
         handles, labels = plt.gca().get_legend_handles_labels()
