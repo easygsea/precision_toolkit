@@ -43,7 +43,7 @@ workflow gene_target_evaluation_workflow {
         }
 
     // TODO: del
-    bam_ch.view{item -> "BAMS_CH: $item"}
+    //bam_ch.view{item -> "BAMS_CH: $item"}
     println "TARGETS BED: ${params.targets_bed}"
 
     // 0. Setup
@@ -71,7 +71,6 @@ workflow gene_target_evaluation_workflow {
         add_target_labels.out.labelled_pileup
             .collectFile(name: "combined_labelled_pileups.txt"){it[0]}
     )
-    add_target_labels.out.labelled_pileup.view(item -> "PASTPAST: $item")
 
     // 4. Score files on thresholds
     score_bases_per_library (

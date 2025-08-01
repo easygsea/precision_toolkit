@@ -13,9 +13,17 @@ process add_target_labels {
     // NOTE: back to 0-indexed
 
     """
-    awk 'BEGIN{OFS="\\t"} NR > 1 {print \$1, \$2-1, \$2, \$0}' ${parsed_pileup} | \
-    bedtools intersect -a - -b ${targets_bed} -wa -wb | \
-    awk 'BEGIN {OFS="\\t"} {print \$4,\$5,\$15,\$11,\$6,\$7,\$8,\$9,\$10}' > ${OUT}
+    awk 'BEGIN{OFS="\\t"} NR > 1 {print \$1, \$2-1, \$2, \$0}' ${parsed_pileup} |
+    bedtools intersect -a - -b ${targets_bed} -wa -wb |
+    awk -v OFS='\\t' '
+    /^#/ {
+        print "#CHROM","POS","TRACT","POOL","COVERAGE",\
+        "BASEQ_MED","BASEQ_Q1","MAPQ_MED","MAPQ_Q1";
+        next;
+    }
+    {
+        print \$4,\$5,\$15,\$11,\$6,\$7,\$8,\$9,\$10;
+    }' > ${OUT}
     """
 }
 
@@ -130,7 +138,6 @@ process generate_visualization {
     --baseq-threshold ${bq_threshold} \
     --mapq-threshold ${mq_threshold} \
     """
-
 }
 
 
