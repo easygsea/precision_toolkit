@@ -65,11 +65,13 @@ def main():
 
     for metric in ['COVERAGE_Q1','BASEQ_Q1_Q1','MAPQ_Q1_Q1'] :
 
+
         for file,pool in zip(input_files,args.pool_ids):
 
             # read data
             df = pd.read_csv(file, sep='\t', comment=None)
             df.columns=[col.lstrip('#') for col in df.columns]
+            df[metric] = df[metric].astype(float)
 
             # plot graph
             plt.scatter(data=df, x='TRACT', y=metric, c=matplotlib.colors.rgb2hex(colors[pool]), label=pool, alpha=0.8)

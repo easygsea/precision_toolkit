@@ -76,7 +76,7 @@ process generate_per_base_summary {
     //TODO: add header
     """
     sort -k1,1 -k2,2 -k3,3 ${combined_labelled_pileups} |
-    bedtools groupby -g 1,2,3,4 -c 5,6,7,8,9 -o median > ${OUT}
+    bedtools groupby -g 1,2,3 -c 5,6,7,8,9 -o median > ${OUT}
     """
 }
 
