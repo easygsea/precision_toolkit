@@ -79,7 +79,7 @@ def main():
 
         # plot formatting
         plt.grid(axis='x')
-        plt.title(f"{metric} Q1 per tract", fontsize=64)
+        plt.title(f"{metric} per tract", fontsize=64)
         plt.xticks(rotation=90, ha='right')
         plt.tick_params(axis='x', which='major', labelsize=5)
         handles, labels = plt.gca().get_legend_handles_labels()

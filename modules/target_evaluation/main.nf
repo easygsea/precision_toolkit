@@ -16,10 +16,9 @@ process add_target_labels {
     awk 'BEGIN{OFS="\\t"} NR > 1 {print \$1, \$2-1, \$2, \$0}' ${parsed_pileup} |
     bedtools intersect -a - -b ${targets_bed} -wa -wb |
     awk -v OFS='\\t' '
-    /^#/ {
-        print "#CHROM","POS","TRACT","POOL","COVERAGE",\
+    BEGIN {
+        print "#CHROM","POS","TRACT","POOL","COVERAGE", \
         "BASEQ_MED","BASEQ_Q1","MAPQ_MED","MAPQ_Q1";
-        next;
     }
     {
         print \$4,\$5,\$15,\$11,\$6,\$7,\$8,\$9,\$10;
@@ -45,7 +44,7 @@ process get_per_target_aggregated_stats {
     // TODO: ignore chimeric reads?
 
     """
-    bedtools groupby -i ${labelled_pileup} -g 1,3,4 -c 5,7,9 -o collapse |
+    bedtools groupby -inheader -i ${labelled_pileup} -g 1,3,4 -c 5,7,9 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
         print "#CHROM","POS","TRACT","POOL","COVERAGE_Q1",\
@@ -75,8 +74,14 @@ process generate_per_base_summary {
     // Generates median of all bases within the target group
     //TODO: add header
     """
+    grep -v '^#' |
     sort -k1,1 -k2,2 -k3,3 ${combined_labelled_pileups} |
-    bedtools groupby -g 1,2,3 -c 5,6,7,8,9 -o median > ${OUT}
+    bedtools groupby -g 1,2,3 -c 5,6,7,8,9 -o median |
+    awk -v OFS='\\t' '
+    BEGIN {
+        print "#CHROM","POS","TRACT","POOL","COVERAGE_MED", \
+        "BASEQ_MED_MED","BASEQ_MED_Q1","MAPQ_MED_MED","MAPQ_MED_Q1";
+    } {print \$1,\$2,\$3,"AGGREGATE",\$4,\$5,\$6,\$7,\$8,\$9 }' > ${OUT}
     """
 }
 

@@ -21,6 +21,7 @@ process get_per_base_stats {
     OUT="${in_bam.baseName}.mpileup.per_base.parsed.txt"
     """
     samtools mpileup -A -aa -x --min-BQ 10 --min-MQ 1 --output-MQ \
+    --no-output-ends  --no-output-ins --no-output-ins --no-output-del --no-output-del \
     --positions ${targets_bed} ${in_bam} |
     gawk -v OFS='\\t' '
     function ord(c,i) {
@@ -41,12 +42,12 @@ process get_per_base_stats {
             del_index = index(\$5, "*");
         }
         baseQ=0; mapQ=0; baseQs[1]=0; mapQs[1]=0;
-        for(i=1;i<=\$4;i++) {
-            baseChr=substr(\$6, i, 1); baseQs[i]=ord(baseChr)-33;
+        for(i=1;i<=total_non_del;i++) {
+            baseChr=substr(\$6,i,1); baseQs[i]=ord(baseChr)-33;
             mapChr=substr(\$7,i,1); mapQs[i]=ord(mapChr)-33;
         }
         asort(baseQs); asort(mapQs);
-        median=int(total_non_del/2);
+        median=int(total_non_del/2+0.5);
         q1=int((total_non_del+3)/4);
         if (total_non_del==-1) {print(\$1,\$2,0,0,0,0,0,"${pool_id}")}
         else {print(\$1,\$2,total_non_del,baseQs[median],baseQs[q1],mapQs[median],mapQs[q1],"${pool_id}")}
