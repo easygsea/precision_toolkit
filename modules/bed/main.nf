@@ -1,4 +1,4 @@
-process sort_bed {
+process SORT_BED {
 
     input:
     path bed_file

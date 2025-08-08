@@ -10,8 +10,10 @@ process get_per_base_stats {
     // 5. custom gawk to adjust for deletions & parse
 
     input:
-    path(targets_bed)
+    path targets_bed
     tuple path(in_bam), val(pool_id)
+    val bq_min
+    val mq_min
 
     output:
     tuple path(OUT), val(pool_id), emit: parsed_pileup
@@ -20,7 +22,7 @@ process get_per_base_stats {
     script:
     OUT="${in_bam.baseName}.mpileup.per_base.parsed.txt"
     """
-    samtools mpileup -A -aa -x --min-BQ 10 --min-MQ 1 --output-MQ \
+    samtools mpileup -A -aa -x --min-BQ ${bq_min} --min-MQ ${mq_min} --output-MQ \
     --no-output-ends  --no-output-ins --no-output-ins --no-output-del --no-output-del \
     --positions ${targets_bed} ${in_bam} |
     gawk -v OFS='\\t' '
@@ -57,5 +59,25 @@ process get_per_base_stats {
 }
 //        else {print(\$1,\$2,total_non_del,baseQ/total_non_del,baseQs[q1],mapQ/total_non_del,mapQs[q1]) }; \
 
+process get_per_base_stats_no_parse {
+    label "dynamic_resource"
+    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
+    input:
+    path(targets_bed)
+    tuple path(in_bam), val(pool_id)
+    val bq_min
+    val mq_min
+
+    output:
+    tuple path(OUT), val(pool_id), emit: raw_mpileup_out
+
+    script:
+    OUT="${in_bam.baseName}.mpileup.raw.txt"
+    """
+    samtools mpileup -A -aa -x --min-BQ ${bq_min} --min-MQ ${mq_min} --output-MQ \
+    --no-output-ends  --no-output-ins --no-output-ins --no-output-del --no-output-del \
+    --positions ${targets_bed} ${in_bam} > ${OUT}
+    """
+}
 

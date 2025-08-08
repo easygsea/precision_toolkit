@@ -21,6 +21,7 @@ include {
     get_per_base_stats_with_bedmap as extract_per_base_baseq_with_bedmap
     convert_to_baseq_scores
 } from '../../modules/target_evaluation/bedmap'
+include { SORT_BED                          } from '../../modules/bed/main'
 
 
 // TODO: valid input checks function
@@ -50,19 +51,32 @@ workflow gene_target_evaluation_workflow {
     sort_bed(file(params.targets_bed))
     index_bam_files(bam_ch)
 
-    //1.a Option a: using mpileup
-    if (params.tool == "mpileup") {
-        get_per_base_stats(sort_bed.out.sorted_bed, bam_ch)
-        add_target_labels(sort_bed.out.sorted_bed, get_per_base_stats.out.parsed_pileup)
-    }
-    //1.b Option b: using samtools depth (not currently in development -- ignore)
-    else {
-        // add_target_labels(sort_bed.out.sorted_bed, something.out.parsed_pileup)
+
+    // 1. Get per-base stats mpileup on stats
+    get_per_base_stats(
+        SORT_BED.out.sorted_bed,
+        bam_ch,
+        params.mpileup_baseq_min,
+        params.mpileup_mapq_min
+    )
+    add_target_labels(
+        SORT_BED.out.sorted_bed,
+        get_per_base_stats.out.parsed_pileup
+    )
+
+    // 1.5 aside
+    if (params.output_raw_mpileup) {
+        get_per_base_stats(
+            SORT_BED.out.sorted_bed,
+            bam_ch,
+            params.mpileup_baseq_min,
+            params.mpileup_mapq_min
+        )
     }
 
     // 2. Aggregate per target (q1s)
     get_per_target_aggregated_stats(
-        sort_bed.out.sorted_bed,
+        SORT_BED.out.sorted_bed,
         add_target_labels.out.labelled_pileup
     )
 
