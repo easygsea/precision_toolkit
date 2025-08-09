@@ -1,4 +1,4 @@
-process add_target_labels {
+process ADD_TARGET_LABELS {
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
@@ -26,7 +26,7 @@ process add_target_labels {
     """
 }
 
-process get_per_target_aggregated_stats {
+process GET_PER_TARGET_AGGREGATED_STATS {
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
@@ -60,7 +60,7 @@ process get_per_target_aggregated_stats {
     """
 }
 
-process generate_per_base_summary {
+process GENERATE_PER_BASE_SUMMARY {
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
@@ -85,15 +85,13 @@ process generate_per_base_summary {
     """
 }
 
-process score_output {
+process SCORE_OUTPUT {
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     // Expected format: chr1	17371254	SDHB_NM_003000_EXON02   IX00000	570	63	52	60	60
-    path(labelled_pileup)
-    val(cov_threshold)
-    val(bq_threshold)
-    val(mq_threshold)
+    path labelled_pileup
+    tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
 
     output:
     path(OUT)
@@ -117,7 +115,7 @@ process score_output {
     """
 }
 
-process generate_visualization {
+process GENERATE_VISUALIZATION {
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
@@ -125,9 +123,7 @@ process generate_visualization {
     path(input_files)
     val(pool_ids)
     val(prefix)
-    val(cov_threshold)
-    val(bq_threshold)
-    val(mq_threshold)
+    tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
 
     output:
     path(OUT)

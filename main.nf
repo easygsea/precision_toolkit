@@ -84,6 +84,7 @@ def helpMessage() {
             --targets_bed               BED file of genomic targets
 
         Optional Parameters:
+            --genome_ref                    Must use if and only if cram input
             --mapq_threshold                Minimum acceptable first quartile (Q1) of the MAPQ scores of mapped reads
                                             per base,default is 30
             --baseq_threshold               Minimum acceptable first quartile (Q1) of the BASEQ scores of mapped reads
