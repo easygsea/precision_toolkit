@@ -44,6 +44,7 @@ process GET_PER_BASE_STATS {
     gawk -v OFS='\\t' '
     function ord(c,i) {
         for(i=0;i<256;i++){if (sprintf("%c",i) == c) return i}
+        echo "Error: ascii value out of bounds, check bam files";
         return -10;
     }
     BEGIN {
@@ -67,7 +68,7 @@ process GET_PER_BASE_STATS {
         asort(baseQs); asort(mapQs);
         median=int(total_non_del/2+0.5);
         q1=int((total_non_del+3)/4);
-        if (total_non_del==-1) {print(\$1,\$2,0,0,0,0,0,"${pool_id}")}
+        if (total_non_del==-1 || total_non_del==0) {print(\$1,\$2,0,0,0,0,0,"${pool_id}")}
         else {print(\$1,\$2,total_non_del,baseQs[median],baseQs[q1],mapQs[median],mapQs[q1],"${pool_id}")}
         delete baseQs; delete mapQs;
     }' - > ${OUT}

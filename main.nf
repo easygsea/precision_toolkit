@@ -80,17 +80,23 @@ def helpMessage() {
 
     Target Evaluation Workflow:
         Mandatory Parameters:
-            --bams_dir                  Directory including bam files
-            --targets_bed               BED file of genomic targets
+            --aligned_files                 Glob expression matching one or more bam/cram file paths. Any non-bam/cram
+                                            files are ignored. If any cram provided, also provide --genome-ref for
+                                            expansion. Example usage: 'path/to/dir/*.{bam,cram,bai}'
+            --targets_bed                   BED file of genomic targets
 
         Optional Parameters:
-            --genome_ref                    Must use if and only if cram input
-            --mapq_threshold                Minimum acceptable first quartile (Q1) of the MAPQ scores of mapped reads
-                                            per base,default is 30
-            --baseq_threshold               Minimum acceptable first quartile (Q1) of the BASEQ scores of mapped reads
-                                            per base, default is 30
+            --genome_ref                    Reference genome for CRAM files. CRAM files skipped if not provided.
+            --coverage_threshold            Minimum acceptable coverage per base (default: 25)
+            --baseq_threshold               Minimum acceptable first-quartile(Q1) of BASEQ scores per base (default: 30)
+            --mapq_threshold                Minimum acceptable first-quartile(Q1) of MAPQ scores per base (default: 30)
+            --visualize                     Flag to generate per-target plots for all input files per stat
+            --output_raw_mpileup            Flag to output raw/un-parsed mpileup file (note that this file is large)
+            --mpileup_baseq_min             Adjust minimum baseq for a base to be considered in a read (default: 10)
+            --mpileup_mapq_min              Adjust minimum mapq for a read to be considered (default: 1)
+        In Development:
             --normalize_to_mean_coverage    Bam files will be normalized to the provided mean coverage
-            --coverage_threshold            Coverage threshold per base, default is 25
+            --aligned_files_comparator      Glob expression (similar to --aligned_files) to compare against
 
     ====================
     Resource Management
