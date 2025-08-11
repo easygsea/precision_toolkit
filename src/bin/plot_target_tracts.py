@@ -1,14 +1,41 @@
-# TODO: ADD HEADER HERE
+#!/usr/bin/env python3
+
+"""
+Visualize tract/target scores output from target evaluation workflow, grouped by poolID.
+
+Usage:
+    plot-target-tracts --input-files <input_files> --pool-ids <pool_ids>
+   --prefix <prefix> --coverage-threshold <coverage-threshold>
+   --baseq-threshold <baseq-threshold> --mapq-threshold <mapq-threshold>
+
+Example:
+    plot-target-tracts --input-files
+    A.mpileup.per_base.parsed.labelled.target_aggregated.txt
+    B.mpileup.per_base.parsed.labelled.target_aggregated.txt
+    C.mpileup.per_base.parsed.labelled.target_aggregated.txt
+    --pool-ids IX00001 IX00000 IX12265 --prefix target_eval_visual
+    --coverage-threshold 25 --baseq-threshold 30 --mapq-threshold 30
+"""
 
 import argparse
 from pathlib import Path
-import matplotlib.pyplot as plt
+
 import matplotlib.colors
-import seaborn as sns
+import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
+
 
 def main():
+    """
+    Visualize tract/target scores output from target evaluation workflow, by poolID.
 
+    Args:
+        None. Arguments are parsed from command line.
+
+    Returns:
+        None. Results are saved as PNG files.
+    """
     # Get input parameters
     parser = argparse.ArgumentParser(
         description=("Plot visualizations per-target region.")
@@ -48,45 +75,58 @@ def main():
 
     args = parser.parse_args()
 
+    # Convert all filepaths to Path type
     input_files = [Path(file_path) for file_path in args.input_files]
 
+    # Make thresholds dictionary
     thresholds = {
         "COVERAGE_Q1": args.coverage_threshold,
         "BASEQ_Q1_Q1": args.baseq_threshold,
-        "MAPQ_Q1_Q1": args.mapq_threshold
+        "MAPQ_Q1_Q1": args.mapq_threshold,
     }
 
-    # set pool colors
+    # Set pool colors
     pool_list = set(args.pool_ids)
-    colors = dict(zip(pool_list, [cs for cs in sns.color_palette("hls", len(pool_list))]))
+    colors = dict(
+        zip(pool_list, [cs for cs in sns.color_palette("hls", len(pool_list))])
+    )
 
-    # initialize figure
-    fig = plt.figure(figsize=(120, 50))
+    # Initialize figure
+    plt.figure(figsize=(120, 50))
 
-    for metric in ['COVERAGE_Q1','BASEQ_Q1_Q1','MAPQ_Q1_Q1'] :
-
-
-        for file,pool in zip(input_files,args.pool_ids):
-
-            # read data
-            df = pd.read_csv(file, sep='\t', comment=None)
-            df.columns=[col.lstrip('#') for col in df.columns]
+    for metric in ["COVERAGE_Q1", "BASEQ_Q1_Q1", "MAPQ_Q1_Q1"]:
+        for file, pool in zip(input_files, args.pool_ids):
+            # Read data
+            df = pd.read_csv(file, sep="\t", comment=None)
+            df.columns = [col.lstrip("#") for col in df.columns]
             df[metric] = df[metric].astype(float)
 
-            # plot graph
-            plt.scatter(data=df, x='TRACT', y=metric, c=matplotlib.colors.rgb2hex(colors[pool]), label=pool, alpha=0.8)
-            plt.axhline(y=thresholds[metric], color='orange', linestyle='--', label='Threshold')
+            # Plot graph
+            plt.scatter(
+                data=df,
+                x="TRACT",
+                y=metric,
+                c=matplotlib.colors.rgb2hex(colors[pool]),
+                label=pool,
+                alpha=0.8,
+            )
+            plt.axhline(
+                y=thresholds[metric],
+                color="orange",
+                linestyle="--",
+                label="Threshold",
+            )
 
-        # plot formatting
-        plt.grid(axis='x')
+        # Format plot
+        plt.grid(axis="x")
         plt.title(f"{metric} per tract", fontsize=64)
-        plt.xticks(rotation=90, ha='right')
-        plt.tick_params(axis='x', which='major', labelsize=5)
+        plt.xticks(rotation=90, ha="right")
+        plt.tick_params(axis="x", which="major", labelsize=5)
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = dict(zip(labels, handles))
         plt.legend(by_label.values(), by_label.keys(), fontsize=32)
 
-        # save plot
+        # Save plot
         plt.savefig(f"{args.prefix}_{metric}.png")
         plt.clf()
 
