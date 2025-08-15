@@ -60,7 +60,7 @@ workflow gene_target_evaluation_workflow {
             .concat(
                 CRAM_TO_BAM_WITH_SUBSET (
                     mixed_aligned_ch.cram,
-                    params.genome_ref,
+                    file(params.genome_ref),
                     targets_bed,
                     32
                 )

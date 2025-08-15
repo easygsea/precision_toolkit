@@ -13,7 +13,6 @@ process CRAM_TO_BAM_WITH_SUBSET {
 
     script:
     bam_file="${alignment_file.baseName}.bam"
-
     """
     #temp files
     INTERSECTING_READS=intersect_reads.txt
