@@ -1,16 +1,16 @@
 process CRAM_TO_BAM_WITH_SUBSET {
     label "dynamic_resource"
-    tag "${sampleName}"
+    tag "${sample_name}"
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
-    tuple val(sampleName), path(alignment_file), val(pool)
+    tuple val(sample_name), path(alignment_file), val(pool)
     path genome_ref
     path sorted_bed
     val cpus
 
     output:
-    tuple val(sampleName), path(bam_file), val(pool), emit: cram_bam
+    tuple val(sample_name), path(bam_file), val(pool), emit: cram_bam
 
     script:
     bam_file="${alignment_file.baseName}.bam"

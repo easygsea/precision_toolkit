@@ -123,7 +123,7 @@ nextflow run main.nf \
    - You are analyzing somatic variants (e.g. tumor-normal pairs)
    - You need to normalize variant representations before comparison
 
-2. **Use witty.er when:**
+3. **Use witty.er when:**
    - You are analyzing structural variants or large indels (>50bp)
    - You need faster processing times for complex variant analysis
    - Your variants may have positional uncertainty or require fuzzy matching

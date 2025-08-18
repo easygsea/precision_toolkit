@@ -1,13 +1,13 @@
 process ADD_TARGET_LABELS {
-    tag "${sampleName}"
+    tag "${sample_name}"
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
-    tuple val(sampleName), path(parsed_pileup), val(pool_id)
+    tuple val(sample_name), path(parsed_pileup), val(pool_id)
 
     output:
-    tuple val(sampleName), path(OUT), val(pool_id), emit: labelled_pileup
+    tuple val(sample_name), path(OUT), val(pool_id), emit: labelled_pileup
 
     script:
     OUT="${parsed_pileup.baseName}.labelled.txt"
@@ -28,15 +28,15 @@ process ADD_TARGET_LABELS {
 }
 
 process GET_PER_TARGET_AGGREGATED_STATS {
-    tag "${sampleName}"
+    tag "${sample_name}"
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
-    tuple val(sampleName), path(labelled_pileup), val(pool_id)
+    tuple val(sample_name), path(labelled_pileup), val(pool_id)
 
     output:
-    tuple val(sampleName), path(OUT), val(pool_id), emit: per_target_aggregated
+    tuple val(sample_name), path(OUT), val(pool_id), emit: per_target_aggregated
 
     script:
     OUT="${labelled_pileup.baseName}.target_aggregated.txt"
@@ -88,16 +88,16 @@ process GENERATE_PER_BASE_SUMMARY {
 }
 
 process SCORE_OUTPUT {
-    tag "${sampleName}"
+    tag "${sample_name}"
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     // Expected format: chr1	17371254	SDHB_NM_003000_EXON02   IX00000	570	63	52	60	60
-    tuple val(sampleName), path(pre_scored_file), val(pool_id)
+    tuple val(sample_name), path(pre_scored_file), val(pool_id)
     tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
 
     output:
-    tuple val(sampleName), path(OUT), val(pool_id)
+    tuple val(sample_name), path(OUT), val(pool_id)
 
     script:
     OUT="${pre_scored_file.baseName}.scored.txt"
