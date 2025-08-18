@@ -17,7 +17,7 @@ include {
 include { CRAM_TO_BAM_WITH_SUBSET   } from '../../modules/cram/main'
 include { SORT_BED                  } from '../../modules/bed/main'
 
-// collect all threshold variables
+// collect all scoring thresholds
 def scoring_thresholds = tuple (
     params.coverage_threshold,
     params.baseq_threshold,
@@ -35,11 +35,12 @@ workflow gene_target_evaluation_workflow {
     mixed_aligned_ch = channel
         .fromPath(params.aligned_files)
         .map{file_path ->
+            def sampleName = file_path.getName().replaceFirst(/\..*$/, "")
             def matcher = file_path.toString() =~ /IX\d{5}/
             def pool_id = matcher.find() ? matcher.group(0) : null
-            tuple (file_path, pool_id)
+            tuple (sampleName, file_path, pool_id)
         }
-        .branch { file_path, pool_id ->
+        .branch { sampleName, file_path, pool_id ->
             def ext = file_path.extension.toLowerCase()
             bam: ext == 'bam'
             cram: ext == 'cram'
@@ -49,7 +50,7 @@ workflow gene_target_evaluation_workflow {
     // if no genome_ref, skip any cram file & output warning for each file not processed
     if (!params.genome_ref) {
        mixed_aligned_ch.cram
-            .view {no_ref_cram, pool_id ->
+            .view {sampleName, no_ref_cram, pool_id ->
                 log.warn "No genome reference provided for cram files. \n" +
                 "SKIPPING ${no_ref_cram}" }
        bam_ch = mixed_aligned_ch.bam
@@ -103,30 +104,31 @@ workflow gene_target_evaluation_workflow {
     // 3. Aggregate per base across libraries
     GENERATE_PER_BASE_SUMMARY (
         ADD_TARGET_LABELS.out.labelled_pileup
-            .collectFile(name: "combined_labelled_pileups.txt"){it[0]}
+            .collectFile(name: "combined_labelled_pileups.txt"){it[1]}
     )
 
     // 4. Score files on thresholds
     SCORE_BASES_PER_LIBRARY (
-        ADD_TARGET_LABELS.out.labelled_pileup.map{it[0]},
+        ADD_TARGET_LABELS.out.labelled_pileup,
         scoring_thresholds
     )
     SCORE_TARGETS_PER_LIBRARY (
-        GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.map{it[0]},
+        GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated,
         scoring_thresholds
     )
+
+    // TODO: Does it make sens to score the per_base_summary?
     SCORE_PER_BASE_SUMMARY (
         GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base,
         scoring_thresholds
     )
-    // TODO: Does it make sens to score the per_base_summary?
 
     // 5. Generate visualization per target
     if (params.visualize) {
         GENERATE_VISUALIZATION (
-            GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[0]},
             GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[1]},
-            "target_eval_visual",
+            GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[2]},
+            "plot",
             scoring_thresholds
         )
     }

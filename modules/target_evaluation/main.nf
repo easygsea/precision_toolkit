@@ -1,12 +1,13 @@
 process ADD_TARGET_LABELS {
+    tag "${sampleName}"
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
-    tuple path(parsed_pileup), val(pool_id)
+    tuple val(sampleName), path(parsed_pileup), val(pool_id)
 
     output:
-    tuple path(OUT), val(pool_id), emit: labelled_pileup
+    tuple val(sampleName), path(OUT), val(pool_id), emit: labelled_pileup
 
     script:
     OUT="${parsed_pileup.baseName}.labelled.txt"
@@ -27,14 +28,15 @@ process ADD_TARGET_LABELS {
 }
 
 process GET_PER_TARGET_AGGREGATED_STATS {
+    tag "${sampleName}"
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
-    tuple path(labelled_pileup), val(pool_id)
+    tuple val(sampleName), path(labelled_pileup), val(pool_id)
 
     output:
-    tuple path(OUT), val(pool_id), emit: per_target_aggregated
+    tuple val(sampleName), path(OUT), val(pool_id), emit: per_target_aggregated
 
     script:
     OUT="${labelled_pileup.baseName}.target_aggregated.txt"
@@ -61,18 +63,18 @@ process GET_PER_TARGET_AGGREGATED_STATS {
 }
 
 process GENERATE_PER_BASE_SUMMARY {
+    tag "All_Samples"
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(combined_labelled_pileups)
 
     output:
-    path(OUT), emit: all_libraries_per_base
+    tuple val("All_Samples"), path(OUT), val("All_Pools"), emit: all_libraries_per_base
 
     script:
     OUT="summary_per_base_median.txt"
     // Generates median of all bases within the target group
-    //TODO: add header
     """
     grep -v '^#' |
     sort -k1,1 -k2,2 -k3,3 ${combined_labelled_pileups} |
@@ -86,18 +88,19 @@ process GENERATE_PER_BASE_SUMMARY {
 }
 
 process SCORE_OUTPUT {
+    tag "${sampleName}"
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     // Expected format: chr1	17371254	SDHB_NM_003000_EXON02   IX00000	570	63	52	60	60
-    path labelled_pileup
+    tuple val(sampleName), path(pre_scored_file), val(pool_id)
     tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
 
     output:
-    path(OUT)
+    tuple val(sampleName), path(OUT), val(pool_id)
 
     script:
-    OUT="${labelled_pileup.baseName}.scored.txt"
+    OUT="${pre_scored_file.baseName}.scored.txt"
     """
     awk -v OFS='\\t' '
     /^#/ {
@@ -111,7 +114,7 @@ process SCORE_OUTPUT {
         else {
             print \$0,"FAIL";
         }
-    }' ${labelled_pileup} > ${OUT}
+    }' ${pre_scored_file} > ${OUT}
     """
 }
 
@@ -140,6 +143,5 @@ process GENERATE_VISUALIZATION {
     --mapq-threshold ${mq_threshold} \
     """
 }
-
 
 //process generate_metrics_tracts{}

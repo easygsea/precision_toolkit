@@ -1,8 +1,9 @@
 process INDEX_BAM_FILE {
+    tag "${sampleName}"
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
-    tuple path(bam_file), val(pool)
+    tuple val(sampleName), path(bam_file), val(pool)
 
     output:
     path OUT, emit: bam_index
@@ -16,6 +17,7 @@ process INDEX_BAM_FILE {
 
 process GET_PER_BASE_STATS {
     label "dynamic_resource"
+    tag "${sampleName}"
     //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     // Current specs used here:
@@ -27,12 +29,12 @@ process GET_PER_BASE_STATS {
 
     input:
     path targets_bed
-    tuple path(in_bam), val(pool_id)
+    tuple val(sampleName), path(in_bam), val(pool_id)
     val bq_min
     val mq_min
 
     output:
-    tuple path(OUT), val(pool_id), emit: parsed_pileup
+    tuple val(sampleName), path(OUT), val(pool_id), emit: parsed_pileup
     // Example Output: chr1	17371254	570	63	52	60	60	IX00000
 
     script:
@@ -78,16 +80,17 @@ process GET_PER_BASE_STATS {
 
 process GET_PER_BASE_STATS_NO_PARSE {
     label "dynamic_resource"
+    tag "${sampleName}"
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
-    tuple path(in_bam), val(pool_id)
+    tuple val(sampleName), path(in_bam), val(pool_id)
     val bq_min
     val mq_min
 
     output:
-    tuple path(OUT), val(pool_id), emit: raw_mpileup_out
+    tuple val(sampleName), path(OUT), val(pool_id), emit: raw_mpileup_out
 
     script:
     OUT="${in_bam.baseName}.mpileup.raw.txt"

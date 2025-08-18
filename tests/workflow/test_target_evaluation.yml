@@ -23,11 +23,11 @@
       md5sum: 56f7b58685f21bef55bb69611ff24b71
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/summary_per_base_median.scored.txt
       md5sum: 356eb52e9b3a2c4039111659839aba63
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/target_eval_visual_COVERAGE_Q1.png
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/plot_COVERAGE_Q1.png
       md5sum: 032c25d8f5bd3b54704f21277569c7ad
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/target_eval_visual_BASEQ_Q1_Q1.png
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/plot_BASEQ_Q1_Q1.png
       md5sum: 91071176057279abd4e29c7a51c5f9dd
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/target_eval_visual_MAPQ_Q1_Q1.png
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/plot_MAPQ_Q1_Q1.png
       md5sum: 0f09be851310f94a259e7a41b5ab0358
 
 - name: target_evaluation_test_mixed_noref
@@ -52,11 +52,11 @@
       should_exist: false
     - path: target_evaluation_test_mixed_noref/target_eval_results/summary_per_base_median.scored.txt
       md5sum: 57a2a82e69faa2a881bb91e49cd10c75
-    - path: target_evaluation_test_mixed_noref/target_eval_results/target_eval_visual_COVERAGE_Q1.png
+    - path: target_evaluation_test_mixed_noref/target_eval_results/plot_COVERAGE_Q1.png
       should_exist: false
-    - path: target_evaluation_test_mixed_noref/target_eval_results/target_eval_visual_BASEQ_Q1_Q1.png
+    - path: target_evaluation_test_mixed_noref/target_eval_results/plot_BASEQ_Q1_Q1.png
       should_exist: false
-    - path: target_evaluation_test_mixed_noref/target_eval_results/target_eval_visual_MAPQ_Q1_Q1.png
+    - path: target_evaluation_test_mixed_noref/target_eval_results/plot_MAPQ_Q1_Q1.png
       should_exist: false
 
 - name: target_evaluation_test_bam_only
@@ -140,9 +140,9 @@
       md5sum: 56f7b58685f21bef55bb69611ff24b71
     - path: target_evaluation_test_thresholds/target_eval_results/summary_per_base_median.scored.txt
       md5sum: 17ceea7379bee7409fee4260e05721ec
-    - path: target_evaluation_test_thresholds/target_eval_results/target_eval_visual_COVERAGE_Q1.png
+    - path: target_evaluation_test_thresholds/target_eval_results/plot_COVERAGE_Q1.png
       md5sum: 3709dbbe3cc10360f99eef6c9ddacf78
-    - path: target_evaluation_test_thresholds/target_eval_results/target_eval_visual_BASEQ_Q1_Q1.png
+    - path: target_evaluation_test_thresholds/target_eval_results/plot_BASEQ_Q1_Q1.png
       md5sum: d052f6eaff15390397471c2005b2abf0
-    - path: target_evaluation_test_thresholds/target_eval_results/target_eval_visual_MAPQ_Q1_Q1.png
+    - path: target_evaluation_test_thresholds/target_eval_results/plot_MAPQ_Q1_Q1.png
       md5sum: f197cf30025f43b14fc2850875c1d917
