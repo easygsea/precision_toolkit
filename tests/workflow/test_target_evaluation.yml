@@ -24,11 +24,11 @@
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/summary_per_base_median.scored.txt
       md5sum: 356eb52e9b3a2c4039111659839aba63
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/plot_COVERAGE_Q1.png
-      md5sum: 032c25d8f5bd3b54704f21277569c7ad
+      md5sum: 2e5a8f5c3e99eb8115a817e937e4804a
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/plot_BASEQ_Q1_Q1.png
-      md5sum: 91071176057279abd4e29c7a51c5f9dd
+      md5sum: 997d19fae56821f36a38e5bd798fef62
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/plot_MAPQ_Q1_Q1.png
-      md5sum: 0f09be851310f94a259e7a41b5ab0358
+      md5sum: 6b7ae8e181630ff898d2c2b45f4c00f9
 
 - name: target_evaluation_test_mixed_noref
   command: >

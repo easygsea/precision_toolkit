@@ -86,7 +86,7 @@ def main():
     }
 
     # Set pool colors
-    pool_list = set(args.pool_ids)
+    pool_list = sorted(list(args.pool_ids))
     colors = dict(
         zip(pool_list, [cs for cs in sns.color_palette("hls", len(pool_list))])
     )
