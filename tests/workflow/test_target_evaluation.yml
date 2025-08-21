@@ -1,12 +1,12 @@
 - name: target_evaluation_test_mixed_ref_visualize_with_raw
   command: >
-    nextflow run main.nf 
-    --workflows target_evaluation 
-    --aligned_files 'tests_data/target_evaluation/*.{bam,cram,bed}' 
-    --targets_bed tests_data/target_evaluation/test_targets.bed 
-    --genome_ref tests_data/target_evaluation/chr5_region.fa 
-    --output_dir target_evaluation_test_mixed_ref_visualize_with_raw 
-    --visualize 
+    nextflow run main.nf
+    --workflows target_evaluation
+    --aligned_files 'tests_data/target_evaluation/*.{bam,cram,bed}'
+    --targets_bed tests_data/target_evaluation/test_targets.bed
+    --genome_ref tests_data/target_evaluation/chr5_region.fa
+    --output_dir target_evaluation_test_mixed_ref_visualize_with_raw
+    --visualize
     --output_raw_mpileup
   files:
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_eval_results/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.raw.txt
@@ -32,10 +32,10 @@
 
 - name: target_evaluation_test_mixed_noref
   command: >
-    nextflow run main.nf 
-    --workflows target_evaluation 
-    --aligned_files 'tests_data/target_evaluation/*.{bam,cram,bed}' 
-    --targets_bed tests_data/target_evaluation/test_targets.bed 
+    nextflow run main.nf
+    --workflows target_evaluation
+    --aligned_files 'tests_data/target_evaluation/*.{bam,cram,bed}'
+    --targets_bed tests_data/target_evaluation/test_targets.bed
     --output_dir target_evaluation_test_mixed_noref
   files:
     - path: target_evaluation_test_mixed_noref/target_eval_results/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.raw.txt
@@ -61,10 +61,10 @@
 
 - name: target_evaluation_test_bam_only
   command: >
-    nextflow run main.nf 
-    --workflows target_evaluation 
-    --aligned_files tests_data/target_evaluation/*.bam 
-    --targets_bed tests_data/target_evaluation/test_targets.bed 
+    nextflow run main.nf
+    --workflows target_evaluation
+    --aligned_files tests_data/target_evaluation/*.bam
+    --targets_bed tests_data/target_evaluation/test_targets.bed
     --output_dir target_evaluation_test_bam_only
   files:
     - path: target_evaluation_test_bam_only/target_eval_results/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.scored.txt
@@ -80,11 +80,11 @@
 
 - name: target_evaluation_test_cram_only_ref
   command: >
-    nextflow run main.nf 
-    --workflows target_evaluation 
-    --aligned_files 'tests_data/target_evaluation/*.cram' 
-    --genome_ref tests_data/target_evaluation/chr5_region.fa 
-    --targets_bed tests_data/target_evaluation/test_targets.bed 
+    nextflow run main.nf
+    --workflows target_evaluation
+    --aligned_files 'tests_data/target_evaluation/*.cram'
+    --genome_ref tests_data/target_evaluation/chr5_region.fa
+    --targets_bed tests_data/target_evaluation/test_targets.bed
     --output_dir target_evaluation_test_cram_only_ref
   files:
     - path: target_evaluation_test_cram_only_ref/target_eval_results/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.scored.txt
@@ -100,10 +100,10 @@
 
 - name: target_evaluation_test_cram_only_noref
   command: >
-    nextflow run main.nf 
-    --workflows target_evaluation 
-    --aligned_files 'tests_data/target_evaluation/*.cram' 
-    --targets_bed tests_data/target_evaluation/test_targets.bed 
+    nextflow run main.nf
+    --workflows target_evaluation
+    --aligned_files 'tests_data/target_evaluation/*.cram'
+    --targets_bed tests_data/target_evaluation/test_targets.bed
     --output_dir target_evaluation_test_cram_only_noref
   files:
     - path: target_evaluation_test_cram_only_noref/target_eval_results/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.scored.txt
@@ -119,15 +119,15 @@
 
 - name: target_evaluation_test_thresholds
   command: >
-    nextflow run main.nf 
-    --workflows target_evaluation 
-    --aligned_files 'tests_data/target_evaluation/*' 
-    --genome_ref tests_data/target_evaluation/chr5_region.fa 
-    --targets_bed tests_data/target_evaluation/test_targets.bed 
-    --output_dir target_evaluation_test_thresholds 
-    --coverage_threshold 1 
-    --baseq_threshold 24 
-    --mapq_threshold 40 
+    nextflow run main.nf
+    --workflows target_evaluation
+    --aligned_files 'tests_data/target_evaluation/*'
+    --genome_ref tests_data/target_evaluation/chr5_region.fa
+    --targets_bed tests_data/target_evaluation/test_targets.bed
+    --output_dir target_evaluation_test_thresholds
+    --coverage_threshold 1
+    --baseq_threshold 24
+    --mapq_threshold 40
     --visualize
   files:
     - path: target_evaluation_test_thresholds/target_eval_results/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.scored.txt
