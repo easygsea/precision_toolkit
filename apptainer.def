@@ -50,6 +50,7 @@ Stage: runtime1
     PSUTIL_VERSION=6.1.1
     PYTHON_VERSION=3.11.7
     NEXTFLOW_VERSION=24.10.3
+    BEDTOOLS_VERSION=2.31.0
     BEDOPS_VERSION=2.4.41
 
 %files from witty_er_builder
@@ -112,6 +113,10 @@ Stage: runtime1
     cd "samtools-{{HTSLIB_VERSION}}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
+    # Install precompiled bedtools
+    wget --quiet "https://github.com/arq5x/bedtools2/releases/download/v{{BEDTOOLS_VERSION}}/bedtools.static" && \
+    chmod a+x bedtools.static && \
+    mv bedtools.static /opt/hap.py/bin/bedtools && \
     # Build bedops
     wget --quiet "https://github.com/bedops/bedops/releases/download/v{{BEDOPS_VERSION}}/bedops_linux_x86_64-v{{BEDOPS_VERSION}}.tar.bz2" && \
     mkdir "bedops_linux_x86_64-v{{BEDOPS_VERSION}}" && \
