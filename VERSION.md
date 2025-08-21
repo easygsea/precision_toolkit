@@ -1,6 +1,6 @@
 # Clinical Tools Update Log
 
-### V1.0.2
+### V1.1.0
 2025/08/21 Added new target evaluation workflow for analyzing per-base stats across target regions.
 
 ### V1.0.1

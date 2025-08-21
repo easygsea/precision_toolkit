@@ -1,6 +1,5 @@
 process ADD_TARGET_LABELS {
     tag "${sample_name}"
-    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
@@ -12,7 +11,6 @@ process ADD_TARGET_LABELS {
     script:
     OUT="${parsed_pileup.baseName}.labelled.txt"
     // NOTE: back to 0-indexed
-
     """
     awk 'BEGIN{OFS="\\t"} NR > 1 {print \$1, \$2-1, \$2, \$0}' ${parsed_pileup} |
     bedtools intersect -a - -b ${targets_bed} -wa -wb |
@@ -29,7 +27,6 @@ process ADD_TARGET_LABELS {
 
 process GET_PER_TARGET_AGGREGATED_STATS {
     tag "${sample_name}"
-    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(targets_bed)
@@ -40,11 +37,6 @@ process GET_PER_TARGET_AGGREGATED_STATS {
 
     script:
     OUT="${labelled_pileup.baseName}.target_aggregated.txt"
-    // Gets per-target stats (median of cov, q1 of baseq_q1, q1 of mapq_q1)
-    // Example Output: chr1	NA	SDHB_NM_003000_EXON02	586	NA	40	NA	60	PASS
-    // TODO: add headers
-    // TODO: ignore chimeric reads?
-
     """
     bedtools groupby -inheader -i ${labelled_pileup} -g 1,3,4 -c 5,7,9 -o collapse |
     awk -v OFS='\\t' '
@@ -64,7 +56,6 @@ process GET_PER_TARGET_AGGREGATED_STATS {
 
 process GENERATE_PER_BASE_SUMMARY {
     tag "All_Samples"
-    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     path(combined_labelled_pileups)
@@ -74,7 +65,6 @@ process GENERATE_PER_BASE_SUMMARY {
 
     script:
     OUT="summary_per_base_median.txt"
-    // Generates median of all bases within the target group
     """
     grep -v '^#' |
     sort -k1,1 -k2,2 -k3,3 ${combined_labelled_pileups} |
@@ -92,7 +82,6 @@ process SCORE_OUTPUT {
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
-    // Expected format: chr1	17371254	SDHB_NM_003000_EXON02   IX00000	570	63	52	60	60
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
     tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
 
@@ -122,7 +111,6 @@ process GENERATE_VISUALIZATION {
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
-    // Expected format: chr1	17371254	SDHB_NM_003000_EXON02	570	63	52	60	60
     path(input_files)
     val(pool_ids)
     val(prefix)
@@ -144,4 +132,4 @@ process GENERATE_VISUALIZATION {
     """
 }
 
-//process generate_metrics_tracts{}
+//TODO: process generate_metrics_tracts{}

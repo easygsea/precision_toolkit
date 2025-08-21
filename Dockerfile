@@ -1,4 +1,5 @@
 # Environment variables
+ARG BEDTOOLS_VERSION=2.31.0
 ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
@@ -7,8 +8,6 @@ ARG POETRY_VERSION=2.0.1
 ARG PSUTIL_VERSION=6.1.1
 ARG PYTHON_VERSION=3.11.7
 ARG WITTYER_VERSION=0.5.2
-ARG BEDTOOLS_VERSION=2.31.0
-ARG BEDOPS_VERSION=2.4.41
 
 # Stage 1: Build witty.er from source
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS witty_er_builder
@@ -40,13 +39,12 @@ RUN pip install --upgrade pip --no-cache-dir && \
 
 # Stage 3: Runtime
 FROM mgibio/hap.py:v${HAPPY_VERSION}
+ARG BEDTOOLS_VERSION
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
 ARG JOBLIB_VERSION
 ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
-ARG BEDTOOLS_VERSION
-ARG BEDOPS_VERSION
 WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
@@ -105,12 +103,6 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     wget --quiet "https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static" && \
     chmod a+x bedtools.static && \
     mv bedtools.static /opt/hap.py/bin/bedtools && \
-    # Build bedops
-    wget --quiet "https://github.com/bedops/bedops/releases/download/v${BEDOPS_VERSION}/bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2" && \
-    mkdir "bedops_linux_x86_64-v${BEDOPS_VERSION}" && \
-    tar -jxf "bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2" -C "bedops_linux_x86_64-v${BEDOPS_VERSION}" && \
-    cp bedops_linux_x86_64-v${BEDOPS_VERSION}/bin/* /opt/hap.py/bin/ && \
-    rm -rf bedops_linux_x86_64-v${BEDOPS_VERSION}* && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" && \
     tar -xzf "Python-${PYTHON_VERSION}.tgz" && \

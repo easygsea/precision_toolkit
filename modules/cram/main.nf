@@ -1,7 +1,6 @@
-process CRAM_TO_BAM_WITH_SUBSET {
+process SUBSET_CRAM_TO_BAM {
     label "dynamic_resource"
     tag "${sample_name}"
-    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     tuple val(sample_name), path(alignment_file), val(pool)

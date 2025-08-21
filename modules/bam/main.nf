@@ -1,6 +1,5 @@
 process INDEX_BAM_FILE {
     tag "${sample_name}"
-    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     input:
     tuple val(sample_name), path(bam_file), val(pool)
@@ -18,14 +17,13 @@ process INDEX_BAM_FILE {
 process GET_PER_BASE_STATS {
     label "dynamic_resource"
     tag "${sample_name}"
-    //publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
     // Current specs used here:
-    // 1, output all positions in bed file
+    // 1. Output all positions in bed file
     // 2. Min BQ of 10 consider BQ in calculations (ref old) (TODO: pass in values, with default here, caveat 0 for baseq in docs)
     // 3. Min MQ of 1 (ref old)
     // 4. -A count anomalous reads pairs -x turn off overlaps removal
-    // 5. custom gawk to adjust for deletions & parse
+    // 5. Custom gawk to adjust for deletions & parse
 
     input:
     path targets_bed
@@ -35,7 +33,6 @@ process GET_PER_BASE_STATS {
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: parsed_pileup
-    // Example Output: chr1	17371254	570	63	52	60	60	IX00000
 
     script:
     OUT="${in_bam.baseName}.mpileup.per_base.parsed.txt"
@@ -76,7 +73,6 @@ process GET_PER_BASE_STATS {
     }' - > ${OUT}
     """
 }
-//        else {print(\$1,\$2,total_non_del,baseQ/total_non_del,baseQs[q1],mapQ/total_non_del,mapQs[q1]) }; \
 
 process GET_PER_BASE_STATS_NO_PARSE {
     label "dynamic_resource"

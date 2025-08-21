@@ -14,8 +14,8 @@ include {
     GET_PER_BASE_STATS_NO_PARSE
 } from '../../modules/bam/main'
 
-include { CRAM_TO_BAM_WITH_SUBSET   } from '../../modules/cram/main'
-include { SORT_BED                  } from '../../modules/bed/main'
+include { SUBSET_CRAM_TO_BAM    } from '../../modules/cram/main'
+include { SORT_BED              } from '../../modules/bed/main'
 
 // collect all scoring thresholds
 def scoring_thresholds = tuple (
@@ -27,7 +27,6 @@ def scoring_thresholds = tuple (
 // Main variant gene target evaluation workflow
 workflow gene_target_evaluation_workflow {
     main:
-
     // 0. Setup
     targets_bed = SORT_BED(file(params.targets_bed)).sorted_bed
 
@@ -35,12 +34,12 @@ workflow gene_target_evaluation_workflow {
     mixed_aligned_ch = channel
         .fromPath(params.aligned_files)
         .map{file_path ->
-            def sampleName = file_path.getName().replaceFirst(/\..*$/, "")
+            def sample_name = file_path.getName().replaceFirst(/\..*$/, "")
             def matcher = file_path.toString() =~ /IX\d{5}/
             def pool_id = matcher.find() ? matcher.group(0) : null
-            tuple (sampleName, file_path, pool_id)
+            tuple (sample_name, file_path, pool_id)
         }
-        .branch { sampleName, file_path, pool_id ->
+        .branch { sample_name, file_path, pool_id ->
             def ext = file_path.extension.toLowerCase()
             bam: ext == 'bam'
             cram: ext == 'cram'
@@ -50,7 +49,7 @@ workflow gene_target_evaluation_workflow {
     // if no genome_ref, skip any cram file & output warning for each file not processed
     if (!params.genome_ref) {
        mixed_aligned_ch.cram
-            .view {sampleName, no_ref_cram, pool_id ->
+            .view {sample_name, no_ref_cram, pool_id ->
                 log.warn "No genome reference provided for cram files. \n" +
                 "SKIPPING ${no_ref_cram}" }
        bam_ch = mixed_aligned_ch.bam
