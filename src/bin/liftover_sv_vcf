@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# VCF Liftover Tool
+# Structural Variant VCF Liftover Tool
 #
-# This script converts VCF files from one genome assembly to another using UCSC's liftover utility.
+# This script converts VCF files from one genome assembly to another using UCSC's liftOver utility.
 # It mainly supports structural variants (CNVs, SV breakends, imprecise intervals).
 # For SNVs and indels, Picard LiftoverVcf is recommended.
 #
-# Usage: liftover_vcf <input.vcf> <output.vcf> <chain_file> [options]
+# Usage: liftover_sv_vcf <input.vcf> <output.vcf> <chain_file> [options]
 
 set -euo pipefail
 
@@ -25,7 +25,7 @@ log_msg() {
 # Function to show usage
 show_usage() {
     cat << EOF
-VCF Liftover Tool
+Structural Variant VCF Liftover Tool
 
 Usage: $0 <input.vcf> <output.vcf> <chain_file> [options]
 

@@ -3,7 +3,7 @@
 - [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
 - [Convert Multi-Sample VCF File into Single-Sample VCF files](#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
 - [Count Variants By Size](#count-variants-by-size)
-- [VCF Liftover](#vcf-liftover)
+- [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
 
 ## Manual Diagnostic Metric Curation
 
@@ -48,13 +48,13 @@ Example output:
 >50: 0
 ```
 
-## VCF Liftover
+## Structural Variant VCF Liftover
 
-The `liftover_vcf` tool enables conversion of structural variant VCF files between different genome assemblies (e.g., from hg19 to hg38) by leveraging the UCSC liftOver utility.
+The `liftover_sv_vcf` tool enables conversion of structural variant VCF files between different genome assemblies (e.g., from hg19 to hg38) by leveraging the UCSC liftOver utility.
 
 Usage:
 ```bash
-apptainer exec <path/to/clinical_tools_latest.sif> liftover_vcf input.vcf output.vcf chain_file.chain
+apptainer exec <path/to/clinical_tools_latest.sif> liftover_sv_vcf input.vcf output.vcf chain_file.chain
 ```
 
-For detailed documentation and examples, see [VCF Liftover Tool](liftover_vcf.md).
+For detailed documentation and examples, see [Structural Variant VCF Liftover Tool](liftover_sv_vcf.md).

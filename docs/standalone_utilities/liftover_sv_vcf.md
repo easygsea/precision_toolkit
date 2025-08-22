@@ -1,6 +1,8 @@
-# VCF Liftover Tool
+# Structural Variant VCF Liftover Tool
 
-The `liftover_vcf` utility is a helper script in Bash that converts VCF files from one genome assembly to another using the UCSC liftOver tool. It is designed primarily for structural variants (SVs, CNVs, breakends, imprecise intervals) and is best used when you need to remap variant coordinates between assemblies (e.g., hg19 to hg38). For SNVs and indels, consider using Picard's LiftoverVcf.
+The `liftover_sv_vcf` utility is a helper script in Bash that converts structural variant VCF files from one genome assembly to another using the UCSC liftOver tool.
+It is designed primarily for structural variants (SVs, CNVs, breakends, imprecise intervals) and is best used when you need to remap variant coordinates between assemblies (e.g., hg19 to hg38).
+For SNVs and indels, consider using Picard's LiftoverVcf.
 
 ---
 
@@ -29,12 +31,12 @@ You'll need appropriate chain files for the coordinate conversion you want to pe
 
 ### Basic Usage
 ```bash
-apptainer exec <path/to/clinical_tools_latest.sif> liftover_vcf input.vcf output.vcf chain_file.chain
+apptainer exec <path/to/clinical_tools_latest.sif> liftover_sv_vcf input.vcf output.vcf chain_file.chain
 ```
 
 ### Keep Temporary Files for Debugging
 ```bash
-apptainer exec <path/to/clinical_tools_latest.sif> liftover_vcf input.vcf output.vcf chain_file.chain \
+apptainer exec <path/to/clinical_tools_latest.sif> liftover_sv_vcf input.vcf output.vcf chain_file.chain \
     --temp-dir /path/to/temp \
     --keep-temp \
     --verbose
@@ -103,7 +105,7 @@ process LIFTOVER_VCF {
     script:
     def prefix = vcf.baseName
     """
-    liftover_vcf ${vcf} ${prefix}_lifted.vcf ${chain} --verbose 2>&1 | tee ${prefix}_liftover.log
+    liftover_sv_vcf ${vcf} ${prefix}_lifted.vcf ${chain} --verbose 2>&1 | tee ${prefix}_liftover.log
     """
 }
 ```
