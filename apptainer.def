@@ -56,7 +56,7 @@ Stage: runtime1
 
 %files from clinical_tools_builder
     /app/dist/*.whl app/
-    /app/bin/*[^.py] app/bin/
+    /app/bin/* app/bin/
 
 %environment
     export PATH="$PATH:/opt/hap.py/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
@@ -136,6 +136,8 @@ Stage: runtime1
     rm -rf /usr/local/lib/python2.7/dist-packages/bx_python* && \
     python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python && \
     rm *.whl && \
+    # Remove .py files from /app/bin
+    rm -f /app/bin/*.py && \
     # Make everything in /app/bin executable
     chmod -R a+rx /app/bin && \
     # CDI-158
