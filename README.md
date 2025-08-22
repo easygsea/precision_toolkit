@@ -108,6 +108,8 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
     - `convert-multi-sample-vcf`
   - [Count Variants By Size](./docs/standalone_utilities/standalone_utilities.md#count-variants-by-size)
     - `count-variants-by-size`
+  - [VCF Liftover for Structural Variants](./docs/standalone_utilities/liftover_vcf.md)
+    - `liftover_vcf`
 
 ## Resource Optimization and High-Performance Computing
 

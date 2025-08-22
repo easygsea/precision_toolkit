@@ -16,7 +16,6 @@ Stage: witty_er_builder
     cd Wittyer && \
     dotnet publish . -c Release
 
-
 Bootstrap: docker
 From: python:{{ PYTHON_VERSION }}-slim-bookworm
 Stage: clinical_tools_builder
@@ -57,10 +56,12 @@ Stage: runtime1
 
 %files from clinical_tools_builder
     /app/dist/*.whl app/
+    /app/bin/*[^.py] app/bin/
 
 %environment
     export PATH="$PATH:/opt/hap.py/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
     export PATH="$PATH:/usr/bin"
+    export PATH="$PATH:/app/bin"
 
 %post
     cd app && \
@@ -135,5 +136,7 @@ Stage: runtime1
     rm -rf /usr/local/lib/python2.7/dist-packages/bx_python* && \
     python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python && \
     rm *.whl && \
+    # Make everything in /app/bin executable
+    chmod -R a+rx /app/bin && \
     # CDI-158
     sed -i 's~True,  # pass_only~not args.inc_nonpass, # account for nonpass in truth vcf~' /opt/hap.py/bin/som.py
