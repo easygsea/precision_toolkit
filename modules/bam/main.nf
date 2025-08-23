@@ -41,10 +41,16 @@ process GET_PER_BASE_STATS {
     --no-output-ends  --no-output-ins --no-output-ins --no-output-del --no-output-del \
     --positions ${targets_bed} ${in_bam} |
     gawk -v OFS='\\t' '
-    function ord(c,i) {
-        for(i=0;i<256;i++){if (sprintf("%c",i) == c) return i}
-        echo "Error: ascii value out of bounds, check bam files";
-        return -10;
+    function decode_quality_score(target_chr, low, high, mid) {
+        if (low > high) {return -10;}
+        mid = int ((low+high)/2);
+        if (sprintf("%c",mid) == target_chr) {
+            return mid;
+        } else if (sprintf("%c",mid) < target_chr) {
+            return decode_quality_score(target_chr, mid + 1, high);
+        } else {
+            return decode_quality_score(target_chr, low, mid - 1);
+        }
     }
     BEGIN {
         print "#CHROM","POS","COVERAGE","BASEQ_MED", \
@@ -61,8 +67,10 @@ process GET_PER_BASE_STATS {
         }
         baseQ=0; mapQ=0; baseQs[1]=0; mapQs[1]=0;
         for(i=1;i<=total_non_del;i++) {
-            baseChr=substr(\$6,i,1); baseQs[i]=ord(baseChr)-33;
-            mapChr=substr(\$7,i,1); mapQs[i]=ord(mapChr)-33;
+            baseChr=substr(\$6,i,1);
+            baseQs[i]=decode_quality_score(baseChr,0,255,127)-33;
+            mapChr=substr(\$7,i,1);
+            mapQs[i]=decode_quality_score(mapChr,0,255,127)-33;
         }
         asort(baseQs); asort(mapQs);
         median=int(total_non_del/2+0.5);
