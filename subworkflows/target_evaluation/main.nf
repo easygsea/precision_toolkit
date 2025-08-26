@@ -67,9 +67,6 @@ workflow gene_target_evaluation_workflow {
             )
     }
 
-    // TODO: erase print line
-    bam_ch.view{"FINAL BAMS CHANNEL: $it"}
-
     INDEX_BAM_FILES(bam_ch)
 
     // 1. Get per-base stats
