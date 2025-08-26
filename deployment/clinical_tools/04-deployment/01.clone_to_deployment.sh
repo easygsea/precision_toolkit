@@ -16,7 +16,8 @@ function clone_and_deploy {
     mkdir -p "${PRODUCTION_ROOT}/clinical_tools/${version}"
     mv tmp_dir/* "${PRODUCTION_ROOT}/clinical_tools/${version}/"
     cd "${PRODUCTION_ROOT}/clinical_tools/${version}"
-    apptainer build clinical_tools.sif apptainer.def
+    apptainer build "${APPTAINER_IMAGE}" apptainer.def
+    sed -i "s~container = \"quay.io/easygsea/clinical_tools:latest\"~container = \"${PRODUCTION_ROOT}/clinical_tools/${version}/${APPTAINER_IMAGE}\"~" nextflow.config
   fi
   rm -rf tmp_dir/
 }
@@ -40,7 +41,8 @@ function main {
   declare -r \
     BRANCH_NAME="$1"  \
     REPOSITORY_URL="$2"  \
-    PRODUCTION_ROOT="$3"
+    PRODUCTION_ROOT="$3" \
+    APPTAINER_IMAGE="$4"
   echo "Deploying branch '${BRANCH_NAME}'..."
   clone_and_deploy
 }
