@@ -52,12 +52,12 @@ EOF
 }
 
 # Function to check dependencies
-check_dependencies() {    
+check_dependencies() {
     if ! command -v liftOver &> /dev/null; then
         log_msg "ERROR" "UCSC liftOver utility not found in PATH"
         log_msg "ERROR" "Please install it from: https://genome.ucsc.edu/cgi-bin/hgLiftOver"
         exit 1
-    fi    
+    fi
 }
 
 # Function to validate input files
