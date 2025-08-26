@@ -80,9 +80,9 @@ vcf_to_bed() {
 	local input_vcf="$1"
 	local output_bed="$2"
 	log_msg "INFO" "Converting VCF to BED format (BED4+INFO)..."
-	# Support both plain VCF and bgzipped VCF (.vcf.gz)
+	# Support both plain VCF and bgzipped VCF (.gz)
 	local vcf_stream_cmd
-	if [[ "${input_vcf}" == *.vcf.gz || "${input_vcf}" == *.gz ]]; then
+	if [[ "${input_vcf}" == *.gz ]]; then
 		if command -v zcat &>/dev/null; then
 			vcf_stream_cmd="zcat"
 		elif command -v gunzip &>/dev/null; then
