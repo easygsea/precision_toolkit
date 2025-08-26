@@ -1,5 +1,4 @@
 process SORT_BED {
-
     input:
     path bed_file
 
@@ -9,6 +8,6 @@ process SORT_BED {
     script:
     OUT="${bed_file.baseName}.sorted.bed"
     """
-    sort-bed ${bed_file} > ${OUT}
+    bedtools sort -i ${bed_file} > ${OUT}
     """
 }
