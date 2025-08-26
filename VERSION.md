@@ -1,7 +1,7 @@
 # Clinical Tools Update Log
 
 ## Version History
-### V1.0.3 - 2025/08/26
+### V1.0.3 - 2025-08-26
 - [Unreleased]
 - Fixed the deployment stage to point the container built instead of remote
 

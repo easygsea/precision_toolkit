@@ -50,11 +50,11 @@ Example output:
 
 ## Structural Variant VCF Liftover
 
-The `liftover_sv_vcf` tool enables conversion of structural variant VCF files between different genome assemblies (e.g., from hg19 to hg38) by leveraging the UCSC liftOver utility.
+The `liftover_sv_vcf.sh` tool enables conversion of structural variant VCF files between different genome assemblies (e.g., from hg19 to hg38) by leveraging the UCSC liftOver utility.
 
 Usage:
 ```bash
-apptainer exec <path/to/clinical_tools_latest.sif> liftover_sv_vcf input.vcf output.vcf chain_file.chain
+<path/to/clinical_tools/src/bin/>liftover_sv_vcf.sh input.vcf output.vcf chain_file.chain
 ```
 
 For detailed documentation and examples, see [Structural Variant VCF Liftover Tool](liftover_sv_vcf.md).

@@ -29,11 +29,6 @@ WORKDIR /app
 COPY README.md pyproject.toml poetry.lock ./
 COPY src/ /app/src/
 
-# Copy only non-.py files from src/bin to /app/bin and make them executable
-RUN mkdir -p /app/bin && \
-    find src/bin -type f ! -name "*.py" -exec cp --parents {} /app/bin/ \; && \
-    find /app/bin -type f -exec chmod +x {} \;
-
 # Install and configure poetry, build project, and set permissions
 RUN pip install --upgrade pip --no-cache-dir && \
     pip install --no-cache-dir "poetry==${POETRY_VERSION}" && \
@@ -116,7 +111,7 @@ COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
 COPY --from=clinical_tools_builder /app/dist/*.whl .
 
 # Set environment variables
-ENV PATH="$PATH:/opt/hap.py/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install:/app/bin"
+ENV PATH="$PATH:/opt/hap.py/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
 ENV PATH="$PATH:/usr/bin"
 
 # Update shebangs, create wrapper script, set python defaults, and install package

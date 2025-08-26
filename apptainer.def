@@ -56,12 +56,10 @@ Stage: runtime1
 
 %files from clinical_tools_builder
     /app/dist/*.whl app/
-    /app/bin/* app/bin/
 
 %environment
     export PATH="$PATH:/opt/hap.py/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
     export PATH="$PATH:/usr/bin"
-    export PATH="$PATH:/app/bin"
 
 %post
     cd app && \

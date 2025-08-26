@@ -6,7 +6,7 @@
 # It mainly supports structural variants (CNVs, SV breakends, imprecise intervals).
 # For SNVs and indels, Picard LiftoverVcf is recommended.
 #
-# Usage: liftover_sv_vcf <input.vcf> <output.vcf> <chain_file> [options]
+# Usage: liftover_sv_vcf.sh <input.vcf> <output.vcf> <chain_file> [options]
 
 set -euo pipefail
 

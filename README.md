@@ -109,7 +109,7 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
   - [Count Variants By Size](./docs/standalone_utilities/README.md#count-variants-by-size)
     - `count-variants-by-size`
   - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
-- `liftover_sv_vcf`
+- `liftover_sv_vcf.sh`
 
 ## Resource Optimization and High-Performance Computing
 
