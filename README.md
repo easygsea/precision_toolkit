@@ -30,18 +30,23 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
        --output_dir output_clinical_tools
    ```
 
-Using containerized tools:
+### Using Containerized Tools
 
-1. Clone the repository:
+1. Pull the container image:
    ```bash
    apptainer pull docker://quay.io/easygsea/clinical_tools
    ```
 
-2. Run specific tools. Example:
+2. Run specific tools inside the container. Example:
    ```bash
    apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
    ```
-   See official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for guidance on calling commands within a container.
+   See the official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for more details on running commands within a container.
+
+### Running Non-Containerized Tools
+
+Some utilities, such as `liftover_sv_vcf.sh`, can be run directly from the source without a container.
+For a full list and documentation of available standalone utilities, see the [Standalone Utilities README](docs/standalone_utilities/README.md).
 
 ## Demo Data
 
