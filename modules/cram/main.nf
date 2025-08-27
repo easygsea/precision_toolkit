@@ -24,7 +24,7 @@ process SUBSET_CRAM_TO_BAM {
     export REF_PATH=\$CACHE/%2s/%2s/%s:http://www.ebi.ac.uk/ena/cram/md5/%s
     export REF_CACHE=\$CACHE/%2s/%2s/%s
 
-    #bedtools intersect bam against panel target space to get any intersecting alignments (note, not inclusive)
+    #bedtools intersect bam against panel target space to get any intersecting alignments
     bedtools intersect -a ${alignment_file} -b ${sorted_bed} -bed | cut -f4 | cut -f1 -d"/" | sort | uniq > \$INTERSECTING_READS
 
     #using the read names that had an intersecting alignment, retrieve those alignments along with all their mates,

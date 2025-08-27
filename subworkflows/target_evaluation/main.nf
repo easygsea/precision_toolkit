@@ -69,7 +69,7 @@ workflow gene_target_evaluation_workflow {
 
     INDEX_BAM_FILES(bam_ch)
 
-    // 1. Get per-base stats
+    // 1. Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
     GET_PER_BASE_STATS(
         targets_bed,
         bam_ch,
@@ -91,13 +91,13 @@ workflow gene_target_evaluation_workflow {
         )
     }
 
-    // 2. Aggregate per target (q1s)
+    // 2. Aggregate per target (Q1 of per-base stats)
     GET_PER_TARGET_AGGREGATED_STATS(
         targets_bed,
         ADD_TARGET_LABELS.out.labelled_pileup
     )
 
-    // 3. Aggregate per base across libraries
+    // 3. Aggregate per base across libraries (Median of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
         ADD_TARGET_LABELS.out.labelled_pileup
             .collectFile(name: "combined_labelled_pileups.txt"){it[1]}
@@ -112,8 +112,6 @@ workflow gene_target_evaluation_workflow {
         GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated,
         scoring_thresholds
     )
-
-    // TODO: Does it make sens to score the per_base_summary?
     SCORE_PER_BASE_SUMMARY (
         GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base,
         scoring_thresholds
