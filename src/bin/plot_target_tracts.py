@@ -45,11 +45,14 @@ def main():
         "--input-files",
         nargs="+",
         help="List of tract aggregated output files to process.",
+        required=True,
     )
     parser.add_argument(
         "--pool-ids",
         nargs="+",
-        help="List of pool ids corresponding to input files.",
+        help="List of pool ids corresponding to input files."
+        "If not provided, graphs will not be colored",
+        default=[],
     )
     parser.add_argument(
         "-p",
@@ -61,41 +64,45 @@ def main():
         "--coverage-threshold",
         type=int,
         help="Coverage threshold to plot.",
+        required=True,
     )
     parser.add_argument(
         "--baseq-threshold",
         type=int,
         help="BASEQ threshold to plot.",
+        required=True,
     )
     parser.add_argument(
         "--mapq-threshold",
         type=int,
         help="MAPQ threshold to plot.",
+        required=True,
     )
 
     args = parser.parse_args()
 
-    # Convert all filepaths to Path type
-    input_files = [Path(file_path) for file_path in args.input_files]
-
-    # Make thresholds dictionary
-    thresholds = {
+    # Make metrics and thresholds dictionary
+    METRICS_THRESHOLDS = {
         "COVERAGE_Q1": args.coverage_threshold,
         "BASEQ_Q1_Q1": args.baseq_threshold,
         "MAPQ_Q1_Q1": args.mapq_threshold,
     }
 
-    # Set pool colors
-    pool_list = sorted(list(args.pool_ids))
-    colors = dict(
-        zip(pool_list, [cs for cs in sns.color_palette("hls", len(pool_list))])
+    # Convert all filepaths to Path type
+    input_files = [Path(file_path) for file_path in args.input_files]
+
+    # Set pools and colors
+    pool_ids = (
+        args.pool_ids if args.pool_ids != [] else ["No_Pool_Info"] * len(input_files)
     )
+    colors = dict(zip(sorted(args.pool_ids), sns.color_palette("hls", len(pool_ids))))
+    colors["No_Pool_Info"] = (0.0, 0.0, 1.0)  # default blue points
 
     # Initialize figure
     plt.figure(figsize=(120, 50))
 
-    for metric in ["COVERAGE_Q1", "BASEQ_Q1_Q1", "MAPQ_Q1_Q1"]:
-        for file, pool in zip(input_files, args.pool_ids):
+    for metric, threshold in METRICS_THRESHOLDS.items():
+        for file, pool in zip(input_files, pool_ids):
             # Read data
             df = pd.read_csv(file, sep="\t", comment=None)
             df.columns = [col.lstrip("#") for col in df.columns]
@@ -111,7 +118,7 @@ def main():
                 alpha=0.8,
             )
             plt.axhline(
-                y=thresholds[metric],
+                y=threshold,
                 color="orange",
                 linestyle="--",
                 label="Threshold",
