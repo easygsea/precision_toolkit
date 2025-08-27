@@ -38,7 +38,8 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     script:
     OUT="${labelled_pileup.baseName}.target_aggregated.txt"
     """
-    bedtools groupby -inheader -i ${labelled_pileup} -g 1,3,4 -c 5,7,9 -o collapse |
+    sort -V -k1,1 -k3,3 -k2,2n ${labelled_pileup} |
+    bedtools groupby -inheader -i - -g 1,3,4 -c 5,7,9 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
         print "#CHROM","POS","TRACT","POOL","COVERAGE_Q1",\

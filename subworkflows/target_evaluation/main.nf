@@ -81,7 +81,7 @@ workflow gene_target_evaluation_workflow {
         GET_PER_BASE_STATS.out.parsed_pileup
     )
 
-    // 1.5 aside to output raw mpileup if needed
+    // 1.1 Aside to output raw mpileup if needed
     if (params.output_raw_mpileup) {
         GET_PER_BASE_STATS_NO_PARSE(
             targets_bed,
