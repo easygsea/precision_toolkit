@@ -86,19 +86,20 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
     # Build bcftools
+    cd .. && \
     wget --quiet "https://github.com/samtools/bcftools/releases/download/${HTSLIB_VERSION}/bcftools-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "bcftools-${HTSLIB_VERSION}.tar.bz2" && \
     cd "bcftools-${HTSLIB_VERSION}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
-    cd ../.. && rm -rf htslib-* samtools-* bcftools-* && \
+    cd .. && \
     # Build samtools
     wget --quiet "https://github.com/samtools/samtools/releases/download/${HTSLIB_VERSION}/samtools-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "samtools-${HTSLIB_VERSION}.tar.bz2" && \
     cd "samtools-${HTSLIB_VERSION}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
-    cd ../.. && rm -rf htslib-* samtools-* bcftools-* && \
+    cd .. && rm -rf htslib-* samtools-* bcftools-* && \
     # Install precompiled bedtools
     wget --quiet "https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static" && \
     chmod a+x bedtools.static && \
