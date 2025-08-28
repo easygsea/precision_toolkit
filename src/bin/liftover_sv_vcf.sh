@@ -256,9 +256,19 @@ cleanup() {
 
 # Main function
 main() {
+	# Check if we have the required arguments
+	if [[ $# -lt 3 ]]; then
+		log_msg "ERROR" "Missing required arguments"
+		show_usage
+		exit 1
+	fi
+	# Parse required positional arguments
+	local input_vcf="$1"
+	local output_vcf="$2"
+	local chain_file="$3"
 	# Parse command line arguments
 	while [[ $# -gt 0 ]]; do
-		case $1 in
+		case "$1" in
 			-h|--help)
 				show_usage
 				exit 0
@@ -281,19 +291,10 @@ main() {
 				exit 1
 				;;
 			*)
-				break
+				shift
 				;;
 		esac
 	done
-	# Check if we have the required arguments
-	if [[ $# -lt 3 ]]; then
-		log_msg "ERROR" "Missing required arguments"
-		show_usage
-		exit 1
-	fi
-	local input_vcf="$1"
-	local output_vcf="$2"
-	local chain_file="$3"
 	log_msg "INFO" "Starting VCF liftover process"
 	if [[ "${VERBOSE}" == "true" ]]; then
 		log_msg "DEBUG" "Input VCF: ${input_vcf}"
