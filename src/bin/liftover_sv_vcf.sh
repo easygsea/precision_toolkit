@@ -80,24 +80,8 @@ vcf_to_bed() {
 	local input_vcf="$1"
 	local output_bed="$2"
 	log_msg "INFO" "Converting VCF to BED format (BED4+INFO)..."
-	# Support both plain VCF and bgzipped VCF (.gz)
-	local vcf_stream_cmd
-	if [[ "${input_vcf}" == *.gz ]]; then
-		if command -v zcat &>/dev/null; then
-			vcf_stream_cmd="zcat"
-		elif command -v gunzip &>/dev/null; then
-			vcf_stream_cmd="gunzip -c"
-		else
-			log_msg "ERROR" "Cannot process gzipped VCF: zcat or gunzip not found"
-			exit 1
-		fi
-	else
-		vcf_stream_cmd="cat"
-	fi
-	# Use awk to convert VCF to BED4+ (chrom, start, end, name, and all INFO)
-	# - Extract END from INFO if present, else use POS+length(REF)-1
-	# - Output all INFO as 5th field (for -bedPlus=4)
-	${vcf_stream_cmd} "${input_vcf}" | awk -F'\t' 'BEGIN{OFS="\t"}
+	# Always use the uncompressed VCF file (input_vcf is already uncompressed to temp)
+	awk -F'\t' 'BEGIN{OFS="\t"}
 	/^#/ { next }
 	{
 		chrom = $1
@@ -121,7 +105,7 @@ vcf_to_bed() {
 		}
 		# Output: chrom, start, end, name, info (BED4+)
 		print chrom, start, end, name, info
-	}' > "${output_bed}"
+	}' "${input_vcf}" > "${output_bed}"
 	local variant_count
 	variant_count=$(wc -l < "${output_bed}")
 	log_msg "INFO" "Created BED file with ${variant_count} variants"
@@ -308,6 +292,23 @@ main() {
 	validate_inputs "${input_vcf}" "${chain_file}"
 	# Create temporary directory
 	mkdir -p "${TEMP_DIR}"
+
+	# Unzip input VCF to a temporary file if needed, and use that for all downstream processing
+	local uncompressed_vcf="${TEMP_DIR}/input.vcf"
+	if [[ "${input_vcf}" == *.gz ]]; then
+		log_msg "INFO" "Unzipping input VCF to temporary file: ${uncompressed_vcf}"
+		if command -v zcat &>/dev/null; then
+			zcat "${input_vcf}" > "${uncompressed_vcf}"
+		elif command -v gunzip &>/dev/null; then
+			gunzip -c "${input_vcf}" > "${uncompressed_vcf}"
+		else
+			log_msg "ERROR" "Cannot process gzipped VCF: zcat or gunzip not found"
+			exit 1
+		fi
+	else
+		cp "${input_vcf}" "${uncompressed_vcf}"
+	fi
+
 	# Define temporary file paths
 	local input_bed="${TEMP_DIR}/input.bed"
 	local output_bed="${TEMP_DIR}/output.bed"
@@ -315,11 +316,11 @@ main() {
 	# Set up trap to cleanup on exit
 	trap cleanup EXIT
 	# Step 1: Convert VCF to BED4+INFO
-	vcf_to_bed "${input_vcf}" "${input_bed}"
+	vcf_to_bed "${uncompressed_vcf}" "${input_bed}"
 	# Step 2: Run liftover with -bedPlus=4
 	run_liftover "${input_bed}" "${chain_file}" "${output_bed}" "${unmapped_bed}"
 	# Step 3: Convert back to VCF
-	bed_to_vcf "${input_vcf}" "${output_bed}" "${output_vcf}"
+	bed_to_vcf "${uncompressed_vcf}" "${output_bed}" "${output_vcf}"
 	# Step 4: Report statistics
 	report_statistics "${output_bed}" "${unmapped_bed}"
 	log_msg "INFO" "Liftover completed successfully. Output: ${output_vcf}"
