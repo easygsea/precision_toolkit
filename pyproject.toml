@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clinical-tools"
-version = "1.0.1"
+version = "1.0.2"
 description = "An integrated toolset to support clinical validation"
 authors = ["Canada's Michael Smith Genome Sciences Centre - Precision Informatics"]
 readme = "README.md"

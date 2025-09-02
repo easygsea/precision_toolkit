@@ -11,4 +11,4 @@ This manual provides complete documentation for Clinical Tools, including:
 
 ## Standalone Utilities
 
-- [Manual Diagnostic Metrics Curation](./standalone_utilities/standalone_utilities.md#manual-diagnostic-metrics-curation)
+- [Standalone Utilities Manual](./standalone_utilities/README.md)
