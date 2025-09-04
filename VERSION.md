@@ -2,6 +2,10 @@
 
 ## Version History
 
+### v1.0.4 - 2025-09-04
+- [Unreleased]
+- Fixed the CI/CD bug preventing the checkout if the previous build was interrupted.
+
 ### v1.0.3 - 2025-08-26
 - [Unreleased]
 - Fixed the deployment stage to point the container built instead of remote.
