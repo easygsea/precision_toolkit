@@ -12,3 +12,4 @@ git clone -b "${BRANCH_NAME}" "${REPOSITORY_URL}" \
 cd "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
 VERSION=$(sed -nr "s|^version\s*=\s*\"([^\"]+)\"|\1|p" pyproject.toml)
 echo "VERSION=${VERSION}" > clinical_tools_version.txt
+chmod -R g+w "${TESTING_DEPLOYMENT_DIRECTORY}"
