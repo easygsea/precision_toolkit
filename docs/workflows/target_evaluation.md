@@ -1,14 +1,14 @@
 # Target Evaluation
 
-The target evaluation workflow extracts the coverage, and first quartile baseQ and mapQ for each base in the provided target space. 
-Following extraction, each base is scored as pass/fail based on thresholds for each metric (user provided or default). 
-Per-base metrics are further aggregated on two rules: A) per-target per-library (method: Q1) and B) per-base across libraries (method: median) to provide better performance estimates. 
+The target evaluation workflow extracts the coverage, and first quartile baseQ and mapQ for each base in the provided target space.
+Following extraction, each base is scored as pass/fail based on thresholds for each metric (user provided or default).
+Per-base metrics are further aggregated on two rules: A) per-target per-library (method: Q1) and B) per-base across libraries (method: median) to provide better performance estimates.
 Visualization on per-target level optionally enabled by `--visualize` option.
 
 
 ## Quick Start
 
-Run the following command to input a mix of cram and bam files. Symlinks are accepted. 
+Run the following command to input a mix of cram and bam files. Symlinks are accepted.
 
 *Important to provide a genome reference if inputting cram files.*
 ```bash
@@ -18,10 +18,10 @@ nextflow run main.nf \
 --genome_ref <path/to/genome_ref> \
 --targets_bed <path/to/targets_bed> \
 --output_dir <path/to/output_dir> \
---visualize 
+--visualize
 ```
 
-Customize pass/fail scoring with 3 "threshold" options. 
+Customize pass/fail scoring with 3 "threshold" options.
 ```bash
 nextflow run main.nf \
 --workflows target_evaluation \
@@ -45,7 +45,7 @@ nextflow run main.nf \
 
 **Required Parameters:**
 - `--aligned_files`: Glob including bam and/or cram files to be processed (eg. '/path/to/dir/*'). Any other filetypes ignored. If cram files included, also provide `--genome_ref`.
-- `--targets_bed`: Target space for per-base metric extraction. 
+- `--targets_bed`: Target space for per-base metric extraction.
 - `--genome_ref`: Reference genome FASTA file. Required to process any input cram files.
 
 **Optional Parameters:**
@@ -108,18 +108,18 @@ chr5	665	MSH3_NM_002439_EXON01_2	AGGREGATE	0.5	20	20	30	30		FAIL
 Scoring is conducted based on the following metrics for each file
 
 1. Per-base
-   - COVERAGE: Each base has a coverage count of all aligned reads covering the base that pass the mpileup requirements. 
+   - COVERAGE: Each base has a coverage count of all aligned reads covering the base that pass the mpileup requirements.
            These requirements can be adjusted using`--mpileup_baseq_min` and `--mpileup_mapq_min`.
    - BASEQ_Q1: Calculated as the first quartile of all baseQ scores at this loci of reads in COVERAGE.
    - MAPQ_Q1: Calculated as the first quartile of all mapQ score of reads in COVERAGE.
-   
+
 
 2. Per-target
    - COVERAGE_Q1: First quartile of the coverages of all bases within the target region.
    - BASEQ_Q1_Q1: First quartile of all BASEQ_Q1s of all bases within the target region.
    - MAPQ_Q1_Q1: First quartile of all MAPQ_Q1s of all bases within the target region.
 
-   Overall, a `FAIL` here suggests that more than 75% of the bases within this target-region failed on one or more of the 3 metrics. 
+   Overall, a `FAIL` here suggests that more than 75% of the bases within this target-region failed on one or more of the 3 metrics.
 
 
 3. Per-base aggregated across libraries
