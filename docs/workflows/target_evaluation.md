@@ -72,7 +72,7 @@ For example, when `--output_raw_mpileup` and `--visualize` is flagged:
     ├── plot_BASEQ_Q1_Q1.png                # Per-target plot baseQ
     ├── plot_COVERAGE_Q1.png                # Per-target plot coverage
     ├── plot_MAPQ_Q1_Q1.png                 # Per-target plot mapQ
-    ├── summary_per_base_median.scored.txt  #`Per-base aggregated across libraries
+    ├── summary_per_base_median.scored.txt  # Per-base aggregated across libraries
     ├── WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.scored.txt                    # Per-base output
     ├── WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt  # Per-target output
     └── WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.raw.txt                                                # Raw mpilup output
