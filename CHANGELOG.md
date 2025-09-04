@@ -15,12 +15,12 @@
 
 ---
 
-### v1.0.1 - 2025-07-12 
+### v1.0.1 - 2025-07-12 [Released 2025-07-12]
 - Added "all data CSV" export option for easier data wrangling and plotting.
 
 ---
 
-### v1.0.0 - 2025-07-11
+### v1.0.0 - 2025-07-11 [Released 2025-07-11]
 - Initial release of Clinical Tools.
 - Introduced workflows: variant benchmarking and signal correlation.
 - Included initial set of standalone utility tools.
