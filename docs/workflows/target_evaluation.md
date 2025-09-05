@@ -2,7 +2,9 @@
 
 The target evaluation workflow measures coverage and the first-quartile baseQ (base quality) and mapQ (mapping quality) for every base in your target regions (provided in BED format) using the alignment data.
 Following extraction, each base is scored as pass/fail based on thresholds for each metric (user provided or default).
-Per-base metrics are further aggregated on two rules: A) per-target per-library (method: Q1) and B) per-base across libraries (method: median) to provide better performance estimates.
+Per-base metrics are further aggregated on two rules to provide reliable performance estimates:
+A) Per target region within each library/sample, using the first-quartile (Q1) value.
+B) Per base across all libraries/samples, using the median value.
 Visualization on per-target level optionally enabled by `--visualize` option.
 
 
