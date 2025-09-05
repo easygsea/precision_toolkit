@@ -30,18 +30,23 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
        --output_dir output_clinical_tools
    ```
 
-Using containerized tools:
+### Using Containerized Tools
 
-1. Clone the repository:
+1. Pull the container image:
    ```bash
    apptainer pull docker://quay.io/easygsea/clinical_tools
    ```
 
-2. Run specific tools. Example:
+2. Run specific tools inside the container. Example:
    ```bash
    apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
    ```
-   See official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for guidance on calling commands within a container.
+   See the official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for more details on running commands within a container.
+
+### Running Non-Containerized Tools
+
+Some utilities, such as `liftover_sv_vcf.sh`, can be run directly from the source without a container.
+For a full list and documentation of available standalone utilities, see the [Standalone Utilities README](docs/standalone_utilities/README.md).
 
 ## Demo Data
 
@@ -103,12 +108,14 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
   - [Signal Correlation](./docs/workflows/signal_correlation.md)
   - [Target Evaluation](./docs/workflows/target_evaluation.md)
 - [Standalone Utilities](./docs/README.md#standalone-utilities)
-  - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/standalone_utilities.md#manual-diagnostic-metric-curation)
+  - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
     - `manual-diagnostic-metric-curation`
-  - [Convert Multi-Sample VCF File into Single-Sample VCF files](./docs/standalone_utilities/standalone_utilities.md#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
+  - [Convert Multi-Sample VCF File into Single-Sample VCF files](./docs/standalone_utilities/README.md#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
     - `convert-multi-sample-vcf`
-  - [Count Variants By Size](./docs/standalone_utilities/standalone_utilities.md#count-variants-by-size)
+  - [Count Variants By Size](./docs/standalone_utilities/README.md#count-variants-by-size)
     - `count-variants-by-size`
+  - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
+- `liftover_sv_vcf.sh`
 
 ## Resource Optimization and High-Performance Computing
 
