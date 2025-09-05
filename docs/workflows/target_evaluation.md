@@ -1,16 +1,21 @@
 # Target Evaluation
 
-The target evaluation workflow measures coverage and the first-quartile baseQ (base quality) and mapQ (mapping quality) for every base in your target regions (provided in BED format) using the alignment data.
-Following extraction, each base is scored as pass/fail based on thresholds for each metric (user provided or default).
-Per-base metrics are further aggregated on two rules to provide reliable performance estimates:
-A) Per target region within each library/sample, using the first-quartile (Q1) value.
-B) Per base across all libraries/samples, using the median value.
+The target evaluation workflow extracts coverage and computes the first-quartile base
+quality (baseQ) and mapping quality (mapQ) for every base in your target regions using
+your alignment data (in CRAM or BAM format).
+Each base is marked as pass/fail based on satisfying minimum thresholds for each
+metric. You may adjust these thresholds to fine tune the evaluation for your data.
+
+Per-base metrics are further aggregated on two rules to provide reliable performance estimates: <br>
+- A) Per target region within each library/sample, using the first-quartile (Q1) value. <br>
+- B) Per base across all libraries/samples, using the median value. <br>
+
 Visualization on per-target level optionally enabled by `--visualize` option.
 
 
 ## Quick Start
 
-Run the following command to input a mix of cram and bam files. Symlinks are accepted.
+Run the following command to input a mix of cram and bam alignment files. Symlinks are accepted.
 
 *Important to provide a genome reference if inputting cram files.*
 ```bash
@@ -23,7 +28,7 @@ nextflow run main.nf \
 --visualize
 ```
 
-Customize pass/fail scoring with 3 "threshold" options.
+Custom pass/fail scoring by setting three threshold parameters: coverage, baseQ, and mapQ.
 ```bash
 nextflow run main.nf \
 --workflows target_evaluation \
@@ -46,7 +51,7 @@ nextflow run main.nf \
 ### Target Evaluation Parameters
 
 **Required Parameters:**
-- `--aligned_files`: Glob including bam and/or cram files to be processed (eg. '/path/to/dir/*'). Any other filetypes ignored. If cram files included, also provide `--genome_ref`.
+- `--aligned_files`: Glob including BAM and/or CRAM files to be processed (eg. '/path/to/dir/*'). Any other filetypes ignored. If cram files included, also provide `--genome_ref`.
 - `--targets_bed`: Target regions in BED format.
 - `--genome_ref`: Reference genome FASTA file. Required to process any input cram files.
 
