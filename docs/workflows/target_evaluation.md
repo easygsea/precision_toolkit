@@ -45,7 +45,7 @@ nextflow run main.nf \
 
 **Required Parameters:**
 - `--aligned_files`: Glob including bam and/or cram files to be processed (eg. '/path/to/dir/*'). Any other filetypes ignored. If cram files included, also provide `--genome_ref`.
-- `--targets_bed`: Target space for per-base metric extraction.
+- `--targets_bed`: Target regions in BED format.
 - `--genome_ref`: Reference genome FASTA file. Required to process any input cram files.
 
 **Optional Parameters:**
