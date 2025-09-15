@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 # Clone the repository, move it into the deployment folder and build the apptainer image
-function clone_and_deploy {
+function clone_and_copy {
   cd "${PRODUCTION_ROOT}/clinical_tools"
   git clone --branch "${BRANCH_NAME}" "${REPOSITORY_URL}" tmp_dir
   cd tmp_dir
@@ -16,9 +16,10 @@ function clone_and_deploy {
     mkdir -p "${PRODUCTION_ROOT}/clinical_tools/${version}"
     mv tmp_dir/* "${PRODUCTION_ROOT}/clinical_tools/${version}/"
     cd "${PRODUCTION_ROOT}/clinical_tools/${version}"
-    apptainer build clinical_tools.sif apptainer.def
+    scp -r README.md pyproject.toml poetry.lock apptainer.def src "${HOST_NAME}":"${BUILDING_DEPLOYMENT_DIRECTORY}"
+    #apptainer build clinical_tools.sif apptainer.def
   fi
-  rm -rf tmp_dir/
+  #rm -rf tmp_dir/
 }
 
 # Get version defined in the pyproject.toml
