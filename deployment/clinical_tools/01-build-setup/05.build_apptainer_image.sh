@@ -2,9 +2,9 @@
 
 set -euxo pipefail
 
-BUILDING_DEPLOYMENT_DIRECTORY=$1
+TESTING_DEPLOYMENT_DIRECTORY=$1
 APPTAINER_IMAGE=$2
 
-cd "${BUILDING_DEPLOYMENT_DIRECTORY}"
+cd "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
 
-sudo apptainer build "${APPTAINER_IMAGE}" apptainer.def
+apptainer build "${APPTAINER_IMAGE}" apptainer.def
