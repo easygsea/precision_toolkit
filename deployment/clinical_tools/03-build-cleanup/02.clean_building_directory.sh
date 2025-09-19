@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+BUILDING_DEPLOYMENT_DIRECTORY=$1
+
+rm -rfv "${BUILDING_DEPLOYMENT_DIRECTORY}"

@@ -2,9 +2,17 @@
 
 set -euxo pipefail
 
-TESTING_DEPLOYMENT_DIRECTORY=$1
-APPTAINER_IMAGE=$2
+BUILDING_DEPLOYMENT_DIRECTORY=$1
+IMAGE_NAME=$2
 
-cd "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
+cd "${BUILDING_DEPLOYMENT_DIRECTORY}"
 
-apptainer build "${APPTAINER_IMAGE}" apptainer.def
+docker build -t clinical_tools:bamboo -f ./Dockerfile .
+
+echo "Building apptainer image...."
+( while true; do echo "Still building..."; sleep 60; done ) &
+KEEPALIVE_PID=$!
+
+sudo apptainer build "${IMAGE_NAME}" docker-daemon://clinical_tools:bamboo
+
+kill $KEEPALIVE_PID || true
