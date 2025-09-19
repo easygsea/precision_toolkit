@@ -16,11 +16,10 @@ process ADD_TARGET_LABELS {
     bedtools intersect -a - -b ${targets_bed} -wa -wb |
     awk -v OFS='\\t' '
     BEGIN {
-        print "#CHROM","POS","TRACT","POOL","COVERAGE", \
-        "BASEQ_MED","BASEQ_Q1","MAPQ_MED","MAPQ_Q1";
+        print "#CHROM","POS","TRACT","POOL","COVERAGE","BASEQ_Q1","MAPQ_Q1";
     }
     {
-        print \$4,\$5,\$15,\$11,\$6,\$7,\$8,\$9,\$10;
+        print \$4,\$5,\$13,\$9,\$6,\$7,\$8;
     }' > ${OUT}
     """
 }
@@ -39,17 +38,16 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     OUT="${labelled_pileup.baseName}.target_aggregated.txt"
     """
     sort -V -k1,1 -k3,3 -k2,2n ${labelled_pileup} |
-    bedtools groupby -inheader -i - -g 1,3,4 -c 5,7,9 -o collapse |
+    bedtools groupby -inheader -i - -g 1,3,4 -c 5,6,7 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
-        print "#CHROM","POS","TRACT","POOL","COVERAGE_Q1",\
-        "BASEQ_Q1_MED","BASEQ_Q1_Q1","MAPQ_Q1_MED","MAPQ_Q1_Q1";
+        print "#CHROM","POS","TRACT","POOL","COVERAGE_Q1","BASEQ_Q1_Q1","MAPQ_Q1_Q1";
     }
     {
         n=split(\$4, coverages, ","); split(\$5, baseQ1s, ","); split(\$6, mapQ1s, ",");
         asort(coverages); asort(baseQ1s); asort(mapQ1s);
         q1=int((n + 3) / 4);
-        print(\$1,"NA",\$2,\$3,coverages[q1],"NA",baseQ1s[q1],"NA",mapQ1s[q1]);
+        print(\$1,"NA",\$2,\$3,coverages[q1],baseQ1s[q1],mapQ1s[q1]);
         delete coverages; delete baseQ1s; delete mapQ1s;
     }' - > ${OUT}
     """
@@ -69,12 +67,14 @@ process GENERATE_PER_BASE_SUMMARY {
     """
     grep -v '^#' |
     sort -k1,1 -k2,2 -k3,3 ${combined_labelled_pileups} |
-    bedtools groupby -g 1,2,3 -c 5,6,7,8,9 -o median |
+    bedtools groupby -g 1,2,3 -c 5,6,7 -o median |
     awk -v OFS='\\t' '
     BEGIN {
-        print "#CHROM","POS","TRACT","POOL","COVERAGE_MED", \
-        "BASEQ_MED_MED","BASEQ_MED_Q1","MAPQ_MED_MED","MAPQ_MED_Q1";
-    } {print \$1,\$2,\$3,"AGGREGATE",\$4,\$5,\$6,\$7,\$8,\$9 }' > ${OUT}
+        print "#CHROM","POS","TRACT","POOL","COVERAGE_MED","BASEQ_MED_Q1","MAPQ_MED_Q1";
+    }
+    {
+        print \$1,\$2,\$3,"AGGREGATE",\$4,\$5,\$6,\$7;
+    }' > ${OUT}
     """
 }
 
@@ -98,7 +98,7 @@ process SCORE_OUTPUT {
         next;
     }
     {
-        if (\$5>=${cov_threshold} && \$7>=${bq_threshold} && \$9>=${mq_threshold}) {
+        if (\$5>=${cov_threshold} && \$6>=${bq_threshold} && \$7>=${mq_threshold}) {
             print \$0,"PASS";
         }
         else {

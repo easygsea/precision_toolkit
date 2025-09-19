@@ -73,8 +73,8 @@ workflow gene_target_evaluation_workflow {
     GET_PER_BASE_STATS(
         targets_bed,
         bam_ch,
-        params.mpileup_baseq_min,
-        params.mpileup_mapq_min
+        params.min_bq_per_read,
+        params.min_mq_per_read
     )
     ADD_TARGET_LABELS(
         targets_bed,
@@ -85,9 +85,7 @@ workflow gene_target_evaluation_workflow {
     if (params.output_raw_mpileup) {
         GET_PER_BASE_STATS_NO_PARSE(
             targets_bed,
-            bam_ch,
-            params.mpileup_baseq_min,
-            params.mpileup_mapq_min
+            bam_ch
         )
     }
 

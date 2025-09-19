@@ -28,8 +28,8 @@ process GET_PER_BASE_STATS {
     input:
     path targets_bed
     tuple val(sample_name), path(in_bam), val(pool_id)
-    val bq_min
-    val mq_min
+    val min_bq_per_read
+    val min_mq_per_read
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: parsed_pileup
@@ -37,7 +37,7 @@ process GET_PER_BASE_STATS {
     script:
     OUT="${in_bam.baseName}.mpileup.per_base.parsed.txt"
     """
-    samtools mpileup -A -aa -x --min-BQ ${bq_min} --min-MQ ${mq_min} --output-MQ \
+    samtools mpileup -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
     --no-output-ends  --no-output-ins --no-output-ins --no-output-del --no-output-del \
     --positions ${targets_bed} ${in_bam} |
     gawk -v OFS='\\t' '
@@ -65,18 +65,30 @@ process GET_PER_BASE_STATS {
             \$7=substr(\$7,1,del_index-1)substr(\$7,del_index+1);
             del_index = index(\$5, "*");
         }
-        baseQ=0; mapQ=0; baseQs[1]=0; mapQs[1]=0;
+        baseQ=0; mapQ=0; baseQs[1]=-1; mapQs[1]=-1; baseQ_count=0; mapQ_count=0; coverage=0;
         for(i=1;i<=total_non_del;i++) {
             baseChr=substr(\$6,i,1);
-            baseQs[i]=decode_quality_score(baseChr,0,255,127)-33;
             mapChr=substr(\$7,i,1);
-            mapQs[i]=decode_quality_score(mapChr,0,255,127)-33;
+            baseQ=decode_quality_score(baseChr,0,255,127)-33;
+            mapQ=decode_quality_score(mapChr,0,255,127)-33;
+            if (baseQ >= ${min_bq_per_read.coverage_analysis} && mapQ >= ${min_mq_per_read.coverage_analysis}) {
+                coverage++;
+            }
+            if (baseQ >= ${min_bq_per_read.baseq_analysis} && mapQ >= ${min_mq_per_read.baseq_analysis}) {
+                baseQ_count++;
+                baseQs[baseQ_count]=baseQ;
+            }
+            if (baseQ >= ${min_bq_per_read.mapq_analysis} && mapQ >= ${min_mq_per_read.mapq_analysis}) {
+                mapQ_count++;
+                mapQs[mapQ_count]=mapQ;
+            }
         }
         asort(baseQs); asort(mapQs);
-        median=int(total_non_del/2+0.5);
-        q1=int((total_non_del+3)/4);
-        if (total_non_del==-1 || total_non_del==0) {print(\$1,\$2,0,0,0,0,0,"${pool_id}")}
-        else {print(\$1,\$2,total_non_del,baseQs[median],baseQs[q1],mapQs[median],mapQs[q1],"${pool_id}")}
+        q1_index_baseq=int((baseQ_count+3)/4);
+        q1_index_mapq=int((mapQ_count+3)/4);
+        if (baseQ_count==0) {q1_index_baseq=1}
+        if (mapQ_count==0) {q1_index_mapq=1}
+        print(\$1,\$2,coverage,baseQs[q1_index_baseq],mapQs[q1_index_mapq],"${pool_id}")
         delete baseQs; delete mapQs;
     }' - > ${OUT}
     """
@@ -90,8 +102,6 @@ process GET_PER_BASE_STATS_NO_PARSE {
     input:
     path(targets_bed)
     tuple val(sample_name), path(in_bam), val(pool_id)
-    val bq_min
-    val mq_min
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: raw_mpileup_out
@@ -99,7 +109,7 @@ process GET_PER_BASE_STATS_NO_PARSE {
     script:
     OUT="${in_bam.baseName}.mpileup.raw.txt"
     """
-    samtools mpileup -A -aa -x --min-BQ ${bq_min} --min-MQ ${mq_min} --output-MQ \
+    samtools mpileup -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
     --no-output-ends  --no-output-ins --no-output-ins --no-output-del --no-output-del \
     --positions ${targets_bed} ${in_bam} > ${OUT}
     """

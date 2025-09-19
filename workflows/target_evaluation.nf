@@ -16,6 +16,6 @@ workflow target_evaluation {
 
     //TODO: future development
     //gene_target_evaluation_workflow(params.aligned_files)
-    //gene_target_evaluation_workflow(params.comparison_files)
+    //gene_target_evaluation_workflow(params.query_files)
     //paired_comparison()
 }
