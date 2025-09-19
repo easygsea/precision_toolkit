@@ -7,6 +7,8 @@ IMAGE_NAME=$2
 
 cd "${BUILDING_DEPLOYMENT_DIRECTORY}"
 
+rm -rfv "${IMAGE_NAME}"
+
 docker build -t clinical_tools:bamboo -f ./Dockerfile .
 
 echo "Building apptainer image...."
