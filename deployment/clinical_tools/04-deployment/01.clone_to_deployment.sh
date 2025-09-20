@@ -16,6 +16,12 @@ function clone_and_deploy {
     mkdir -p "${PRODUCTION_ROOT}/clinical_tools/${version}"
     mv tmp_dir/* "${PRODUCTION_ROOT}/clinical_tools/${version}/"
     cd "${PRODUCTION_ROOT}/clinical_tools/${version}"
+    "${PYTHON_EXECUTABLE}" -m venv venv
+    chmod -R g+w venv/
+    source venv/bin/activate
+    pip install --upgrade pip wheel
+    pip install poetry==2.0.1
+    poetry install --with dev
     apptainer build clinical_tools.sif apptainer.def
   fi
   rm -rf tmp_dir/
