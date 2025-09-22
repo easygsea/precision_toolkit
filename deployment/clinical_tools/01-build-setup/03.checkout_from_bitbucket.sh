@@ -16,5 +16,5 @@ VERSION=$(sed -nr "s|^version\s*=\s*\"([^\"]+)\"|\1|p" pyproject.toml)
 echo "VERSION=${VERSION}" > clinical_tools_version.txt
 chmod -R g+w "${TESTING_DEPLOYMENT_DIRECTORY}"
 
-scp -r README.md pyproject.toml poetry.lock Dockerfile src \
-  "${HOST_NAME}":"${BUILDING_DEPLOYMENT_DIRECTORY}"
+rsync -av README.md pyproject.toml poetry.lock Dockerfile src \
+  "${HOST_NAME}":"${BUILDING_DEPLOYMENT_DIRECTORY}/"
