@@ -95,26 +95,25 @@ For example, when `--output_raw_mpileup` and `--visualize` is flagged:
 
 **Example Output:**
 
-*NOTE: Output files are 1-indexed. If no bases pass the min metric parameters, then Q1 will be reported as -1.*
+*NOTE: Output files are 1-indexed. If no bases pass the minimum metric parameters, then Q1 will be reported as -1.*
 
 1. Per-base output
 ```bash
 #CHROM	POS	TRACT	POOL	COVERAGE	BASEQ_Q1	MAPQ_Q1	SCORE
 chr5	664	MSH3_NM_002439_EXON01_2	IX00001	1	40	60	FAIL
-chr5	665	MSH3_NM_002439_EXON01_2	IX00001	1	40	60	FAIL
+chr5	665	MSH3_NM_002439_EXON01_2	IX00001	1	-1	60	FAIL
 ...
 ```
 2. Per-target output
 ```bash
 #CHROM	POS	TRACT	POOL	COVERAGE_Q1	BASEQ_Q1_MED	BASEQ_Q1_Q1	MAPQ_Q1_MED	MAPQ_Q1_Q1	SCORE
-chr5	NA	MSH3_NM_002439_EXON01_1	IX00001	0	0	0	FAIL
-chr5	NA	MSH3_NM_002439_EXON01_2	IX00001	0	0	0	FAIL
+chr5	NA	MSH3_NM_002439_EXON02_2	IX00001	1	40	60	FAIL
 ```
 3. Per-base aggregated across libraries
 ```bash
-#CHROM	POS	TRACT	POOL	COVERAGE_MED	BASEQ_MED_MED	BASEQ_MED_Q1	MAPQ_MED_MED	MAPQ_MED_Q1	SCORE
-chr5	664	MSH3_NM_002439_EXON01_2	AGGREGATE	0.5	20	20	30	30		FAIL
-chr5	665	MSH3_NM_002439_EXON01_2	AGGREGATE	0.5	20	20	30	30		FAIL
+#CHROM	POS	TRACT	POOL	COVERAGE_MED	BASEQ_MED_Q1	MAPQ_MED_Q1	SCORE
+chr5	664	MSH3_NM_002439_EXON01_2	AGGREGATE	0.5	20	30		FAIL
+chr5	665	MSH3_NM_002439_EXON01_2	AGGREGATE	0.5	20	30		FAIL
 ...
 ```
 
