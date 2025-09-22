@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""
+Standalone JIRA table converter for command line usage.
+
+Usage:
+    jira-table file.csv                   # Convert CSV file to JIRA table
+    cat file.csv | jira-table             # Convert from stdin
+    jira-table -h                         # Show help
+    jira-table --format tsv file.tsv      # Specify input format
+    jira-table --delimiter ';' file.txt   # Specify custom delimiter
+"""
+
+import argparse
+
+from clinical_tools.core.io import detect_format, read_dataframe, sniff_delimiter
+from clinical_tools.core.writers.jira_table import pandas_to_jira_table
+
+
+def main():
+    """Main function for command line interface."""
+    parser = argparse.ArgumentParser(
+        description="Convert tabular data to JIRA table format",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  jira-table data.csv                   # Convert CSV file
+  cat data.csv | jira-table             # Convert from stdin
+  jira-table --format tsv data.tsv      # Convert TSV file
+  jira-table --delimiter ';' data.txt   # Use custom delimiter
+        """
+    )
+    parser.add_argument(
+        "input_file",
+        nargs="?",
+        help="Input file (CSV, TSV, Excel, or JSON). If not provided, reads from stdin."
+    )
+    parser.add_argument(
+        "-f", "--format",
+        choices=["csv", "tsv", "excel", "json"],
+        help="Input format (auto-detected from file extension if not specified)"
+    )
+    parser.add_argument(
+        "-d", "--delimiter",
+        help="Specify a custom delimiter for CSV/TSV files (e.g. ';' or '|')."
+    )
+    parser.add_argument(
+        "--no-headers",
+        action="store_true",
+        help="Treat first row as data instead of headers"
+    )
+
+    args = parser.parse_args()
+
+    # Determine format
+    format_type = args.format or detect_format(args.input_file)
+
+    # Determine delimiter
+    delimiter = args.delimiter
+    if not delimiter:
+        # Try to sniff delimiter if not provided
+        delimiter = sniff_delimiter(args.input_file)
+        # If still not found, use default for format
+        if not delimiter:
+            delimiter = "\t" if format_type == "tsv" else ","
+
+    # Read data
+    df = read_dataframe(args.input_file, format_type, delimiter)
+
+    # Handle headers option
+    if args.no_headers:
+        df.columns = [f"Column_{i+1}" for i in range(len(df.columns))]
+
+    # Convert to JIRA table using the imported function
+    jira_table = pandas_to_jira_table(df)
+    
+    # Output
+    print(jira_table)  
+
+
+if __name__ == "__main__":
+    main()
