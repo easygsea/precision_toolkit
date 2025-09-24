@@ -23,6 +23,10 @@ function clone_and_deploy {
     pip install poetry==2.0.1
     poetry install --with dev
     apptainer build clinical_tools.sif apptainer.def
+    cd "${PRODUCTION_ROOT}/clinical_tools"
+    rm -rf main
+    mkdir main
+    cp -r "${version}"/* main/
   fi
   rm -rf tmp_dir/
 }
