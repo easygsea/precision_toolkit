@@ -7,8 +7,6 @@ from unittest.mock import mock_open, patch
 from clinical_tools.core.writers.jira_table import (
     pandas_to_jira_table,
     populate_jira_table,
-    save_jira_table,
-    save_dataframe_as_jira_table,
 )
 
 
@@ -117,55 +115,6 @@ class TestPopulateJiraTable:
         # Verify content structure
         assert "||A||B||" in result
         assert "1|2" in result
-
-
-class TestSaveJiraTable:
-    """Test save_jira_table function."""
-
-    @patch('builtins.open', new_callable=mock_open)
-    def test_save_jira_table_success(self, mock_file):
-        """Test successful file save."""
-        content = "||A||B||\n1|2"
-        output_file = "test.jira"
-        
-        save_jira_table(content, output_file)
-        
-        mock_file.assert_called_once_with(output_file, "w")
-        mock_file().write.assert_called_once_with(content)
-
-    @patch('builtins.open', side_effect=IOError("Permission denied"))
-    def test_save_jira_table_io_error(self, mock_file):
-        """Test file save with IO error."""
-        content = "test content"
-        output_file = "test.jira"
-        
-        with pytest.raises(IOError, match="Permission denied"):
-            save_jira_table(content, output_file)
-
-
-class TestSaveDataframeAsJiraTable:
-    """Test save_dataframe_as_jira_table function."""
-
-    @patch('clinical_tools.core.writers.jira_table.save_jira_table')
-    def test_save_dataframe_as_jira_table(self, mock_save):
-        """Test complete DataFrame to JIRA table conversion and save."""
-        df = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
-        output_file = "test.jira"
-        
-        save_dataframe_as_jira_table(df, output_file, "Test", "Summary")
-        
-        # Verify save_jira_table was called with correct content
-        mock_save.assert_called_once()
-        call_args = mock_save.call_args
-        assert call_args[0][1] == output_file
-        
-        # Verify the content contains expected elements
-        content = call_args[0][0]
-        assert "h1. Test" in content
-        assert "Summary" in content
-        assert "||A||B||" in content
-        assert "1|3" in content
-        assert "2|4" in content
 
 
 class TestIntegration:
