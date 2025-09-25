@@ -65,7 +65,7 @@ nextflow run main.nf \
 - `--visualize`: Flag to generate per-target level plots for each stat.
 - `--output_raw_mpileup`: Flag to output raw mpileup file.
 
-**Custom Metric Parameters** (optional filtering parameters for each metric):
+**Custom Metric Parameters** (optional parameters to fine-tune filtering of raw mpileup output for each metric):
 - `--min_bq_per_read.coverage_analysis`: Minimum BASEQ for read to be included in coverage count at each position (default = 10).
 - `--min_bq_per_read.mapq_analysis`: Minimum BASEQ for read to be included in MAPQ Q1 analysis at each position (default = 10).
 - `--min_bq_per_read.baseq_analysis`: Minimum BASEQ for read to be included in BASEQ Q1 analysis at each position (default = 0).

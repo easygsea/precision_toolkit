@@ -38,7 +38,7 @@ process GET_PER_BASE_STATS {
     OUT="${in_bam.baseName}.mpileup.per_base.parsed.txt"
     """
     samtools mpileup -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
-    --no-output-ends  --no-output-ins --no-output-ins --no-output-del --no-output-del \
+    --no-output-ends --no-output-ins --no-output-ins --no-output-del --no-output-del \
     --positions ${targets_bed} ${in_bam} |
     gawk -v OFS='\\t' '
     function decode_quality_score(target_chr, low, high, mid) {
@@ -110,7 +110,7 @@ process GET_PER_BASE_STATS_NO_PARSE {
     OUT="${in_bam.baseName}.mpileup.raw.txt"
     """
     samtools mpileup -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
-    --no-output-ends  --no-output-ins --no-output-ins --no-output-del --no-output-del \
+    --no-output-ends --no-output-ins --no-output-ins --no-output-del --no-output-del \
     --positions ${targets_bed} ${in_bam} > ${OUT}
     """
 }
