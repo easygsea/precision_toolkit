@@ -1,10 +1,10 @@
 process run_happy {
     label "dynamic_resource"
-    tag "${sampleName}"
+    tag "${sample_name}"
     publishDir "${params.output_dir}/${output_dir ?: ''}/happy", mode: 'copy'
 
     input:
-    tuple val(sampleName), path(truth_vcf), path(query_vcf)
+    tuple val(sample_name), path(truth_vcf), path(query_vcf)
     path genome_ref
     path genome_fai
     val happy_engine
@@ -13,8 +13,8 @@ process run_happy {
     val label
 
     output:
-    path("${sampleName}.${label}.summary.csv"), emit: happy_summary
-    path("${sampleName}*"), emit: happy_outputs
+    path("${sample_name}.${label}.summary.csv"), emit: happy_summary
+    path("${sample_name}*"), emit: happy_outputs
 
     script:
     """
@@ -25,7 +25,7 @@ process run_happy {
     "${truth_vcf}" \
     "${query_vcf}" \
     -r "${genome_ref}" \
-    -o "${sampleName}.${label}" \
+    -o "${sample_name}.${label}" \
     --engine=${happy_engine} \
     --scratch-prefix scratch_happy \
     ${happy_options}
@@ -34,11 +34,11 @@ process run_happy {
 
 process run_sompy {
     label "dynamic_resource"
-    tag "${sampleName}"
+    tag "${sample_name}"
     publishDir "${params.output_dir}/${output_dir ?: ''}/sompy", mode: 'copy'
 
     input:
-    tuple val(sampleName), path(truth_vcf), path(query_vcf)
+    tuple val(sample_name), path(truth_vcf), path(query_vcf)
     path genome_ref
     path genome_fai
     val sompy_options
@@ -47,10 +47,10 @@ process run_sompy {
 
     output:
     path("*.stats.csv"), emit: sompy_summary
-    path("${sampleName}*"), emit: sompy_outputs
+    path("${sample_name}*"), emit: sompy_outputs
 
     script:
-    PREFIX = "${sampleName}.${label}"
+    PREFIX = "${sample_name}.${label}"
     SCRATCH_DIR = "${PREFIX}.scratch_sompy"
     """
     export HGREF="${genome_ref}"
@@ -68,22 +68,22 @@ process run_sompy {
 
 process run_wittyer {
     label "dynamic_resource"
-    tag "${sampleName}"
+    tag "${sample_name}"
     containerOptions = "-B /home"
     publishDir "${params.output_dir}/${output_dir ?: ''}/wittyer", mode: 'copy'
 
     input:
-    tuple val(sampleName), path(truth_vcf), path(query_vcf)
+    tuple val(sample_name), path(truth_vcf), path(query_vcf)
     val wittyer_options
     val output_dir
     val label
 
     output:
     path("*/*Wittyer.Stats.json"), emit: wittyer_summary
-    path("${sampleName}*"), emit: wittyer_outputs
+    path("${sample_name}*"), emit: wittyer_outputs
 
     script:
-    PREFIX = "${sampleName}.${label}"
+    PREFIX = "${sample_name}.${label}"
     // CDI-90 workaround: clean witty.er invalid options
     def clean_options = wittyer_options.replaceAll('--evaluationMode=Default|--evaluationMode=d|--em=Default|--em=d', '')
     """

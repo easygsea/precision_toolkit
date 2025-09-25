@@ -42,17 +42,17 @@ process normalize_vcf {
 }
 
 process exclude_spurious_variants {
-    tag "${sampleName}"
+    tag "${sample_name}"
 
     input:
-    tuple val(sampleName), path(original_vcf)
+    tuple val(sample_name), path(original_vcf)
     path normalized_spurious_vcf
     path normalized_spurious_vcf_tbi
     val label
     val collapse // collapse option for bcftools isec
 
     output:
-    tuple val(sampleName), path("${sampleName}.${label}.no_spurious.vcf.gz"), emit: no_spurious_vcf
+    tuple val(sample_name), path("${sample_name}.${label}.no_spurious.vcf.gz"), emit: no_spurious_vcf
 
     script:
     """
@@ -77,6 +77,6 @@ process exclude_spurious_variants {
 
     # Perform variant exclusion using bcftools isec on normalized VCFs
     bcftools isec --collapse "${collapse}" --complement --write 1 --output-type z \
-        --output "${sampleName}.${label}.no_spurious.vcf.gz" normalized_original.vcf.gz "${normalized_spurious_vcf}"
+        --output "${sample_name}.${label}.no_spurious.vcf.gz" normalized_original.vcf.gz "${normalized_spurious_vcf}"
     """
 }

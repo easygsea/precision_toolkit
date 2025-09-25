@@ -1,4 +1,5 @@
 # Environment variables
+ARG BEDTOOLS_VERSION=2.31.0
 ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
@@ -38,6 +39,7 @@ RUN pip install --upgrade pip --no-cache-dir && \
 
 # Stage 3: Runtime
 FROM mgibio/hap.py:v${HAPPY_VERSION}
+ARG BEDTOOLS_VERSION
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
 ARG JOBLIB_VERSION
@@ -84,18 +86,24 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
     # Build bcftools
+    cd .. && \
     wget --quiet "https://github.com/samtools/bcftools/releases/download/${HTSLIB_VERSION}/bcftools-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "bcftools-${HTSLIB_VERSION}.tar.bz2" && \
     cd "bcftools-${HTSLIB_VERSION}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
-    cd ../.. && rm -rf htslib-* samtools-* bcftools-* && \
+    cd .. && \
     # Build samtools
     wget --quiet "https://github.com/samtools/samtools/releases/download/${HTSLIB_VERSION}/samtools-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "samtools-${HTSLIB_VERSION}.tar.bz2" && \
     cd "samtools-${HTSLIB_VERSION}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
+    cd .. && rm -rf htslib-* samtools-* bcftools-* && \
+    # Install precompiled bedtools
+    wget --quiet "https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static" && \
+    chmod a+x bedtools.static && \
+    mv bedtools.static /opt/hap.py/bin/bedtools && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" && \
     tar -xzf "Python-${PYTHON_VERSION}.tgz" && \

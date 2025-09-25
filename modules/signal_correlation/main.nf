@@ -1,12 +1,12 @@
 process extract_signal {
     label "dynamic_resource"
-    tag "${sampleName}"
+    tag "${sample_name}"
     publishDir "${params.output_dir}/signal_correlation", mode: 'copy'
 
     input:
     val truth_signal_name
     val query_signal_name
-    tuple val(sampleName), path(truth_vcf), path(query_vcf)
+    tuple val(sample_name), path(truth_vcf), path(query_vcf)
 
     output:
     path("truth/${truth_signal_name}/*"), emit: truth_signal
@@ -15,8 +15,8 @@ process extract_signal {
     script:
     def truth_output_folder = "truth/${truth_signal_name}"
     def query_output_folder = "query/${query_signal_name}"
-    def truth_output = "${truth_output_folder}/${sampleName}_truth_${truth_signal_name}.tsv"
-    def query_output = "${query_output_folder}/${sampleName}_query_${query_signal_name}.tsv"
+    def truth_output = "${truth_output_folder}/${sample_name}_truth_${truth_signal_name}.tsv"
+    def query_output = "${query_output_folder}/${sample_name}_query_${query_signal_name}.tsv"
     """
     # Normalize VCFs to split multialleles
     bcftools norm -m- "${truth_vcf}" -o "${truth_vcf}.norm.vcf"

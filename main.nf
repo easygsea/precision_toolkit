@@ -4,6 +4,7 @@ nextflow.enable.dsl=2
 
 include { variant_benchmark } from './workflows/variant_benchmark'
 include { signal_correlation } from './workflows/signal_correlation'
+include { target_evaluation } from './workflows/target_evaluation'
 
 def helpMessage() {
     log.info"""
@@ -24,6 +25,7 @@ def helpMessage() {
     Available Workflows:
         variant_benchmark    Run variant benchmark diagnostic metrics (concordance, sensitivity, precision, f1_score)
         signal_correlation   Run signal (e.g. VAF, log-ratio) correlation analysis
+        target_evaluation    Run target evaluation to generate per-base coverage, MAPQ, and BASEQ metrics for target space
         (more workflows to come...)
 
     ====================
@@ -75,6 +77,26 @@ def helpMessage() {
             --ylim            y-axis limits for the figure (default: "", auto-fit). Example usage: --ylim="0 1"
             --show_regression Whether to show the regression line and equation (default: false)
             --filter_source   FILTER column to use for coloring ('', 'truth', or 'query') (default: '')
+
+    Target Evaluation Workflow:
+        Mandatory Parameters:
+            --aligned_files                 Glob expression matching one or more bam/cram file paths. Any non-bam/cram
+                                            files are ignored. If any cram provided, also provide --genome-ref for
+                                            expansion. Example usage: 'path/to/dir/*.{bam,cram,bai}'
+            --targets_bed                   BED file of genomic targets
+
+        Optional Parameters:
+            --genome_ref                    Reference genome for CRAM files. CRAM files skipped if not provided.
+            --coverage_threshold            Minimum acceptable coverage per base (default: 25)
+            --baseq_threshold               Minimum acceptable first-quartile(Q1) of BASEQ scores per base (default: 30)
+            --mapq_threshold                Minimum acceptable first-quartile(Q1) of MAPQ scores per base (default: 30)
+            --visualize                     Flag to generate per-target plots for all input files per stat
+            --output_raw_mpileup            Flag to output raw/un-parsed mpileup file (note that this file is large)
+            --mpileup_baseq_min             Adjust minimum baseq for a base to be considered in a read (default: 10)
+            --mpileup_mapq_min              Adjust minimum mapq for a read to be considered (default: 1)
+        In Development:
+            --normalize_to_mean_coverage    Bam files will be normalized to the provided mean coverage
+            --aligned_files_comparator      Glob expression (similar to --aligned_files) to compare against
 
     ====================
     Resource Management
@@ -188,7 +210,7 @@ workflow {
         exit 0
     } else {
         def workflowList = params.workflows.split(',').collect { it.trim() }
-        def validWorkflows = ['variant_benchmark', 'signal_correlation']
+        def validWorkflows = ['variant_benchmark', 'signal_correlation', 'target_evaluation']
 
         // Validate user-selected workflows
         def invalidWorkflows = workflowList - validWorkflows
