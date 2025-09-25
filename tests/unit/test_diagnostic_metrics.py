@@ -16,21 +16,6 @@ from clinical_tools.core.metrics.variant import (  # type: ignore[import-not-fou
 )
 
 
-@pytest.fixture
-def sample_metrics() -> VariantCallMetrics:
-    """Fixture providing sample variant call metrics."""
-    return VariantCallMetrics(
-        VariantType="SNV",
-        VariantCallFilter="PASS",
-        TruthTotal=100,
-        TruthTP=90,
-        TruthFN=10,
-        QueryTotal=120,
-        QueryTP=90,
-        QueryFP=30,
-    )
-
-
 @pytest.mark.parametrize(
     "truth_total, truth_tp, truth_fn, expected_sensitivity",
     [
