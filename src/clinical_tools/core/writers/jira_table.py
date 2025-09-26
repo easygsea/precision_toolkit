@@ -17,7 +17,6 @@ def pandas_to_jira_table(df: pd.DataFrame) -> str:
     if df.empty:
         return "||No data available||"
 
-    # Use tabulate with JIRA format
     jira_table = tabulate(
         df.to_dict(orient="list"),
         headers="keys",
@@ -29,9 +28,7 @@ def pandas_to_jira_table(df: pd.DataFrame) -> str:
 
 
 def populate_jira_table(
-    df: pd.DataFrame, 
-    heading: str | None, 
-    summary: str | None
+    df: pd.DataFrame, heading: str | None, summary: str | None
 ) -> str:
     """
     Generate a complete JIRA table document from DataFrame.
@@ -55,4 +52,3 @@ def populate_jira_table(
     jira_content += jira_table
 
     return jira_content
-

@@ -17,7 +17,7 @@ from clinical_tools.core.writers.jira_table import pandas_to_jira_table
 
 
 def main():
-    """Main function for command line interface."""
+    """Convert input files or stdin into JIRA tables."""
     parser = argparse.ArgumentParser(
         description="Convert tabular data to JIRA table format",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -27,26 +27,28 @@ Examples:
   cat data.csv | jira-table             # Convert from stdin
   jira-table --format tsv data.tsv      # Convert TSV file
   jira-table --delimiter ';' data.txt   # Use custom delimiter
-        """
+        """,
     )
     parser.add_argument(
         "input_file",
         nargs="?",
-        help="Input file (CSV, TSV, Excel, or JSON). If not provided, reads from stdin."
+        help="Input file (CSV, TSV, Excel, JSON). If not provided, reads from stdin.",
     )
     parser.add_argument(
-        "-f", "--format",
+        "-f",
+        "--format",
         choices=["csv", "tsv", "excel", "json"],
-        help="Input format (auto-detected from file extension if not specified)"
+        help="Input format (auto-detected from file extension if not specified)",
     )
     parser.add_argument(
-        "-d", "--delimiter",
-        help="Specify a custom delimiter for CSV/TSV files (e.g. ';' or '|')."
+        "-d",
+        "--delimiter",
+        help="Specify a custom delimiter for CSV/TSV files (e.g. ';' or '|').",
     )
     parser.add_argument(
         "--no-headers",
         action="store_true",
-        help="Treat first row as data instead of headers"
+        help="Treat first row as data instead of headers",
     )
 
     args = parser.parse_args()
@@ -68,13 +70,13 @@ Examples:
 
     # Handle headers option
     if args.no_headers:
-        df.columns = [f"Column_{i+1}" for i in range(len(df.columns))]
+        df.columns = [f"Column_{i + 1}" for i in range(len(df.columns))]
 
     # Convert to JIRA table using the imported function
     jira_table = pandas_to_jira_table(df)
-    
+
     # Output
-    print(jira_table)  
+    print(jira_table)
 
 
 if __name__ == "__main__":

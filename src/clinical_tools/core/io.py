@@ -40,9 +40,7 @@ def detect_format(file_path: str | None) -> str:
 
 
 def read_dataframe(
-    input_file: str | None,
-    format_type: str | None = None,
-    delimiter: str | None = None
+    input_file: str | None, format_type: str | None = None, delimiter: str | None = None
 ) -> pd.DataFrame:
     """
     Read DataFrame from file or stdin with automatic format detection.
@@ -108,7 +106,7 @@ def read_dataframe(
 def sniff_delimiter(file_path: str | None) -> str | None:
     """
     Try to sniff delimiter from file content using CSV sniffer.
-    
+
     This is useful for files that don't have standard extensions or
     use non-standard delimiters.
 
