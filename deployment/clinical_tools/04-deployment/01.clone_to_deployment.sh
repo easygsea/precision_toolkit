@@ -52,7 +52,8 @@ function main {
     BRANCH_NAME="$1"  \
     REPOSITORY_URL="$2"  \
     PRODUCTION_ROOT="$3" \
-    APPTAINER_IMAGE="$4"
+    APPTAINER_IMAGE="$4" \
+    PYTHON_EXECUTABLE="$5"
   echo "Deploying branch '${BRANCH_NAME}'..."
   clone_and_deploy
 }
