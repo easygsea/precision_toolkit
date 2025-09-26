@@ -17,7 +17,6 @@ function clone_and_deploy {
     mv tmp_dir/* "${PRODUCTION_ROOT}/clinical_tools/${version}/"
     cd "${PRODUCTION_ROOT}/clinical_tools/${version}"
     "${PYTHON_EXECUTABLE}" -m venv venv
-    chmod -R g+w venv/
     source venv/bin/activate
     pip install --upgrade pip wheel
     pip install poetry==2.0.1

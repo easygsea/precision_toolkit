@@ -2,11 +2,11 @@
 
 set -euxo pipefail
 
-TESTING_DEPLOYMENT_DIRECTORY=$1
-IMAGE_NAME=$2
-NEXTFLOW_EXECUTABLE=$3
-JAVA_EXECUTABLE=$4
-PYTHON_LIB_DIR=$5
+TESTING_DEPLOYMENT_DIRECTORY="$1"
+IMAGE_NAME="$2"
+NEXTFLOW_EXECUTABLE="$3"
+JAVA_EXECUTABLE="$4"
+PYTHON_LIB_DIR="$5"
 
 export PATH="$PATH:${NEXTFLOW_EXECUTABLE}"
 export JAVA_HOME="${JAVA_EXECUTABLE}"
@@ -26,6 +26,6 @@ apptainer exec "${IMAGE_NAME}" python -m pytest tests/standalone/ tests/unit/ --
 sed -i 's~container = "quay.io/easygsea/clinical_tools:latest"~container = "file://'"${IMAGE_NAME}"'"~' nextflow.config
 pytest tests/workflow/ --junit-xml=test_results_workflow.xml
 
-chmod o+x "${TESTING_DEPLOYMENT_DIRECTORY}"
-chmod o+x "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
-chmod o+r "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools/test_results_*.xml
+chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}"
+chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
+chmod a+r "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools/test_results_*.xml
