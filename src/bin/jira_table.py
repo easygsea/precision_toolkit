@@ -13,7 +13,7 @@ Usage:
 import argparse
 
 from clinical_tools.core.io import detect_format, read_dataframe, sniff_delimiter
-from clinical_tools.core.writers.jira_table import pandas_to_jira_table
+from clinical_tools.core.writers.jira_table import populate_jira_table
 
 
 def main():
@@ -27,6 +27,7 @@ Examples:
   cat data.csv | jira-table             # Convert from stdin
   jira-table --format tsv data.tsv      # Convert TSV file
   jira-table --delimiter ';' data.txt   # Use custom delimiter
+  jira-table --heading "My Table" --summary "This is a summary" data.csv # Add heading and summary
         """,
     )
     parser.add_argument(
@@ -50,6 +51,16 @@ Examples:
         action="store_true",
         help="Treat first row as data instead of headers",
     )
+    parser.add_argument(
+        "--heading",
+        required=False,
+        help="Optional heading/title for the JIRA table"
+    )
+    parser.add_argument(
+        "--summary",
+        required=False,
+        help="Optional summary/introduction for the JIRA table"
+    )
 
     args = parser.parse_args()
 
@@ -72,8 +83,12 @@ Examples:
     if args.no_headers:
         df.columns = [f"Column_{i + 1}" for i in range(len(df.columns))]
 
-    # Convert to JIRA table using the imported function
-    jira_table = pandas_to_jira_table(df)
+    # Convert to JIRA table, with optional heading and summary
+    jira_table = populate_jira_table(
+        df,
+        heading=args.heading if args.heading else None,
+        summary=args.summary if args.summary else None
+    )
 
     # Output
     print(jira_table)

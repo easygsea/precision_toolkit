@@ -1,11 +1,15 @@
 """Input/Output utilities for reading data from various file formats."""
 
 import csv
+import logging
 import sys
 from pathlib import Path
 
 import pandas as pd
 
+#Setup logging:
+logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def detect_format(file_path: str | None) -> str:
     """
@@ -99,8 +103,8 @@ def read_dataframe(
                 return pd.read_csv(sys.stdin, sep=delimiter)
 
     except Exception as e:
-        print(f"Error reading data: {e}", file=sys.stderr)
-        sys.exit(1)
+        logging.exception("Error reading data:")
+        print(f"Exception details: {e}")
 
 
 def sniff_delimiter(file_path: str | None) -> str | None:

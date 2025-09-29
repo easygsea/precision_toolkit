@@ -1,4 +1,5 @@
 """Tests for JIRA table writer."""
+from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
@@ -8,28 +9,28 @@ from clinical_tools.core.writers.jira_table import (  # type: ignore[import-not-
     populate_jira_table,
 )
 
-table_inputs = [
-    {"Name": ["Alice", "Bob"], "Age": [25, 30], "City": ["NYC", "LA"]},  # Basic case
-    {"A": [1, 2, 3], "B": [10.5, 20.1, 30.6], "C": [100, 200, 300]},  # Numeric case
-    {
-        "Passed": [True, False, True],
-        "Active": [False, False, True],
-        "Inactive": [False, False, False],
-    },  # Boolean case
-    {
-        "Product1": ["A|B", "C||D", "東京"],
-        "Description": ["Line.Break$", "Pipe | Symbol", "Regular text"],
-        "Product_Price": [9.99, "Mango $2", True],
-    },  # Special case
-]
-
 
 @pytest.mark.parametrize(
     "table_input",
-    table_inputs,
+    [
+        {"Name": ["Alice", "Bob"], "Age": [25, 30], "City": ["NYC", "LA"]},  # Basic case
+        {"A": [1, 2, 3], "B": [10.5, 20.1, 30.6], "C": [100, 200, 300]},  # Numeric case
+        {
+            "Passed": [True, False, True],
+            "Active": [False, False, True],
+            "Inactive": [False, False, False],
+        },  # Boolean case
+        {
+            "Product1": ["A|B", "C||D", "東京"],
+            "Description": ["Line.Break$", "Pipe | Symbol", "Regular text"],
+            "Product_Price": [9.99, "Mango $2", True],
+        },  # Special characters case
+    ],
     ids=["basic_case", "numeric_values", "boolean_values", "special_characters"],
 )
-def test_pandas_to_jira_table(table_input):
+def test_pandas_to_jira_table(
+        table_input: dict[str, list[str | float | bool]]
+) -> None:
     """Test pandas_to_jira_table function."""
     df = pd.DataFrame(table_input)
     result = pandas_to_jira_table(df)
@@ -41,7 +42,7 @@ def test_pandas_to_jira_table(table_input):
     assert result.count("\n") == len(df)
 
 
-def test_empty_pandas_to_jira_table():
+def test_empty_pandas_to_jira_table() -> None:
     """Test empty DataFrame handling."""
     df = pd.DataFrame()
     result = pandas_to_jira_table(df)
@@ -50,7 +51,7 @@ def test_empty_pandas_to_jira_table():
 
 
 @pytest.fixture
-def basic_df():
+def basic_df() -> MagicMock:
     """Fixture for a sample dataframe."""
     return pd.DataFrame({"A": [1, 2], "B": [3, 4]})
 
@@ -83,7 +84,7 @@ def test_populate_jira_table(
     assert pandas_to_jira_table(basic_df) in result
 
 
-def test_empty_populate_jira_table():
+def test_empty_populate_jira_table() -> None:
     """Test empty DataFrame handling."""
     empty_df = pd.DataFrame()
     result = populate_jira_table(empty_df, None, None)
