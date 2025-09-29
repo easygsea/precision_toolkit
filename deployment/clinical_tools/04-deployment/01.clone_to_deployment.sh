@@ -21,8 +21,8 @@ function clone_and_deploy {
     pip install --upgrade pip wheel
     pip install poetry==2.0.1
     poetry install --with dev
-    apptainer build "${APPTAINER_IMAGE}" apptainer.def
-    sed -i "s~container = \"quay.io/easygsea/clinical_tools:latest\"~container = \"${PRODUCTION_ROOT}/clinical_tools/${version}/${APPTAINER_IMAGE}\"~" nextflow.config
+    cp "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" ./"${NEW_IMAGE_NAME}"
+    sed -i "s~container = \"quay.io/easygsea/clinical_tools:latest\"~container = \"${PRODUCTION_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
     cd "${PRODUCTION_ROOT}/clinical_tools"
     rm -rf main
     mkdir main
@@ -51,8 +51,14 @@ function main {
     BRANCH_NAME="$1"  \
     REPOSITORY_URL="$2"  \
     PRODUCTION_ROOT="$3" \
-    APPTAINER_IMAGE="$4" \
-    PYTHON_EXECUTABLE="$5"
+    IMAGE_NAME="$4" \
+    PYTHON_EXECUTABLE="$5" \
+    IMAGE_STORE_ROOT="$6" \
+    PYTHON_LIB_DIR="$7" \
+    NEW_IMAGE_NAME="$8"
+
+  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:${PYTHON_LIB_DIR}"
+
   echo "Deploying branch '${BRANCH_NAME}'..."
   clone_and_deploy
 }
