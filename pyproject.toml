@@ -32,6 +32,7 @@ convert-multi-sample-vcf = "bin.convert_multi_sample_vcf:main"
 count-variants-by-size = "bin.count_variants_by_size:main"
 manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
 plot-signal-correlation = "bin.plot_signal_correlation:main"
+rename-bed-features = "bin.rename_bed_features:main"
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
 
 [build-system]
