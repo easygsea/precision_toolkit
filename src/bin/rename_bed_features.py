@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """
-Reformat into a 4-column BED file and relabel 4th column such that it follows the format
-<gene_symbol>_<refseq_accession>_<feature><exon_number>, where exon_number (if present) is
-zero-padded dynamically:
+Reformat into a 4-column BED file and relabel 4th column.
+
+Updated labels should follow the format
+<gene_symbol>_<refseq_accession>_<feature><exon_number>, where exon_number (if present)
+is zero-padded dynamically:
 
 For genes with <10 features: no leading zeros.
 For 10-99 features: one leading zero (e.g. <feature>01).
@@ -15,11 +17,11 @@ Usage:
 
 import argparse
 import gzip
+import logging
 import re
 from enum import Enum
 from pathlib import Path
 from typing import IO, cast
-import logging
 
 # Configure logging
 logging.basicConfig(
@@ -37,7 +39,7 @@ class FileMode(str, Enum):
 
 
 def open_file(filename: Path, mode: FileMode) -> IO[str]:
-    """Opens file in the specified mode with the appropriate method depending on the extension."""
+    """Open file with the appropriate method depending on the extension."""
     if filename.suffix == ".gz":
         return cast(IO[str], gzip.open(filename, mode + "t"))
     else:
@@ -48,8 +50,7 @@ def count_num_features(
     bed_file_path: Path, refseq_accession_regex_pattern: re.Pattern[str]
 ) -> dict[str, dict[str, int]]:
     """
-    Parse input BED file and count the occurences of each feature type for each
-    transcript (unique RefSeq accession) found in the attributes field.
+    Parse input BED file and count the occurences of each feature type per transcript.
 
     Args:
         bed_file_path: Path to input BED file.
@@ -78,13 +79,11 @@ def count_num_features(
                 if refseq_acc not in transcript_feature_counts_dict.keys():
                     transcript_feature_counts_dict[refseq_acc] = {}
                 if feature not in transcript_feature_counts_dict[refseq_acc].keys():
-                    transcript_feature_counts_dict[refseq_acc][
-                        feature
-                    ] = 1  # initiate total count
+                    # Initiate total count
+                    transcript_feature_counts_dict[refseq_acc][feature] = 1
                 else:
-                    transcript_feature_counts_dict[refseq_acc][
-                        feature
-                    ] += 1  # increment total count
+                    # Increment total count
+                    transcript_feature_counts_dict[refseq_acc][feature] += 1
     return transcript_feature_counts_dict
 
 
@@ -96,11 +95,12 @@ def construct_feature_name(
     transcript_feature_counts_dict: dict[str, dict[str, int]],
 ) -> str:
     """
-    Construct updated feature name with the format:
-    <gene_symbol>_<refseq_accession>_<genomic_feature><exon_number>.
+    Construct updated feature name.
 
-    exon_number, if present, is dynamically zero-padded based on total number of genomic
-    features present for the transcript.
+    Feature names follow the format
+    <gene_symbol>_<refseq_accession>_<genomic_feature><exon_number> where exon_number,
+    if present, is dynamically zero-padded based on total number of genomic features
+    present for the transcript.
 
     Args:
         gene_symbol: HGNC gene symbol.
@@ -142,6 +142,12 @@ def construct_feature_name(
 
 
 def main():
+    """
+    Reformat BED file and rename features.
+
+    Returns:
+        Modified BED file.
+    """
     parser = argparse.ArgumentParser(
         "Reformat input into a 4-column BED file and rename 4th column such that "
         "it follows the format "
@@ -154,7 +160,7 @@ def main():
         "-g",
         "--gene_list",
         help="Path to file with target HGNC gene symbols (one symbol per line).",
-        required=True
+        required=True,
     )
     parser.add_argument(
         "-A",
@@ -169,7 +175,7 @@ def main():
         "-o",
         "--output_folder",
         help="Name of folder to output renamed BED file.",
-        required=True
+        required=True,
     )
 
     # Parse args

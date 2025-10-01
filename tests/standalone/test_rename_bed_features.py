@@ -1,9 +1,9 @@
 """Integration tests for renaming features in BED files."""
 
+import re
 import subprocess
 import tempfile
 from pathlib import Path
-import re
 
 import pytest
 
@@ -50,14 +50,16 @@ def test_rename_exons_lt10(test_data_dir):
                 fields = line.strip().split("\t")
                 feature_name = fields[3]
                 feature_name_search = re.search(r"(\d+)$", feature_name)
-                assert (
-                    feature_name_search
-                ), f"1 ending digit expected, but none were found in feature name: {feature_name}"
+                assert feature_name_search, (
+                    f"1 ending digit expected, but none were found in feature name: "
+                    f"{feature_name}"
+                )
 
                 exon_number = feature_name_search.group(1)
-                assert (
-                    len(exon_number) == 1
-                ), f"Exon number '{exon_number}' in '{feature_name}' should be 1 digit for < 10 features."
+                assert len(exon_number) == 1, (
+                    f"Exon number '{exon_number}' in '{feature_name}' should be 1 "
+                    f"digit for < 10 features."
+                )
 
 
 def test_rename_exons_lt100(test_data_dir):
@@ -89,14 +91,16 @@ def test_rename_exons_lt100(test_data_dir):
                 fields = line.strip().split("\t")
                 feature_name = fields[3]
                 feature_name_search = re.search(r"(\d+)$", feature_name)
-                assert (
-                    feature_name_search
-                ), f"2 ending digits expected, but none were found in feature name: {feature_name}"
+                assert feature_name_search, (
+                    f"2 ending digits expected, but none were found in feature name: "
+                    f"{feature_name}"
+                )
 
                 exon_number = feature_name_search.group(1)
-                assert (
-                    len(exon_number) == 2
-                ), f"Exon number '{exon_number}' in '{feature_name}' should be 2 digits for < 100 features."
+                assert len(exon_number) == 2, (
+                    f"Exon number '{exon_number}' in '{feature_name}' should be 2 "
+                    f"digits for < 100 features."
+                )
 
 
 def test_bed_with_missing_targets(test_data_dir):
@@ -129,10 +133,11 @@ def test_bed_with_missing_targets(test_data_dir):
             for line in renamed_bed:
                 fields = line.strip().split("\t")
                 feature_name = fields[3]
-                assert feature_name.startswith(
-                    "NRAS_"
-                ), f"Unexpected gene feature encountered: {feature_name}. Only features from 'NRAS' should be output."
-        
+                assert feature_name.startswith("NRAS_"), (
+                    f"Unexpected gene feature encountered: {feature_name}. Only "
+                    f"features from 'NRAS' should be output."
+                )
+
         # Check that warning is output due to missing target gene
         assert (
             "One or more target genes were not found in input BED file" in result.stderr
