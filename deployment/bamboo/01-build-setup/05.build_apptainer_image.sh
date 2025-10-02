@@ -16,5 +16,6 @@ echo "Building apptainer image...."
 KEEPALIVE_PID=$!
 
 sudo apptainer build "${IMAGE_NAME}" docker-daemon://clinical_tools:bamboo
+chmod --changes g+w "${IMAGE_NAME}"
 
 kill $KEEPALIVE_PID || true
