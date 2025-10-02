@@ -7,9 +7,10 @@ from pathlib import Path
 
 import pandas as pd
 
-#Setup logging:
+# Setup logging:
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def detect_format(file_path: str | None) -> str:
     """
@@ -45,7 +46,7 @@ def detect_format(file_path: str | None) -> str:
 
 def read_dataframe(
     input_file: str | None, format_type: str | None = None, delimiter: str | None = None
-) -> pd.DataFrame:
+) -> pd.DataFrame | None:
     """
     Read DataFrame from file or stdin with automatic format detection.
 
@@ -105,6 +106,7 @@ def read_dataframe(
     except Exception as e:
         logging.exception("Error reading data:")
         print(f"Exception details: {e}")
+        return None
 
 
 def sniff_delimiter(file_path: str | None) -> str | None:

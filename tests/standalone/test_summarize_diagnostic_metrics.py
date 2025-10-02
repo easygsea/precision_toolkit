@@ -15,13 +15,13 @@ from clinical_tools.core.statistics.proportion import (  # type: ignore
 
 
 @pytest.fixture
-def test_data_dir():
+def test_data_dir() -> Path:
     """Fixture for the test data directory."""
     return Path(__file__).parent / "data"
 
 
 @pytest.fixture
-def raw_summary_files(test_data_dir):
+def raw_summary_files(test_data_dir: Path) -> list[Path]:
     """Fixture for raw summary files."""
     return [
         test_data_dir / "sample1.happy.raw.summary.csv",
@@ -30,7 +30,7 @@ def raw_summary_files(test_data_dir):
 
 
 @pytest.fixture
-def curated_summary_files(test_data_dir):
+def curated_summary_files(test_data_dir: Path) -> list[Path]:
     """Fixture for curated summary files."""
     return [
         test_data_dir / "sample1.happy.curated.summary.csv",
@@ -39,8 +39,8 @@ def curated_summary_files(test_data_dir):
 
 
 def test_summarize_diagnostic_metrics(
-    tmp_path, raw_summary_files, curated_summary_files
-):
+    tmp_path: Path, raw_summary_files: list[Path], curated_summary_files: list[Path]
+) -> None:
     """Test the summarize_diagnostic_metrics script."""
     output_prefix = tmp_path / "diagnostic_metrics"
     output_csvs = [

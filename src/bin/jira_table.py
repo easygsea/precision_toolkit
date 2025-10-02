@@ -3,31 +3,45 @@
 Standalone JIRA table converter for command line usage.
 
 Usage:
-    jira-table file.csv                   # Convert CSV file to JIRA table
-    cat file.csv | jira-table             # Convert from stdin
-    jira-table -h                         # Show help
-    jira-table --format tsv file.tsv      # Specify input format
-    jira-table --delimiter ';' file.txt   # Specify custom delimiter
+    jira-table file.csv
+        # Convert file to JIRA table based on extension and auto-detected delimiter
+    cat file.csv | jira-table
+        # Convert from stdin
+    jira-table -h
+        # Show help
+    jira-table --format tsv file.tsv
+        # Specify input format
+    jira-table --delimiter ';' file.txt
+        # Specify custom delimiter
+    jira-table --heading "My Table" --summary "This is a summary" data.csv
+        # Add heading and summary
 """
 
 import argparse
+
+import pandas as pd
 
 from clinical_tools.core.io import detect_format, read_dataframe, sniff_delimiter
 from clinical_tools.core.writers.jira_table import populate_jira_table
 
 
-def main():
+def main() -> None:
     """Convert input files or stdin into JIRA tables."""
     parser = argparse.ArgumentParser(
         description="Convert tabular data to JIRA table format",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  jira-table data.csv                   # Convert CSV file
-  cat data.csv | jira-table             # Convert from stdin
-  jira-table --format tsv data.tsv      # Convert TSV file
-  jira-table --delimiter ';' data.txt   # Use custom delimiter
-  jira-table --heading "My Table" --summary "This is a summary" data.csv # Add heading and summary
+  jira-table data.csv
+    # Convert file to JIRA table based on extension and auto-detected delimiter
+  cat data.csv | jira-table
+    # Convert from stdin
+  jira-table --format tsv data.tsv
+    # Convert TSV file
+  jira-table --delimiter ';' data.txt
+    # Use custom delimiter
+  jira-table --heading "My Table" --summary "This is a summary" data.csv
+    # Add heading and summary
         """,
     )
     parser.add_argument(
@@ -52,14 +66,12 @@ Examples:
         help="Treat first row as data instead of headers",
     )
     parser.add_argument(
-        "--heading",
-        required=False,
-        help="Optional heading/title for the JIRA table"
+        "--heading", required=False, help="Optional heading/title for the JIRA table"
     )
     parser.add_argument(
         "--summary",
         required=False,
-        help="Optional summary/introduction for the JIRA table"
+        help="Optional summary/introduction for the JIRA table",
     )
 
     args = parser.parse_args()
@@ -79,15 +91,18 @@ Examples:
     # Read data
     df = read_dataframe(args.input_file, format_type, delimiter)
 
+    if df is None:
+        raise ValueError("Failed to read input file")
+
     # Handle headers option
     if args.no_headers:
-        df.columns = [f"Column_{i + 1}" for i in range(len(df.columns))]
+        df.columns = pd.Index([f"Column_{i + 1}" for i in range(len(df.columns))])
 
     # Convert to JIRA table, with optional heading and summary
     jira_table = populate_jira_table(
         df,
         heading=args.heading if args.heading else None,
-        summary=args.summary if args.summary else None
+        summary=args.summary if args.summary else None,
     )
 
     # Output

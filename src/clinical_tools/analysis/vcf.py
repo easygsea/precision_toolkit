@@ -32,7 +32,7 @@ def count_variants_by_size(
 
     with pysam.VariantFile(vcf_file) as vcf:
 
-        def _process_variant(variant_size, occurrence_count):
+        def _process_variant(variant_size: int, occurrence_count: int) -> None:
             """Count variant in appropriate size range."""
             if variant_size <= size_points[0]:
                 size_counts[size_ranges[0]] += occurrence_count
@@ -46,7 +46,7 @@ def count_variants_by_size(
                 if not found_range:
                     size_counts[f">{size_points[-1]}"] += occurrence_count
 
-        def _get_occurrence_count(record):
+        def _get_occurrence_count(record: pysam.libcbcf.VariantRecord) -> int:
             """Calculate occurrence count."""
             if not count_occurrences or len(vcf.header.samples) <= 1:
                 return 1

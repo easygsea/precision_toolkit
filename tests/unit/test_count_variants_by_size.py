@@ -1,12 +1,14 @@
 """Test count variants by size."""
 
+from pathlib import Path
+
 import pytest
 
 from clinical_tools.analysis.vcf import count_variants_by_size  # type: ignore
 
 
 @pytest.fixture
-def test_vcf(tmp_path):
+def test_vcf(tmp_path: Path) -> str:
     """Create a VCF file with variants of different sizes."""
     vcf_path = tmp_path / "test.vcf"
     with open(vcf_path, "w") as f:
@@ -24,7 +26,7 @@ def test_vcf(tmp_path):
 
 
 @pytest.fixture
-def test_multi_sample_vcf(tmp_path):
+def test_multi_sample_vcf(tmp_path: Path) -> str:
     """Create a multi-sample VCF file with variants of different sizes."""
     vcf_path = tmp_path / "test.vcf"
     with open(vcf_path, "w") as f:
@@ -42,7 +44,7 @@ def test_multi_sample_vcf(tmp_path):
 
 
 @pytest.fixture
-def test_multi_sample_vcf_with_end(tmp_path):
+def test_multi_sample_vcf_with_end(tmp_path: Path) -> str:
     """Create a multi-sample VCF file with variants of different sizes and INFO END."""
     vcf_path = tmp_path / "test.vcf"
     with open(vcf_path, "w") as f:
@@ -68,7 +70,7 @@ def test_multi_sample_vcf_with_end(tmp_path):
     return str(vcf_path)
 
 
-def test_count_variants_by_size_basic(test_vcf):
+def test_count_variants_by_size_basic(test_vcf: str) -> None:
     """Test basic counting of variants by size."""
     size_strat = [1, 5]
     expected = {"1": 1, "2-5": 4, ">5": 1}
@@ -76,7 +78,7 @@ def test_count_variants_by_size_basic(test_vcf):
     assert result == expected
 
 
-def test_count_variants_by_size_custom_stratification(test_vcf):
+def test_count_variants_by_size_custom_stratification(test_vcf: str) -> None:
     """Test with custom size stratification."""
     size_strat = [1, 3, 10]
     expected = {"1": 1, "2-3": 2, "4-10": 3, ">10": 0}
@@ -84,7 +86,7 @@ def test_count_variants_by_size_custom_stratification(test_vcf):
     assert result == expected
 
 
-def test_count_variants_by_size_occurrences(test_multi_sample_vcf):
+def test_count_variants_by_size_occurrences(test_multi_sample_vcf: str) -> None:
     """Test counting occurrences in multi-sample VCF."""
     size_strat = [1]
     expected = {"1": 2, ">1": 2}
@@ -94,7 +96,7 @@ def test_count_variants_by_size_occurrences(test_multi_sample_vcf):
     assert result == expected
 
 
-def test_count_variants_by_size_with_end(test_multi_sample_vcf_with_end):
+def test_count_variants_by_size_with_end(test_multi_sample_vcf_with_end: str) -> None:
     """Test counting variants by size with END in INFO."""
     size_strat = [100, 500, 1000]
     expected = {"1-100": 0, "101-500": 2, "501-1000": 1, ">1000": 2}

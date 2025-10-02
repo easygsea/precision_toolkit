@@ -149,7 +149,7 @@ def _compute_concordance_and_ci_for_group(
     ci_lower, ci_upper = analysis.confidence_interval(ci_method, ci_level)
 
     return (
-        analysis._get_selected_tp(),
+        analysis._ci_total,
         aggregated_metrics.TruthFN,
         aggregated_metrics.QueryFP,
         concordance,
