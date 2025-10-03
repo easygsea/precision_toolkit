@@ -10,7 +10,6 @@ Deployment is a manual stage that promotes a tested build into the operational e
 To run the default plan configuration, one has to define the following variables in the Bamboo configuration\
 `APPTAINER_IMAGE_NAME` - default name of the Apptainer image to be built (e.g. clinical_tools_latest.sif)\
 `CONTAINER_BUILD_ROOT` - path where the Docker and Apptainer images are built\
-`DEPLOYMENT_SCRIPTS` - path to the deployment scripts\
 `TEMPORARY_TESTING_ROOT` - path where the repository is cloned to, tested in, and where the virtual environment is stored\
 `HOST` -  standard server providing access to testing and deployment directories.\
 `HOST_CONTAINER` - server that supports Docker for creating and building images\
