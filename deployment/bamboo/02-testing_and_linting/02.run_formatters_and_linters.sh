@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
 
+: <<'BAMBOO_CONFIG_DOC'
+
+Task type:
+  SSH Task
+
+Hosts:
+  ${bamboo.HOST}
+
+Authentication type:
+  Username and password
+
+Username:
+  ${bamboo.USER}
+
+Password:
+  ${bamboo.PASSWORD}
+
+BAMBOO_CONFIG_DOC
+
 set -euxo pipefail
 
 TESTING_DEVELOPMENT_DIRECTORY="$1"
