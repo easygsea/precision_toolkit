@@ -17,8 +17,6 @@ cd "${TESTING_DEPLOYMENT_DIRECTORY}"
 source venv/bin/activate
 cd clinical_tools/
 
-apptainer exec "${IMAGE_NAME}" pip install pytest pytest-cov pytest-workflow pytest-xdist pyproject-pre-commit
-
 # Executing the python unit and standalone tests inside the container to avoid dependency conflicts with OS
 apptainer exec "${IMAGE_NAME}" python -m pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standalone.xml
 
