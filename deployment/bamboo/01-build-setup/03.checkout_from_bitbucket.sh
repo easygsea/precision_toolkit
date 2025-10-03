@@ -17,4 +17,5 @@ echo "VERSION=${VERSION}" > clinical_tools_version.txt
 chmod -R g+w "${TESTING_DEPLOYMENT_DIRECTORY}"
 
 rsync -av README.md pyproject.toml poetry.lock Dockerfile src \
+  deployment/bamboo/01-build-setup/05.build_apptainer_image.sh \
   "${HOST_NAME}":"${BUILDING_DEPLOYMENT_DIRECTORY}/"

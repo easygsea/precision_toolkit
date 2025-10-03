@@ -2,10 +2,7 @@
 
 set -euxo pipefail
 
-BUILDING_DEPLOYMENT_DIRECTORY="$1"
-IMAGE_NAME="$2"
-
-cd "${BUILDING_DEPLOYMENT_DIRECTORY}"
+IMAGE_NAME="$1"
 
 rm -rfv "${IMAGE_NAME}"
 
