@@ -127,13 +127,15 @@ def construct_feature_name(
 
     # Extract exon number, if applicable, and construct feature name
     # If no exon number, don't append to feature name
-    exon_num_attr_search = re.search(r"exon_number.*(\d+)", bed_attributes)
+    exon_num_attr_search = re.search(r"exon_number.*?(\d+)", bed_attributes)
     if exon_num_attr_search:
-        exon_num = exon_num_attr_search.group(1)
+        exon_num = str(exon_num_attr_search.group(1))
         num_digits = len(
             str(transcript_feature_counts_dict[refseq_acc][genomic_feature])
         )
-        exon_num_padded = str(exon_num).zfill(num_digits)
+        exon_num_padded = (
+            exon_num.zfill(num_digits) if len(exon_num) < num_digits else exon_num
+        )
         feature_id = genomic_feature.upper() + exon_num_padded
     else:
         feature_id = genomic_feature.upper()
