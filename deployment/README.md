@@ -24,7 +24,7 @@ To run the default plan configuration, one has to define the following variables
 `PRODUCTION_ROOT` - path where clinical tools are deployed to\
 `PYTHON_EXECUTABLE` - path to the Python executable, off of which the virtual environment is created\
 `PYTHON_LIB_DIR` - path to the python libraries\
-`USER` - name of the user running the Bamboo plan 
+`USER` - name of the user running the Bamboo plan
 
 
 ## CI/CD Agent Instructions
@@ -124,7 +124,7 @@ cp ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/test_results_wor
 ```bash
 cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
 cd clinical_tools/deployment/bamboo/02-testing_and_linting/
- 
+
 bash 02.run_formatters_and_linters.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} ${bamboo.PYTHON_LIB_DIR} ${bamboo.inject.IMAGE_NAME} ${bamboo.IMAGE_STORE_ROOT}
 ```
 ### Clean Up
