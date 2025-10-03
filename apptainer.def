@@ -135,7 +135,7 @@ Stage: runtime1
     python -m pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir ./*.whl && \
     # Install dev dependencies
-    pip install --no-cache-dir pytest pytest-cov pytest-workflow pytest-xdist pyproject-pre-commit && \
+    pip install --no-cache-dir pytest=8.3.4 pytest-cov=4.0.0 pytest-workflow=2.0.1 pytest-xdist=3.6.1 pyproject-pre-commit=0.4.1 && \
     pip2 uninstall -y bx-python && \
     rm -rf /usr/local/lib/python2.7/dist-packages/bx* && \
     rm -rf /usr/local/lib/python2.7/dist-packages/bx_python* && \
