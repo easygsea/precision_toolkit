@@ -2,6 +2,8 @@
 
 : <<'BAMBOO_CONFIG_DOC'
 
+Set deployment as a Manual stage to control testing vs final build.
+
 Task type:
   SSH Task
 
@@ -16,6 +18,9 @@ Username:
 
 Password:
   ${bamboo.PASSWORD}
+
+Script body:
+  Copy and paste the full code from this script into the Bamboo interface.
 
 BAMBOO_CONFIG_DOC
 
@@ -68,14 +73,13 @@ function get_version {
 
 function main {
   declare -r \
-    BRANCH_NAME="$1"  \
-    REPOSITORY_URL="$2"  \
-    PRODUCTION_ROOT="$3" \
-    IMAGE_NAME="$4" \
-    PYTHON_EXECUTABLE="$5" \
-    IMAGE_STORE_ROOT="$6" \
-    PYTHON_LIB_DIR="$7" \
-    NEW_IMAGE_NAME="$8"
+    BRANCH_NAME="${1:-${bamboo.planRepository.branchName}}"  \
+    REPOSITORY_URL="${2:-${bamboo.planRepository.repositoryUrl}}"  \
+    PRODUCTION_ROOT="${3:-${bamboo.DEPLOYMENT_ROOT}}" \
+    IMAGE_NAME="${4:-${bamboo.inject.IMAGE_NAME}}" \
+    PYTHON_EXECUTABLE="${5:-${bamboo.PYTHON_EXECUTABLE}}" \
+    IMAGE_STORE_ROOT="${6:-${bamboo.TEMPORARY_IMAGE_ROOT}}" \
+    NEW_IMAGE_NAME="${7:-${bamboo.APPTAINER_IMAGE_NAME}}"
 
   echo "Deploying branch '${BRANCH_NAME}'..."
   clone_and_deploy
