@@ -5,6 +5,9 @@
 Task type:
   SSH Task
 
+Task description:
+  Run pre commit
+
 Hosts:
   ${bamboo.HOST}
 
@@ -17,16 +20,21 @@ Username:
 Password:
   ${bamboo.PASSWORD}
 
+SSH command:
+cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
+cd clinical_tools/deployment/bamboo/02-testing_and_linting/
+bash 02.run_formatters_and_linters.sh \
+${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
+${bamboo.inject.IMAGE_NAME} \
+${bamboo.TEMPORARY_IMAGE_ROOT}
+
 BAMBOO_CONFIG_DOC
 
 set -euxo pipefail
 
 TESTING_DEVELOPMENT_DIRECTORY="$1"
-PYTHON_LIB_DIR="$2"
-IMAGE_NAME="$3"
-IMAGE_STORE_ROOT="$4"
-
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:${PYTHON_LIB_DIR}"
+IMAGE_NAME="$2"
+IMAGE_STORE_ROOT="$3"
 
 cd "${TESTING_DEVELOPMENT_DIRECTORY}"
 source venv/bin/activate

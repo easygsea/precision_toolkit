@@ -5,6 +5,9 @@
 Task type:
   SSH Task
 
+Task description:
+  Remove temporary testing directory
+
 Hosts:
   ${bamboo.HOST}
 
@@ -16,6 +19,9 @@ Username:
 
 Password:
   ${bamboo.PASSWORD}
+
+SSH command:
+rm -rfv ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
 
 BAMBOO_CONFIG_DOC
 

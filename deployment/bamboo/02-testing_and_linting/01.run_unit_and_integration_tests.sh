@@ -5,6 +5,9 @@
 Task type:
   SSH Task
 
+Task description:
+  Run unit and integration tests
+
 Hosts:
   ${bamboo.HOST}
 
@@ -16,6 +19,42 @@ Username:
 
 Password:
   ${bamboo.PASSWORD}
+
+SSH command:
+cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
+cd clinical_tools/deployment/bamboo/02-testing_and_linting/
+bash 01.run_unit_and_integration_tests.sh \
+${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
+${bamboo.inject.IMAGE_NAME} \
+${bamboo.NEXTFLOW_EXECUTABLE} \
+${bamboo.JAVA_EXECUTABLE}
+
+Additional two tasks for this step:
+
+Task type:
+  Script
+
+Task description:
+  Move test results
+
+Interpreter:
+  Shell
+
+Script location:
+  Inline
+
+Script body:
+cp ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/test_results_unit_standalone.xml ${bamboo.build.working.directory}/test_results_unit_standalone.xml
+cp ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/test_results_workflow.xml ${bamboo.build.working.directory}/test_results_workflow.xml
+
+Task type:
+  JUnit Parser
+
+Task description:
+  Analyze test results
+
+Specify custom results directories:
+  *.xml
 
 BAMBOO_CONFIG_DOC
 

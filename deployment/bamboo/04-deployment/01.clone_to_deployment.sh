@@ -7,6 +7,9 @@ Set deployment as a Manual stage to control testing vs final build.
 Task type:
   SSH Task
 
+Task description:
+  Deploy clinical_tools
+
 Hosts:
   ${bamboo.HOST}
 

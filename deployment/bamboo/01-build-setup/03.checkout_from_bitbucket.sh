@@ -5,6 +5,9 @@
 Task type:
   SSH Task
 
+Task description:
+  Checkout from BitBucket
+
 Hosts:
   ${bamboo.HOST}
 
@@ -16,6 +19,9 @@ Username:
 
 Password:
   ${bamboo.PASSWORD}
+
+SSH command:
+  Copy and paste the full code from this script into the Bamboo interface.
 
 BAMBOO_CONFIG_DOC
 
