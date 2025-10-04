@@ -23,9 +23,6 @@ set -euxo pipefail
 
 TESTING_DEPLOYMENT_DIRECTORY="$1"
 PYTHON_EXECUTABLE="$2"
-PYTHON_LIB_DIR="$3"
-
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:${PYTHON_LIB_DIR}"
 
 cd "${TESTING_DEPLOYMENT_DIRECTORY}"
 # Ensures $@ is empty when calling source to avoid passing in unwanted parameters

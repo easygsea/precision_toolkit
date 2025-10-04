@@ -77,8 +77,6 @@ function main {
     PYTHON_LIB_DIR="$7" \
     NEW_IMAGE_NAME="$8"
 
-  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:${PYTHON_LIB_DIR}"
-
   echo "Deploying branch '${BRANCH_NAME}'..."
   clone_and_deploy
 }
