@@ -29,31 +29,31 @@ Below are the recommended steps for launching scripts stored in the `bamboo/` fo
 Configuration details for the Bamboo interface are documented in the corresponding files.
 
 ### 01-build-setup
-- 01.create_variables_file.sh
+- 01.create_variables_file.sh\
 Generates additional variables from the Bamboo configuration and saves them into `02.inject_bamboo_variables.txt` on the Bamboo agent.
-- 02.inject_bamboo_variables.txt
+- 02.inject_bamboo_variables.txt\
 Contains Bamboo configuration instructions for injecting variables from the file generated above into the Bamboo agent.
-- 03.checkout_from_bitbucket.sh
+- 03.checkout_from_bitbucket.sh\
 Checks out the testing branch from a remote repository (e.g., Bitbucket, GitHub) to the temporary testing path.
-- 04.poetry_environment.sh
+- 04.poetry_environment.sh\
 Sets up the Poetry environment for testing.
-- 05.build_apptainer_image.sh
+- 05.build_apptainer_image.sh\
 Builds the Apptainer image on `HOST_CONTAINER`.
-- 06.transfer_image.sh
+- 06.transfer_image.sh\
 Transfers the built image into the temporary testing path.
 
 ### 02-testing_and_linting
-- 01.run_unit_and_integration_tests.sh
+- 01.run_unit_and_integration_tests.sh\
 Runs unit and integration tests.
-- 02.run_formatters_and_linters.sh
+- 02.run_formatters_and_linters.sh\
 Executes formatters and linters to enforce coding standards.
 
 ### 03-build-cleanup
-- 01.cleanup_testing_directory.sh
+- 01.cleanup_testing_directory.sh\
 Cleans up the temporary testing directory.
-- 02.clean_building_directory.sh
+- 02.clean_building_directory.sh\
 Cleans up the image-building directory on `HOST_CONTAINER`.
 
 ### 04-deployment
-- 01.clone_to_deployment.sh
+- 01.clone_to_deployment.sh\
 Cleans up temporary images and clones the final build into the deployment directory.
