@@ -49,19 +49,19 @@ function clone_and_deploy {
     source venv/bin/activate
     pip install --upgrade pip wheel
     pip install poetry==2.0.1
-    poetry install --with dev
+    poetry install
     cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" ./"${NEW_IMAGE_NAME}"
-    rm -rfv "${IMAGE_STORE_ROOT}/${version}"
     sed -i "s~container = \"quay.io/easygsea/clinical_tools:latest\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
     cd "${DEPLOYMENT_ROOT}/clinical_tools"
     chmod -R a-w "${version}"
-    chmod -R u+w main
-    rm -rf main
+    [[ -d main ]] &&  rm -rfv main
     mkdir main
+    chmod --changes -R u+w main
     cp -r "${version}"/* main/
-    chmod -R a-w main
+    chmod --changes -R a-w main
   fi
-  rm -rf tmp_dir/
+  rm -rfv tmp_dir/
+  rm -rfv "${IMAGE_STORE_ROOT}/${version}"
 }
 
 # Get version defined in the pyproject.toml
