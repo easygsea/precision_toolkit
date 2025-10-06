@@ -53,12 +53,11 @@ function clone_and_deploy {
     cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" ./"${NEW_IMAGE_NAME}"
     sed -i "s~container = \"quay.io/easygsea/clinical_tools:latest\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
     cd "${DEPLOYMENT_ROOT}/clinical_tools"
-    chmod -R a-w "${version}"
-    [[ -d main ]] &&  rm -rfv main
-    mkdir main
-    chmod --changes -R u+w main
+    chmod --recursive a-w "${version}"
+    [[ -d main ]] && chmod --changes --recursive u+w main && rm -rfv main
+    mkdir --mode 2750 main
     cp -r "${version}"/* main/
-    chmod --changes -R a-w main
+    chmod --changes --recursive a-w main
   fi
   rm -rfv tmp_dir/
   rm -rfv "${IMAGE_STORE_ROOT}/${version}"
