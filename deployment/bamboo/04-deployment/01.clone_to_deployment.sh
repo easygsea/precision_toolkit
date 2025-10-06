@@ -44,7 +44,7 @@ function clone_and_deploy {
     version_folder="${DEPLOYMENT_ROOT}/clinical_tools/${version}"
     mkdir -pv "${version_folder}"
     mv tmp_dir/* "${version_folder}/"
-    cd "${DEPLOYMENT_ROOT}/clinical_tools/${version}"
+    cd "${version_folder}"
     "${PYTHON_EXECUTABLE}" -m venv venv
     source venv/bin/activate
     pip install --upgrade pip wheel
