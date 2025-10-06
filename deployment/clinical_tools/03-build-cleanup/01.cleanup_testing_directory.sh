@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-TESTING_DEPLOYMENT_DIRECTORY=$1
-
-rm -rfv "${TESTING_DEPLOYMENT_DIRECTORY}"

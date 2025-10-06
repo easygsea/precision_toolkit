@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+: <<'BAMBOO_CONFIG_DOC'
+
+Task type:
+  SSH Task
+
+Task description:
+  Checkout from BitBucket
+
+Hosts:
+  ${bamboo.HOST}
+
+Authentication type:
+  Username and password
+
+Username:
+  ${bamboo.USER}
+
+Password:
+  ${bamboo.PASSWORD}
+
+SSH command:
+  Copy and paste the full code from this script into the Bamboo interface.
+
+BAMBOO_CONFIG_DOC
+
+set -euxo pipefail
+
+TESTING_DEPLOYMENT_DIRECTORY="$1"
+REPOSITORY_URL="$2"
+BRANCH_NAME="$3"
+BUILDING_DEPLOYMENT_DIRECTORY="$4"
+HOST_NAME="$5"
+
+rm -rfv "${TESTING_DEPLOYMENT_DIRECTORY}"
+git clone -b "${BRANCH_NAME}" "${REPOSITORY_URL}" \
+  "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
+cd "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
+VERSION=$(sed -nr "s|^version\s*=\s*\"([^\"]+)\"|\1|p" pyproject.toml)
+echo "VERSION=${VERSION}" > clinical_tools_version.txt
+chmod -R g+w "${TESTING_DEPLOYMENT_DIRECTORY}"
+
+rsync -av README.md pyproject.toml poetry.lock Dockerfile src \
+  deployment/bamboo/01-build-setup/05.build_apptainer_image.sh \
+  "${HOST_NAME}":"${BUILDING_DEPLOYMENT_DIRECTORY}/"
