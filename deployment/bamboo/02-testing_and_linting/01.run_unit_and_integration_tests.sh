@@ -73,7 +73,7 @@ cd "${TESTING_DEPLOYMENT_DIRECTORY}"
 source venv/bin/activate
 cd clinical_tools/
 
-# Executing the python unit and standalone tests
+# Execute Python unit and standalone tests
 pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standalone.xml
 
 # Replace the pointer to the remote image to the local one and run workflow tests with Nextflow pointing to the local image
