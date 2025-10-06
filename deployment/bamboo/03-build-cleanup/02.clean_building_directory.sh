@@ -5,6 +5,9 @@
 Task type:
   SSH Task
 
+Task description:
+  Remove temporary image build directory
+
 Hosts:
   ${bamboo.HOST_CONTAINER}
 
@@ -16,6 +19,9 @@ Username:
 
 Password:
   ${bamboo.PASSWORD_CONTAINER}
+
+SSH command:
+rm -rfv ${bamboo.inject.BUILDING_DEPLOYMENT_DIRECTORY}
 
 BAMBOO_CONFIG_DOC
 

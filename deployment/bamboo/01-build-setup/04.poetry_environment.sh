@@ -5,6 +5,9 @@
 Task type:
   SSH Task
 
+Task description:
+  Build Poetry environment for testing
+
 Hosts:
   ${bamboo.HOST}
 
@@ -17,15 +20,19 @@ Username:
 Password:
   ${bamboo.PASSWORD}
 
+SSH command:
+cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
+cd clinical_tools/deployment/bamboo/01-build-setup/
+bash 04.poetry_environment.sh \
+${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
+${bamboo.PYTHON_EXECUTABLE}
+
 BAMBOO_CONFIG_DOC
 
 set -euxo pipefail
 
 TESTING_DEPLOYMENT_DIRECTORY="$1"
 PYTHON_EXECUTABLE="$2"
-PYTHON_LIB_DIR="$3"
-
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:${PYTHON_LIB_DIR}"
 
 cd "${TESTING_DEPLOYMENT_DIRECTORY}"
 # Ensures $@ is empty when calling source to avoid passing in unwanted parameters

@@ -5,6 +5,9 @@
 Task type:
   Script
 
+Task description:
+  Inject Bamboo variables
+
 Interpreter:
   Shell
 
@@ -13,6 +16,9 @@ Script location:
 
 Arguments:
   ${bamboo.planRepository.branchName} ${bamboo.TEMPORARY_TESTING_ROOT} ${bamboo.CONTAINER_BUILD_ROOT} ${bamboo.APPTAINER_IMAGE_NAME} ${bamboo.buildResultKey}
+
+Script body:
+  Copy and paste the full code from this script into the Bamboo interface.
 
 BAMBOO_CONFIG_DOC
 

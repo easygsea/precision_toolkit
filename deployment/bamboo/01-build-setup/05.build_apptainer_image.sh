@@ -5,6 +5,9 @@
 Task type:
   SSH Task
 
+Task description:
+  Build Apptainer Image
+
 Hosts:
   ${bamboo.HOST_CONTAINER}
 
@@ -16,6 +19,10 @@ Username:
 
 Password:
   ${bamboo.PASSWORD_CONTAINER}
+
+SSH command:
+cd ${bamboo.inject.BUILDING_DEPLOYMENT_DIRECTORY}
+bash 05.build_apptainer_image.sh ${bamboo.inject.IMAGE_NAME}
 
 BAMBOO_CONFIG_DOC
 

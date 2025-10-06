@@ -8,9 +8,9 @@ include { target_evaluation } from './workflows/target_evaluation'
 
 def helpMessage() {
     log.info"""
-    =========================================
-    Clinical Validation Tools v${workflow.manifest.version}
-    =========================================
+    =========================
+    Clinical Validation Tools
+    =========================
 
     ====================
     Quick Start Guide
