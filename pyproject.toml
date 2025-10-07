@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clinical-tools"
-version = "1.0.2"
+version = "1.1.0"
 description = "An integrated toolset to support clinical validation"
 authors = ["Canada's Michael Smith Genome Sciences Centre - Precision Informatics"]
 readme = "README.md"
@@ -33,6 +33,7 @@ count-variants-by-size = "bin.count_variants_by_size:main"
 jira-table = "bin.jira_table:main"
 manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
 plot-signal-correlation = "bin.plot_signal_correlation:main"
+plot-target-tracts = "bin.plot_target_tracts:main"
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
 
 [build-system]
