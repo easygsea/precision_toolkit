@@ -80,11 +80,9 @@ def read_dataframe(
             # Use default delimiter if sniffing fails
             if delimiter is None:
                 delimiter = "\t" if format_type == "tsv" else ","
-
+            if buffer is not None:
+                input_file = StringIO(buffer)
         # Read file based on format
-        if buffer is not None:
-            input_file = StringIO(buffer)
-
         if format_type == "tsv":
             return pd.read_csv(input_file, sep=delimiter)
         elif format_type == "json":
