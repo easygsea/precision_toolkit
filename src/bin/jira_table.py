@@ -18,10 +18,11 @@ Usage:
 """
 
 import argparse
+import sys
 
 import pandas as pd
 
-from clinical_tools.core.io import detect_format, read_dataframe, sniff_delimiter
+from clinical_tools.core.io import read_dataframe
 from clinical_tools.core.writers.jira_table import populate_jira_table
 
 
@@ -47,6 +48,7 @@ Examples:
     parser.add_argument(
         "input_file",
         nargs="?",
+        default=sys.stdin,
         help="Input file (CSV, TSV, Excel, JSON). If not provided, reads from stdin.",
     )
     parser.add_argument(
@@ -65,32 +67,22 @@ Examples:
         action="store_true",
         help="Treat first row as data instead of headers",
     )
-    parser.add_argument(
-        "--heading", required=False, help="Optional heading/title for the JIRA table"
-    )
+    parser.add_argument("--heading", help="Optional heading/title for the JIRA table")
     parser.add_argument(
         "--summary",
-        required=False,
         help="Optional summary/introduction for the JIRA table",
     )
 
     args = parser.parse_args()
 
-    # Determine format
-    format_type = args.format or detect_format(args.input_file)
-
-    # Determine delimiter
-    delimiter = args.delimiter
-    if not delimiter:
-        # Try to sniff delimiter if not provided
-        delimiter = sniff_delimiter(args.input_file)
-        # If still not found, use default for format
-        if not delimiter:
-            delimiter = "\t" if format_type == "tsv" else ","
+    # Exit if no file provided
+    if args.input_file is sys.stdin and sys.stdin.isatty():
+        raise IOError("No input file or stdin provided.")
 
     # Read data
-    df = read_dataframe(args.input_file, format_type, delimiter)
+    df = read_dataframe(args.input_file, args.format, args.delimiter)
 
+    # Exit if unable to read file
     if df is None:
         raise ValueError("Failed to read input file")
 

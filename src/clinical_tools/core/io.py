@@ -3,7 +3,9 @@
 import csv
 import logging
 import sys
+from io import StringIO
 from pathlib import Path
+from typing import TextIO
 
 import pandas as pd
 
@@ -12,12 +14,12 @@ logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def detect_format(file_path: str | None) -> str:
+def detect_format(file_path: str | TextIO) -> str:
     """
     Detect file format based on extension.
 
     Args:
-        file_path: Path to the file, or None for stdin
+        file_path: Path to the file, or TextIO for stdin
 
     Returns:
         Detected format: 'csv', 'tsv', or 'json'
@@ -29,10 +31,8 @@ def detect_format(file_path: str | None) -> str:
         'tsv'
         >>> detect_format("data.json")
         'json'
-        >>> detect_format(None)
-        'csv'
     """
-    if not file_path:
+    if hasattr(file_path, "read"):
         return "csv"
 
     suffix = Path(file_path).suffix.lower()
@@ -45,7 +45,9 @@ def detect_format(file_path: str | None) -> str:
 
 
 def read_dataframe(
-    input_file: str | None, format_type: str | None = None, delimiter: str | None = None
+    input_file: str | TextIO,
+    format_type: str | None = None,
+    delimiter: str | None = None,
 ) -> pd.DataFrame | None:
     """
     Read DataFrame from file or stdin with automatic format detection.
@@ -54,15 +56,13 @@ def read_dataframe(
     from extension if not specified, and can sniff delimiters for text files.
 
     Args:
-        input_file: Path to input file, or None to read from stdin
+        input_file: Path to input file, or TextIO to read from stdin
         format_type: Explicit format ('csv', 'tsv', 'json'), or None for auto-detection
         delimiter: Custom delimiter character, or None for auto-detection
 
     Returns:
-        pandas DataFrame containing the file data
+        pandas DataFrame containing the file data, or None if read fails
 
-    Raises:
-        SystemExit: If file cannot be read or parsed
 
     Examples:
         >>> df = read_dataframe("data.csv")
@@ -76,32 +76,21 @@ def read_dataframe(
 
         # Auto-detect delimiter if not specified
         if delimiter is None:
-            delimiter = sniff_delimiter(input_file)
+            delimiter, buffer = sniff_delimiter(input_file)
             # Use default delimiter if sniffing fails
             if delimiter is None:
                 delimiter = "\t" if format_type == "tsv" else ","
 
         # Read file based on format
-        if input_file:
-            if format_type == "tsv":
-                return pd.read_csv(input_file, sep=delimiter)
-            elif format_type == "json":
-                return pd.read_json(input_file)
-            elif format_type == "csv":
-                return pd.read_csv(input_file, sep=delimiter)
-            else:
-                # Fallback: try CSV with detected delimiter
-                return pd.read_csv(input_file, sep=delimiter)
+        if buffer is not None:
+            input_file = StringIO(buffer)
+
+        if format_type == "tsv":
+            return pd.read_csv(input_file, sep=delimiter)
+        elif format_type == "json":
+            return pd.read_json(input_file)
         else:
-            # Read from stdin
-            if format_type == "tsv":
-                return pd.read_csv(sys.stdin, sep=delimiter)
-            elif format_type == "json":
-                return pd.read_json(sys.stdin)
-            elif format_type == "csv":
-                return pd.read_csv(sys.stdin, sep=delimiter)
-            else:
-                return pd.read_csv(sys.stdin, sep=delimiter)
+            return pd.read_csv(input_file, sep=delimiter)
 
     except Exception as e:
         logging.exception("Error reading data:")
@@ -109,7 +98,7 @@ def read_dataframe(
         return None
 
 
-def sniff_delimiter(file_path: str | None) -> str | None:
+def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
     """
     Try to sniff delimiter from file content using CSV sniffer.
 
@@ -117,7 +106,7 @@ def sniff_delimiter(file_path: str | None) -> str | None:
     use non-standard delimiters.
 
     Args:
-        file_path: Path to the file, or None for stdin
+        file_path: Path to the file, or TextIO for stdin
 
     Returns:
         Detected delimiter character, or None if detection fails
@@ -125,20 +114,19 @@ def sniff_delimiter(file_path: str | None) -> str | None:
     Examples:
         >>> sniff_delimiter("data.txt")  # Could return ';', '|', etc.
         ';'
-        >>> sniff_delimiter(None)
-        None
     """
     try:
-        if file_path:
-            with open(file_path, "r", encoding="utf-8") as f:
-                sample = f.read(4096)
+        if hasattr(file_path, "read"):
+            buffer = sys.stdin.read()
+            keep_buffer = True
         else:
-            # For stdin, read a small sample and reset pointer
-            sample = sys.stdin.read(4096)
-            sys.stdin = sys.__stdin__  # Reset stdin for pandas
+            with open(file_path, "r", encoding="utf-8") as f:
+                buffer = f.read(4096)
+                keep_buffer = False
 
         sniffer = csv.Sniffer()
-        dialect = sniffer.sniff(sample)
-        return dialect.delimiter
+        dialect = sniffer.sniff(buffer)
+
+        return dialect.delimiter, buffer if keep_buffer else None
     except Exception:
-        return None
+        return None, None
