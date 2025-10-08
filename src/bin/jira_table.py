@@ -22,8 +22,10 @@ import sys
 
 import pandas as pd
 
-from clinical_tools.core.io import read_dataframe
-from clinical_tools.core.writers.jira_table import populate_jira_table
+from clinical_tools.core.io import read_dataframe  # type: ignore[import-not-found]
+from clinical_tools.core.writers.jira_table import (  # type: ignore[import-not-found]
+    populate_jira_table,
+)
 
 
 def main() -> None:
@@ -49,12 +51,12 @@ Examples:
         "input_file",
         nargs="?",
         default=sys.stdin,
-        help="Input file (CSV, TSV, Excel, JSON). If not provided, reads from stdin.",
+        help="Input file (CSV, TSV, JSON). If not provided, reads from stdin.",
     )
     parser.add_argument(
         "-f",
         "--format",
-        choices=["csv", "tsv", "excel", "json"],
+        choices=["csv", "tsv", "json"],
         help="Input format (auto-detected from file extension if not specified)",
     )
     parser.add_argument(
@@ -88,7 +90,10 @@ Examples:
 
     # Handle headers option
     if args.no_headers:
+        current_header = df.columns
         df.columns = pd.Index([f"Column_{i + 1}" for i in range(len(df.columns))])
+        first_row = pd.DataFrame([current_header], columns=df.columns)
+        df = pd.concat([first_row, df], ignore_index=True)
 
     # Convert to JIRA table, with optional heading and summary
     jira_table = populate_jira_table(
