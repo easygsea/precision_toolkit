@@ -7,7 +7,7 @@ The first three stages - build-setup, testing-and-linting, and build-cleanup - a
 any PUSH to your Clinical Tool Branch on BitBucket.
 Deployment is a manual stage that promotes a tested build into the operational environment.
 
-To run the default plan configuration, the following Variables must be defined in the Bamboo Default plan configuration:
+To run the default plan configuration, the following Variables must be defined in the Bamboo Default plan configuration:\
 `APPTAINER_IMAGE_NAME` - default name of the Apptainer image to be built (e.g. clinical_tools_latest.sif)\
 `CONTAINER_BUILD_ROOT` - path where Docker and Apptainer images are built\
 `DEPLOYMENT_ROOT` - path where the clinical_tools package is deployed to\
