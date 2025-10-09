@@ -22,8 +22,8 @@ import sys
 
 import pandas as pd
 
-from clinical_tools.core.io import read_dataframe  # type: ignore[import-not-found]
-from clinical_tools.core.writers.jira_table import (  # type: ignore[import-not-found]
+from clinical_tools.core.io import read_dataframe
+from clinical_tools.core.writers.jira_table import (
     populate_jira_table,
 )
 

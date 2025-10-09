@@ -13,7 +13,7 @@ from clinical_tools.core.writers.jira_table import (  # type: ignore[import-not-
 
 @pytest.fixture
 def sample_files(tmp_path: Path) -> dict[str, Path | pd.DataFrame]:
-    """Fixture for sample CSV, TSV, and JSON files."""
+    """Fixture for sample CSV, TSV, EXCEL and JSON files."""
     df = pd.DataFrame(
         {
             "Name": ["Alice", "Bob", "Charlie", "David"],
@@ -24,21 +24,26 @@ def sample_files(tmp_path: Path) -> dict[str, Path | pd.DataFrame]:
     csv_file = tmp_path / "sample.csv"
     tsv_file = tmp_path / "sample.tsv"
     json_file = tmp_path / "sample.json"
+    excel_file = tmp_path / "sample.xlsx"
 
     df.to_csv(csv_file, index=False)
     df.to_csv(tsv_file, sep="\t", index=False)
     df.to_json(json_file, lines=False, orient="records")
+    df.to_excel(excel_file, index=False)
 
     return {
         "csv_file": csv_file,
         "tsv_file": tsv_file,
         "json_file": json_file,
+        "excel_file": excel_file,
         "df": df,
     }
 
 
 @pytest.mark.parametrize(
-    "file_format", ["csv_file", "tsv_file", "json_file"], ids=["csv", "tsv", "json"]
+    "file_format",
+    ["csv_file", "tsv_file", "excel_file", "json_file"],
+    ids=["csv", "tsv", "excel", "json"],
 )
 def test_jira_table_formats(sample_files: dict[str, Path], file_format: str) -> None:
     """Test basic jira-table command with all allowed file formats."""
