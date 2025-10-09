@@ -4,6 +4,7 @@
 - [Convert Multi-Sample VCF File into Single-Sample VCF files](#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
 - [Count Variants By Size](#count-variants-by-size)
 - [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
+- [Jira Table Converter](#jira-table-converter)
 
 ## Manual Diagnostic Metric Curation
 
@@ -58,3 +59,12 @@ Usage:
 ```
 
 For detailed documentation and examples, see [Structural Variant VCF Liftover Tool](liftover_sv_vcf.md).
+
+## Jira Table Converter
+
+The `jira-table` tool converts structured data files (CSV, TSV, Excel, and JSON) into a neatly formatted JIRA table.
+
+Example Usage:
+```bash
+jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY>
+```
