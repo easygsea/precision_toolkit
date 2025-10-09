@@ -51,12 +51,12 @@ Examples:
         "input_file",
         nargs="?",
         default=sys.stdin,
-        help="Input file (CSV, TSV, JSON). If not provided, reads from stdin.",
+        help="Input file (CSV, TSV, EXCEL, JSON). If not provided, reads from stdin.",
     )
     parser.add_argument(
         "-f",
         "--format",
-        choices=["csv", "tsv", "json"],
+        choices=["csv", "tsv", "excel", "json"],
         help="Input format (auto-detected from file extension if not specified)",
     )
     parser.add_argument(

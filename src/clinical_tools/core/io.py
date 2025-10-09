@@ -3,7 +3,7 @@
 import csv
 import logging
 import sys
-from io import StringIO
+from io import BytesIO, StringIO
 from pathlib import Path
 from typing import TextIO
 
@@ -38,6 +38,8 @@ def detect_format(file_path: str | TextIO) -> str:
     suffix = Path(file_path).suffix.lower()
     if suffix == ".tsv":
         return "tsv"
+    elif suffix == ".xlsx":
+        return "excel"
     elif suffix == ".json":
         return "json"
     else:
@@ -75,16 +77,23 @@ def read_dataframe(
             format_type = detect_format(input_file)
 
         # Auto-detect delimiter if not specified
-        if delimiter is None:
+        if delimiter is None and format_type in {"csv", "tsv"}:
             delimiter, buffer = sniff_delimiter(input_file)
             # Use default delimiter if sniffing fails
             if delimiter is None:
                 delimiter = "\t" if format_type == "tsv" else ","
             if buffer is not None:
                 input_file = StringIO(buffer)
+
         # Read file based on format
         if format_type == "tsv":
             return pd.read_csv(input_file, sep=delimiter)
+        elif format_type == "excel":
+            if hasattr(input_file, "buffer"):
+                data = input_file.buffer.read()
+                return pd.read_excel(BytesIO(data), engine="openpyxl")
+            else:
+                return pd.read_excel(input_file, engine="openpyxl")
         elif format_type == "json":
             return pd.read_json(input_file)
         else:
