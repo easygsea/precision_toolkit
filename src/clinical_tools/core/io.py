@@ -22,14 +22,16 @@ def detect_format(file_path: str | TextIO) -> str:
         file_path: Path to the file, or TextIO for stdin
 
     Returns:
-        Detected format: 'csv', 'tsv', or 'json'
+        Detected format: 'csv', 'tsv', 'excel', or 'json'
 
     Examples:
-        >>> detect_format("data.csv")
+        >>> detect_format("file.csv")
         'csv'
         >>> detect_format("file.tsv")
         'tsv'
-        >>> detect_format("data.json")
+        >>> detect_format("file.xlsx")
+        'excel'
+        >>> detect_format("file.json")
         'json'
     """
     if hasattr(file_path, "read"):
@@ -54,12 +56,12 @@ def read_dataframe(
     """
     Read DataFrame from file or stdin with automatic format detection.
 
-    Supports CSV, TSV, and JSON formats. Automatically detects file format
+    Supports CSV, TSV, EXCEL and JSON formats. Automatically detects file format
     from extension if not specified, and can sniff delimiters for text files.
 
     Args:
         input_file: Path to input file, or TextIO to read from stdin
-        format_type: Explicit format ('csv', 'tsv', 'json'), or None for auto-detection
+        format_type: File format ('csv', 'tsv', 'excel', 'json') or None to auto-detect
         delimiter: Custom delimiter character, or None for auto-detection
 
     Returns:
@@ -116,7 +118,8 @@ def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
         file_path: Path to the file, or TextIO for stdin
 
     Returns:
-        Detected delimiter character, or None if detection fails
+        Tuple containing the detected delimiter character and the read buffer.
+        If detection fails, returns None.
 
     Examples:
         >>> sniff_delimiter("data.txt")  # Could return ';', '|', etc.
