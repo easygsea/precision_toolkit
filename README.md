@@ -21,17 +21,6 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
    git clone https://github.com/easygsea/clinical_tools.git
    ```
 
-   > **Note on Apptainer Container Caching:**
-   Nextflow saves Apptainer images to a `.apptainer` folder in each `work` directory, using extra disk space.
-   See [Nextflow docs](https://nextflow.io/docs/latest/container.html).
-
-   To avoid this, set a shared cache by exporting before running the workflow:
-   ```bash
-   export NXF_APPTAINER_CACHEDIR="/shared/nextflow_apptainer_cache"
-   ```
-
-   Or set `apptainer.cacheDir` in `nextflow.config`.
-
 2. Run specific workflow(s). Example:
    ```bash
    nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
@@ -40,6 +29,20 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
        --variant_benchmark_engine happy \
        --output_dir output_clinical_tools
    ```
+
+> **Note:**
+Nextflow saves Apptainer images to a `.apptainer` folder in each `work` directory, using extra disk space.
+See [Nextflow docs](https://nextflow.io/docs/latest/container.html).
+
+To avoid this, set a shared cache by exporting before running the workflow:
+```bash
+export NXF_APPTAINER_CACHEDIR="/shared/nextflow_apptainer_cache"
+```
+
+Or set `apptainer.cacheDir` in `nextflow.config`.
+
+> **Advanced users:**
+If you have deployed clinical_tools using the recommended [deployment and Bamboo plans](deployment/README.md), you do **not** need to manually set up the Apptainer cache.
 
 ### Using Containerized Tools
 
