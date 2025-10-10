@@ -1,7 +1,13 @@
 """JIRA table writer."""
 
+import logging
+
 import pandas as pd
 from tabulate import tabulate
+
+# Setup logging:
+logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def pandas_to_jira_table(df: pd.DataFrame) -> str:
@@ -16,6 +22,16 @@ def pandas_to_jira_table(df: pd.DataFrame) -> str:
     """
     if df.empty:
         return "||No data available||"
+
+    df.columns = pd.Index([str(col).replace("|", "\\|") for col in df.columns])
+    for index in df.index:
+        for col in df.columns:
+            if "|" in str(df.at[index, col]):
+                logging.info(
+                    f"Detected '|' in row {index}, column '{col}'. "
+                    f"Replacing with '\\|' for better formatting."
+                )
+                df.at[index, col] = str(df.at[index, col]).replace("|", "\\|")
 
     jira_table = tabulate(
         df.to_dict(orient="list"),

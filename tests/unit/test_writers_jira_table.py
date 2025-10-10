@@ -36,11 +36,14 @@ def test_pandas_to_jira_table(table_input: dict[str, list[str | float | bool]]) 
     df = pd.DataFrame(table_input)
     result = pandas_to_jira_table(df)
     for key, values in table_input.items():
-        assert key in result
+        assert key.replace("|", "\\|") in result
         for value in values:
-            assert str(value) in result
-    assert result.count("||") >= len(table_input) + 1
+            assert str(value).replace("|", "\\|") in result
+    assert result.count("||") == len(df.columns) + 1
     assert result.count("\n") == len(df)
+    result = result.replace("||", "")
+    result = result.replace("\\|", "")
+    assert result.count("|") == (len(df.columns) + 1) * (len(df))
 
 
 def test_empty_pandas_to_jira_table() -> None:
