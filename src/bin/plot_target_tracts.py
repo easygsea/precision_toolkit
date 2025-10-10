@@ -26,7 +26,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def main():
+def main() -> None:
     """
     Visualize tract/target scores output from target evaluation workflow, by poolID.
 
@@ -105,7 +105,7 @@ def main():
         for file, pool in zip(input_files, pool_ids):
             # Read data
             df = pd.read_csv(file, sep="\t", comment=None)
-            df.columns = [col.lstrip("#") for col in df.columns]
+            df.columns = pd.Index([col.lstrip("#") for col in df.columns])
             df[metric] = df[metric].astype(float)
 
             # Plot graph

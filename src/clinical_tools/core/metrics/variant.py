@@ -61,25 +61,44 @@ class BaseVariantCallMetrics(ABC):
         """Get the metrics instance."""
         return self._metrics
 
+    @property
     @abstractmethod
+    def _ci_successes(self) -> int:
+        """Number of successes for confidence interval calculation."""
+        pass
+
+    @property
+    @abstractmethod
+    def _ci_total(self) -> int:
+        """Total number for confidence interval calculation."""
+        pass
+
     def confidence_interval(
         self,
         method: ProportionConfidenceIntervalMethod = (
             ProportionConfidenceIntervalMethod.WILSON
         ),
-        **kwargs,
+        ci_level: float = DEFAULT_CI_LEVEL,
+        **kwargs: dict[str, str],
     ) -> tuple[float, float]:
         """
         Calculate confidence interval for the metric.
 
         Args:
             method: Statistical method for CI calculation.
+            ci_level: Confidence level for CI calculation.
             **kwargs: Additional parameters for the method.
 
         Returns:
             Lower and upper bounds of the confidence interval
         """
-        pass
+        return ProportionConfidenceInterval.proportion_confidence_interval(
+            successes=self._ci_successes,
+            total=self._ci_total,
+            method=method,
+            ci_level=ci_level,
+            **kwargs,
+        )
 
 
 class SensitivityMetrics(BaseVariantCallMetrics):
@@ -97,32 +116,13 @@ class SensitivityMetrics(BaseVariantCallMetrics):
             return 0.0
         return self.metrics.TruthTP / self.metrics.TruthTotal
 
-    def confidence_interval(
-        self,
-        method: ProportionConfidenceIntervalMethod = (
-            ProportionConfidenceIntervalMethod.WILSON
-        ),
-        ci_level: float = DEFAULT_CI_LEVEL,
-        **kwargs,
-    ) -> tuple[float, float]:
-        """
-        Calculate confidence interval for sensitivity.
+    @property
+    def _ci_successes(self) -> int:
+        return self.metrics.TruthTP
 
-        Args:
-            method: Statistical method for CI calculation.
-            ci_level: Confidence level for CI calculation.
-            **kwargs: Additional parameters for the method.
-
-        Returns:
-            Lower and upper bounds of the confidence interval
-        """
-        return ProportionConfidenceInterval.proportion_confidence_interval(
-            successes=self.metrics.TruthTP,
-            total=self.metrics.TruthTotal,
-            method=method,
-            ci_level=ci_level,
-            **kwargs,
-        )
+    @property
+    def _ci_total(self) -> int:
+        return self.metrics.TruthTotal
 
 
 class PrecisionMetrics(BaseVariantCallMetrics):
@@ -139,32 +139,13 @@ class PrecisionMetrics(BaseVariantCallMetrics):
             return 0.0
         return self.metrics.QueryTP / self.metrics.QueryTotal
 
-    def confidence_interval(
-        self,
-        method: ProportionConfidenceIntervalMethod = (
-            ProportionConfidenceIntervalMethod.WILSON
-        ),
-        ci_level: float = DEFAULT_CI_LEVEL,
-        **kwargs,
-    ) -> tuple[float, float]:
-        """
-        Calculate confidence interval for precision.
+    @property
+    def _ci_successes(self) -> int:
+        return self.metrics.QueryTP
 
-        Args:
-            method: Statistical method for CI calculation.
-            ci_level: Confidence level for CI calculation.
-            **kwargs: Additional parameters for the method.
-
-        Returns:
-            Lower and upper bounds of the confidence interval
-        """
-        return ProportionConfidenceInterval.proportion_confidence_interval(
-            successes=self.metrics.QueryTP,
-            total=self.metrics.QueryTotal,
-            method=method,
-            ci_level=ci_level,
-            **kwargs,
-        )
+    @property
+    def _ci_total(self) -> int:
+        return self.metrics.QueryTotal
 
 
 class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
@@ -190,13 +171,13 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
             ConcordanceTPMethod.MinTP: min(self.metrics.TruthTP, self.metrics.QueryTP),
         }
 
-    def _get_selected_tp(self) -> int:
-        """Get TP count based on selected TP method."""
+    @property
+    def _ci_successes(self) -> int:
         return self._tp_selector[self._tp_method]
 
-    def _get_total_calls(self) -> int:
-        """Calculate total calls."""
-        return self._get_selected_tp() + self.metrics.TruthFN + self.metrics.QueryFP
+    @property
+    def _ci_total(self) -> int:
+        return self._ci_successes + self.metrics.TruthFN + self.metrics.QueryFP
 
     @property
     def concordance(self) -> float:
@@ -206,35 +187,8 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         Returns:
             Concordance value between 0 and 1
         """
-        total_calls = self._get_total_calls()
-        return 0.0 if total_calls == 0 else self._get_selected_tp() / total_calls
-
-    def confidence_interval(
-        self,
-        method: ProportionConfidenceIntervalMethod = (
-            ProportionConfidenceIntervalMethod.WILSON
-        ),
-        ci_level: float = DEFAULT_CI_LEVEL,
-        **kwargs,
-    ) -> tuple[float, float]:
-        """
-        Calculate confidence interval for concordance.
-
-        Args:
-            method: Statistical method for CI calculation.
-            ci_level: Confidence level for CI calculation.
-            **kwargs: Additional parameters for the method.
-
-        Returns:
-            Lower and upper bounds of the confidence interval
-        """
-        return ProportionConfidenceInterval.proportion_confidence_interval(
-            successes=self._get_selected_tp(),
-            total=self._get_total_calls(),
-            method=method,
-            ci_level=ci_level,
-            **kwargs,
-        )
+        total_calls = self._ci_total
+        return 0.0 if total_calls == 0 else self._ci_successes / total_calls
 
 
 class F1ScoreMetrics:

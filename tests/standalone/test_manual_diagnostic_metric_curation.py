@@ -14,12 +14,12 @@ from clinical_tools.core.constants import (  # type: ignore[import-not-found]
 
 
 @pytest.fixture
-def test_data_dir():
+def test_data_dir() -> Path:
     """Fixture for the test data directory."""
     return Path(__file__).parent / "data"
 
 
-def test_manual_concordance_curation(test_data_dir):
+def test_manual_concordance_curation(test_data_dir: Path) -> None:
     """Test manual concordance curation."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = test_data_dir / "concordance.csv"
@@ -66,7 +66,7 @@ def test_manual_concordance_curation(test_data_dir):
         assert row["CI Upper"] == pytest.approx(0.65947, abs=0.0001)
 
 
-def test_manual_sensitivity_curation(test_data_dir):
+def test_manual_sensitivity_curation(test_data_dir: Path) -> None:
     """Test manual sensitivity curation."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = test_data_dir / "sensitivity.csv"
@@ -112,7 +112,7 @@ def test_manual_sensitivity_curation(test_data_dir):
         assert row["CI Upper"] == pytest.approx(0.73711, abs=0.0001)
 
 
-def test_manual_precision_curation(test_data_dir):
+def test_manual_precision_curation(test_data_dir: Path) -> None:
     """Test manual precision curation."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = test_data_dir / "precision.csv"
@@ -158,7 +158,7 @@ def test_manual_precision_curation(test_data_dir):
         assert row["CI Upper"] == pytest.approx(0.73712, abs=0.0001)
 
 
-def test_manual_f1_score_curation(test_data_dir):
+def test_manual_f1_score_curation(test_data_dir: Path) -> None:
     """Test manual F1 score curation."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = test_data_dir / "f1_score.csv"

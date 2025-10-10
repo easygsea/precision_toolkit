@@ -8,12 +8,12 @@ import pytest
 
 
 @pytest.fixture
-def test_data_dir():
+def test_data_dir() -> Path:
     """Fixture for the test data directory."""
     return Path(__file__).parent / "data"
 
 
-def test_plot_signal_correlation_basic(test_data_dir):
+def test_plot_signal_correlation_basic(test_data_dir: Path) -> None:
     """Generate a plot file without correlation."""
     with tempfile.TemporaryDirectory() as tmpdir:
         truth_signal_file = test_data_dir / "vaf" / "truth" / "sample1_truth_vaf.tsv"
