@@ -6,6 +6,7 @@
 ### v1.1.0 - 2025-09-03 [Released 2025-09-03]
 - New Workflow: Added new target evaluation workflow for analyzing per-base stats across target regions.
 - Improvement: Refactored Bamboo plan to build images via Docker build.
+- Improvement: Specify container version in nextflow.config.
 - Improvement: Removed redundant version tracking.
 - Bugfix: Cleanup in DockerFile.
 - Bugfix: Removed unused fixture in `tests/unit/test_diagnostic_metrics.py`.

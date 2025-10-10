@@ -77,7 +77,7 @@ cd clinical_tools/
 pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standalone.xml
 
 # Replace the pointer to the remote image to the local one and run workflow tests with Nextflow pointing to the local image
-sed -i 's~container = "quay.io/easygsea/clinical_tools:latest"~container = "file://'"${IMAGE_NAME}"'"~' nextflow.config
+sed -i 's~container = ".*"~container = "file://'"${IMAGE_NAME}"'"~' nextflow.config
 pytest tests/workflow/ --junit-xml=test_results_workflow.xml
 
 chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}"
