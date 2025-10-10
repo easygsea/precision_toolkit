@@ -16,9 +16,14 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
 
 ## Quick Start
 
-1. Clone the repository:
+1. Download the container image:
+   For the latest version, run:
    ```bash
-   git clone https://github.com/easygsea/clinical_tools.git
+   apptainer pull docker://quay.io/easygsea/clinical_tools
+   ```
+   To get a specific version, use:
+   ```bash
+   apptainer pull docker://quay.io/easygsea/clinical_tools:v1.0.1
    ```
 
 2. Run specific workflow(s). Example:
