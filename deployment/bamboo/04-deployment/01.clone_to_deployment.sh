@@ -51,7 +51,7 @@ function clone_and_deploy {
     pip install poetry==2.0.1
     poetry install
     cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" ./"${NEW_IMAGE_NAME}"
-    sed -i "s~container = \"quay.io/easygsea/clinical_tools:latest\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
+    sed -i 's~container = ".*"~container = "${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}"~' nextflow.config
     cd "${DEPLOYMENT_ROOT}/clinical_tools"
     chmod --recursive a-w "${version}"
     [[ -d main ]] && chmod --changes --recursive u+w main && rm -rfv main
