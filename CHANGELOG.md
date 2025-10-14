@@ -3,7 +3,7 @@
 ## Version History
 
 ---
-### v1.1.0 - 2025-09-03 [Released 2025-09-03]
+### v1.1.0 - 2025-10-15 [Released 2025-10-15]
 - New Workflow: Added new target evaluation workflow for analyzing per-base stats across target regions.
 - Feature: Added GitHub Actions to automatically sync changes from Bitbucket.
 - Improvement: Refactored Bamboo plan to build images via Docker build.
@@ -11,6 +11,7 @@
 - Improvement: Removed redundant version tracking.
 - Bugfix: Cleanup in DockerFile.
 - Bugfix: Removed unused fixture in `tests/unit/test_diagnostic_metrics.py`.
+- Apply GPL-3.0 license
 
 ### v1.0.3 - 2025-08-26
 - Bugfix: Fixed the deployment stage to point the container built instead of remote.
