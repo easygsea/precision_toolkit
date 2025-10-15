@@ -1,112 +1,58 @@
 # Deployment scripts
 
 Provided with the repository, there are recommended scripts for testing and linting the code for continuous integration
-and continuous development using Apptainer image.
+and continuous development.
 
 The first three stages - build-setup, testing-and-linting, and build-cleanup - are automated on Bamboo and triggered by
 any PUSH to your Clinical Tool Branch on BitBucket.
-Deployment is a manual stage and is designed to build the final Apptainer image.
+Deployment is a manual stage that promotes a tested build into the operational environment.
 
-To run the default plan configuration, one has to define the following variables in the Bamboo configuration\
-`APPTAINER_IMAGE` - default name of the apptainer image to be built (e.g. clinical_tools_latest.sif)\
-`BAMBOO_EXEC_ROOT` - path to the deployment scripts\
-`BAMBOO_TMP_ROOT` - path where the repository is cloned to, tested in, and where the virtual environment is stored\
-`JAVA_EXECUTABLE` - path to the Java executable, required by Nextflow (e.g. `usr/local/bin/jdk-17.0.2`)\
-`NEXTFLOW_EXECUTABLE` - path to the local Nextflow executable\
-`PRODUCTION_ROOT` - path where clinical tools are deployed to\
-`PYTHON_EXECUTABLE` - path to the Python executable, off of which the virtual environment is created
+To run the default plan configuration, the following Variables must be defined in the Bamboo Default plan configuration:
+- `APPTAINER_IMAGE_NAME` - default name of the Apptainer image to be built (e.g. clinical_tools_latest.sif)
+- `CONTAINER_BUILD_ROOT` - path where Docker and Apptainer images are built
+- `DEPLOYMENT_ROOT` - path where the clinical_tools package is deployed to
+- `HOST` -  standard server providing access to testing and deployment directories
+- `HOST_CONTAINER` - server used for building Docker/Apptainer images, which is typically separated from regular filesystems because it requires sudo access and offers better protection for sensitive environments
+- `JAVA_EXECUTABLE` - path to the Java executable required by Nextflow (e.g. `/usr/local/bin/jdk-21.0.6`)
+- `NEXTFLOW_EXECUTABLE` - path to the Nextflow executable
+- `PASSWORD` - login password for HOST
+- `PASSWORD_CONTAINER` - login password for HOST_CONTAINER
+- `PYTHON_EXECUTABLE` - path to the Python executable used to create the virtual environment
+- `TEMPORARY_IMAGE_ROOT` - path where the image is temporarily stored before deployment
+- `TEMPORARY_TESTING_ROOT` - path where the repository is cloned and tests are executed
+- `USER` - username of the account running the Bamboo plan
 
 
-## CI/CD Agent Instructions
-Below are the recommended instructions to launch the scripts saved in the deployment folder.
+## CI/CD Bamboo Agent Instructions
+Below are the recommended steps for launching scripts stored in the `bamboo/` folder.
+Configuration details for the Bamboo interface are documented in the corresponding files.
 
-### Build Setup
-- Create Variables File - Local Script\
-This script copies the needed variables that are only available on the CI/CD agent, and saves them locally into the
-`02.inject_bamboo_variables.txt`
-```bash
-#!/usr/bin/env bash
+### 01-build-setup
+- 01.create_variables_file.sh\
+Generates additional variables from the Bamboo configuration and saves them into `02.inject_bamboo_variables.txt` on the Bamboo agent.
+- 02.inject_bamboo_variables.txt\
+Contains Bamboo configuration instructions for injecting variables from the file generated above into the Bamboo agent.
+- 03.checkout_from_bitbucket.sh\
+Checks out the testing branch from a remote repository (e.g., Bitbucket, GitHub) to the temporary testing path.
+- 04.poetry_environment.sh\
+Sets up the Poetry environment for testing.
+- 05.build_apptainer_image.sh\
+Builds the Apptainer image on `HOST_CONTAINER`.
+- 06.transfer_image.sh\
+Transfers the built image into the temporary testing path.
 
-set -euxo pipefail
+### 02-testing_and_linting
+- 01.run_unit_and_integration_tests.sh\
+Runs unit and integration tests.
+- 02.run_formatters_and_linters.sh\
+Executes formatters and linters to enforce coding standards.
 
-BRANCH_NAME=$1
-BAMBOO_TMP_ROOT=$2
+### 03-build-cleanup
+- 01.cleanup_testing_directory.sh\
+Cleans up the temporary testing directory.
+- 02.clean_building_directory.sh\
+Cleans up the image-building directory on `HOST_CONTAINER`.
 
-CLINICAL_TOOLS_IDENTIFIER="CLINICAL_TOOLS"
-
-UNIQUE_IDENTIFIER="${CLINICAL_TOOLS_IDENTIFIER}_${BRANCH_NAME}"
-UNIQUE_IDENTIFIER="${UNIQUE_IDENTIFIER//[.,\/-]/_}"
-
-echo "UNIQUE_IDENTIFIER=${UNIQUE_IDENTIFIER}
-TESTING_DEPLOYMENT_DIRECTORY=${BAMBOO_TMP_ROOT}/${UNIQUE_IDENTIFIER}" \
-  >> 02.inject_bamboo_variables.txt
-cat 02.inject_bamboo_variables.txt
-```
-- Checkout from BitBucket - SSH Task
-```bash
-cd ${bamboo.BAMBOO_EXEC_ROOT}
-cd 01-build-setup/
-
-bash 03.checkout_from_bitbucket.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
-${bamboo.planRepository.repositoryUrl} \
-${bamboo.planRepository.branchName}
-```
-  -  Setup Poetry Environment
-```bash
-cd ${bamboo.BAMBOO_EXEC_ROOT}
-cd 01-build-setup/
-
-bash 04.poetry_environment.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
-${bamboo.PYTHON_EXECUTABLE} \
-${bamboo.POETRY_EXECUTABLE}
-```
-  - Build Apptainer Image
-```bash
-cd ${bamboo.BAMBOO_EXEC_ROOT}
-cd 01-build-setup/
-
-bash 05.build_apptainer_image.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} ${bamboo.APPTAINER_IMAGE}
-```
-### Run Unit Tests
-- Run Tests - SSH Task
-```bash
-cd ${bamboo.BAMBOO_EXEC_ROOT}
-cd 02-testing_and_linting/
-
-bash 01.run_unit_and_integration_tests.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} ${bamboo.APPTAINER_IMAGE} \
-    ${bamboo.NEXTFLOW_EXECUTABLE} ${bamboo.JAVA_EXECUTABLE}
-```
-- Move Test Results - Local Task
-```bash
-cp ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/test_results_unit_standalone.xml ${bamboo.build.working.directory}/test_results_unit_standalone.xml
-cp ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/test_results_workflow.xml ${bamboo.build.working.directory}/test_results_workflow.xml
-```
-- Analyze Test Results - JUnit Parser
-
-### Linting
-- Run Pre Commit - SSH Task
-```bash
-cd ${bamboo.BAMBOO_EXEC_ROOT}
-cd 02-testing_and_linting/
-
-bash 02.run_formatters_and_linters.sh ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
-```
-### Clean Up
-- Remove Temporary Directory - SSH Task
-```bash
-cd ${bamboo.BAMBOO_TMP_ROOT}
-
-rm -rfv ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
-```
-### Deployment
-This stage is recommended to be manual, especially if the CI/CD agent is running the pipeline every time there is a commit.
-The main purpose of this stage is to build the container and copy it to the deployment folder.
-
-- Deploy - SSH Task
-```bash
-cd ${bamboo.BAMBOO_EXEC_ROOT}
-cd 04-deployment/
-
-bash 01-deploy.sh ${bamboo.planRepository.branchName} ${bamboo.planRepository.repositoryUrl} \
-    ${bamboo.PRODUCTION_ROOT}
-```
+### 04-deployment
+- 01.clone_to_deployment.sh\
+Cleans up temporary images and clones the final build into the deployment directory.

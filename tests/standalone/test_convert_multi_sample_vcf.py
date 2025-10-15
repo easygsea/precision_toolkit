@@ -59,12 +59,12 @@ SAMPLE2_DATA = [
 
 
 @pytest.fixture
-def test_data_dir():
+def test_data_dir() -> Path:
     """Fixture for the test data directory."""
     return Path(__file__).parent / "data"
 
 
-def test_two_sample_vcf_conversion(test_data_dir):
+def test_two_sample_vcf_conversion(test_data_dir: Path) -> None:
     """Test conversion of two-sample VCF file."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = test_data_dir / "two_sample.vcf"

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clinical-tools"
-version = "1.0.1"
+version = "1.1.0"
 description = "An integrated toolset to support clinical validation"
 authors = ["Canada's Michael Smith Genome Sciences Centre - Precision Informatics"]
 readme = "README.md"
@@ -19,6 +19,7 @@ scipy = "1.15.2"
 seaborn = "0.13.2"
 statsmodels = "0.14.4"
 tabulate = "0.9.0"
+openpyxl = "3.1.5"
 
 [tool.poetry.group.dev.dependencies]
 pyproject-pre-commit = "0.4.1"
@@ -30,8 +31,10 @@ pytest-xdist = "3.6.1"
 [tool.poetry.scripts]
 convert-multi-sample-vcf = "bin.convert_multi_sample_vcf:main"
 count-variants-by-size = "bin.count_variants_by_size:main"
+jira-table = "bin.jira_table:main"
 manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
 plot-signal-correlation = "bin.plot_signal_correlation:main"
+plot-target-tracts = "bin.plot_target_tracts:main"
 rename-bed-features = "bin.rename_bed_features:main"
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
 

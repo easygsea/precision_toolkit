@@ -73,7 +73,7 @@ def generate_all_data_csv(
     return all_data_table
 
 
-def main():
+def main() -> None:
     """
     Summarize and compute diagnostic metrics from VCF comparisons.
 

@@ -19,10 +19,10 @@ def build_vcf_pair_channels(truth_dir, query_dir) {
     return Channel
         .fromPath("${truth_dir}/*.{vcf,vcf.gz}")
         .map { truth_vcf ->
-            def sampleName = truth_vcf.getName().replaceFirst(/\..*$/, "")
-            def query_vcf = file("${query_dir}/${sampleName}.*.vcf.gz") ?:
-                            file("${query_dir}/${sampleName}.*.vcf")
-            return tuple(sampleName, truth_vcf, query_vcf)
+            def sample_name = truth_vcf.getName().replaceFirst(/\..*$/, "")
+            def query_vcf = file("${query_dir}/${sample_name}.*.vcf.gz") ?:
+                            file("${query_dir}/${sample_name}.*.vcf")
+            return tuple(sample_name, truth_vcf, query_vcf)
         }
 }
 
@@ -61,8 +61,8 @@ def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
     // Index normalized spurious variants VCF
     def normalized_spurious_variants_vcf_tbi = index_spurious_variants_normalized_vcf(normalized_spurious_variants_vcf).indexed_vcf
 
-    def truth_vcfs = vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, truth_vcf) }
-    def query_vcfs = vcf_pairs.map { sampleName, truth_vcf, query_vcf -> tuple(sampleName, query_vcf) }
+    def truth_vcfs = vcf_pairs.map { sample_name, truth_vcf, query_vcf -> tuple(sample_name, truth_vcf) }
+    def query_vcfs = vcf_pairs.map { sample_name, truth_vcf, query_vcf -> tuple(sample_name, query_vcf) }
 
     def no_spurious_truth = exclude_spurious_variants_truth(
         truth_vcfs,

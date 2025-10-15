@@ -35,7 +35,7 @@ class ProportionConfidenceInterval:
             ProportionConfidenceIntervalMethod.WILSON
         ),
         ci_level: float = DEFAULT_CI_LEVEL,
-        **kwargs,
+        **kwargs: dict[str, str],
     ) -> tuple[float, float]:
         """Calculate the confidence interval for a binomial proportion.
 
