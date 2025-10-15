@@ -52,6 +52,7 @@ function clone_and_deploy {
     poetry install
     cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" ./"${NEW_IMAGE_NAME}"
     sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
+    cd "${DEPLOYMENT_ROOT}/clinical_tools"
     chmod --recursive a-w "${version}"
     [[ -d main ]] && chmod --changes --recursive u+w main && rm -rfv main
     mkdir --mode 2750 main
