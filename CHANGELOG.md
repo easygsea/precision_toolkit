@@ -2,10 +2,10 @@
 
 ## Version History
 
----
 ### v1.1.1 - 2025-10-15
 - Bugfix: fixed container link in local deployment's `nextflow.config`
 
+---
 
 ### v1.1.0 - 2025-10-15 [Released 2025-10-15]
 - New Workflow: Added new target evaluation workflow for analyzing per-base stats across target regions.
