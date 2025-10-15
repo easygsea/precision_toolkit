@@ -30,18 +30,45 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
        --output_dir output_clinical_tools
    ```
 
-Using containerized tools:
+> **Note:**
+Nextflow saves Apptainer images to a `.apptainer` folder in each `work` directory, using extra disk space.
+See [Nextflow docs](https://nextflow.io/docs/latest/container.html).
+>
+>To avoid this, set a shared cache by exporting before running the workflow:
+>```bash
+>export NXF_APPTAINER_CACHEDIR="/shared/nextflow_apptainer_cache"
+>```
+>
+>Or set `apptainer.cacheDir` in `nextflow.config`.
+>
+> **Advanced users:**
+If you have deployed clinical_tools using the recommended [deployment and Bamboo plans](deployment/README.md), you do **not** need to manually set up the Apptainer cache.
 
-1. Clone the repository:
+### Using Containerized Tools
+
+1. Download the container image:
+
+   > **Tip:** If you have already run a workflow with Clinical Tools, you likely have a cached Apptainer image (see notes above), so you may not need to download it again.
+
+   For the latest version, run:
    ```bash
    apptainer pull docker://quay.io/easygsea/clinical_tools
    ```
+   To get a specific version, use:
+   ```bash
+   apptainer pull docker://quay.io/easygsea/clinical_tools:v1.0.1
+   ```
 
-2. Run specific tools. Example:
+2. Run specific tools inside the container. Example:
    ```bash
    apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
    ```
-   See official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for guidance on calling commands within a container.
+   See the official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for more details on running commands within a container.
+
+### Running Non-Containerized Tools
+
+Some utilities, such as `liftover_sv_vcf.sh`, can be run directly from the source without a container.
+For a full list and documentation of available standalone utilities, see the [Standalone Utilities README](docs/standalone_utilities/README.md).
 
 ## Demo Data
 
@@ -101,13 +128,18 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
 - [Workflows](./docs/README.md#workflows)
   - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
   - [Signal Correlation](./docs/workflows/signal_correlation.md)
+  - [Target Evaluation](./docs/workflows/target_evaluation.md)
 - [Standalone Utilities](./docs/README.md#standalone-utilities)
-  - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/standalone_utilities.md#manual-diagnostic-metric-curation)
+  - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
     - `manual-diagnostic-metric-curation`
-  - [Convert Multi-Sample VCF File into Single-Sample VCF files](./docs/standalone_utilities/standalone_utilities.md#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
+  - [Convert Multi-Sample VCF File into Single-Sample VCF files](./docs/standalone_utilities/README.md#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
     - `convert-multi-sample-vcf`
-  - [Count Variants By Size](./docs/standalone_utilities/standalone_utilities.md#count-variants-by-size)
+  - [Count Variants By Size](./docs/standalone_utilities/README.md#count-variants-by-size)
     - `count-variants-by-size`
+  - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
+    - `liftover_sv_vcf.sh`
+  - [Jira Table Converter ](./docs/standalone_utilities/README.md#jira-table-converter)
+    - `jira-table`
 
 ## Resource Optimization and High-Performance Computing
 

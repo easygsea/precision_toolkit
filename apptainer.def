@@ -16,7 +16,6 @@ Stage: witty_er_builder
     cd Wittyer && \
     dotnet publish . -c Release
 
-
 Bootstrap: docker
 From: python:{{ PYTHON_VERSION }}-slim-bookworm
 Stage: clinical_tools_builder
@@ -44,6 +43,7 @@ From: mgibio/hap.py:v{{ HAPPY_VERSION }}
 Stage: runtime1
 
 %arguments
+    BEDTOOLS_VERSION=2.31.0
     DOTNET_VERSION=6.0
     HAPPY_VERSION=0.3.15
     HTSLIB_VERSION=1.21
@@ -112,6 +112,10 @@ Stage: runtime1
     cd "samtools-{{HTSLIB_VERSION}}" && \
     ./configure --prefix=/opt/hap.py && \
     make && make install && \
+    # Install precompiled bedtools
+    wget --quiet "https://github.com/arq5x/bedtools2/releases/download/v{{BEDTOOLS_VERSION}}/bedtools.static" && \
+    chmod a+x bedtools.static && \
+    mv bedtools.static /opt/hap.py/bin/bedtools && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/{{ PYTHON_VERSION }}/Python-{{ PYTHON_VERSION }}.tgz" && \
     tar -xzf "Python-{{ PYTHON_VERSION }}.tgz" && \

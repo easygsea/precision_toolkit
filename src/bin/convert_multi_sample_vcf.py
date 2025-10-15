@@ -107,7 +107,7 @@ def write_file(
             single_vcf.close()
 
 
-def main():
+def main() -> None:
     """
     Parse the original VCF and split into single-sample VCF files with each sample.
 

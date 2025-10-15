@@ -39,7 +39,7 @@ from clinical_tools.core.statistics.proportion import (
 )
 
 
-def main():
+def main() -> None:
     """
     Manually curate a diagnostic metric.
 

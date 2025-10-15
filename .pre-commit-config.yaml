@@ -31,7 +31,7 @@ repos:
       - id: mypy
         name: mypy (src)
         types: [python]
-        args: ["--no-warn-return-any"]
+        args: ["--no-warn-return-any", "--disallow-untyped-defs"]
         additional_dependencies:
           - pandas-stubs==2.2.3.241126
           - python-docx==1.1.2
@@ -44,7 +44,7 @@ repos:
       - id: mypy
         name: mypy (tests)
         types: [python]
-        args: ["--no-warn-return-any", "--explicit-package-bases"]
+        args: ["--no-warn-return-any", "--explicit-package-bases", "--disallow-untyped-defs"]
         additional_dependencies:
           - scipy-stubs==1.15.2.2
           - pandas-stubs==2.2.3.241126

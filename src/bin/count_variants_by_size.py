@@ -24,7 +24,7 @@ from pathlib import Path
 from clinical_tools.analysis.vcf import count_variants_by_size
 
 
-def main():
+def main() -> None:
     """Count variants by size in a VCF file or folder of VCF files.
 
     Args:
@@ -68,7 +68,7 @@ def main():
 
     if input_path.is_file():
         all_counts = count_variants_by_size(
-            input_path, sorted(args.size_stratification), args.count_occurrences
+            args.input_path, sorted(args.size_stratification), args.count_occurrences
         )
         for size_range, count in all_counts.items():
             print(f"{size_range}: {count}")
@@ -82,7 +82,7 @@ def main():
         for vcf_file in vcf_files:
             print(f"\nProcessing {vcf_file.name}:")
             counts = count_variants_by_size(
-                vcf_file, args.size_stratification, args.count_occurrences
+                str(vcf_file), args.size_stratification, args.count_occurrences
             )
             for size_range, count in counts.items():
                 print(f"{size_range}: {count}")
