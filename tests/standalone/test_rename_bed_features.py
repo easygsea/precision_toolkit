@@ -9,19 +9,19 @@ import pytest
 
 
 @pytest.fixture
-def test_data_dir():
+def test_data_dir() -> Path:
     """Fixture for the test data directory."""
     return Path(__file__).parent / "data"
 
 
-def create_gene_list(tmp_path, genes):
+def create_gene_list(tmp_path: Path, genes: list[str]) -> Path:
     """Create a temporary gene list file."""
     gene_file = tmp_path / "genes.txt"
     gene_file.write_text("\n".join(genes))
     return gene_file
 
 
-def test_rename_exons_lt10(test_data_dir):
+def test_rename_exons_lt10(test_data_dir: Path) -> None:
     """Test renaming of BED features where zero-padding is not needed."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "exons_lt10.bed"
@@ -62,7 +62,7 @@ def test_rename_exons_lt10(test_data_dir):
                 )
 
 
-def test_rename_exons_lt100(test_data_dir):
+def test_rename_exons_lt100(test_data_dir: Path) -> None:
     """Test renaming of BED features where zero-padding to two digits is needed."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "exons_lt100.bed"
@@ -103,7 +103,7 @@ def test_rename_exons_lt100(test_data_dir):
                 )
 
 
-def test_bed_with_missing_targets(test_data_dir):
+def test_bed_with_missing_targets(test_data_dir: Path) -> None:
     """Test behavior when gene list contains genes not in BED file."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "exons_lt10.bed"
@@ -144,7 +144,7 @@ def test_bed_with_missing_targets(test_data_dir):
         )
 
 
-def test_features_missing_refseq_accession(test_data_dir):
+def test_features_missing_refseq_accession(test_data_dir: Path) -> None:
     """Test behavior when RefSeq accession is missing in BED attributes."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "missing_refseq_accession.bed"
