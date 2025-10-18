@@ -107,9 +107,8 @@ def helpMessage() {
 
     SLURM Execution:
         --profile slurm                     # Enable SLURM execution
-        --slurm_account <your_account>      # Your SLURM account name (required)
-        --slurm_partition <partition_name>  # SLURM partition to use (default: general)
-        --slurm_queue <queue_name>          # SLURM queue to use (default: general)
+        --slurm_account <your_account>      # Your SLURM account name
+        --slurm_queue <queue_name>          # SLURM partition to use (default: general)
 
     ====================
     Example Commands
