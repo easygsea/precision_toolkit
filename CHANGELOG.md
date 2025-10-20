@@ -12,7 +12,7 @@
 - New Standalone Utility: Added new utility to convert structured data files into a formatted JIRA table.
 - Feature: Added GitHub Actions to automatically sync changes from Bitbucket.
 - Improvement: Refactored Bamboo plan to build images via Docker build.
-- Improvement: Specify container version in nextflow.config.
+- Improvement: Specify container version in `nextflow.config`.
 - Improvement: Removed redundant version tracking.
 - Bugfix: Cleanup in DockerFile.
 - Bugfix: Removed unused fixture in `tests/unit/test_diagnostic_metrics.py`.
