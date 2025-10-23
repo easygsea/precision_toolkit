@@ -19,6 +19,7 @@ import argparse
 import gzip
 import logging
 import re
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import IO, cast
@@ -29,6 +30,80 @@ logging.basicConfig(
     format="[%(asctime)s] %(levelname)s %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
+
+
+class Strand(str, Enum):
+    """Valid strand orientations."""
+
+    PLUS = "+"
+    MINUS = "-"
+    UNSTRANDED = "."
+
+
+@dataclass
+class GenomicRange:
+    """Class for tracking a genomic range and associated number attribute."""
+
+    range: tuple
+    number_attribute: str = ""
+
+
+@dataclass
+class Transcript:
+    """Class for tracking a transcript's feature counts and exon/intron ranges."""
+
+    refseq_accession: str
+    strand: Strand
+    feature_counts: dict[str, int] = field(default_factory=dict)
+    exons: list[GenomicRange] = field(default_factory=list)
+    introns: list[GenomicRange] | None = None
+    exon_to_intron: dict[tuple[int, int], GenomicRange] = field(default_factory=dict)
+
+    def calc_intron_ranges(self) -> None:
+        """
+        Calculate introns based on exon ranges.
+
+        feature_counts attribute is updated to reflect new intron feature and
+        exon_to_intron attribute is populated with a 1-to-1 mapping of exon range to
+        intron GenomicRange object.
+
+        Example:
+            >> transcript.exons
+            [GenomicRange((100, 200), "1"), GenomicRange((300, 400), "2")]
+            >> transcript.calc_intron_ranges()
+            >> transcript.introns
+            [GenomicRange((201, 299), "1")]
+            >> transcript.exon_to_intron
+            {(100, 200): GenomicRange((201, 299), "1")}
+        """
+        self.introns = []
+        if len(self.exons) > 1:
+            # Sort exon GenomicRange objects by start position in range attribute
+            sorted_exons = sorted(self.exons, key=lambda e: e.range[0])
+
+            for i in range(len(sorted_exons) - 1):
+                prev_exon = sorted_exons[i]
+                next_exon = sorted_exons[i + 1]
+                intron_start = prev_exon.range[1] + 1
+                intron_end = next_exon.range[0] - 1
+
+                # Determine which exon precedes intron based on strand
+                if self.strand == Strand.MINUS:
+                    intron_number = next_exon.number_attribute
+                else:
+                    intron_number = prev_exon.number_attribute
+
+                # Create intron GenomicRange object and add to introns list
+                intron = GenomicRange(
+                    range=(intron_start, intron_end), number_attribute=intron_number
+                )
+                self.introns.append(intron)
+
+                # Map exon range to intron range
+                self.exon_to_intron[prev_exon.range] = intron
+
+                # Update feature counts
+                self.feature_counts["intron"] = len(self.introns)
 
 
 class FileMode(str, Enum):
@@ -46,53 +121,78 @@ def open_file(filename: Path, mode: FileMode) -> IO[str]:
         return open(filename, mode)
 
 
-def count_num_features(
+def extract_refseq_accession(
+    refseq_accession_regex_pattern: re.Pattern[str], bed_attributes: str
+) -> str | None:
+    """Extract RefSeq accession from BED attributes."""
+    match = re.search(refseq_accession_regex_pattern, bed_attributes)
+    return match.group(1) if match else None
+
+
+def extract_exon_number(bed_attributes: str) -> str:
+    """Extract exon number from BED attributes."""
+    exon_num_attr_search = re.search(r"exon_number.*?(\d+)", bed_attributes)
+    return exon_num_attr_search.group(1) if exon_num_attr_search else ""
+
+
+def parse_bed_file(
     bed_file_path: Path, refseq_accession_regex_pattern: re.Pattern[str]
-) -> dict[str, dict[str, int]]:
+) -> dict[str, Transcript]:
     """
-    Parse input BED file and count the occurences of each feature type per transcript.
+    Parse input BED file to track feature counts and genomic ranges per transcript.
 
     Args:
         bed_file_path: Path to input BED file.
         refseq_accession_regex_pattern: Compiled regex to extract RefSeq accession.
 
     Returns:
-        Nested dict with structure {refseq_accession: {feature_type: count}}.
-
-    Example:
-        >>> result = count_num_features(bed_path, pattern)
-        >>> result["NM_000760.4"]["exon"]
-        17
+        Dictionary mapping RefSeq accessions to corresponding Transcript objects, which
+        tracks feature counts and genomic ranges.
     """
-    transcript_feature_counts_dict: dict[str, dict[str, int]] = {}
+    refseq_accession_to_transcript_obj: dict[str, Transcript] = {}
     with open_file(bed_file_path, FileMode.READ) as in_bed:
         for line in in_bed:
             fields = line.split("\t")
+            start = int(fields[1])
+            end = int(fields[2])
+            strand = fields[5]
             feature = fields[7]
             attributes = fields[9]
 
             # Get RefSeq accession
-            refseq_attr_search = re.search(refseq_accession_regex_pattern, attributes)
-            if refseq_attr_search:
-                refseq_acc = refseq_attr_search.group(1)
+            refseq_acc = extract_refseq_accession(
+                refseq_accession_regex_pattern, attributes
+            )
+            if refseq_acc is not None:
+                # Create transcript object, if not already present
+                if refseq_acc not in refseq_accession_to_transcript_obj.keys():
+                    refseq_accession_to_transcript_obj[refseq_acc] = Transcript(
+                        refseq_acc, Strand(strand)
+                    )
+                transcript_obj = refseq_accession_to_transcript_obj[refseq_acc]
 
-                if refseq_acc not in transcript_feature_counts_dict.keys():
-                    transcript_feature_counts_dict[refseq_acc] = {}
-                if feature not in transcript_feature_counts_dict[refseq_acc].keys():
+                # Update feature count attribute
+                if feature not in transcript_obj.feature_counts.keys():
                     # Initiate total count
-                    transcript_feature_counts_dict[refseq_acc][feature] = 1
+                    transcript_obj.feature_counts[feature] = 1
                 else:
                     # Increment total count
-                    transcript_feature_counts_dict[refseq_acc][feature] += 1
-    return transcript_feature_counts_dict
+                    transcript_obj.feature_counts[feature] += 1
+
+                # Update exon attribute, if applicable
+                if feature == "exon":
+                    exon_number = extract_exon_number(attributes)
+                    transcript_obj.exons.append(GenomicRange((start, end), exon_number))
+
+    return refseq_accession_to_transcript_obj
 
 
 def construct_feature_name(
     gene_symbol: str,
     genomic_feature: str,
-    bed_attributes: str,
-    refseq_accession_regex_pattern: re.Pattern[str],
-    transcript_feature_counts_dict: dict[str, dict[str, int]],
+    refseq_acc: str,
+    exon_num: str,
+    refseq_accession_to_transcript_obj: dict[str, Transcript],
 ) -> str:
     """
     Construct updated feature name.
@@ -105,33 +205,23 @@ def construct_feature_name(
     Args:
         gene_symbol: HGNC gene symbol.
         genomic_feature: Feature type.
-        bed_attributes: Attributes field from BED file.
-        refseq_accession_regex_pattern: Compiled regex to extract RefSeq accession.
-        transcript_feature_counts_dict: Nested dict with feature counts for each RefSeq
-            accession.
+        refseq_acc: RefSeq accession.
+        exon_num: Exon number extracted from BED attributes.
+        refseq_accession_to_transcript_obj: Dictionary mapping RefSeq accessions to
+            corresponding Transcript objects.
 
     Returns:
         Updated feature name.
-
-    Raises:
-        ValueError: If RefSeq accession is missing.
     """
-    # Extract RefSeq accession
-    refseq_attr_search = re.search(refseq_accession_regex_pattern, bed_attributes)
-    if not refseq_attr_search:
-        raise ValueError(
-            f"RefSeq accession not found for {genomic_feature.upper()} feature "
-            f"belonging to {gene_symbol}... skipping."
-        )
-    refseq_acc = refseq_attr_search.group(1)
-
     # Extract exon number, if applicable, and construct feature name
     # If no exon number, don't append to feature name
-    exon_num_attr_search = re.search(r"exon_number.*?(\d+)", bed_attributes)
-    if exon_num_attr_search:
-        exon_num = str(exon_num_attr_search.group(1))
+    if exon_num:
         num_digits = len(
-            str(transcript_feature_counts_dict[refseq_acc][genomic_feature])
+            str(
+                refseq_accession_to_transcript_obj[refseq_acc].feature_counts[
+                    genomic_feature
+                ]
+            )
         )
         exon_num_padded = (
             exon_num.zfill(num_digits) if len(exon_num) < num_digits else exon_num
@@ -143,7 +233,7 @@ def construct_feature_name(
     return f"{gene_symbol}_{refseq_acc}_{feature_id}"
 
 
-def main():
+def main() -> None:
     """
     Reformat BED file and rename features.
 
@@ -172,6 +262,11 @@ def main():
             "which is used in the name field (fourth column)."
         ),
         default="db_xref",
+    )
+    parser.add_argument(
+        "--output_introns",
+        help=("Calculate introns and output to reformatted BED file."),
+        action="store_true",
     )
     parser.add_argument(
         "-o",
@@ -205,13 +300,15 @@ def main():
         for line in target_gene_list:
             target_gene_set.add(line.strip())
 
-    # First pass: get total count for each feature type per transcript
+    # First pass: parse BED file to extract feature counts and genomic ranges per
+    # transcript
     refseq_accession_pattern = re.compile(rf"{args.attribute_key}.*(N[MRP]_\d+.\d+)")
-    transcript_feature_counts_dict = count_num_features(
+    refseq_accession_to_transcript_obj = parse_bed_file(
         bed_file_path, refseq_accession_pattern
     )
 
-    # Second pass: update feature name (4th column)
+    # Second pass: reformat BED file, update feature name (4th column), and add introns
+    # if applicable
     gene_set = set()  # keep track of genes that were in input_bed
     out_bed = open_file(output_folder / out_filename, FileMode.WRITE)
     with open_file(bed_file_path, FileMode.READ) as in_bed:
@@ -223,20 +320,56 @@ def main():
             feature_name = fields[3]
             genomic_feature = fields[7]
             attributes = fields[9]
+            exon_num = extract_exon_number(attributes)
+
+            # Extract refseq accession
+            refseq_acc = extract_refseq_accession(refseq_accession_pattern, attributes)
+            if refseq_acc is None:
+                logging.warning(
+                    f"RefSeq accession not found for {genomic_feature.upper()} feature "
+                    f"belonging to {feature_name}... skipping."
+                )
+                continue
 
             gene_set.add(feature_name)  # For logging purposes
-            try:
-                updated_feature_name = construct_feature_name(
-                    feature_name,
-                    genomic_feature,
-                    attributes,
-                    refseq_accession_pattern,
-                    transcript_feature_counts_dict,
-                )
-                out_bed.write(f"{chr}\t{start}\t{end}\t{updated_feature_name}\n")
-            except ValueError as e:
-                logging.warning(e)
-                continue
+            updated_feature_name = construct_feature_name(
+                feature_name,
+                genomic_feature,
+                refseq_acc,
+                exon_num,
+                refseq_accession_to_transcript_obj,
+            )
+            out_bed.write(f"{chr}\t{start}\t{end}\t{updated_feature_name}\n")
+
+            # If current line in BED file is an exon feature write corresponding intron
+            # feature to BED file, if applicable
+            if args.output_introns and genomic_feature == "exon":
+                transcript_obj = refseq_accession_to_transcript_obj[refseq_acc]
+                # Calculate intron ranges if first time encountering an exon for
+                # transcript
+                if transcript_obj.introns is None:
+                    transcript_obj.calc_intron_ranges()
+
+                # Check if transcript has introns (i.e. more than one exon) and write
+                if transcript_obj.introns:
+                    exon_to_intron = transcript_obj.exon_to_intron
+                    exon_range = (int(start), int(end))
+
+                    if exon_range in exon_to_intron.keys():
+                        # Get corresponding intron and construct intron feature name
+                        intron = exon_to_intron[exon_range]
+                        intron_feature_name = construct_feature_name(
+                            feature_name,
+                            "intron",
+                            refseq_acc,
+                            intron.number_attribute,
+                            refseq_accession_to_transcript_obj,
+                        )
+                        out_bed.write(
+                            f"{chr}\t{intron.range[0]}\t{intron.range[1]}\t"
+                            f"{intron_feature_name}\n"
+                        )
+
     out_bed.close()
 
     # Output warning if any genes in target gene list were not found in input BED file
