@@ -17,6 +17,7 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
 ## Quick Start
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/easygsea/clinical_tools.git
    ```
@@ -31,18 +32,19 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
    ```
 
 > **Note:**
-Nextflow saves Apptainer images to a `.apptainer` folder in each `work` directory, using extra disk space.
-See [Nextflow docs](https://nextflow.io/docs/latest/container.html).
+> Nextflow saves Apptainer images to a `.apptainer` folder in each `work` directory, using extra disk space.
+> See [Nextflow docs](https://nextflow.io/docs/latest/container.html).
 >
->To avoid this, set a shared cache by exporting before running the workflow:
->```bash
->export NXF_APPTAINER_CACHEDIR="/shared/nextflow_apptainer_cache"
->```
+> To avoid this, set a shared cache by exporting before running the workflow:
 >
->Or set `apptainer.cacheDir` in `nextflow.config`.
+> ```bash
+> export NXF_APPTAINER_CACHEDIR="/shared/nextflow_apptainer_cache"
+> ```
+>
+> Or set `apptainer.cacheDir` in `nextflow.config`.
 >
 > **Advanced users:**
-If you have deployed clinical_tools using the recommended [deployment and Bamboo plans](deployment/README.md), you do **not** need to manually set up the Apptainer cache.
+> If you have deployed clinical_tools using the recommended [deployment and Bamboo plans](deployment/README.md), you do **not** need to manually set up the Apptainer cache.
 
 ### Using Containerized Tools
 
@@ -51,10 +53,13 @@ If you have deployed clinical_tools using the recommended [deployment and Bamboo
    > **Tip:** If you have already run a workflow with Clinical Tools, you likely have a cached Apptainer image (see notes above), so you may not need to download it again.
 
    For the latest version, run:
+
    ```bash
    apptainer pull docker://quay.io/easygsea/clinical_tools
    ```
+
    To get a specific version, use:
+
    ```bash
    apptainer pull docker://quay.io/easygsea/clinical_tools:v1.0.1
    ```
@@ -79,6 +84,7 @@ Clinical Tools are rigorously tested at both unit and integration levels. Integr
 Example:
 [Variant Benchmark Tests](./tests/workflow/test_variant_benchmark.yml)
 Demo of customized benchmarking small variant calls across multiple samples and calculating variant concordance, sensitivity, precision, confidence intervals (Jeffreys method, 99% CI; default: Wilson method, 95% CI), and F1 score reported to 1 (default: 2) decimal place:
+
 ```bash
 nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
     --variant_benchmark_engine happy \
@@ -96,6 +102,7 @@ nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
 Example:
 [Manual Diagnostic Metric Curation Tests](./tests/standalone/test_manual_diagnostic_metric_curation.py)
 Demo of manual sensitivity curation:
+
 ```bash
 apptainer exec \
     -B <path/to/clinical_tools> \
@@ -105,7 +112,6 @@ apptainer exec \
     --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" \
     --output-prefix manually_curated_sensitivity
 ```
-
 
 # Contents
 
@@ -140,6 +146,8 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
     - `liftover_sv_vcf.sh`
   - [Jira Table Converter ](./docs/standalone_utilities/README.md#jira-table-converter)
     - `jira-table`
+  - [Generate Standardized BED](./docs/standalone_utilities/README.md#generate-standardized-bed)
+    - `generate-standardized-bed`
 
 ## Resource Optimization and High-Performance Computing
 

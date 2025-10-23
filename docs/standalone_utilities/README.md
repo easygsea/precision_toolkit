@@ -5,6 +5,7 @@
 - [Count Variants By Size](#count-variants-by-size)
 - [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
 - [Jira Table Converter](#jira-table-converter)
+- [Generate Standardized BED](#generate-standardized-bed)
 
 ## Manual Diagnostic Metric Curation
 
@@ -67,4 +68,43 @@ The `jira-table` tool converts structured data files (CSV, TSV, Excel, and JSON)
 Example Usage:
 ```bash
 jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY>
+```
+
+## Generate Standardized BED
+
+The `generate-standardized-bed` tool reformats a BED file in BED6+4 format into a 4-column BED file and standardizes feature names. As intron features are not typically included in BED files, users can enable intron calculation using `--output_introns`.
+
+Specifically, the input BED file should have the following columns:
+
+1. chrom: chromosome
+2. chromStart: start position
+3. chromEnd: end position
+4. geneSymbol: gene symbol
+5. score: score or "." if missing
+6. strand: strand orientation or "." if missing
+7. source: GTF/GFF source field or "." if missing
+8. feature: GTF/GFF feature type
+9. frame: GTF/GFF frame field or "." if missing
+10. attributes: GTF/GFF attributes
+
+This will be converted into a 4-column BED file consisting of:
+
+1. chrom: chromosome
+2. chromStart: start position
+3. chromEnd: end position
+4. featureName: feature name with the format `<gene_symbol>_<refseq_accession>_<feature><exon_number>`
+
+`exon_number`, if present in the attributes, is dynamically zero-padded based on the total number of genomic features present for the gene/transcript:
+
+- For genes/transcripts with <10 features: no leading zeros
+- For 10-99 features: one leading zero (e.g. `<feature>01`)
+- For 100-999 features: two leading zeros (e.g. `<feature>001`)
+- Etc.
+
+For features without `exon_number`, the feature name will simply be `<gene_symbol>_<refseq_accession>_<feature>`.
+
+Example usage:
+
+```bash
+generate-standardized-bed --bed_file <BED> --gene_list <TARGET GENES FILE> --output_folder <OUTPUT DIRECTORY>
 ```
