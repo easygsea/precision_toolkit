@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Reformat into a 4-column BED file and relabel 4th column.
+Reformat BED6+4 to 4-column BED file with standardized feature names.
 
-Updated labels should follow the format
+Updated names should follow the format
 <gene_symbol>_<refseq_accession>_<feature><exon_number>, where exon_number (if present)
 is zero-padded dynamically:
 
@@ -12,7 +12,7 @@ For 100-999 features: two leading zeros (e.g. <feature>001).
 Etc.
 
 Usage:
-    rename-bed-features -b <bed> -g <target_gene_list> -o <output_folder>
+    generate-standardized-bed -b <bed> -g <target_gene_list> -o <output_folder>
 """
 
 import argparse

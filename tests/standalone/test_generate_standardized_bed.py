@@ -1,4 +1,4 @@
-"""Integration tests for renaming features in BED files."""
+"""Integration tests for generating standardized BED files."""
 
 import re
 import subprocess
