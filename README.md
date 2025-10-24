@@ -155,8 +155,8 @@ Its workflows implement several resource optimization strategies:
      - Second attempt: 4 CPUs, 8GB memory
      - Third attempt: 6 CPUs, 16GB memory
      - Subsequent attempts: Up to 8 CPUs, 32GB memory
-   - Note that this only applies to cluster execution
-   - By default, a maximum time limit of 24 hours is set per task when executing locally
+   - Note that the retry pathway only applies to cluster execution
+   - For local execution, a maximum time limit of 24 hours is set per task with no retry options
 
 2. **Containerization**:
    - All dependencies are containerized using Docker/Singularity
