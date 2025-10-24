@@ -74,6 +74,23 @@ Usage:
 generate-standardized-bed --bed_file <BED> --gene_list <TARGET GENES FILE> --output_folder <OUTPUT DIRECTORY>
 ```
 
+### Interpretation of `exon_number`
+
+According to [Gencode's GTF format documentation](https://www.gencodegenes.org/pages/data_format.html), `exon_number` is a key found in the attributes field of all features except genes and transcripts. This integer value indicates the exon position in the transcript from its 5' end. Thus, in the example below, `*_START_CODON2` indicates that the start codon for this transcript is in exon 2 and `_STOP_CODON3` indicates that the stop codon is in exon 3.
+
+```bash
+chr1	65418	65433	OR4F5_NM_001005484.2_EXON1
+chr1	65434	65518	OR4F5_NM_001005484.2_INTRON1
+chr1	65418	71585	OR4F5_NM_001005484.2_TRANSCRIPT
+chr1	65519	65573	OR4F5_NM_001005484.2_EXON2
+chr1	65574	69035	OR4F5_NM_001005484.2_INTRON2
+chr1	65564	65567	OR4F5_NP_001005484.2_START_CODON2
+chr1	65564	65573	OR4F5_NP_001005484.2_CDS2
+chr1	69036	70005	OR4F5_NP_001005484.2_CDS3
+chr1	69036	71585	OR4F5_NM_001005484.2_EXON3
+chr1	70005	70008	OR4F5_NP_001005484.2_STOP_CODON3
+```
+
 ## Jira Table Converter
 
 The `jira-table` tool converts structured data files (CSV, TSV, Excel, and JSON) into a neatly formatted JIRA table.
