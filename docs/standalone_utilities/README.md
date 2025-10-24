@@ -1,31 +1,17 @@
 # Standalone Utilities
 
-- [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
 - [Convert Multi-Sample VCF File into Single-Sample VCF files](#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
 - [Count Variants By Size](#count-variants-by-size)
-- [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
-- [Jira Table Converter](#jira-table-converter)
 - [Generate Standardized BED](#generate-standardized-bed)
-
-## Manual Diagnostic Metric Curation
-
-We provide a handy tool to manually curate a diagnostic metric (concordance, sensitivity, precision, or f1_score) after the variant benchmark (diagnostic metrics) workflow has been run.
-
-`manual-diagnostic-metric-curation`
-
-To view the help message, run:
-
-```bash
-apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-curation -h
-```
-
-Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
+- [Jira Table Converter](#jira-table-converter)
+- [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
+- [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
 
 ## Convert Multi-Sample VCF File into Single-Sample VCF files
 
 The `convert-multi-sample-vcf` tool allows to convert multi-sample VCF file into a folder of multiple single-sample VCFs for better analysis of each individual sample.
 
-Usage
+Usage:
 ```commandline
 convert-multi-sample-vcf <PATH/TO/VCF> --output-folder <OUTPUT NAME> (--suffix <SUFFIX FOR OUTPUT FILES>)
 ```
@@ -48,26 +34,6 @@ Example output:
 2-25: 25
 26-50: 2
 >50: 0
-```
-
-## Structural Variant VCF Liftover
-
-The `liftover_sv_vcf.sh` tool enables conversion of structural variant VCF files between different genome assemblies (e.g., from hg19 to hg38) by leveraging the UCSC liftOver utility.
-
-Usage:
-```bash
-<path/to/clinical_tools/src/bin/>liftover_sv_vcf.sh input.vcf output.vcf chain_file.chain
-```
-
-For detailed documentation and examples, see [Structural Variant VCF Liftover Tool](liftover_sv_vcf.md).
-
-## Jira Table Converter
-
-The `jira-table` tool converts structured data files (CSV, TSV, Excel, and JSON) into a neatly formatted JIRA table.
-
-Example Usage:
-```bash
-jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY>
 ```
 
 ## Generate Standardized BED
@@ -103,8 +69,40 @@ This will be converted into a 4-column BED file consisting of:
 
 For features without `exon_number`, the feature name will simply be `<gene_symbol>_<refseq_accession>_<feature>`.
 
-Example usage:
-
+Usage:
 ```bash
 generate-standardized-bed --bed_file <BED> --gene_list <TARGET GENES FILE> --output_folder <OUTPUT DIRECTORY>
 ```
+
+## Jira Table Converter
+
+The `jira-table` tool converts structured data files (CSV, TSV, Excel, and JSON) into a neatly formatted JIRA table.
+
+Usage:
+```bash
+jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY>
+```
+
+## Manual Diagnostic Metric Curation
+
+We provide a handy tool to manually curate a diagnostic metric (concordance, sensitivity, precision, or f1_score) after the variant benchmark (diagnostic metrics) workflow has been run.
+
+`manual-diagnostic-metric-curation`
+
+To view the help message, run:
+```bash
+apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-curation -h
+```
+
+Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
+
+## Structural Variant VCF Liftover
+
+The `liftover_sv_vcf.sh` tool enables conversion of structural variant VCF files between different genome assemblies (e.g., from hg19 to hg38) by leveraging the UCSC liftOver utility.
+
+Usage:
+```bash
+<path/to/clinical_tools/src/bin/>liftover_sv_vcf.sh input.vcf output.vcf chain_file.chain
+```
+
+For detailed documentation and examples, see [Structural Variant VCF Liftover Tool](liftover_sv_vcf.md).

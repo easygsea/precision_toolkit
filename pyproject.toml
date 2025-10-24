@@ -31,11 +31,11 @@ pytest-xdist = "3.6.1"
 [tool.poetry.scripts]
 convert-multi-sample-vcf = "bin.convert_multi_sample_vcf:main"
 count-variants-by-size = "bin.count_variants_by_size:main"
+generate-standardized-bed = "bin.generate_standardized_bed:main"
 jira-table = "bin.jira_table:main"
 manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
 plot-signal-correlation = "bin.plot_signal_correlation:main"
 plot-target-tracts = "bin.plot_target_tracts:main"
-generate-standardized-bed = "bin.generate_standardized_bed:main"
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
 
 [build-system]
