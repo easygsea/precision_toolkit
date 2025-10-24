@@ -61,7 +61,7 @@ If you have deployed clinical_tools using the recommended [deployment and Bamboo
 
 2. Run specific tools inside the container. Example:
    ```bash
-   apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
+   apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-diagnostic-metric-curation -h
    ```
    See the official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for more details on running commands within a container.
 
