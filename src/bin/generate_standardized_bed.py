@@ -271,7 +271,7 @@ def main() -> None:
     parser.add_argument(
         "-o",
         "--output_folder",
-        help="Name of folder to output renamed BED file.",
+        help="Name of folder to output reformatted BED file.",
         required=True,
     )
 
@@ -286,7 +286,7 @@ def main() -> None:
     bed_ext_search = re.search(r"\.bed(\.gz)?$", args.bed_file)
     if bed_ext_search:
         ext = bed_ext_search.group(0)
-        out_filename = bed_file_path.name.replace(ext, "") + ".renamed" + ext
+        out_filename = bed_file_path.name.replace(ext, "") + ".reformatted" + ext
     else:
         logging.error(
             "Improper input BED file detected - extension is neither "

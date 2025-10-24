@@ -25,12 +25,12 @@ def test_rename_exons_lt10(test_data_dir: Path) -> None:
     """Test renaming of BED features where zero-padding is not needed."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "exons_lt10.bed"
-        output_prefix = Path(tmpdir) / "rename_bed_features"
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
         input_gene_list = create_gene_list(Path(tmpdir), ["NRAS"])
 
         subprocess.run(
             [
-                "rename-bed-features",
+                "generate-standardized-bed",
                 "-b",
                 str(input_bed_file),
                 "-g",
@@ -41,12 +41,12 @@ def test_rename_exons_lt10(test_data_dir: Path) -> None:
             check=True,
         )
 
-        output_file = output_prefix / "exons_lt10.renamed.bed"
+        output_file = output_prefix / "exons_lt10.reformatted.bed"
         assert output_file.exists()
 
         # Extract ending digits from each line and check they're single digit
-        with open(output_file) as renamed_bed:
-            for line in renamed_bed:
+        with open(output_file) as reformatted_bed:
+            for line in reformatted_bed:
                 fields = line.strip().split("\t")
                 feature_name = fields[3]
                 feature_name_search = re.search(r"(\d+)$", feature_name)
@@ -66,12 +66,12 @@ def test_rename_exons_lt100(test_data_dir: Path) -> None:
     """Test renaming of BED features where zero-padding to two digits is needed."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "exons_lt100.bed"
-        output_prefix = Path(tmpdir) / "rename_bed_features"
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
         input_gene_list = create_gene_list(Path(tmpdir), ["CSF3R"])
 
         subprocess.run(
             [
-                "rename-bed-features",
+                "generate-standardized-bed",
                 "-b",
                 str(input_bed_file),
                 "-g",
@@ -82,12 +82,12 @@ def test_rename_exons_lt100(test_data_dir: Path) -> None:
             check=True,
         )
 
-        output_file = output_prefix / "exons_lt100.renamed.bed"
+        output_file = output_prefix / "exons_lt100.reformatted.bed"
         assert output_file.exists()
 
         # Extract ending digits from each line and check they're two digits
-        with open(output_file) as renamed_bed:
-            for line in renamed_bed:
+        with open(output_file) as reformatted_bed:
+            for line in reformatted_bed:
                 fields = line.strip().split("\t")
                 feature_name = fields[3]
                 feature_name_search = re.search(r"(\d+)$", feature_name)
@@ -107,12 +107,12 @@ def test_bed_with_missing_targets(test_data_dir: Path) -> None:
     """Test behavior when gene list contains genes not in BED file."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "exons_lt10.bed"
-        output_prefix = Path(tmpdir) / "rename_bed_features"
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
         input_gene_list = create_gene_list(Path(tmpdir), ["NRAS", "ANKRD26"])
 
         result = subprocess.run(
             [
-                "rename-bed-features",
+                "generate-standardized-bed",
                 "-b",
                 str(input_bed_file),
                 "-g",
@@ -125,12 +125,12 @@ def test_bed_with_missing_targets(test_data_dir: Path) -> None:
             check=True,
         )
 
-        output_file = output_prefix / "exons_lt10.renamed.bed"
+        output_file = output_prefix / "exons_lt10.reformatted.bed"
         assert output_file.exists()
 
         # Verify that the output file was created and contains only NRAS features
-        with open(output_file) as renamed_bed:
-            for line in renamed_bed:
+        with open(output_file) as reformatted_bed:
+            for line in reformatted_bed:
                 fields = line.strip().split("\t")
                 feature_name = fields[3]
                 assert feature_name.startswith("NRAS_"), (
@@ -148,12 +148,12 @@ def test_features_missing_refseq_accession(test_data_dir: Path) -> None:
     """Test behavior when RefSeq accession is missing in BED attributes."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "missing_refseq_accession.bed"
-        output_prefix = Path(tmpdir) / "rename_bed_features"
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
         input_gene_list = create_gene_list(Path(tmpdir), ["CSF3R"])
 
         result = subprocess.run(
             [
-                "rename-bed-features",
+                "generate-standardized-bed",
                 "-b",
                 str(input_bed_file),
                 "-g",
@@ -166,7 +166,7 @@ def test_features_missing_refseq_accession(test_data_dir: Path) -> None:
             check=True,
         )
 
-        output_file = output_prefix / "missing_refseq_accession.renamed.bed"
+        output_file = output_prefix / "missing_refseq_accession.reformatted.bed"
         assert output_file.exists()
         assert output_file.stat().st_size == 0
         assert "RefSeq accession not found" in result.stderr
