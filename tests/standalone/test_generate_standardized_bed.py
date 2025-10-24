@@ -170,3 +170,95 @@ def test_features_missing_refseq_accession(test_data_dir: Path) -> None:
         assert output_file.exists()
         assert output_file.stat().st_size == 0
         assert "RefSeq accession not found" in result.stderr
+
+
+def test_output_introns_single_exon(test_data_dir: Path) -> None:
+    """Test that no introns are generated for single-exon genes."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        input_bed_file = test_data_dir / "single_exon.bed"
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
+        input_gene_list = create_gene_list(Path(tmpdir), ["MOCS3"])
+
+        subprocess.run(
+            [
+                "generate-standardized-bed",
+                "-b",
+                str(input_bed_file),
+                "-g",
+                str(input_gene_list),
+                "-o",
+                str(output_prefix),
+                "--output_introns",
+            ],
+            check=True,
+        )
+
+        output_file = output_prefix / "single_exon.reformatted.bed"
+        assert output_file.exists()
+
+        with open(output_file) as reformatted_bed:
+            for line in reformatted_bed:
+                fields = line.strip().split("\t")
+                feature_name = fields[3]
+                assert "INTRON" not in feature_name, (
+                    f"Introns should not be generated for single-exon genes, but "
+                    f"found intron feature: {feature_name}"
+                )
+
+
+def test_output_introns_multiple_exons(test_data_dir: Path) -> None:
+    """Test that introns are correctly generated for multi-exon genes."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        input_bed_file = test_data_dir / "exons_lt10.bed"
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
+        input_gene_list = create_gene_list(Path(tmpdir), ["NRAS"])
+
+        subprocess.run(
+            [
+                "generate-standardized-bed",
+                "-b",
+                str(input_bed_file),
+                "-g",
+                str(input_gene_list),
+                "-o",
+                str(output_prefix),
+                "--output_introns",
+            ],
+            check=True,
+        )
+
+        output_file = output_prefix / "exons_lt10.reformatted.bed"
+        assert output_file.exists()
+
+        introns = {}
+        exons = {}
+        with open(output_file) as reformatted_bed:
+            for line in reformatted_bed:
+                fields = line.strip().split("\t")
+                start = int(fields[1])
+                end = int(fields[2])
+                feature_name = fields[3]
+                feature_name_search = re.search(r"(\d+)$", feature_name)
+                assert feature_name_search, (
+                    f"1 ending digit expected, but none were found in feature name: "
+                    f"{feature_name}"
+                )
+
+                exon_number = feature_name_search.group(1)
+                if "INTRON" in feature_name:
+                    introns[exon_number] = (start, end)
+                elif "EXON" in feature_name:
+                    exons[exon_number] = (start, end)
+
+        # Check that intron count is correct
+        assert len(introns) == len(exons) - 1, (
+            f"Expected {len(exons) - 1} introns for {len(exons)} exons, got "
+            f"{len(introns)}"
+        )
+
+        # For each intron, check it's adjacent to the corresponding exon
+        for i in introns.keys():
+            assert introns[i][1] + 1 == exons[i][0], (
+                f"Intron {i} ends at {introns[i][1]}, but exon {i} starts at "
+                f"{exons[i][0]}"
+            )
