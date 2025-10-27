@@ -247,17 +247,17 @@ def main() -> None:
         "<gene_symbol>_<refseq_accession>_<genomic_feature><exon_number>."
     )
     parser.add_argument(
-        "-b", "--bed_file", help="Path to input BED file.", required=True
+        "-b", "--bed-file", help="Path to input BED file.", required=True
     )
     parser.add_argument(
         "-g",
-        "--gene_list",
+        "--gene-list",
         help="Path to file with target HGNC gene symbols (one symbol per line).",
         required=True,
     )
     parser.add_argument(
         "-A",
-        "--attribute_key",
+        "--attribute-key",
         help=(
             "Provided attribute is parsed to extract the RefSeq accession, "
             "which is used in the name field (fourth column)."
@@ -265,13 +265,13 @@ def main() -> None:
         default="db_xref",
     )
     parser.add_argument(
-        "--output_introns",
+        "--output-introns",
         help=("Calculate introns and output to reformatted BED file."),
         action="store_true",
     )
     parser.add_argument(
         "-o",
-        "--output_folder",
+        "--output-folder",
         help="Name of folder to output reformatted BED file.",
         required=True,
     )

@@ -229,7 +229,7 @@ def test_output_introns_single_exon(test_data_dir: Path) -> None:
                 str(input_gene_list),
                 "-o",
                 str(output_prefix),
-                "--output_introns",
+                "--output-introns",
             ],
             check=True,
         )
@@ -263,7 +263,7 @@ def test_output_introns_multiple_exons(test_data_dir: Path) -> None:
                 str(input_gene_list),
                 "-o",
                 str(output_prefix),
-                "--output_introns",
+                "--output-introns",
             ],
             check=True,
         )
