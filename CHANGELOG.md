@@ -2,13 +2,17 @@
 
 ## Version History
 
+### v1.1.1 - 2025-10-15
+- Bugfix: fixed container link in local deployment's `nextflow.config`
+
 ---
+
 ### v1.1.0 - 2025-10-15 [Released 2025-10-15]
 - New Workflow: Added new target evaluation workflow for analyzing per-base stats across target regions.
 - New Standalone Utility: Added new utility to convert structured data files into a formatted JIRA table.
 - Feature: Added GitHub Actions to automatically sync changes from Bitbucket.
 - Improvement: Refactored Bamboo plan to build images via Docker build.
-- Improvement: Specify container version in nextflow.config.
+- Improvement: Specify container version in `nextflow.config`.
 - Improvement: Removed redundant version tracking.
 - Bugfix: Cleanup in DockerFile.
 - Bugfix: Removed unused fixture in `tests/unit/test_diagnostic_metrics.py`.
