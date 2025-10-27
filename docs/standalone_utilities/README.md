@@ -60,7 +60,7 @@ This will be converted into a 4-column BED file consisting of:
 3. chromEnd: end position
 4. featureName: feature name with the format `<gene_symbol>_<refseq_accession>_<feature><exon_number>`
 
-`exon_number`, if present in the attributes, is dynamically zero-padded based on the total number of genomic features present for the gene/transcript:
+`exon_number`, if present in the attributes, is optionally dynamically zero-padded (when `--zero-pad-names` is specified) based on the total number of genomic features present for the gene/transcript:
 
 - For genes/transcripts with <10 features: no leading zeros
 - For 10-99 features: one leading zero (e.g. `<feature>01`)

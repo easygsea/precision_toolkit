@@ -3,8 +3,8 @@
 Reformat BED6+4 to 4-column BED file with standardized feature names.
 
 Updated names should follow the format
-<gene_symbol>_<refseq_accession>_<feature><exon_number>, where exon_number (if present)
-is zero-padded dynamically:
+<gene_symbol>_<refseq_accession>_<feature><exon_number>, where exon_number
+(if present) is optionally zero-padded dynamically:
 
 For genes with <10 features: no leading zeros.
 For 10-99 features: one leading zero (e.g. <feature>01).
@@ -13,7 +13,7 @@ Etc.
 
 Usage:
     generate-standardized-bed --bed_file <bed> --gene_list <target_gene_file>
-    --output_folder <output_folder> [--output_introns]
+    --output_folder <output_folder> [--output_introns] [--zero-pad-names]
 """
 
 import argparse
@@ -194,6 +194,7 @@ def construct_feature_name(
     refseq_acc: str,
     exon_num: str,
     refseq_accession_to_transcript_obj: dict[str, Transcript],
+    zero_pad_names: bool,
 ) -> str:
     """
     Construct updated feature name.
@@ -210,6 +211,8 @@ def construct_feature_name(
         exon_num: Exon number extracted from BED attributes.
         refseq_accession_to_transcript_obj: Dictionary mapping RefSeq accessions to
             corresponding Transcript objects.
+        zero_pad_names: If True, zero-pad numbers in feature names (e.g., exon_001
+            instead of exon_1).
 
     Returns:
         Updated feature name.
@@ -217,16 +220,20 @@ def construct_feature_name(
     # Extract exon number, if applicable, and construct feature name
     # If no exon number, don't append to feature name
     if exon_num:
-        num_digits = len(
-            str(
-                refseq_accession_to_transcript_obj[refseq_acc].feature_counts[
-                    genomic_feature
-                ]
+        if zero_pad_names:
+            num_digits = len(
+                str(
+                    refseq_accession_to_transcript_obj[refseq_acc].feature_counts[
+                        genomic_feature
+                    ]
+                )
             )
-        )
-        exon_num_padded = (
-            exon_num.zfill(num_digits) if len(exon_num) < num_digits else exon_num
-        )
+            exon_num_padded = (
+                exon_num.zfill(num_digits) if len(exon_num) < num_digits else exon_num
+            )
+        else:
+            # No padding required
+            exon_num_padded = exon_num
         feature_id = genomic_feature.upper() + exon_num_padded
     else:
         feature_id = genomic_feature.upper()
@@ -266,7 +273,12 @@ def main() -> None:
     )
     parser.add_argument(
         "--output-introns",
-        help=("Calculate introns and output to reformatted BED file."),
+        help="Calculate introns and output to reformatted BED file.",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--zero-pad-names",
+        help="Dynamically add zeros to exon_number in feature names.",
         action="store_true",
     )
     parser.add_argument(
@@ -339,6 +351,7 @@ def main() -> None:
                 refseq_acc,
                 exon_num,
                 refseq_accession_to_transcript_obj,
+                args.zero_pad_names,
             )
             out_bed.write(f"{chr}\t{start}\t{end}\t{updated_feature_name}\n")
 
@@ -365,6 +378,7 @@ def main() -> None:
                             refseq_acc,
                             intron.number_attribute,
                             refseq_accession_to_transcript_obj,
+                            args.zero_pad_names,
                         )
                         out_bed.write(
                             f"{chr}\t{intron.range[0]}\t{intron.range[1]}\t"

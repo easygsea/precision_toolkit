@@ -21,49 +21,8 @@ def create_gene_list(tmp_path: Path, genes: list[str]) -> Path:
     return gene_file
 
 
-def test_rename_exons_lt10(test_data_dir: Path) -> None:
-    """Test renaming of BED features where zero-padding is not needed."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        input_bed_file = test_data_dir / "exons_lt10.bed"
-        output_prefix = Path(tmpdir) / "generate_standardized_bed"
-        input_gene_list = create_gene_list(Path(tmpdir), ["NRAS"])
-
-        subprocess.run(
-            [
-                "generate-standardized-bed",
-                "-b",
-                str(input_bed_file),
-                "-g",
-                str(input_gene_list),
-                "-o",
-                str(output_prefix),
-            ],
-            check=True,
-        )
-
-        output_file = output_prefix / "exons_lt10.reformatted.bed"
-        assert output_file.exists()
-
-        # Extract ending digits from each line and check they're single digit
-        with open(output_file) as reformatted_bed:
-            for line in reformatted_bed:
-                fields = line.strip().split("\t")
-                feature_name = fields[3]
-                feature_name_search = re.search(r"(\d+)$", feature_name)
-                assert feature_name_search, (
-                    f"1 ending digit expected, but none were found in feature name: "
-                    f"{feature_name}"
-                )
-
-                exon_number = feature_name_search.group(1)
-                assert len(exon_number) == 1, (
-                    f"Exon number '{exon_number}' in '{feature_name}' should be 1 "
-                    f"digit for < 10 features."
-                )
-
-
-def test_rename_exons_lt100(test_data_dir: Path) -> None:
-    """Test renaming of BED features where zero-padding to two digits is needed."""
+def test_exons_lt100(test_data_dir: Path) -> None:
+    """Test reformatting of BED where zero-padding of names is not enabled."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "exons_lt100.bed"
         output_prefix = Path(tmpdir) / "generate_standardized_bed"
@@ -92,6 +51,91 @@ def test_rename_exons_lt100(test_data_dir: Path) -> None:
                 feature_name = fields[3]
                 feature_name_search = re.search(r"(\d+)$", feature_name)
                 assert feature_name_search, (
+                    f"Exon number expected, but none were found in feature name: "
+                    f"{feature_name}"
+                )
+
+                exon_number = feature_name_search.group(1)
+                expected_num_digits = len(str(int(exon_number)))
+                assert len(exon_number) == expected_num_digits, (
+                    f"Exon number '{exon_number}' in '{feature_name}' should "
+                    f"not be zero-padded."
+                )
+
+
+def test_zeropad_name_exons_lt10(test_data_dir: Path) -> None:
+    """Test renaming of BED features where zero-padding is not needed."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        input_bed_file = test_data_dir / "exons_lt10.bed"
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
+        input_gene_list = create_gene_list(Path(tmpdir), ["NRAS"])
+
+        subprocess.run(
+            [
+                "generate-standardized-bed",
+                "-b",
+                str(input_bed_file),
+                "-g",
+                str(input_gene_list),
+                "-o",
+                str(output_prefix),
+                "--zero-pad-names",
+            ],
+            check=True,
+        )
+
+        output_file = output_prefix / "exons_lt10.reformatted.bed"
+        assert output_file.exists()
+
+        # Extract ending digits from each line and check they're single digit
+        with open(output_file) as reformatted_bed:
+            for line in reformatted_bed:
+                fields = line.strip().split("\t")
+                feature_name = fields[3]
+                feature_name_search = re.search(r"(\d+)$", feature_name)
+                assert feature_name_search, (
+                    f"1 ending digit expected, but none were found in feature name: "
+                    f"{feature_name}"
+                )
+
+                exon_number = feature_name_search.group(1)
+                assert len(exon_number) == 1, (
+                    f"Exon number '{exon_number}' in '{feature_name}' should be 1 "
+                    f"digit for < 10 features."
+                )
+
+
+def test_zeropad_name_exons_lt100(test_data_dir: Path) -> None:
+    """Test renaming of BED features where zero-padding to two digits is needed."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        input_bed_file = test_data_dir / "exons_lt100.bed"
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
+        input_gene_list = create_gene_list(Path(tmpdir), ["CSF3R"])
+
+        subprocess.run(
+            [
+                "generate-standardized-bed",
+                "-b",
+                str(input_bed_file),
+                "-g",
+                str(input_gene_list),
+                "-o",
+                str(output_prefix),
+                "--zero-pad-names",
+            ],
+            check=True,
+        )
+
+        output_file = output_prefix / "exons_lt100.reformatted.bed"
+        assert output_file.exists()
+
+        # Extract ending digits from each line and check they're two digits
+        with open(output_file) as reformatted_bed:
+            for line in reformatted_bed:
+                fields = line.strip().split("\t")
+                feature_name = fields[3]
+                feature_name_search = re.search(r"(\d+)$", feature_name)
+                assert feature_name_search, (
                     f"2 ending digits expected, but none were found in feature name: "
                     f"{feature_name}"
                 )
@@ -103,7 +147,7 @@ def test_rename_exons_lt100(test_data_dir: Path) -> None:
                 )
 
 
-def test_rename_exons_lt1000(test_data_dir: Path) -> None:
+def test_zeropad_name_exons_lt1000(test_data_dir: Path) -> None:
     """Test renaming of BED features where zero-padding to three digits is needed."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "exons_lt1000.bed"
@@ -119,6 +163,7 @@ def test_rename_exons_lt1000(test_data_dir: Path) -> None:
                 str(input_gene_list),
                 "-o",
                 str(output_prefix),
+                "--zero-pad-names",
             ],
             check=True,
         )
