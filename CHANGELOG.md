@@ -2,6 +2,9 @@
 
 ## Version History
 
+### v1.1.1 - 2025-10-28
+- New Standalone Utility: Added new utility to reformat BED files in BED6+4 format into a 4-column BED file and standardizes feature names
+
 ---
 ### v1.1.0 - 2025-10-15 [Released 2025-10-15]
 - New Workflow: Added new target evaluation workflow for analyzing per-base stats across target regions.
