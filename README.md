@@ -132,22 +132,22 @@ The pipeline's architecture supports execution across various computing environm
 The manual is detailed in the [docs](./docs/README.md) directory, including:
 
 - [Workflows](./docs/README.md#workflows)
-  - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
   - [Signal Correlation](./docs/workflows/signal_correlation.md)
   - [Target Evaluation](./docs/workflows/target_evaluation.md)
+  - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
 - [Standalone Utilities](./docs/README.md#standalone-utilities)
-  - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
-    - `manual-diagnostic-metric-curation`
   - [Convert Multi-Sample VCF File into Single-Sample VCF files](./docs/standalone_utilities/README.md#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
     - `convert-multi-sample-vcf`
   - [Count Variants By Size](./docs/standalone_utilities/README.md#count-variants-by-size)
     - `count-variants-by-size`
-  - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
-    - `liftover_sv_vcf.sh`
-  - [Jira Table Converter ](./docs/standalone_utilities/README.md#jira-table-converter)
-    - `jira-table`
   - [Generate Standardized BED](./docs/standalone_utilities/README.md#generate-standardized-bed)
     - `generate-standardized-bed`
+  - [Jira Table Converter ](./docs/standalone_utilities/README.md#jira-table-converter)
+    - `jira-table`
+  - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
+    - `manual-diagnostic-metric-curation`
+  - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
+    - `liftover_sv_vcf.sh`
 
 ## Resource Optimization and High-Performance Computing
 
