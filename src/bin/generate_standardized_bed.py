@@ -12,8 +12,8 @@ For 100-999 features: two leading zeros (e.g. <feature>001).
 Etc.
 
 Usage:
-    generate-standardized-bed --bed_file <bed> --gene_list <target_gene_file>
-    --output_folder <output_folder> [--output_introns] [--zero-pad-names]
+    generate-standardized-bed --bed-file <bed> --gene-list <target_gene_file>
+    --output-folder <output_folder> [--output-introns] [--zero-pad-names]
 """
 
 import argparse
