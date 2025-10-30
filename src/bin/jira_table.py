@@ -74,6 +74,11 @@ Examples:
         "--summary",
         help="Optional summary/introduction for the JIRA table",
     )
+    parser.add_argument(
+        "--scientific-format",
+        action="store_true",
+        help="Enables scientific notation for numeric values",
+    )
 
     args = parser.parse_args()
 
@@ -100,6 +105,7 @@ Examples:
         df,
         heading=args.heading if args.heading else None,
         summary=args.summary if args.summary else None,
+        scientific_format=args.scientific_format,
     )
 
     # Output
