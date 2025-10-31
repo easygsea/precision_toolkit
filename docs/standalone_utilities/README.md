@@ -71,7 +71,7 @@ For features without `exon_number`, the feature name will simply be `<gene_symbo
 
 Usage:
 ```bash
-generate-standardized-bed --bed_file <BED> --gene_list <TARGET GENES FILE> --output_folder <OUTPUT DIRECTORY>
+generate-standardized-bed --bed-file <BED> --gene-list <TARGET GENES FILE> --output-folder <OUTPUT DIRECTORY>
 ```
 
 ### Interpretation of `exon_number`
