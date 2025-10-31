@@ -75,9 +75,9 @@ Examples:
         help="Optional summary/introduction for the JIRA table",
     )
     parser.add_argument(
-        "--scientific-format",
-        action="store_true",
-        help="Enables scientific notation for numeric values",
+        "--float-format",
+        type=int,
+        help="Customize the output format for float values",
     )
 
     args = parser.parse_args()
@@ -87,7 +87,11 @@ Examples:
         raise IOError("No input file or stdin provided.")
 
     # Read data
-    df = read_dataframe(args.input_file, args.format, args.delimiter)
+    if args.float_format is None:
+        convert_to_string = True
+    else:
+        convert_to_string = False
+    df = read_dataframe(args.input_file, convert_to_string, args.format, args.delimiter)
 
     # Exit if unable to read file
     if df is None:
@@ -105,7 +109,7 @@ Examples:
         df,
         heading=args.heading if args.heading else None,
         summary=args.summary if args.summary else None,
-        scientific_format=args.scientific_format,
+        float_format=args.float_format,
     )
 
     # Output
