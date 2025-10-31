@@ -2,6 +2,11 @@
 
 ## Version History
 
+### v1.1.1 - 2025-10-28
+- Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in nextflow.config.
+- Improvement: Set time limit for local execution in nextflow.config.
+- Bugfix: Fix circular dependency in resource allocation.
+
 ---
 ### v1.1.0 - 2025-10-15 [Released 2025-10-15]
 - New Workflow: Added new target evaluation workflow for analyzing per-base stats across target regions.
