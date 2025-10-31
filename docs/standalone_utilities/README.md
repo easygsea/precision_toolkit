@@ -74,6 +74,8 @@ Usage:
 generate-standardized-bed --bed-file <BED> --gene-list <TARGET GENES FILE> --output-folder <OUTPUT DIRECTORY>
 ```
 
+For detailed documentation of how to use this tool to generate target BED files, see [BED Standardization Tool](generate_standardized_bed.md).
+
 ### Interpretation of `exon_number`
 
 According to [Gencode's GTF format documentation](https://www.gencodegenes.org/pages/data_format.html), `exon_number` is a key found in the attributes field of all features except genes and transcripts. This integer value indicates the exon position in the transcript from its 5' end. Thus, in the example below, `*_START_CODON2` indicates that the start codon for this transcript is in exon 2 and `_STOP_CODON3` indicates that the stop codon is in exon 3.
