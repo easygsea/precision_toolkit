@@ -24,7 +24,7 @@ Run the following command to input a mix of CRAM and BAM alignment files. Symlin
 ```bash
 nextflow run main.nf \
 --workflows target_evaluation \
---aligned_files <path/to/alignment_files_dir/*.{cram,bam}> \
+--aligned_files '<path/to/alignment_files_dir/*.{cram,bam}>' \
 --genome_ref <path/to/genome_ref> \
 --targets_bed <path/to/targets_bed> \
 --output_dir <path/to/output_dir> \
@@ -35,7 +35,7 @@ Custom pass/fail scoring by setting three threshold parameters: coverage, BASEQ,
 ```bash
 nextflow run main.nf \
 --workflows target_evaluation \
---aligned_files <path/to/alignment_files_dir/*.bam> \
+--aligned_files '<path/to/alignment_files_dir/*.bam>' \
 --targets_bed <path/to/targets_bed> \
 --output_dir <path/to/output_dir> \
 --coverage_threshold <min_coverage> \
