@@ -10,6 +10,7 @@ By default, all metrics, and their confidence intervals (CIs) wherever applicabl
 Small variant benchmark:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine happy \
@@ -19,6 +20,7 @@ nextflow run main.nf \
 Large variant benchmark:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine wittyer
@@ -27,6 +29,7 @@ nextflow run main.nf \
 Small variant benchmark excluding spurious variants:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine happy \
@@ -37,6 +40,7 @@ nextflow run main.nf \
 Large variant benchmark excluding spurious variants:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine wittyer \
@@ -46,6 +50,7 @@ nextflow run main.nf \
 Custom small variant benchmark:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine happy \
@@ -57,6 +62,7 @@ nextflow run main.nf \
 Custom large variant benchmark:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine wittyer \
@@ -80,6 +86,7 @@ nextflow run main.nf \
 ### Variant Benchmark Parameters
 
 **Required Parameters:**
+- `--workflows variant_benchmark`: Required parameter to run target evaluation workflow
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
 - `--query_dir`: The directory containing query VCF files (the test or experimental dataset). These must be named as <sample>.query.vcf or <sample>.query.vcf.gz.
 - `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, or `wittyer`, default: `happy`).
