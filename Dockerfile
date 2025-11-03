@@ -1,4 +1,5 @@
 # Environment variables
+ARG BEDOPS_VERSION=2.4.41
 ARG BEDTOOLS_VERSION=2.31.0
 ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
@@ -39,6 +40,7 @@ RUN pip install --upgrade pip --no-cache-dir && \
 
 # Stage 3: Runtime
 FROM mgibio/hap.py:v${HAPPY_VERSION}
+ARG BEDOPS_VERSION
 ARG BEDTOOLS_VERSION
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
@@ -104,6 +106,14 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     wget --quiet "https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static" && \
     chmod a+x bedtools.static && \
     mv bedtools.static /opt/hap.py/bin/bedtools && \
+    # Build bedops
+    wget --quiet "https://github.com/bedops/bedops/releases/download/v${BEDOPS_VERSION}/bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2" && \
+    mkdir "bedops_linux_x86_64-v${BEDOPS_VERSION}" && \
+    tar -jxf "bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2" -C "bedops_linux_x86_64-v${BEDOPS_VERSION}" && \
+    # hadolint ignore=SC2086
+    cp bedops_linux_x86_64-v${BEDOPS_VERSION}/bin/* /opt/hap.py/bin/ && \
+    # hadolint ignore=SC2086
+    rm -rf bedops_linux_x86_64-v${BEDOPS_VERSION}* && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" && \
     tar -xzf "Python-${PYTHON_VERSION}.tgz" && \
