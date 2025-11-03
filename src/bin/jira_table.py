@@ -77,7 +77,7 @@ Examples:
     parser.add_argument(
         "--float-format",
         type=int,
-        help="Customize the output format for float values",
+        help="Format of floats: 0 = scientific, ≥1 = decimal (decimal places)",
     )
 
     args = parser.parse_args()
