@@ -1,6 +1,7 @@
 """Input/Output utilities for reading data from various file formats."""
 
 import csv
+import json
 import logging
 import sys
 from io import BytesIO, StringIO
@@ -114,9 +115,17 @@ def read_dataframe(
                     **kwargs,  # type: ignore[call-overload]
                 )
         elif format_type == "json":
-            df = pd.read_json(input_file)
             if convert_to_string:
+                if hasattr(input_file, "read"):
+                    text = input_file.read()
+                else:
+                    with open(input_file, "r", encoding="utf-8") as f:
+                        text = f.read()
+                raw_data = json.loads(text, parse_float=str, parse_int=str)
+                df = pd.json_normalize(raw_data)
                 df = df.astype(str)
+            else:
+                df = pd.read_json(input_file)
             return df
         else:
             return pd.read_csv(
