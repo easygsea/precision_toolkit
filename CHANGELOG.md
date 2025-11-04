@@ -3,6 +3,7 @@
 ## Version History
 
 ### v1.1.1 - 2025-10-28
+- Feature: Target evaluation workflow now has normalization option.
 - Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in nextflow.config.
 - Improvement: Set time limit for local execution in nextflow.config.
 - Bugfix: Fix circular dependency in resource allocation.

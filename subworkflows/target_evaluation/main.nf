@@ -1,4 +1,5 @@
 include {
+    NORMALIZE_TO_TARGET
     ADD_TARGET_LABELS
     GET_PER_TARGET_AGGREGATED_STATS
     GENERATE_PER_BASE_SUMMARY
@@ -27,7 +28,15 @@ def scoring_thresholds = tuple (
 // Main variant gene target evaluation workflow
 workflow gene_target_evaluation_workflow {
     main:
-    // 0. Setup
+
+
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Handle workflow input & file formats
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+    // make sure bed is sorted
     targets_bed = SORT_BED(file(params.targets_bed)).sorted_bed
 
     // build input channel & branch based on filetype
@@ -67,21 +76,38 @@ workflow gene_target_evaluation_workflow {
             )
     }
 
+    /*
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Process BAM files to extract metrics
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
     INDEX_BAM_FILES(bam_ch)
 
-    // 1. Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
+    // Stage 1: Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
     GET_PER_BASE_STATS(
         targets_bed,
         bam_ch,
         params.min_bq_per_read,
         params.min_mq_per_read
     )
-    ADD_TARGET_LABELS(
+   ADD_TARGET_LABELS(
         targets_bed,
         GET_PER_BASE_STATS.out.parsed_pileup
     )
 
-    // 1.1 Aside to output raw mpileup if needed
+    // normalize if target coverage provided
+    if (!params.normalize_to_target_coverage) {
+        sample_stage_output = ADD_TARGET_LABELS.out.labelled_pileup
+    } else {
+        NORMALIZE_TO_TARGET(
+            targets_bed,
+            ADD_TARGET_LABELS.out.labelled_pileup,
+            params.normalize_to_target_coverage,
+        )
+        sample_stage_output = NORMALIZE_TO_TARGET.out.normalized_pileup
+    }
+
+    // aside: output raw mpileup if needed
     if (params.output_raw_mpileup) {
         GET_PER_BASE_STATS_NO_PARSE(
             targets_bed,
@@ -89,21 +115,20 @@ workflow gene_target_evaluation_workflow {
         )
     }
 
-    // 2. Aggregate per target (Q1 of per-base stats)
+    // Stage 2:  Aggregate per target (Q1 of per-base stats)
     GET_PER_TARGET_AGGREGATED_STATS(
         targets_bed,
-        ADD_TARGET_LABELS.out.labelled_pileup
+        sample_stage_output
     )
 
-    // 3. Aggregate per base across libraries (Median of per-base stats)
+    // Stage 3: Aggregate per base across libraries (Median of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
-        ADD_TARGET_LABELS.out.labelled_pileup
-            .collectFile(name: "combined_labelled_pileups.txt"){it[1]}
+        sample_stage_output.collectFile(name: "combined_labelled_pileups.txt"){it[1]}
     )
 
-    // 4. Score files on thresholds
+    // Stage 4: Score files on thresholds
     SCORE_BASES_PER_LIBRARY (
-        ADD_TARGET_LABELS.out.labelled_pileup,
+        sample_stage_output,
         scoring_thresholds
     )
     SCORE_TARGETS_PER_LIBRARY (
@@ -115,7 +140,7 @@ workflow gene_target_evaluation_workflow {
         scoring_thresholds
     )
 
-    // 5. Generate visualization per target
+    // Stage 5: Generate visualization per target
     if (params.visualize) {
         GENERATE_VISUALIZATION (
             GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[1]},
@@ -124,7 +149,4 @@ workflow gene_target_evaluation_workflow {
             scoring_thresholds
         )
     }
-
-//     TODO: normalize_to_mean_coverage = null // If set, coverage will be normalized to match the provided mean
-
 }

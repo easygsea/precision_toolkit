@@ -1,3 +1,41 @@
+process NORMALIZE_TO_TARGET {
+    tag "${sample_name}"
+
+    input:
+    path(targets_bed)
+    tuple val(sample_name), path(parsed_pileup), val(pool_id)
+    val(target_coverage)
+
+    output:
+    tuple val(sample_name), path(OUT), val(pool_id), emit: normalized_pileup
+
+    script:
+    OUT="${parsed_pileup.baseName}.normalized.txt"
+    """
+    echo "Starting calculation for ${parsed_pileup}" #info
+    norm_factor=\$(awk -v tc=${target_coverage} '
+    BEGIN {
+        OFS="\\t"
+    } NR > 1 {
+        total += \$5
+    } END {
+        print tc / total * (NR-1)
+    }' ${parsed_pileup} )
+    echo "TARGET COVERAGE = ${target_coverage}" #info
+    echo "NORM_FACTOR=\${norm_factor}" #info
+    awk -v norm_factor=\${norm_factor} '
+    BEGIN{
+        OFS="\\t"
+    } NR == 1 {
+        print;
+        next;
+    } {
+        \$5 = int(\$5 * norm_factor + 0.5);
+        print;
+    }' ${parsed_pileup} > ${OUT}
+    """
+}
+
 process ADD_TARGET_LABELS {
     tag "${sample_name}"
 
