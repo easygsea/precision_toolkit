@@ -2,8 +2,11 @@
 
 ## Version History
 
-### v1.1.1 - 2025-10-15
-- Bugfix: fixed container link in local deployment's `nextflow.config`
+### v1.1.1 - 2025-10-28
+- Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in nextflow.config.
+- Improvement: Set time limit for local execution in nextflow.config.
+- Bugfix: Fixed circular dependency in resource allocation.
+- Bugfix: Fixed container link in local deployment's `nextflow.config`
 
 ---
 
