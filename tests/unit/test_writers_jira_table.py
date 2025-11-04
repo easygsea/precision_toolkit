@@ -1,5 +1,7 @@
 """Tests for JIRA table writer."""
 
+import re
+
 import pandas as pd
 import pytest
 
@@ -52,6 +54,25 @@ def test_empty_pandas_to_jira_table() -> None:
     result = pandas_to_jira_table(df, float_format=None)
     expected = "||No data available||"
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    "float_format, expected_pattern",
+    [
+        (None, r"12345\.678947"),  # raw formatting
+        (0, r"1\.234568e\+04"),  # scientific notation
+        (2, r"12345\.68"),  # float with 2 decimals
+        (4, r"12345\.6789"),  # float with 4 decimals
+    ],
+    ids=["default", "scientific", "2_decimal", "4_decimal"],
+)
+def test_pandas_to_jira_table_float_format(
+    float_format: int | None, expected_pattern: str
+) -> None:
+    """Test pandas_to_jira_table function with various float_format settings."""
+    df = pd.DataFrame({"Value": [12345.678947, 0.0001234]})
+    result = pandas_to_jira_table(df, float_format=float_format)
+    assert re.search(expected_pattern, result) is not None
 
 
 @pytest.fixture

@@ -92,6 +92,8 @@ def test_jira_table_args(sample_files: dict[str, Path]) -> None:
             "My Table",
             "--summary",
             "This is a summary",
+            "--float-format",
+            "2",
         ],
         check=True,
         capture_output=True,
@@ -100,7 +102,7 @@ def test_jira_table_args(sample_files: dict[str, Path]) -> None:
     assert (
         result.stdout.strip()
         == populate_jira_table(
-            sample_files["df"], "My Table", "This is a summary", float_format=None
+            sample_files["df"], "My Table", "This is a summary", 2
         ).strip()
     )
 
