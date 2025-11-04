@@ -64,6 +64,7 @@ def read_dataframe(
     Args:
         input_file: Path to input file, or TextIO to read from stdin
         format_type: File format ('csv', 'tsv', 'excel', 'json') or None to auto-detect
+        convert_to_string: Whether to read all data as strings
         delimiter: Custom delimiter character, or None for auto-detection
 
     Returns:

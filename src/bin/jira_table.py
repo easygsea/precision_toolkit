@@ -15,6 +15,8 @@ Usage:
         # Specify custom delimiter
     jira-table --heading "My Table" --summary "This is a summary" data.csv
         # Add heading and summary
+    jira-table --float-format 0 file.csv
+        # Specify custom float format
 """
 
 import argparse
@@ -45,6 +47,8 @@ Examples:
     # Use custom delimiter
   jira-table --heading "My Table" --summary "This is a summary" data.csv
     # Add heading and summary
+  jira-table --float-format 0 file.csv
+    # Specify custom float format
         """,
     )
     parser.add_argument(
@@ -77,7 +81,7 @@ Examples:
     parser.add_argument(
         "--float-format",
         type=int,
-        help="Format of floats: 0 = scientific, ≥1 = decimal (decimal places)",
+        help="Format floats: 0 = scientific, ≥1 = decimal (decimal places)",
     )
 
     args = parser.parse_args()

@@ -10,12 +10,13 @@ logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def pandas_to_jira_table(df: pd.DataFrame, float_format: bool) -> str:
+def pandas_to_jira_table(df: pd.DataFrame, float_format: int | None) -> str:
     """
     Convert DataFrame to JIRA table format using tabulate.
 
     Args:
         df: DataFrame to convert
+        float_format: Optional float format type
 
     Returns:
         JIRA table formatted string
@@ -33,7 +34,7 @@ def pandas_to_jira_table(df: pd.DataFrame, float_format: bool) -> str:
                 )
                 df.at[index, col] = str(df.at[index, col]).replace("|", "\\|")
 
-    kwargs = {}
+    kwargs: dict[str, bool | str] = {}
     if float_format is None:
         kwargs["disable_numparse"] = True
     elif float_format == 0:
@@ -42,6 +43,8 @@ def pandas_to_jira_table(df: pd.DataFrame, float_format: bool) -> str:
     elif float_format >= 1:
         # return as a float with n places
         kwargs["floatfmt"] = f".{float_format}f"
+    else:
+        raise ValueError("float_format must be None, 0, or a positive integer")
 
     jira_table = tabulate(
         df.to_dict(orient="list"),
@@ -58,7 +61,7 @@ def populate_jira_table(
     df: pd.DataFrame,
     heading: str | None,
     summary: str | None,
-    float_format: bool,
+    float_format: int | None,
 ) -> str:
     """
     Generate a complete JIRA table document from DataFrame.
@@ -67,7 +70,7 @@ def populate_jira_table(
         df: DataFrame to convert
         heading: Optional heading to add (h1 format)
         summary: Optional summary before table
-
+        float_format: Optional float format type
     Returns:
         Generated JIRA content
     """
