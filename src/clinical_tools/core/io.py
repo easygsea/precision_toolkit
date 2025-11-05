@@ -91,15 +91,12 @@ def read_dataframe(
                 input_file = StringIO(buffer)
 
         # Read file based on format
-        if convert_to_string:
-            kwargs = {"dtype": str}
-        else:
-            kwargs = {}
+        read_arg = {"dtype": str} if convert_to_string else {}
         if format_type == "tsv":
             return pd.read_csv(
                 input_file,
                 sep=delimiter,
-                **kwargs,  # type: ignore[call-overload]
+                **read_arg,  # type: ignore[call-overload]
             )
         elif format_type == "excel":
             if hasattr(input_file, "buffer"):
@@ -107,13 +104,13 @@ def read_dataframe(
                 return pd.read_excel(
                     BytesIO(data),
                     engine="openpyxl",
-                    **kwargs,  # type: ignore[call-overload]
+                    **read_arg,  # type: ignore[call-overload]
                 )
             else:
                 return pd.read_excel(
                     input_file,
                     engine="openpyxl",
-                    **kwargs,  # type: ignore[call-overload]
+                    **read_arg,  # type: ignore[call-overload]
                 )
         elif format_type == "json":
             if convert_to_string:
@@ -132,7 +129,7 @@ def read_dataframe(
             return pd.read_csv(
                 input_file,
                 sep=delimiter,
-                **kwargs,  # type: ignore[call-overload]
+                **read_arg,  # type: ignore[call-overload]
             )
 
     except Exception as e:

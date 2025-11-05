@@ -81,7 +81,7 @@ Examples:
     parser.add_argument(
         "--float-format",
         type=int,
-        help="Format floats: 0 = scientific, ≥1 = decimal (decimal places)",
+        help="Optional float formatting: 0 = scientific, ≥1 = decimal (decimal places)",
     )
 
     args = parser.parse_args()
@@ -91,10 +91,7 @@ Examples:
         raise IOError("No input file or stdin provided.")
 
     # Read data
-    if args.float_format is None:
-        convert_to_string = True
-    else:
-        convert_to_string = False
+    convert_to_string = args.float_format is None
     df = read_dataframe(args.input_file, convert_to_string, args.format, args.delimiter)
 
     # Exit if unable to read file

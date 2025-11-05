@@ -3,9 +3,9 @@
 ## Version History
 
 ### v1.1.1 - 2025-10-28
+- Improvement: Added an argument in jira-table to control how floats appear (scientific or fixed decimal).
 - Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in nextflow.config.
 - Improvement: Set time limit for local execution in nextflow.config.
-- Improvement: Added an argument in jira-table to control how floats appear (scientific or fixed decimal).
 - Bugfix: Fixed circular dependency in resource allocation.
 - Bugfix: Fixed container link in local deployment's `nextflow.config`
 
