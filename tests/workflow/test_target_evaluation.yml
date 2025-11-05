@@ -172,3 +172,25 @@
       md5sum: e644978ac0b825f67fd9cb44aad7e5cb
     - path: target_evaluation_test_metric_parameters/target_eval_results/summary_per_base_median.scored.txt
       md5sum: 03f3ba747d3721f99dc27caba3921dc6
+
+- name: target_evaluation_test_normalization
+  command: >
+    nextflow run main.nf
+     --workflows target_evaluation
+     --aligned_files 'tests_data/target_evaluation/*'
+     --genome_ref tests_data/target_evaluation/chr5_region.fa
+     --targets_bed tests_data/target_evaluation/test_targets.bed
+     --output_dir target_evaluation_test_normalization
+     --visualize
+     --normalize_to_target_coverage 10
+  files:
+    - path: target_evaluation_test_normalization/target_eval_results/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.normalized.scored.txt
+      md5sum: dea7185427f4990798b4d7cfbd6baf9d
+    - path: target_evaluation_test_normalization/target_eval_results/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.normalized.target_aggregated.scored.txt
+      md5sum: bc2d44f9ad448a23d8e072b419dd6a0d
+    - path: target_evaluation_test_normalization/target_eval_results/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.normalized.scored.txt
+      md5sum: 913f912e9a9b1ae474c278666e102491
+    - path: target_evaluation_test_normalization/target_eval_results/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.normalized.target_aggregated.scored.txt
+      md5sum: a345b8973200898849e3941183a90ec8
+    - path: target_evaluation_test_normalization/target_eval_results/summary_per_base_median.scored.txt
+      md5sum: 878ba38a4fce74285622477d786ab7f1
