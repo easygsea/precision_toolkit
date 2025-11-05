@@ -66,7 +66,7 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
 
 2. Run specific tools inside the container. Example:
    ```bash
-   apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
+   apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-diagnostic-metric-curation -h
    ```
    See the official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for more details on running commands within a container.
 
@@ -164,6 +164,8 @@ Its workflows implement several resource optimization strategies:
      - Second attempt: 4 CPUs, 8GB memory
      - Third attempt: 6 CPUs, 16GB memory
      - Subsequent attempts: Up to 8 CPUs, 32GB memory
+   - Note that the retry pathway only applies to cluster execution
+   - For local execution, a maximum time limit of 24 hours is set per task with no retry options
 
 2. **Containerization**:
    - All dependencies are containerized using Docker/Singularity
@@ -181,8 +183,7 @@ It supports seamless integration with HPC environments:
    - Customizable parameters:
      ```bash
      --slurm_account <account_name>
-     --slurm_partition <partition_name>
-     --slurm_queue <queue_name>
+     --slurm_queue <partition_name>
      ```
    - Automatic job submission and monitoring
 
@@ -211,7 +212,7 @@ It supports seamless integration with HPC environments:
    ```bash
    nextflow run main.nf -profile slurm \
        --slurm_account <your_account> \
-       --slurm_partition <partition_name>
+       --slurm_queue <partition_name>
    ```
 
 3. **Resource Monitoring**:
