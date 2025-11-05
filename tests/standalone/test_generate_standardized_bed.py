@@ -63,12 +63,22 @@ def test_exons_lt100(test_data_dir: Path) -> None:
                 )
 
 
-def test_zeropad_name_exons_lt10(test_data_dir: Path) -> None:
-    """Test renaming of BED features where zero-padding is not needed."""
+@pytest.mark.parametrize(
+    "bed_filename, gene_name, expected_digits",
+    [
+        ("exons_lt10.bed", "NRAS", 1),
+        ("exons_lt100.bed", "CSF3R", 2),
+        ("exons_lt1000.bed", "NBPF20", 3),
+    ],
+)
+def test_zeropad_name(
+    test_data_dir: Path, bed_filename: str, gene_name: str, expected_digits: int
+) -> None:
+    """Test renaming of BED features with zero-padding as needed."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        input_bed_file = test_data_dir / "exons_lt10.bed"
+        input_bed_file = test_data_dir / bed_filename
         output_prefix = Path(tmpdir) / "generate_standardized_bed"
-        input_gene_list = create_gene_list(Path(tmpdir), ["NRAS"])
+        input_gene_list = create_gene_list(Path(tmpdir), [gene_name])
 
         subprocess.run(
             [
@@ -84,7 +94,7 @@ def test_zeropad_name_exons_lt10(test_data_dir: Path) -> None:
             check=True,
         )
 
-        output_file = output_prefix / "exons_lt10.reformatted.bed"
+        output_file = output_prefix / bed_filename.replace(".bed", ".reformatted.bed")
         assert output_file.exists()
 
         # Extract ending digits from each line and check they're single digit
@@ -94,98 +104,14 @@ def test_zeropad_name_exons_lt10(test_data_dir: Path) -> None:
                 feature_name = fields[3]
                 feature_name_search = re.search(r"(\d+)$", feature_name)
                 assert feature_name_search, (
-                    f"1 ending digit expected, but none were found in feature name: "
-                    f"{feature_name}"
+                    f"{expected_digits} ending digit expected, but none were found in "
+                    f"feature name: {feature_name}"
                 )
 
                 exon_number = feature_name_search.group(1)
-                assert len(exon_number) == 1, (
-                    f"Exon number '{exon_number}' in '{feature_name}' should be 1 "
-                    f"digit for < 10 features."
-                )
-
-
-def test_zeropad_name_exons_lt100(test_data_dir: Path) -> None:
-    """Test renaming of BED features where zero-padding to two digits is needed."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        input_bed_file = test_data_dir / "exons_lt100.bed"
-        output_prefix = Path(tmpdir) / "generate_standardized_bed"
-        input_gene_list = create_gene_list(Path(tmpdir), ["CSF3R"])
-
-        subprocess.run(
-            [
-                "generate-standardized-bed",
-                "-b",
-                str(input_bed_file),
-                "-g",
-                str(input_gene_list),
-                "-o",
-                str(output_prefix),
-                "--zero-pad-names",
-            ],
-            check=True,
-        )
-
-        output_file = output_prefix / "exons_lt100.reformatted.bed"
-        assert output_file.exists()
-
-        # Extract ending digits from each line and check they're two digits
-        with open(output_file) as reformatted_bed:
-            for line in reformatted_bed:
-                fields = line.strip().split("\t")
-                feature_name = fields[3]
-                feature_name_search = re.search(r"(\d+)$", feature_name)
-                assert feature_name_search, (
-                    f"2 ending digits expected, but none were found in feature name: "
-                    f"{feature_name}"
-                )
-
-                exon_number = feature_name_search.group(1)
-                assert len(exon_number) == 2, (
-                    f"Exon number '{exon_number}' in '{feature_name}' should be 2 "
-                    f"digits for < 100 features."
-                )
-
-
-def test_zeropad_name_exons_lt1000(test_data_dir: Path) -> None:
-    """Test renaming of BED features where zero-padding to three digits is needed."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        input_bed_file = test_data_dir / "exons_lt1000.bed"
-        output_prefix = Path(tmpdir) / "generate_standardized_bed"
-        input_gene_list = create_gene_list(Path(tmpdir), ["NBPF20"])
-
-        subprocess.run(
-            [
-                "generate-standardized-bed",
-                "-b",
-                str(input_bed_file),
-                "-g",
-                str(input_gene_list),
-                "-o",
-                str(output_prefix),
-                "--zero-pad-names",
-            ],
-            check=True,
-        )
-
-        output_file = output_prefix / "exons_lt1000.reformatted.bed"
-        assert output_file.exists()
-
-        # Extract ending digits from each line and check they're two digits
-        with open(output_file) as reformatted_bed:
-            for line in reformatted_bed:
-                fields = line.strip().split("\t")
-                feature_name = fields[3]
-                feature_name_search = re.search(r"(\d+)$", feature_name)
-                assert feature_name_search, (
-                    f"3 ending digits expected, but none were found in feature name: "
-                    f"{feature_name}"
-                )
-
-                exon_number = feature_name_search.group(1)
-                assert len(exon_number) == 3, (
-                    f"Exon number '{exon_number}' in '{feature_name}' should be 3 "
-                    f"digits for < 1000 features."
+                assert len(exon_number) == expected_digits, (
+                    f"Exon number '{exon_number}' in '{feature_name}' should be "
+                    f"{expected_digits}"
                 )
 
 
