@@ -12,8 +12,8 @@ For 100-999 features: two leading zeros (e.g. <feature>001).
 Etc.
 
 Usage:
-    generate-standardized-bed --bed-file <bed> --gene-list <target_gene_file>
-    --output-folder <output_folder> [--output-introns] [--zero-pad-names]
+    generate-standardized-bed --bed-file <bed> --output-folder <output_folder>
+    [--gene-list <target_gene_file>] [--output-introns] [--zero-pad-names]
 """
 
 import argparse
@@ -259,8 +259,11 @@ def main() -> None:
     parser.add_argument(
         "-g",
         "--gene-list",
-        help="Path to file with target HGNC gene symbols (one symbol per line).",
-        required=True,
+        help=(
+            "Path to file with target HGNC gene symbols (one symbol per line). "
+            "If provided, warning is output for any genes in this list that "
+            "are not found in input BED file."
+        ),
     )
     parser.add_argument(
         "-A",
@@ -291,7 +294,7 @@ def main() -> None:
     # Parse args
     args = parser.parse_args()
     bed_file_path = Path(args.bed_file)
-    gene_list_path = Path(args.gene_list)
+    gene_list_path = Path(args.gene_list) if args.gene_list else None
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True)
 
@@ -306,12 +309,6 @@ def main() -> None:
             "`.bed` nor `.bed.gz`."
         )
         exit()
-
-    # Parse gene_list file and store as target_gene_set
-    target_gene_set = set()
-    with open_file(gene_list_path, FileMode.READ) as target_gene_list:
-        for line in target_gene_list:
-            target_gene_set.add(line.strip())
 
     # First pass: parse BED file to extract feature counts and genomic ranges per
     # transcript
@@ -387,15 +384,23 @@ def main() -> None:
 
     out_bed.close()
 
-    # Output warning if any genes in target gene list were not found in input BED file
-    missing_genes = target_gene_set.difference(gene_set)
-    if missing_genes:
-        logging.warning(
-            "One or more target genes were not found in input BED file: %s. "
-            "Check whether these genes are stored as gene synonyms rather than "
-            "gene symbols in MANE RefSeq GTF/GFF files.",
-            ",".join(missing_genes),
-        )
+    # If gene_list provided, output warning if any genes in target gene list
+    # were not found in input BED file
+    if gene_list_path:
+        # Parse gene_list file and store as target_gene_set
+        target_gene_set = set()
+        with open_file(gene_list_path, FileMode.READ) as target_gene_list:
+            for line in target_gene_list:
+                target_gene_set.add(line.strip())
+
+        missing_genes = target_gene_set.difference(gene_set)
+        if missing_genes:
+            logging.warning(
+                "One or more target genes were not found in input BED file: "
+                "%s. Check whether these genes are stored as gene synonyms "
+                "rather than gene symbols in MANE RefSeq GTF/GFF files.",
+                ",".join(missing_genes),
+            )
 
 
 if __name__ == "__main__":
