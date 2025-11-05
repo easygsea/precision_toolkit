@@ -4,12 +4,11 @@
 
 ### v1.1.1 - 2025-11-05
 
-- New Standalone Utility: Added new utility to reformat BED files in BED6+4 format into a 4-column BED file and standardizes feature names
-- Bugfix: fixed container link in local deployment's `nextflow.config`
+- New Standalone Utility: Added new utility to reformat BED files in BED6+4 format into a 4-column BED file and standardizes feature names.
 - Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in nextflow.config.
 - Improvement: Set time limit for local execution in nextflow.config.
 - Bugfix: Fixed circular dependency in resource allocation.
-- Bugfix: Fixed container link in local deployment's `nextflow.config`
+- Bugfix: Fixed container link in local deployment's `nextflow.config`.
 
 ---
 
