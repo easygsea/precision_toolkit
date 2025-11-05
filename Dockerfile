@@ -110,10 +110,8 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     wget --quiet "https://github.com/bedops/bedops/releases/download/v${BEDOPS_VERSION}/bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2" && \
     mkdir "bedops_linux_x86_64-v${BEDOPS_VERSION}" && \
     tar -jxf "bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2" -C "bedops_linux_x86_64-v${BEDOPS_VERSION}" && \
-    # hadolint ignore=SC2086
-    cp bedops_linux_x86_64-v${BEDOPS_VERSION}/bin/* /opt/hap.py/bin/ && \
-    # hadolint ignore=SC2086
-    rm -rf bedops_linux_x86_64-v${BEDOPS_VERSION}* && \
+    cp bedops_linux_x86_64-v"${BEDOPS_VERSION}"/bin/* /opt/hap.py/bin/ && \
+    rm -rf bedops_linux_x86_64-v"${BEDOPS_VERSION}"* && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" && \
     tar -xzf "Python-${PYTHON_VERSION}.tgz" && \

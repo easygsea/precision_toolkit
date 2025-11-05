@@ -1,4 +1,4 @@
-process NORMALIZE_TO_TARGET {
+process NORMALIZE_COVERAGE_TO_TARGET {
     tag "${sample_name}"
 
     input:
@@ -22,7 +22,7 @@ process NORMALIZE_TO_TARGET {
         print tc / total * (NR-1)
     }' ${parsed_pileup} )
     echo "TARGET COVERAGE = ${target_coverage}" #info
-    echo "NORM_FACTOR=\${norm_factor}" #info
+    echo "NORM_FACTOR = \${norm_factor}" #info
     awk -v norm_factor=\${norm_factor} '
     BEGIN{
         OFS="\\t"

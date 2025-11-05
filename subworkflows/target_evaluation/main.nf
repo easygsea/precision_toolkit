@@ -1,5 +1,5 @@
 include {
-    NORMALIZE_TO_TARGET
+    NORMALIZE_COVERAGE_TO_TARGET
     ADD_TARGET_LABELS
     GET_PER_TARGET_AGGREGATED_STATS
     GENERATE_PER_BASE_SUMMARY
@@ -90,7 +90,7 @@ workflow gene_target_evaluation_workflow {
         params.min_bq_per_read,
         params.min_mq_per_read
     )
-   ADD_TARGET_LABELS(
+    ADD_TARGET_LABELS(
         targets_bed,
         GET_PER_BASE_STATS.out.parsed_pileup
     )
@@ -99,12 +99,12 @@ workflow gene_target_evaluation_workflow {
     if (!params.normalize_to_target_coverage) {
         sample_stage_output = ADD_TARGET_LABELS.out.labelled_pileup
     } else {
-        NORMALIZE_TO_TARGET(
+        NORMALIZE_COVERAGE_TO_TARGET(
             targets_bed,
             ADD_TARGET_LABELS.out.labelled_pileup,
             params.normalize_to_target_coverage,
         )
-        sample_stage_output = NORMALIZE_TO_TARGET.out.normalized_pileup
+        sample_stage_output = NORMALIZE_COVERAGE_TO_TARGET.out.normalized_pileup
     }
 
     // aside: output raw mpileup if needed
