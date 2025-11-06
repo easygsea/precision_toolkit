@@ -180,7 +180,6 @@ def test_features_missing_refseq_accession(test_data_dir: Path) -> None:
 
         output_file = output_prefix / "missing_refseq_accession.reformatted.bed"
         assert output_file.exists()
-        assert output_file.stat().st_size == 0
         assert "RefSeq accession not found" in result.stderr
 
 

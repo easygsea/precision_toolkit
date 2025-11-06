@@ -197,7 +197,7 @@ def parse_bed_file(
 def construct_feature_name(
     gene_symbol: str,
     genomic_feature: str,
-    refseq_acc: str,
+    refseq_acc: str | None,
     exon_num: str,
     refseq_accession_to_transcript_obj: dict[str, Transcript],
     zero_pad_names: bool,
@@ -226,7 +226,7 @@ def construct_feature_name(
     # Extract exon number, if applicable, and construct feature name
     # If no exon number, don't append to feature name
     if exon_num:
-        if zero_pad_names:
+        if zero_pad_names and refseq_acc:
             num_digits = len(
                 str(
                     refseq_accession_to_transcript_obj[refseq_acc].feature_counts[
@@ -244,7 +244,15 @@ def construct_feature_name(
     else:
         feature_id = genomic_feature.upper()
 
-    return f"{gene_symbol}_{refseq_acc}_{feature_id}"
+    if refseq_acc is None:
+        logging.warning(
+            f"RefSeq accession not found for {genomic_feature.upper()} feature "
+            f"belonging to {gene_symbol}... standardized name won't "
+            f"include RefSeq accession."
+        )
+        return f"{gene_symbol}_{feature_id}"
+    else:
+        return f"{gene_symbol}_{refseq_acc}_{feature_id}"
 
 
 def standardize_bed_file(
@@ -287,12 +295,6 @@ def standardize_bed_file(
             refseq_acc = extract_refseq_accession(
                 refseq_accession_regex_pattern, attributes
             )
-            if refseq_acc is None:
-                logging.warning(
-                    f"RefSeq accession not found for {genomic_feature.upper()} feature "
-                    f"belonging to {feature_name}... skipping."
-                )
-                continue
 
             updated_feature_name = construct_feature_name(
                 feature_name,
@@ -306,7 +308,7 @@ def standardize_bed_file(
 
             # If current line in BED file is an exon feature write corresponding intron
             # feature to BED file, if applicable
-            if output_introns and genomic_feature == "exon":
+            if refseq_acc and output_introns and genomic_feature == "exon":
                 transcript_obj = refseq_accession_to_transcript_obj[refseq_acc]
                 # Calculate intron ranges if first time encountering an exon for
                 # transcript
