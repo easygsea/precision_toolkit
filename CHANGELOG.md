@@ -3,7 +3,7 @@
 ## Version History
 
 ### v1.1.1 - 2025-10-28
-- Feature: Target evaluation workflow now has normalization option.
+- Feature: Introduced coverage normalization option in target evaluation workflow.
 - Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in nextflow.config.
 - Improvement: Set time limit for local execution in nextflow.config.
 - Bugfix: Fixed circular dependency in resource allocation.

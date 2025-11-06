@@ -15,7 +15,7 @@ Per-base metrics are further aggregated on two rules to provide reliable perform
 
 Visualization on per-target level optionally enabled by `--visualize` option.
 
-Normalization per-sample can be optionally enabled by `--normalize_to_target_coverage` option.
+Coverage normalization per-sample can be optionally enabled by `--normalize_to_target_coverage` option.
 
 
 ## Quick Start
@@ -33,7 +33,7 @@ nextflow run main.nf \
 --visualize
 ```
 
-Custom pass/fail scoring by setting three threshold parameters with normalization: coverage, BASEQ, and MAPQ.
+Custom pass/fail scoring by setting three threshold parameters with coverage normalization: coverage, BASEQ, and MAPQ.
 ```bash
 nextflow run main.nf \
 --workflows target_evaluation \
@@ -62,7 +62,7 @@ nextflow run main.nf \
 - `--genome_ref`: Reference genome FASTA file. Required to process any input CRAM files.
 
 **Optional Parameters:**
-- `--normalize_to_target_coverage`: Target coverge per base. If set, coverage will be normalized by a factor of [target_cov/panel_avg].
+- `--normalize_to_target_coverage`: Target mean coverage for target regions. If set, coverage is normalized by a factor of [target_cov/panel_avg].
 - `--coverage_threshold`: Minimum coverage threshold for pass (default = 25).
 - `--baseq_threshold`: Minimum BASEQ threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--mapq_threshold`: Minimum MAPQ score threshold for pass, scored on first quartile of all reads per base (default = 30).
