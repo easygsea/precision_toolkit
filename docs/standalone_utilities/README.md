@@ -66,5 +66,5 @@ The `jira-table` tool converts structured data files (CSV, TSV, Excel, and JSON)
 
 Example Usage:
 ```bash
-jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY>
+jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY> --float-format <DECIMAL_PLACES>
 ```

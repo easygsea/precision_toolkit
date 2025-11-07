@@ -34,15 +34,15 @@ def pandas_to_jira_table(df: pd.DataFrame, float_format: int | None) -> str:
                 )
                 df.at[index, col] = str(df.at[index, col]).replace("|", "\\|")
 
-    kwargs: dict[str, bool | str] = {}
+    format_args: dict[str, bool | str] = {}
     if float_format is None:
-        kwargs["disable_numparse"] = True
+        format_args["disable_numparse"] = True
     elif float_format == 0:
         # return as scientific
-        kwargs["floatfmt"] = "e"
+        format_args["floatfmt"] = "e"
     elif float_format >= 1:
         # return as a float with n places
-        kwargs["floatfmt"] = f".{float_format}f"
+        format_args["floatfmt"] = f".{float_format}f"
     else:
         raise ValueError("float_format must be None, 0, or a positive integer")
 
@@ -51,7 +51,7 @@ def pandas_to_jira_table(df: pd.DataFrame, float_format: int | None) -> str:
         headers="keys",
         tablefmt="jira",
         showindex=False,
-        **kwargs,  # type: ignore[arg-type]
+        **format_args,  # type: ignore[arg-type]
     )
 
     return jira_table

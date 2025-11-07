@@ -91,7 +91,7 @@ def read_dataframe(
                 input_file = StringIO(buffer)
 
         # Read file based on format
-        read_arg = {"dtype": str} if convert_to_string else {}
+        read_arg: dict[str, type[str]] = {"dtype": str} if convert_to_string else {}
         if format_type == "tsv":
             return pd.read_csv(
                 input_file,
