@@ -96,13 +96,13 @@ workflow gene_target_evaluation_workflow {
     )
 
     // normalize if target coverage provided
-    if (!params.normalize_to_target_coverage) {
+    if (!params.normalize_coverage) {
         sample_stage_output = ADD_TARGET_LABELS.out.labelled_pileup
     } else {
         NORMALIZE_COVERAGE_TO_TARGET(
             targets_bed,
             ADD_TARGET_LABELS.out.labelled_pileup,
-            params.normalize_to_target_coverage,
+            params.normalize_coverage,
         )
         sample_stage_output = NORMALIZE_COVERAGE_TO_TARGET.out.normalized_pileup
     }

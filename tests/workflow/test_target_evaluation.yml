@@ -182,7 +182,7 @@
      --targets_bed tests_data/target_evaluation/test_targets.bed
      --output_dir target_evaluation_test_normalization
      --visualize
-     --normalize_to_target_coverage 10
+     --normalize_coverage 10
   files:
     - path: target_evaluation_test_normalization/target_eval_results/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.normalized.scored.txt
       md5sum: dea7185427f4990798b4d7cfbd6baf9d
