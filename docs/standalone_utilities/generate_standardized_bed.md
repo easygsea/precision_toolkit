@@ -28,9 +28,9 @@ Since its introduction, the MANE transcript resources have been widely adopted i
 The following are required for target BED generation:
 
 - Files:
-  - MANE GTF/GFF file
+  - MANE GTF/GFF file (`MANE_GTF`)
     - **Note:** It is recommended to use the MANE Ensembl/Refseq GTF files due to issues encountered when converting GFF files with `bedops gff2bed`
-  - File with a list of target gene symbols, one per line
+  - File with a list of target gene symbols, one per line (`TARGET_GENES_FILE`)
 - Tools:
   - `bedops` (tested with `2.4.41--h4ac6f70_2`)
     - **Note:** For reproducibility and cross-platform compatibility, we recommend using the `bedops` container image available from [quay.io](https://quay.io/repository/biocontainers/bedops)
@@ -64,9 +64,14 @@ Example output is shown below:
 
 ```
 chr20	50958817	50963929	MOCS3	.	+	BestRefSeq	exon	.	gene_id "MOCS3"; transcript_id "NM_014484.5"; db_xref "Ensembl:ENST00000244051.3"; db_xref "GeneID:27304"; db_xref "GenBank:NM_014484.5"; db_xref "HGNC:HGNC:15765"; db_xref "MIM:609277"; gene "MOCS3"; product "molybdenum cofactor synthesis 3"; tag "MANE Select"; transcript_biotype "mRNA"; exon_number "1";
+chr20	50958817	50963929	MOCS3	.	+	BestRefSeq	gene	.	gene_id "MOCS3"; transcript_id ""; db_xref "GeneID:27304"; db_xref "HGNC:HGNC:15765"; db_xref "MIM:609277"; description "molybdenum cofactor synthesis 3"; gbkey "Gene"; gene "MOCS3"; gene_biotype "protein_coding"; gene_synonym "UBA4";
+chr20	50958817	50963929	MOCS3	.	+	BestRefSeq	transcript	.	gene_id "MOCS3"; transcript_id "NM_014484.5"; db_xref "Ensembl:ENST00000244051.3"; db_xref "GeneID:27304"; db_xref "GenBank:NM_014484.5"; db_xref "HGNC:HGNC:15765"; db_xref "MIM:609277"; gbkey "mRNA"; gene "MOCS3"; product "molybdenum cofactor synthesis 3"; tag "MANE Select"; transcript_biotype "mRNA";
+chr20	50958842	50958845	MOCS3	.	+	BestRefSeq	start_codon	0	gene_id "MOCS3"; transcript_id "NM_014484.5"; db_xref "CCDS:CCDS13435.1"; db_xref "Ensembl:ENSP00000244051.1"; db_xref "GeneID:27304"; db_xref "GenBank:NP_055299.1"; db_xref "HGNC:HGNC:15765"; db_xref "MIM:609277"; gbkey "CDS"; gene "MOCS3"; product "adenylyltransferase and sulfurtransferase MOCS3"; protein_id "NP_055299.1"; tag "MANE Select"; exon_number "1";
+chr20	50958842	50960222	MOCS3	.	+	BestRefSeq	CDS	0	gene_id "MOCS3"; transcript_id "NM_014484.5"; db_xref "CCDS:CCDS13435.1"; db_xref "Ensembl:ENSP00000244051.1"; db_xref "GeneID:27304"; db_xref "GenBank:NP_055299.1"; db_xref "HGNC:HGNC:15765"; db_xref "MIM:609277"; gbkey "CDS"; gene "MOCS3"; product "adenylyltransferase and sulfurtransferase MOCS3"; protein_id "NP_055299.1"; tag "MANE Select"; exon_number "1";
+chr20	50960222	50960225	MOCS3	.	+	BestRefSeq	stop_codon	0	gene_id "MOCS3"; transcript_id "NM_014484.5"; db_xref "CCDS:CCDS13435.1"; db_xref "Ensembl:ENSP00000244051.1"; db_xref "GeneID:27304"; db_xref "GenBank:NP_055299.1"; db_xref "HGNC:HGNC:15765"; db_xref "MIM:609277"; gbkey "CDS"; gene "MOCS3"; product "adenylyltransferase and sulfurtransferase MOCS3"; protein_id "NP_055299.1"; tag "MANE Select"; exon_number "1";
 ```
 
-#### Generate target BED file
+#### (Optional) Extract features for genes of interest
 
 Once converted, features for genes of interest can be extracted by filtering on the fourth column, which contains the gene symbol. Furthermore, certain features can be retained/omitted by filtering on the eigth column. While this can be done using various methods, an example to extract exon features for genes of interest using `awk` is shown below:
 
@@ -79,19 +84,30 @@ awk 'NR==FNR{genes[$1]++; next} $8 == "exon" && $4 in genes' <TARGET_GENES_FILE>
 Following this, the `generate_bed_script.py` script can be used to standardize the BED file.
 
 ```
-python generate_standardized_bed.py --bed-file <TARGET_BED> --gene-list <TARGET_GENES_FILE> --output-folder <OUTPUT_DIRECTORY>
+python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY>
 ```
 
 If intron features are of interest, users may enable the calculation and output of introns in the standardized BED with `--output-introns`:
 
 ```
-python generate_standardized_bed.py --bed-file <TARGET_BED> --gene-list <TARGET_GENES_FILE> --output-folder <OUTPUT_DIRECTORY> --output-introns
+python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --output-introns
+```
+
+If `MANE_BED` was previously filtered for genes of interest, as outlined in the [previous section](#optional-extract-features-for-genes-of-interest), `TARGET_GENES_FILE` can be provided to `--gene-list`  to output a warning if any genes in this list are not found in `MANE_BED`:
+
+```
+python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --gene-list <TARGET_GENES_FILE>
 ```
 
 That's it! The standardized BED file should look something like this:
 
 ```
 chr20	50958817	50963929	MOCS3_NM_014484.5_EXON1
+chr20	50958817	50963929	MOCS3_GENE
+chr20	50958817	50963929	MOCS3_NM_014484.5_TRANSCRIPT
+chr20	50958842	50958845	MOCS3_NP_055299.1_START_CODON1
+chr20	50958842	50960222	MOCS3_NP_055299.1_CDS1
+chr20	50960222	50960225	MOCS3_NP_055299.1_STOP_CODON1
 ```
 
 ## Troubleshooting
@@ -104,4 +120,4 @@ chr20	50958817	50963929	MOCS3_NM_014484.5_EXON1
   ```
   chr14	BestRefSeq	gene	50242434	50312229	.	-	.	gene_id "L2HGDH"; transcript_id ""; db_xref "GeneID:79944"; db_xref "HGNC:HGNC:20499"; db_xref "MIM:609584"; description "L-2-hydroxyglutarate dehydrogenase"; gbkey "Gene"; gene "L2HGDH"; gene_biotype "protein_coding"; gene_synonym "C14orf160"; gene_synonym "L2HGA";
   ```
-- If this is the case, add the corresponding symbol stored in the `gene_id` or `gene_name` attribute into the `<TARGET_GENES_FILE>` and re-generate the target BED file using this updated list as input
+- If this is the case, add the corresponding symbol stored in the `gene_id` or `gene_name` attribute into the `TARGET_GENES_FILE` and re-generate the target BED file using this updated list as input

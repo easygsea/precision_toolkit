@@ -13,6 +13,7 @@ Etc.
 
 Usage:
     generate-standardized-bed --bed-file <bed> --output-folder <output_folder>
+    [--attribute-key <refseq_accession_attribute_key>]
     [--gene-list <target_gene_file>] [--output-introns] [--zero-pad-names]
 """
 

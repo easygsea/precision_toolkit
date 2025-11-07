@@ -60,7 +60,9 @@ This will be converted into a 4-column BED file consisting of:
 3. chromEnd: end position
 4. featureName: feature name with the format `<gene_symbol>_<refseq_accession>_<feature><exon_number>`
 
-`exon_number`, if present in the attributes, is optionally dynamically zero-padded (when `--zero-pad-names` is specified) based on the total number of genomic features present for the gene/transcript:
+By default, `refseq_accession` is parsed from the `db_xref` attribute; however, another attribute can be specified using `--attribute-key`. For features lacking the `refseq_accession` value, the feature name will be `<gene_symbol>_<feature>`.
+
+`exon_number`, if present in the attributes together with `refseq_accession`, is optionally dynamically zero-padded (when `--zero-pad-names` is specified) based on the total number of genomic features present for the gene/transcript:
 
 - For genes/transcripts with <10 features: no leading zeros
 - For 10-99 features: one leading zero (e.g. `<feature>01`)
@@ -71,27 +73,38 @@ For features without `exon_number`, the feature name will simply be `<gene_symbo
 
 Usage:
 ```bash
-generate-standardized-bed --bed-file <BED> --gene-list <TARGET GENES FILE> --output-folder <OUTPUT DIRECTORY>
+generate-standardized-bed --bed-file <bed> --output-folder <output_folder> [--attribute-key <refseq_accession_attribute_key>] [--gene-list <target_gene_file>] [--output-introns] [--zero-pad-names]
 ```
 
-For detailed documentation of how to use this tool to generate target BED files, see [BED Standardization Tool](generate_standardized_bed.md).
+Example output:
+```bash
+chrX	154021572	154031450	MECP2_NM_001110792.2_EXON3
+chrX	154021572	154031450	MECP2_NM_004992.4_EXON4
+chrX	154021572	154097717	MECP2_NM_001110792.2_TRANSCRIPT
+chrX	154021572	154097717	MECP2_NM_004992.4_TRANSCRIPT
+chrX	154021572	154097717	MECP2_GENE
+chrX	154030366	154030369	MECP2_NP_001104262.1_STOP_CODON3
+chrX	154030366	154030369	MECP2_NP_004983.1_STOP_CODON4
+chrX	154030369	154031450	MECP2_NP_001104262.1_CDS3
+chrX	154030369	154031450	MECP2_NP_004983.1_CDS4
+chrX	154032206	154032557	MECP2_NP_001104262.1_CDS2
+chrX	154032206	154032557	MECP2_NP_004983.1_CDS3
+chrX	154032206	154032557	MECP2_NM_001110792.2_EXON2
+chrX	154032206	154032557	MECP2_NM_004992.4_EXON3
+chrX	154092183	154092209	MECP2_NP_004983.1_CDS2
+chrX	154092183	154092307	MECP2_NM_004992.4_EXON2
+chrX	154092206	154092209	MECP2_NP_004983.1_START_CODON2
+chrX	154097603	154097665	MECP2_NP_001104262.1_CDS1
+chrX	154097603	154097717	MECP2_NM_001110792.2_EXON1
+chrX	154097603	154097717	MECP2_NM_004992.4_EXON1
+chrX	154097662	154097665	MECP2_NP_001104262.1_START_CODON1
+```
 
 ### Interpretation of `exon_number`
 
-According to [Gencode's GTF format documentation](https://www.gencodegenes.org/pages/data_format.html), `exon_number` is a key found in the attributes field of all features except genes and transcripts. This integer value indicates the exon position in the transcript from its 5' end. Thus, in the example below, `*_START_CODON2` indicates that the start codon for this transcript is in exon 2 and `_STOP_CODON3` indicates that the stop codon is in exon 3.
+According to [Gencode's GTF format documentation](https://www.gencodegenes.org/pages/data_format.html), `exon_number` is a key found in the attributes field of all features except genes and transcripts. This integer value indicates the exon position in the transcript from its 5' end. Thus, in the example above, `*_START_CODON2` indicates that the start codon for this transcript is in exon 2 and `_STOP_CODON4` indicates that the stop codon is in exon 4.
 
-```bash
-chr1	65418	65433	OR4F5_NM_001005484.2_EXON1
-chr1	65434	65518	OR4F5_NM_001005484.2_INTRON1
-chr1	65418	71585	OR4F5_NM_001005484.2_TRANSCRIPT
-chr1	65519	65573	OR4F5_NM_001005484.2_EXON2
-chr1	65574	69035	OR4F5_NM_001005484.2_INTRON2
-chr1	65564	65567	OR4F5_NP_001005484.2_START_CODON2
-chr1	65564	65573	OR4F5_NP_001005484.2_CDS2
-chr1	69036	70005	OR4F5_NP_001005484.2_CDS3
-chr1	69036	71585	OR4F5_NM_001005484.2_EXON3
-chr1	70005	70008	OR4F5_NP_001005484.2_STOP_CODON3
-```
+For detailed documentation of how to use this tool to generate target BED files, see [BED Standardization Tool](generate_standardized_bed.md).
 
 ## Jira Table Converter
 
