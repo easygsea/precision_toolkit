@@ -3,9 +3,9 @@ include {
     ADD_TARGET_LABELS
     GET_PER_TARGET_AGGREGATED_STATS
     GENERATE_PER_BASE_SUMMARY
-    SCORE_OUTPUT as SCORE_BASES_PER_LIBRARY
-    SCORE_OUTPUT as SCORE_TARGETS_PER_LIBRARY
-    SCORE_OUTPUT as SCORE_PER_BASE_SUMMARY
+    SCORE_OUTPUT_ON_METRICS as SCORE_BASES_PER_LIBRARY
+    SCORE_OUTPUT_ON_FIELD as SCORE_TARGETS_PER_LIBRARY
+    SCORE_OUTPUT_ON_METRICS as SCORE_PER_BASE_SUMMARY
     GENERATE_VISUALIZATION
 } from '../../modules/target_evaluation/main'
 
@@ -107,6 +107,12 @@ workflow gene_target_evaluation_workflow {
         sample_stage_output = NORMALIZE_COVERAGE_TO_TARGET.out.normalized_pileup
     }
 
+    // score based on metrics thresholds
+    SCORE_BASES_PER_LIBRARY (
+        sample_stage_output,
+        scoring_thresholds
+    )
+
     // aside: output raw mpileup if needed
     if (params.output_raw_mpileup) {
         GET_PER_BASE_STATS_NO_PARSE(
@@ -118,7 +124,14 @@ workflow gene_target_evaluation_workflow {
     // Stage 2:  Aggregate per target (Q1 of per-base stats)
     GET_PER_TARGET_AGGREGATED_STATS(
         targets_bed,
-        sample_stage_output
+        SCORE_BASES_PER_LIBRARY.out.scored_output
+    )
+
+    // score based on PCT_FAIL/TARGET
+    SCORE_TARGETS_PER_LIBRARY (
+        GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated,
+        9,
+        params.target_pass_threshold
     )
 
     // Stage 3: Aggregate per base across libraries (Median of per-base stats)
@@ -126,15 +139,7 @@ workflow gene_target_evaluation_workflow {
         sample_stage_output.collectFile(name: "combined_labelled_pileups.txt"){it[1]}
     )
 
-    // Stage 4: Score files on thresholds
-    SCORE_BASES_PER_LIBRARY (
-        sample_stage_output,
-        scoring_thresholds
-    )
-    SCORE_TARGETS_PER_LIBRARY (
-        GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated,
-        scoring_thresholds
-    )
+    // score based on thresholds
     SCORE_PER_BASE_SUMMARY (
         GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base,
         scoring_thresholds

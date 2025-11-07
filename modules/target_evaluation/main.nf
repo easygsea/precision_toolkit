@@ -76,7 +76,8 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     OUT="${labelled_pileup.baseName}.target_aggregated.txt"
     """
     sort -V -k1,1 -k3,3 -k2,2n ${labelled_pileup} |
-    bedtools groupby -inheader -i - -g 1,3,4 -c 5,6,7,8 -o collapse |
+    grep -v ^# |
+    bedtools groupby -i - -g 1,3,4 -c 5,6,7,8 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
         print "#CHROM","POS","TRACT","POOL","COVERAGE_Q1","BASEQ_Q1_Q1","MAPQ_Q1_Q1","LEN","PCT_BASES_FAIL";
@@ -117,7 +118,7 @@ process GENERATE_PER_BASE_SUMMARY {
     """
 }
 
-process SCORE_OUTPUT {
+process SCORE_OUTPUT_ON_METRICS {
     tag "${sample_name}"
     publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
 
@@ -126,7 +127,7 @@ process SCORE_OUTPUT {
     tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
 
     output:
-    tuple val(sample_name), path(OUT), val(pool_id)
+    tuple val(sample_name), path(OUT), val(pool_id), emit: scored_output
 
     script:
     OUT="${pre_scored_file.baseName}.scored.txt"
@@ -141,6 +142,36 @@ process SCORE_OUTPUT {
             print \$0,"PASS";
         }
         else {
+            print \$0,"FAIL";
+        }
+    }' ${pre_scored_file} > ${OUT}
+    """
+}
+
+process SCORE_OUTPUT_ON_FIELD {
+    tag "${sample_name}"
+    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+
+    input:
+    tuple val(sample_name), path(pre_scored_file), val(pool_id)
+    val scoring_field
+    val scoring_threshold
+
+    output:
+    tuple val(sample_name), path(OUT), val(pool_id), emit: scored_output
+
+    script:
+    OUT="${pre_scored_file.baseName}.scored.txt"
+    """
+    awk -v OFS='\\t' '
+    /^#/ {
+        print \$0,"SCORE";
+        next;
+    }
+    {
+        if ( \$${scoring_field} >= ${scoring_threshold} ) {
+            print \$0,"PASS";
+        } else {
             print \$0,"FAIL";
         }
     }' ${pre_scored_file} > ${OUT}
