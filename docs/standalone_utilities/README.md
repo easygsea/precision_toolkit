@@ -110,9 +110,9 @@ For detailed documentation of how to use this tool to generate target BED files,
 
 The `jira-table` tool converts structured data files (CSV, TSV, Excel, and JSON) into a neatly formatted JIRA table.
 
-Usage:
+Example Usage:
 ```bash
-jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY>
+jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY> --float-format <DECIMAL_PLACES> --add-spaces
 ```
 
 ## Manual Diagnostic Metric Curation
@@ -138,12 +138,3 @@ Usage:
 ```
 
 For detailed documentation and examples, see [Structural Variant VCF Liftover Tool](liftover_sv_vcf.md).
-
-## Jira Table Converter
-
-The `jira-table` tool converts structured data files (CSV, TSV, Excel, and JSON) into a neatly formatted JIRA table.
-
-Example Usage:
-```bash
-jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY> --float-format <DECIMAL_PLACES> --add-spaces
-```
