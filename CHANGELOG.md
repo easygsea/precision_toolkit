@@ -9,24 +9,24 @@
 - Feature: Introduced coverage normalization option in target evaluation workflow.
 - Feature: Introduced tract building functionality to target evaluation workflow.
 - Improvement: Added two arguments in jira-table to control float formatting and text output formatting.
-- Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in nextflow.config.
+- Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in `nextflow.config`.
 - Improvement: Restructured target evaluation directory for ease of access when working with large datasets.
-- Improvement: Reworked target evaluation workflow with more intuitive and robust scoring and analysis. Added three arguments to control fail tolereance and percentile output. See docs for more details.
-- Improvement: Set time limit for local execution in nextflow.config.
+- Improvement: Reworked target evaluation workflow with more intuitive and robust scoring and analysis. Added three arguments to control fail tolerance and percentile output. See docs for more details.
+- Improvement: Set time limit for local execution in `nextflow.config`.
 - Bugfix: Fixed circular dependency in resource allocation.
-- Bugfix: Fixed container link in local deployment's nextflow.config.
+- Bugfix: Fixed container link in local deployment's `nextflow.config`.
 
 ---
 
 ### v1.1.0 - 2025-10-15
 - New Workflow: Added new target evaluation workflow for analyzing per-base stats across target regions.
 - New Standalone Utility: Added `jira-table` to convert structured data files into a formatted JIRA table.
-- New Standalone Utility: Added `liftover_sv_vcf` helper.
+- New Standalone Utility: Added `liftover_sv_vcf.sh` helper.
 - Feature: Added GitHub Actions to automatically sync changes from Bitbucket.
 - Improvement: Refactored Bamboo plan to build images via Docker build.
-- Improvement: Specified container version in nextflow.config.
+- Improvement: Specified container version in `nextflow.config`.
 - Improvement: Removed redundant version tracking.
-- Bugfix: Cleaned up redundant text in DockerFile.
+- Bugfix: Cleaned up redundant text in `Dockerfile`.
 - Bugfix: Fixed the deployment stage to point the container built instead of remote.
 - Bugfix: Removed unused fixture in `tests/unit/test_diagnostic_metrics.py`.
 - Applied GPL-3.0 license.
