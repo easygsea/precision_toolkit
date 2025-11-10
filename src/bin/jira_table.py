@@ -17,7 +17,7 @@ Usage:
         # Add heading and summary
     jira-table --float-format 0 file.csv
         # Specify custom float format
-    jira-table --add-spaces file.csv
+    jira-table --pretty-print file.csv
         # Add spaces between columns
 """
 
@@ -51,7 +51,7 @@ Examples:
     # Add heading and summary
   jira-table --float-format 0 file.csv
     # Specify custom float format
-  jira-table --add-spaces file.csv
+  jira-table --pretty-print file.csv
     # Add spaces between columns
         """,
     )
@@ -88,7 +88,7 @@ Examples:
         help="Optional float formatting: 0 = scientific, ≥1 = decimal (decimal places)",
     )
     parser.add_argument(
-        "--add-spaces",
+        "--pretty-print",
         action="store_true",
         help="Optional to add spaces between columns in the JIRA table",
     )
@@ -120,7 +120,7 @@ Examples:
         heading=args.heading if args.heading else None,
         summary=args.summary if args.summary else None,
         float_format=args.float_format,
-        add_spaces=args.add_spaces,
+        pretty_print=args.pretty_print,
     )
 
     # Output

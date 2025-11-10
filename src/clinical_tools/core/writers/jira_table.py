@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 def pandas_to_jira_table(
     df: pd.DataFrame,
     float_format: int | None,
-    add_spaces: bool,
+    pretty_print: bool,
 ) -> str:
     """
     Convert DataFrame to JIRA table format using tabulate.
@@ -22,7 +22,7 @@ def pandas_to_jira_table(
     Args:
         df: DataFrame to convert
         float_format: Optional float format type
-        add_spaces: Optional to add spaces between columns
+        pretty_print: Optional to add spaces between columns
 
     Returns:
         JIRA table formatted string
@@ -60,7 +60,7 @@ def pandas_to_jira_table(
         **format_args,  # type: ignore[arg-type]
     )
 
-    if not add_spaces:
+    if not pretty_print:
         jira_table = jira_table.replace(r"\|", "<USER_PIPE>")
         jira_table = re.sub(r"[ \t]*\|[ \t]*", "|", jira_table)
         jira_table = jira_table.replace("<USER_PIPE>", r"\|")
@@ -79,7 +79,7 @@ def populate_jira_table(
     heading: str | None,
     summary: str | None,
     float_format: int | None,
-    add_spaces: bool,
+    pretty_print: bool,
 ) -> str:
     """
     Generate a complete JIRA table document from DataFrame.
@@ -89,7 +89,7 @@ def populate_jira_table(
         heading: Optional heading to add (h1 format)
         summary: Optional summary before table
         float_format: Optional float format type
-        add_spaces: Optional to add spaces between columns
+        pretty_print: Optional to add spaces between columns
     Returns:
         Generated JIRA content
     """
@@ -100,7 +100,7 @@ def populate_jira_table(
     if summary:
         jira_content += f"{summary}\n\n"
 
-    jira_table = pandas_to_jira_table(df, float_format, add_spaces)
+    jira_table = pandas_to_jira_table(df, float_format, pretty_print)
     jira_content += jira_table
 
     return jira_content
