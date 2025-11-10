@@ -86,7 +86,7 @@ nextflow run main.nf \
 ### Variant Benchmark Parameters
 
 **Required Parameters:**
-- `--workflows variant_benchmark`: Required parameter to run target evaluation workflow
+- `--workflows variant_benchmark`: Required parameter to run target evaluation workflow.
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
 - `--query_dir`: The directory containing query VCF files (the test or experimental dataset). These must be named as <sample>.query.vcf or <sample>.query.vcf.gz.
 - `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, or `wittyer`, default: `happy`).
@@ -94,8 +94,8 @@ nextflow run main.nf \
 
 **Optional Parameters:**
 - `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
-- `--output_dir`: Base output directory (default: `output_clinical_tools`)
-- `--variant_benchmark_dir`: Subdirectory for variant benchmark results (default: `variant_benchmark`)
+- `--output_dir`: Base output directory (default: `output_clinical_tools`).
+- `--variant_benchmark_dir`: Subdirectory for variant benchmark results (default: `variant_benchmark`).
 - `--happy_engine`: hap.py engine to use (default: `vcfeval`) Options: `vcfeval`, `xcmp`, `scmp-distance`, `scmp-somatic`. Note: `vcfeval` mode only evaluates PASS variants as hap.py does not support `vcfeval --all-records`.
 - `--happy_options`: Additional hap.py options (default: `--write-vcf --write-counts`). Must quote the string and use = to assign the value.
 - `--sompy_options`: Additional som.py options (default: `--include-nonpass`). Must quote the string and use = to assign the value.
