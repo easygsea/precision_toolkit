@@ -41,4 +41,4 @@
 ### v1.0.0 - 2025-07-11
 - New Workflow: Introduced variant benchmarking workflow for variant calling accuracy analysis.
 - New Workflow: Introduced signal correlation workflow for comparing variant allele frequencies.
-- New Standalone Utilities: Included initial set of standalone utility tools: `convert-multi-sample-vcf`, `count-variants-by-size`, and `manual-diagnostic-metric-curation`.
+- New Standalone Utility: Included initial set of standalone utility tools: `convert-multi-sample-vcf`, `count-variants-by-size`, and `manual-diagnostic-metric-curation`.
