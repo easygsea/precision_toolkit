@@ -2,12 +2,13 @@
 
 ## Version History
 
-### v1.1.1 - 2025-10-28
+### v1.1.1 - 2025-11-05
+- New Standalone Utility: Added new utility to reformat BED files in BED6+4 format into a 4-column BED file and standardizes feature names.
 - Feature: Introduced coverage normalization option in target evaluation workflow.
 - Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in nextflow.config.
 - Improvement: Set time limit for local execution in nextflow.config.
 - Bugfix: Fixed circular dependency in resource allocation.
-- Bugfix: Fixed container link in local deployment's `nextflow.config`
+- Bugfix: Fixed container link in local deployment's `nextflow.config`.
 
 ---
 
