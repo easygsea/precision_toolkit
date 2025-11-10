@@ -68,6 +68,7 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     input:
     path(targets_bed)
     tuple val(sample_name), path(labelled_pileup), val(pool_id)
+    val agg_percentile
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: per_target_aggregated
@@ -77,7 +78,7 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     """
     sort -V -k1,1 -k3,3 -k2,2n ${labelled_pileup} |
     grep -v ^# |
-    bedtools groupby -i - -g 1,3,4 -c 5,6,7,8 -o collapse |
+    bedtools groupby -g 1,3,4 -c 5,6,7,8 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
         print "#CHROM","POS","TRACT","POOL","COVERAGE_Q1","BASEQ_Q1_Q1","MAPQ_Q1_Q1","LEN","PCT_BASES_FAIL";
@@ -86,7 +87,7 @@ process GET_PER_TARGET_AGGREGATED_STATS {
         n=split(\$4, coverages, ","); split(\$5, baseQ1s, ","); split(\$6, mapQ1s, ",");
         bases_failed = gsub(/FAIL/, "", \$7);
         asort(coverages); asort(baseQ1s); asort(mapQ1s);
-        q1=int((n + 3) / 4);
+        p=int( ${agg_percentile} * (n-1) + 1.5 );
         print(\$1,"NA",\$2,\$3,coverages[q1],baseQ1s[q1],mapQ1s[q1],n,bases_failed/n*100);
         delete coverages; delete baseQ1s; delete mapQ1s;
     }' - > ${OUT}
@@ -98,6 +99,8 @@ process GENERATE_PER_BASE_SUMMARY {
 
     input:
     path(combined_labelled_pileups)
+    tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
+    val agg_percentile
 
     output:
     tuple val("All_Samples"), path(OUT), val("All_Pools"), emit: all_libraries_per_base
@@ -105,15 +108,27 @@ process GENERATE_PER_BASE_SUMMARY {
     script:
     OUT="summary_per_base_median.txt"
     """
-    grep -v '^#' |
-    sort -k1,1 -k2,2 -k3,3 ${combined_labelled_pileups} |
-    bedtools groupby -g 1,2,3 -c 5,6,7 -o median |
+    grep -v '^#' ${combined_labelled_pileups} |
+    sort -k1,1 -k2,2 -k3,3 |
+    bedtools groupby -g 1,2,3 -c 5,6,7,8 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
-        print "#CHROM","POS","TRACT","POOL","COVERAGE_MED","BASEQ_MED_Q1","MAPQ_MED_Q1";
+        print "#CHROM","POS","TRACT","POOL","COVERAGE","BASEQ","MAPQ","NUM_LIB_FAIL(COV/BQ/MQ)","PCT_LIB_FAIL(COV/BQ/MQ)";
     }
     {
-        print \$1,\$2,\$3,"AGGREGATE",\$4,\$5,\$6,\$7;
+        n=split(\$4, coverages, ","); split(\$5, baseQ1s, ","); split(\$6, mapQ1s, ",");
+        asort(coverages); asort(baseQ1s); asort(mapQ1s);
+        lib_fail_cov=0; lib_fail_bq=0; lib_fail_mq=0;
+        for (i = 1; i <= n; i++){
+            if (coverages[i] < ${cov_threshold}) lib_fail_cov++; //or <=?
+            if (baseQ1s[i] < ${bq_threshold}) lib_fail_bq++;
+            if (mapQ1s[i] < ${mq_threshold}) lib_fail_mq++;
+        }
+        p=int( ${agg_percentile} * (n-1) + 1.5 );
+        print \$1,\$2,\$3,"AGGREGATE",coverages[p],baseQ1s[p],mapQ1s[p],
+            lib_fail_cov"|"lib_fail_bq"|"lib_fail_mq,
+            lib_fail_cov/n*100;
+        delete coverages; delete baseQ1s; delete mapQ1s;
     }' > ${OUT}
     """
 }

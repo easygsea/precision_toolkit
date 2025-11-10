@@ -5,7 +5,7 @@ include {
     GENERATE_PER_BASE_SUMMARY
     SCORE_OUTPUT_ON_METRICS as SCORE_BASES_PER_LIBRARY
     SCORE_OUTPUT_ON_FIELD as SCORE_TARGETS_PER_LIBRARY
-    SCORE_OUTPUT_ON_METRICS as SCORE_PER_BASE_SUMMARY
+    SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY
     GENERATE_VISUALIZATION
 } from '../../modules/target_evaluation/main'
 
@@ -124,7 +124,8 @@ workflow gene_target_evaluation_workflow {
     // Stage 2:  Aggregate per target (Q1 of per-base stats)
     GET_PER_TARGET_AGGREGATED_STATS(
         targets_bed,
-        SCORE_BASES_PER_LIBRARY.out.scored_output
+        SCORE_BASES_PER_LIBRARY.out.scored_output,
+        0.25 //percentile - more than 75% of libraries above this value TODO MAKE VARIABLE
     )
 
     // score based on PCT_FAIL/TARGET
@@ -136,13 +137,16 @@ workflow gene_target_evaluation_workflow {
 
     // Stage 3: Aggregate per base across libraries (Median of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
-        sample_stage_output.collectFile(name: "combined_labelled_pileups.txt"){it[1]}
+        SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: "combined_labelled_pileups.txt"){it[1]},
+        scoring_thresholds, //TODO - change to scoring metrics thresholds
+        0.25 //percentile - more than 75% of libraries above this value TODO MAKE VARIABLE
     )
 
     // score based on thresholds
     SCORE_PER_BASE_SUMMARY (
         GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base,
-        scoring_thresholds
+        9,
+        50 //params.library_pass_threshold // min pct of libraries pass
     )
 
     // Stage 5: Generate visualization per target
