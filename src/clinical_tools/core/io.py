@@ -1,6 +1,7 @@
 """Input/Output utilities for reading data from various file formats."""
 
 import csv
+import json
 import logging
 import sys
 from io import BytesIO, StringIO
@@ -50,6 +51,7 @@ def detect_format(file_path: str | TextIO) -> str:
 
 def read_dataframe(
     input_file: str | TextIO,
+    convert_to_string: bool,
     format_type: str | None = None,
     delimiter: str | None = None,
 ) -> pd.DataFrame | None:
@@ -62,6 +64,7 @@ def read_dataframe(
     Args:
         input_file: Path to input file, or TextIO to read from stdin
         format_type: File format ('csv', 'tsv', 'excel', 'json') or None to auto-detect
+        convert_to_string: Whether to read all data as strings
         delimiter: Custom delimiter character, or None for auto-detection
 
     Returns:
@@ -88,18 +91,46 @@ def read_dataframe(
                 input_file = StringIO(buffer)
 
         # Read file based on format
+        read_arg: dict[str, type[str]] = {"dtype": str} if convert_to_string else {}
         if format_type == "tsv":
-            return pd.read_csv(input_file, sep=delimiter)
+            return pd.read_csv(
+                input_file,
+                sep=delimiter,
+                **read_arg,  # type: ignore[call-overload]
+            )
         elif format_type == "excel":
             if hasattr(input_file, "buffer"):
                 data = input_file.buffer.read()
-                return pd.read_excel(BytesIO(data), engine="openpyxl")
+                return pd.read_excel(
+                    BytesIO(data),
+                    engine="openpyxl",
+                    **read_arg,  # type: ignore[call-overload]
+                )
             else:
-                return pd.read_excel(input_file, engine="openpyxl")
+                return pd.read_excel(
+                    input_file,
+                    engine="openpyxl",
+                    **read_arg,  # type: ignore[call-overload]
+                )
         elif format_type == "json":
-            return pd.read_json(input_file)
+            if convert_to_string:
+                if hasattr(input_file, "read"):
+                    text = input_file.read()
+                else:
+                    with open(input_file, "r", encoding="utf-8") as f:
+                        text = f.read()
+                raw_data = json.loads(text, parse_float=str, parse_int=str)
+                df = pd.json_normalize(raw_data)
+                df = df.astype(str)
+            else:
+                df = pd.read_json(input_file)
+            return df
         else:
-            return pd.read_csv(input_file, sep=delimiter)
+            return pd.read_csv(
+                input_file,
+                sep=delimiter,
+                **read_arg,  # type: ignore[call-overload]
+            )
 
     except Exception as e:
         logging.exception("Error reading data:")

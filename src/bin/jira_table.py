@@ -15,6 +15,10 @@ Usage:
         # Specify custom delimiter
     jira-table --heading "My Table" --summary "This is a summary" data.csv
         # Add heading and summary
+    jira-table --float-format 0 file.csv
+        # Specify custom float format
+    jira-table --pretty-print file.csv
+        # Add spaces between columns
 """
 
 import argparse
@@ -45,6 +49,10 @@ Examples:
     # Use custom delimiter
   jira-table --heading "My Table" --summary "This is a summary" data.csv
     # Add heading and summary
+  jira-table --float-format 0 file.csv
+    # Specify custom float format
+  jira-table --pretty-print file.csv
+    # Add spaces between columns
         """,
     )
     parser.add_argument(
@@ -74,6 +82,16 @@ Examples:
         "--summary",
         help="Optional summary/introduction for the JIRA table",
     )
+    parser.add_argument(
+        "--float-format",
+        type=int,
+        help="Optional float formatting: 0 = scientific, ≥1 = decimal (decimal places)",
+    )
+    parser.add_argument(
+        "--pretty-print",
+        action="store_true",
+        help="Optional to add spaces between columns in the JIRA table",
+    )
 
     args = parser.parse_args()
 
@@ -82,7 +100,8 @@ Examples:
         raise IOError("No input file or stdin provided.")
 
     # Read data
-    df = read_dataframe(args.input_file, args.format, args.delimiter)
+    convert_to_string = args.float_format is None
+    df = read_dataframe(args.input_file, convert_to_string, args.format, args.delimiter)
 
     # Exit if unable to read file
     if df is None:
@@ -100,6 +119,8 @@ Examples:
         df,
         heading=args.heading if args.heading else None,
         summary=args.summary if args.summary else None,
+        float_format=args.float_format,
+        pretty_print=args.pretty_print,
     )
 
     # Output

@@ -110,10 +110,17 @@ For detailed documentation of how to use this tool to generate target BED files,
 
 The `jira-table` tool converts structured data files (CSV, TSV, Excel, and JSON) into a neatly formatted JIRA table.
 
-Usage:
+Example Usage:
 ```bash
-jira-table <PATH/TO/INPUT_FILE> --heading <HEADING> --summary <SUMMARY>
+jira-table <PATH/TO/INPUT_FILE>
 ```
+**Optional Parameters:**
+- `--format`: Specify input file format (e.g., TSV, CSV).
+- `--delimiter`: Specify a custom delimiter for parsing data.
+- `--heading`: Add a table heading.
+- `--summary`: Add a short description along with the table.
+- `--float-format`: Control output format for float values.
+- `--pretty-print`: Pad columns with spaces for readability.
 
 ## Manual Diagnostic Metric Curation
 
