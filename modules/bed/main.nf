@@ -8,6 +8,6 @@ process SORT_BED {
     script:
     OUT="${bed_file.baseName}.sorted.bed"
     """
-    sort -V ${bed_file} > ${OUT}
+    sort-bed ${bed_file} > ${OUT}
     """
 }
