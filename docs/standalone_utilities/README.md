@@ -117,7 +117,7 @@ jira-table <PATH/TO/INPUT_FILE>
 **Optional Parameters:**
 - `--format`: Specify input file format (e.g., TSV, CSV).
 - `--delimiter`: Specify a custom delimiter for parsing data.
-- `--heading`: Add a table heading
+- `--heading`: Add a table heading.
 - `--summary`: Add a short description along with the table.
 - `--float-format`: Control output format for float values.
 - `--pretty-print`: Pad columns with spaces for readability.
