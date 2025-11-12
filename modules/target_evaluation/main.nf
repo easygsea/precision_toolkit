@@ -76,8 +76,8 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     script:
     OUT="${labelled_pileup.baseName}.target_aggregated.txt"
     """
-    sort -V -k1,1 -k3,3 -k2,2n ${labelled_pileup} |
-    grep -v ^# |
+    grep -v ^# ${labelled_pileup} |
+    sort -V -k1,1 -k3,3 -k2,2n |
     bedtools groupby -g 1,3,4 -c 5,6,7,8 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
@@ -113,21 +113,27 @@ process GENERATE_PER_BASE_SUMMARY {
     bedtools groupby -g 1,2,3 -c 5,6,7,8 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
-        print "#CHROM","POS","TRACT","POOL","COVERAGE","BASEQ","MAPQ","NUM_LIB_FAIL(COV/BQ/MQ)","PCT_LIB_FAIL(COV/BQ/MQ)";
+        print "#CHROM","POS","TRACT","POOL","COVERAGE","BASEQ","MAPQ",
+        "NUM_LIB_FAIL(COV)","NUM_LIB_FAIL(BQ)","NUM_LIB_FAIL(MQ)",
+        "PCT_LIB_FAIL(COV)","PCT_LIB_FAIL(BQ)","PCT_LIB_FAIL(MQ)";
     }
     {
         n=split(\$4, coverages, ","); split(\$5, baseQ1s, ","); split(\$6, mapQ1s, ",");
+
         asort(coverages); asort(baseQ1s); asort(mapQ1s);
+        p=int( ${agg_percentile} * (n-1) + 1.5 );
+
         lib_fail_cov=0; lib_fail_bq=0; lib_fail_mq=0;
         for (i = 1; i <= n; i++){
-            if (coverages[i] < ${cov_threshold}) lib_fail_cov++; //or <=?
+            if (coverages[i] < ${cov_threshold}) lib_fail_cov++;
             if (baseQ1s[i] < ${bq_threshold}) lib_fail_bq++;
             if (mapQ1s[i] < ${mq_threshold}) lib_fail_mq++;
         }
-        p=int( ${agg_percentile} * (n-1) + 1.5 );
+
         print \$1,\$2,\$3,"AGGREGATE",coverages[p],baseQ1s[p],mapQ1s[p],
-            lib_fail_cov"|"lib_fail_bq"|"lib_fail_mq,
-            lib_fail_cov/n*100;
+            lib_fail_cov,lib_fail_bq,lib_fail_mq,
+            lib_fail_cov/n*100,lib_fail_bq/n*100,lib_fail_mq/n*100;
+
         delete coverages; delete baseQ1s; delete mapQ1s;
     }' > ${OUT}
     """
@@ -155,8 +161,7 @@ process SCORE_OUTPUT_ON_METRICS {
     {
         if (\$5>=${cov_threshold} && \$6>=${bq_threshold} && \$7>=${mq_threshold}) {
             print \$0,"PASS";
-        }
-        else {
+        } else {
             print \$0,"FAIL";
         }
     }' ${pre_scored_file} > ${OUT}
@@ -169,8 +174,7 @@ process SCORE_OUTPUT_ON_FIELD {
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
-    val scoring_field
-    val scoring_threshold
+    tuple val(scoring_field), val(scoring_threshold), val(col_name)
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: scored_output
@@ -180,11 +184,11 @@ process SCORE_OUTPUT_ON_FIELD {
     """
     awk -v OFS='\\t' '
     /^#/ {
-        print \$0,"SCORE";
+        print \$0,"${col_name}";
         next;
     }
     {
-        if ( \$${scoring_field} >= ${scoring_threshold} ) {
+        if ( \$${scoring_field} < ${scoring_threshold}*100 ) {
             print \$0,"PASS";
         } else {
             print \$0,"FAIL";

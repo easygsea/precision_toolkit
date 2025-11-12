@@ -5,7 +5,9 @@ include {
     GENERATE_PER_BASE_SUMMARY
     SCORE_OUTPUT_ON_METRICS as SCORE_BASES_PER_LIBRARY
     SCORE_OUTPUT_ON_FIELD as SCORE_TARGETS_PER_LIBRARY
-    SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY
+    SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_COV
+    SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_BQ
+    SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_MQ
     GENERATE_VISUALIZATION
 } from '../../modules/target_evaluation/main'
 
@@ -18,23 +20,28 @@ include {
 include { SUBSET_CRAM_TO_BAM    } from '../../modules/cram/main'
 include { SORT_BED              } from '../../modules/bed/main'
 
-// collect all scoring thresholds
-def scoring_thresholds = tuple (
-    params.coverage_threshold,
-    params.baseq_threshold,
-    params.mapq_threshold
-)
 
 // Main variant gene target evaluation workflow
 workflow gene_target_evaluation_workflow {
     main:
 
-
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        Handle workflow input & file formats
+        Handle workflow setup, input & file formats
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
+
+    // define workflow variables
+    def metrics_scoring_thresholds = tuple (
+        params.coverage_threshold,
+        params.baseq_threshold,
+        params.mapq_threshold
+    )
+    def scoring_fields = [
+        tuple (11, params.base_fail_tolerance, "COV_SCORE"),
+        tuple (12, params.base_fail_tolerance, "BQ_SCORE"),
+        tuple (13, params.base_fail_tolerance, "MQ_SCORE")
+    ]
 
     // make sure bed is sorted
     targets_bed = SORT_BED(file(params.targets_bed)).sorted_bed
@@ -83,7 +90,7 @@ workflow gene_target_evaluation_workflow {
     */
     INDEX_BAM_FILES(bam_ch)
 
-    // Stage 1: Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
+    // STAGE 1: Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
     GET_PER_BASE_STATS(
         targets_bed,
         bam_ch,
@@ -110,10 +117,10 @@ workflow gene_target_evaluation_workflow {
     // score based on metrics thresholds
     SCORE_BASES_PER_LIBRARY (
         sample_stage_output,
-        scoring_thresholds
+        metrics_scoring_thresholds
     )
 
-    // aside: output raw mpileup if needed
+    // aside: output raw mpileup if needed (troubleshooting option)
     if (params.output_raw_mpileup) {
         GET_PER_BASE_STATS_NO_PARSE(
             targets_bed,
@@ -121,33 +128,31 @@ workflow gene_target_evaluation_workflow {
         )
     }
 
-    // Stage 2:  Aggregate per target (Q1 of per-base stats)
+    // STAGE 2: Aggregate per target (percentile of per-base stats)
     GET_PER_TARGET_AGGREGATED_STATS(
         targets_bed,
         SCORE_BASES_PER_LIBRARY.out.scored_output,
-        0.25 //percentile - more than 75% of libraries above this value TODO MAKE VARIABLE
+        0.25 //percentile - more than 75% of libraries above this value TODO MAKE VAR
     )
 
     // score based on PCT_FAIL/TARGET
     SCORE_TARGETS_PER_LIBRARY (
         GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated,
-        9,
-        params.target_pass_threshold
+        tuple (9, params.target_fail_tolerance, "SCORE"), //params.target_fail_tolerance, //params.min_pct_bases_pass_per_target, //params.target_pass_threshold,
     )
 
-    // Stage 3: Aggregate per base across libraries (Median of per-base stats)
+    // STAGE 3: Aggregate per base across libraries (percentile of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
         SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: "combined_labelled_pileups.txt"){it[1]},
-        scoring_thresholds, //TODO - change to scoring metrics thresholds
-        0.25 //percentile - more than 75% of libraries above this value TODO MAKE VARIABLE
+        metrics_scoring_thresholds, //still need this? yes, for num libraries failed
+        0.25 //percentile - more than 75% of libraries above this value TODO MAKE VAR
     )
 
-    // score based on thresholds
-    SCORE_PER_BASE_SUMMARY (
-        GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base,
-        9,
-        50 //params.library_pass_threshold // min pct of libraries pass
-    )
+    // score each base on how many libraries passed for each metric
+    //TOD: remove .corec.scoed.scored
+    SCORE_PER_BASE_SUMMARY_ON_COV (GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base, scoring_fields[0])
+    SCORE_PER_BASE_SUMMARY_ON_BQ (SCORE_PER_BASE_SUMMARY_ON_COV.out.scored_output, scoring_fields[1])
+    SCORE_PER_BASE_SUMMARY_ON_MQ (SCORE_PER_BASE_SUMMARY_ON_BQ.out.scored_output, scoring_fields[2])
 
     // Stage 5: Generate visualization per target
     if (params.visualize) {
@@ -155,7 +160,7 @@ workflow gene_target_evaluation_workflow {
             GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[1]},
             GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[2]},
             "plot",
-            scoring_thresholds
+            metrics_scoring_thresholds
         )
     }
 }
