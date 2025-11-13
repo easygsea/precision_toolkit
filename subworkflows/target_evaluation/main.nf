@@ -132,24 +132,24 @@ workflow gene_target_evaluation_workflow {
     GET_PER_TARGET_AGGREGATED_STATS(
         targets_bed,
         SCORE_BASES_PER_LIBRARY.out.scored_output,
-        0.25 //percentile - more than 75% of libraries above this value TODO MAKE VAR
+        params.target_fail_tolerance //percentile - >= X% of bases are above this value
     )
 
     // score based on PCT_FAIL/TARGET
     SCORE_TARGETS_PER_LIBRARY (
         GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated,
-        tuple (9, params.target_fail_tolerance, "SCORE"), //params.target_fail_tolerance, //params.min_pct_bases_pass_per_target, //params.target_pass_threshold,
+        tuple (10, params.target_fail_tolerance, "SCORE") //same percentile used to score
     )
 
     // STAGE 3: Aggregate per base across libraries (percentile of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
         SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: "combined_labelled_pileups.txt"){it[1]},
-        metrics_scoring_thresholds, //still need this? yes, for num libraries failed
-        0.25 //percentile - more than 75% of libraries above this value TODO MAKE VAR
+        metrics_scoring_thresholds, //detailed output: num libraries failed/metric
+        params.base_fail_tolerance //percentile - >= X% of libraries above this value
+        //TODO: should display percentile be separate from threshold/tolerance percentile?
     )
 
     // score each base on how many libraries passed for each metric
-    //TOD: remove .corec.scoed.scored
     SCORE_PER_BASE_SUMMARY_ON_COV (GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base, scoring_fields[0])
     SCORE_PER_BASE_SUMMARY_ON_BQ (SCORE_PER_BASE_SUMMARY_ON_COV.out.scored_output, scoring_fields[1])
     SCORE_PER_BASE_SUMMARY_ON_MQ (SCORE_PER_BASE_SUMMARY_ON_BQ.out.scored_output, scoring_fields[2])

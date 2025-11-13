@@ -81,14 +81,21 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     bedtools groupby -g 1,3,4 -c 5,6,7,8 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
-        print "#CHROM","POS","TRACT","POOL","COVERAGE_Q1","BASEQ_Q1_Q1","MAPQ_Q1_Q1","LEN","PCT_BASES_FAIL";
+        OFMT = "%.${params.decimals}f"
+        print "#CHROM","POS","TRACT","POOL",
+            int(${agg_percentile}*100)"_CENTILE(COV)",
+            int(${agg_percentile}*100)"_CENTILE(BQ_Q1)",
+            int(${agg_percentile}*100)"_CENTILE(MQ_Q1)",
+            "LEN","NUM_BASES_FAIL","PCT_BASES_FAIL";
     }
     {
         n=split(\$4, coverages, ","); split(\$5, baseQ1s, ","); split(\$6, mapQ1s, ",");
         bases_failed = gsub(/FAIL/, "", \$7);
         asort(coverages); asort(baseQ1s); asort(mapQ1s);
         p=int( ${agg_percentile} * (n-1) + 1.5 );
-        print(\$1,"NA",\$2,\$3,coverages[q1],baseQ1s[q1],mapQ1s[q1],n,bases_failed/n*100);
+        print \$1,"NA",\$2,\$3,
+            coverages[p],baseQ1s[p],mapQ1s[p],
+            n,bases_failed,bases_failed/n*100;
         delete coverages; delete baseQ1s; delete mapQ1s;
     }' - > ${OUT}
     """
@@ -110,12 +117,16 @@ process GENERATE_PER_BASE_SUMMARY {
     """
     grep -v '^#' ${combined_labelled_pileups} |
     sort -k1,1 -k2,2 -k3,3 |
-    bedtools groupby -g 1,2,3 -c 5,6,7,8 -o collapse |
+    bedtools groupby -g 1,2,3 -c 5,6,7 -o collapse |
     awk -v OFS='\\t' '
     BEGIN {
-        print "#CHROM","POS","TRACT","POOL","COVERAGE","BASEQ","MAPQ",
-        "NUM_LIB_FAIL(COV)","NUM_LIB_FAIL(BQ)","NUM_LIB_FAIL(MQ)",
-        "PCT_LIB_FAIL(COV)","PCT_LIB_FAIL(BQ)","PCT_LIB_FAIL(MQ)";
+        OFMT = "%.${params.decimals}f"
+        print "#CHROM","POS","TRACT","POOL",
+            int(${agg_percentile}*100)"_CENTILE(COV)",
+            int(${agg_percentile}*100)"_CENTILE(BQ_Q1)",
+            int(${agg_percentile}*100)"_CENTILE(MQ_Q1)",
+            "NUM_LIB_FAIL(COV)","NUM_LIB_FAIL(BQ)","NUM_LIB_FAIL(MQ)",
+            "PCT_LIB_FAIL(COV)","PCT_LIB_FAIL(BQ)","PCT_LIB_FAIL(MQ)";
     }
     {
         n=split(\$4, coverages, ","); split(\$5, baseQ1s, ","); split(\$6, mapQ1s, ",");
@@ -180,7 +191,7 @@ process SCORE_OUTPUT_ON_FIELD {
     tuple val(sample_name), path(OUT), val(pool_id), emit: scored_output
 
     script:
-    OUT="${pre_scored_file.baseName}.scored.txt"
+    OUT="${pre_scored_file.baseName.replaceFirst( "\\.scored",'')}.scored.txt"
     """
     awk -v OFS='\\t' '
     /^#/ {
@@ -193,7 +204,7 @@ process SCORE_OUTPUT_ON_FIELD {
         } else {
             print \$0,"FAIL";
         }
-    }' ${pre_scored_file} > ${OUT}
+    }' ${pre_scored_file} > temp.txt && mv temp.txt ${OUT}
     """
 }
 
