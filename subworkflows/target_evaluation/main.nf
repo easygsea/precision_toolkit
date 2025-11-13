@@ -8,6 +8,7 @@ include {
     SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_COV
     SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_BQ
     SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_MQ
+    GENERATE_TRACTS
     GENERATE_VISUALIZATION
 } from '../../modules/target_evaluation/main'
 
@@ -37,11 +38,13 @@ workflow gene_target_evaluation_workflow {
         params.baseq_threshold,
         params.mapq_threshold
     )
-    def scoring_fields = [
-        tuple (11, params.base_fail_tolerance, "COV_SCORE"),
-        tuple (12, params.base_fail_tolerance, "BQ_SCORE"),
-        tuple (13, params.base_fail_tolerance, "MQ_SCORE")
+    def scoring_params = [
+        tuple ("SCORE", "PCT_BASES_FAIL", params.target_fail_tolerance),
+        tuple ("COV_SCORE", "PCT_LIB_FAIL(COV)", params.base_fail_tolerance),
+        tuple ("BQ_SCORE", "PCT_LIB_FAIL(BQ)", params.base_fail_tolerance),
+        tuple ("MQ_SCORE", "PCT_LIB_FAIL(MQ)", params.base_fail_tolerance)
     ]
+    def tract_params = channel.of ("COV_SCORE", "BQ_SCORE", "MQ_SCORE")
 
     // make sure bed is sorted
     targets_bed = SORT_BED(file(params.targets_bed)).sorted_bed
@@ -136,10 +139,7 @@ workflow gene_target_evaluation_workflow {
     )
 
     // score based on PCT_FAIL/TARGET
-    SCORE_TARGETS_PER_LIBRARY (
-        GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated,
-        tuple (10, params.target_fail_tolerance, "SCORE") //same percentile used to score
-    )
+    SCORE_TARGETS_PER_LIBRARY (GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated, scoring_params[0])
 
     // STAGE 3: Aggregate per base across libraries (percentile of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
@@ -150,9 +150,16 @@ workflow gene_target_evaluation_workflow {
     )
 
     // score each base on how many libraries passed for each metric
-    SCORE_PER_BASE_SUMMARY_ON_COV (GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base, scoring_fields[0])
-    SCORE_PER_BASE_SUMMARY_ON_BQ (SCORE_PER_BASE_SUMMARY_ON_COV.out.scored_output, scoring_fields[1])
-    SCORE_PER_BASE_SUMMARY_ON_MQ (SCORE_PER_BASE_SUMMARY_ON_BQ.out.scored_output, scoring_fields[2])
+    SCORE_PER_BASE_SUMMARY_ON_COV (GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base, scoring_params[1])
+    SCORE_PER_BASE_SUMMARY_ON_BQ (SCORE_PER_BASE_SUMMARY_ON_COV.out.scored_output, scoring_params[2])
+    SCORE_PER_BASE_SUMMARY_ON_MQ (SCORE_PER_BASE_SUMMARY_ON_BQ.out.scored_output, scoring_params[3])
+
+    //SCORE_PER_BASE_SUMMARY_ON_MQ.out.scored_output --> generate tracts
+    GENERATE_TRACTS (
+        SCORE_PER_BASE_SUMMARY_ON_MQ.out.scored_output,
+        tract_params,
+        params.tract_gap_tolerance
+    )
 
     // Stage 5: Generate visualization per target
     if (params.visualize) {

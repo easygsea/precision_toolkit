@@ -83,9 +83,9 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     BEGIN {
         OFMT = "%.${params.decimals}f"
         print "#CHROM","POS","TRACT","POOL",
-            int(${agg_percentile}*100)"_CENTILE(COV)",
-            int(${agg_percentile}*100)"_CENTILE(BQ_Q1)",
-            int(${agg_percentile}*100)"_CENTILE(MQ_Q1)",
+            "CENTILE"int(${agg_percentile}*100)"(COV)",
+            "CENTILE"int(${agg_percentile}*100)"(BQ_Q1)",
+            "CENTILE"int(${agg_percentile}*100)"(MQ_Q1)",
             "LEN","NUM_BASES_FAIL","PCT_BASES_FAIL";
     }
     {
@@ -122,9 +122,9 @@ process GENERATE_PER_BASE_SUMMARY {
     BEGIN {
         OFMT = "%.${params.decimals}f"
         print "#CHROM","POS","TRACT","POOL",
-            int(${agg_percentile}*100)"_CENTILE(COV)",
-            int(${agg_percentile}*100)"_CENTILE(BQ_Q1)",
-            int(${agg_percentile}*100)"_CENTILE(MQ_Q1)",
+            "CENTILE"int(${agg_percentile}*100)"(COV)",
+            "CENTILE"int(${agg_percentile}*100)"(BQ_Q1)",
+            "CENTILE"int(${agg_percentile}*100)"(MQ_Q1)",
             "NUM_LIB_FAIL(COV)","NUM_LIB_FAIL(BQ)","NUM_LIB_FAIL(MQ)",
             "PCT_LIB_FAIL(COV)","PCT_LIB_FAIL(BQ)","PCT_LIB_FAIL(MQ)";
     }
@@ -185,7 +185,7 @@ process SCORE_OUTPUT_ON_FIELD {
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
-    tuple val(scoring_field), val(scoring_threshold), val(col_name)
+    tuple val(output_col_name), val(col_to_score), val(scoring_threshold)
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: scored_output
@@ -195,16 +195,50 @@ process SCORE_OUTPUT_ON_FIELD {
     """
     awk -v OFS='\\t' '
     /^#/ {
-        print \$0,"${col_name}";
+        # Build a name-position map from header
+        for (i=1; i<=NF; i++) col[\$i] = i
+        print \$0,"${output_col_name}";
         next;
     }
     {
-        if ( \$${scoring_field} < ${scoring_threshold}*100 ) {
+        if ( \$col["${col_to_score}"] < ${scoring_threshold}*100 ) {
             print \$0,"PASS";
         } else {
             print \$0,"FAIL";
         }
     }' ${pre_scored_file} > temp.txt && mv temp.txt ${OUT}
+    """
+}
+
+process GENERATE_TRACTS {
+    tag "${sample_name}"
+    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+
+    input:
+    tuple val(sample_name), path(scored_file), val(pool_id)
+    each metric_name
+    val(gap_tolerance)
+
+    output:
+    path(OUT), emit: tract_bed
+    val(metric_name), emit: metric
+
+    script:
+    OUT="tracts.${metric_name.toLowerCase()}.bed"
+    println "${metric_name}"
+    //TODO: union at some point, also target/all library file
+    """
+    awk -v OFS='\\t' '
+    /^#/ {
+        # Build a name-position map from header
+        for (i=1; i<=NF; i++) col[\$i] = i
+        next
+    }
+    \$col["${metric_name}"] ~ /FAIL/ {
+        # If pos failed on this metric, make a 1-base bed
+        print \$1,\$2,\$2+1,\$3
+    }' ${scored_file} |
+    bedtools merge -d ${gap_tolerance} -c 4, -o distinct -i - > ${OUT}
     """
 }
 
