@@ -107,7 +107,7 @@ process GENERATE_PER_BASE_SUMMARY {
     input:
     path(combined_labelled_pileups)
     tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
-    val agg_percentile
+    val(agg_percentile)
 
     output:
     tuple val("All_Samples"), path(OUT), val("All_Pools"), emit: all_libraries_per_base
@@ -195,7 +195,7 @@ process SCORE_OUTPUT_ON_FIELD {
     """
     awk -v OFS='\\t' '
     /^#/ {
-        # Build a name-position map from header
+        # Handle headers
         for (i=1; i<=NF; i++) col[\$i] = i
         print \$0,"${output_col_name}";
         next;
@@ -216,29 +216,51 @@ process GENERATE_TRACTS {
 
     input:
     tuple val(sample_name), path(scored_file), val(pool_id)
-    each metric_name
+    each(metric)
     val(gap_tolerance)
+    val(centile)
 
     output:
     path(OUT), emit: tract_bed
-    val(metric_name), emit: metric
 
     script:
-    OUT="tracts.${metric_name.toLowerCase()}.bed"
-    println "${metric_name}"
-    //TODO: union at some point, also target/all library file
+    OUT="tracts.${metric.toLowerCase()}.bed"
+    //TODO: also target/all library file
     """
     awk -v OFS='\\t' '
     /^#/ {
-        # Build a name-position map from header
+        # Handle headers
         for (i=1; i<=NF; i++) col[\$i] = i
+        print "# chrom start end name mean_score"
         next
     }
-    \$col["${metric_name}"] ~ /FAIL/ {
-        # If pos failed on this metric, make a 1-base bed
-        print \$1,\$2,\$2+1,\$3
+    \$col["${metric}"] ~ /FAIL/ {
+        # Match tag of values column to calc mean of failed centile
+        col_tag="CENTILE" int(${centile}*100) \
+            "(${metric.replaceFirst("_SCORE","")}" \
+            (("${metric}"!="COV_SCORE") ? "_Q1)" : ")")
+        # Convert to bed format
+        print \$1,\$2,\$2+1,\$3,\$col[col_tag]
     }' ${scored_file} |
-    bedtools merge -d ${gap_tolerance} -c 4, -o distinct -i - > ${OUT}
+    bedtools merge -d ${gap_tolerance} -c 4,5 -o distinct,mean |
+    awk '{ \$5 = sprintf("%.${params.decimals}f", \$5); print }' > ${OUT}
+    """
+}
+
+process UNIONIZE_TRACTS {
+    tag "${sample_name}"
+    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+
+    input:
+    path(all_tracts_bed)
+
+    output:
+    path(OUT), emit: tract_bed
+
+    script:
+    OUT="tracts.unionized.bed"
+    """
+    sort-bed ${all_tracts_bed} | bedtools merge -c 4 -o distinct > ${OUT}
     """
 }
 

@@ -9,6 +9,7 @@ include {
     SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_BQ
     SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_MQ
     GENERATE_TRACTS
+    UNIONIZE_TRACTS
     GENERATE_VISUALIZATION
 } from '../../modules/target_evaluation/main'
 
@@ -154,12 +155,15 @@ workflow gene_target_evaluation_workflow {
     SCORE_PER_BASE_SUMMARY_ON_BQ (SCORE_PER_BASE_SUMMARY_ON_COV.out.scored_output, scoring_params[2])
     SCORE_PER_BASE_SUMMARY_ON_MQ (SCORE_PER_BASE_SUMMARY_ON_BQ.out.scored_output, scoring_params[3])
 
-    //SCORE_PER_BASE_SUMMARY_ON_MQ.out.scored_output --> generate tracts
+    // generate tracts per metric
     GENERATE_TRACTS (
         SCORE_PER_BASE_SUMMARY_ON_MQ.out.scored_output,
         tract_params,
-        params.tract_gap_tolerance
+        params.tract_gap_tolerance,
+        params.base_fail_tolerance
     )
+    // generate unionized tract
+    UNIONIZE_TRACTS (GENERATE_TRACTS.out.tract_bed.collectFile())
 
     // Stage 5: Generate visualization per target
     if (params.visualize) {
