@@ -92,28 +92,28 @@ workflow gene_target_evaluation_workflow {
         Process BAM files to extract metrics
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
-    INDEX_BAM_FILES(bam_ch)
+    INDEX_BAM_FILES (bam_ch)
 
     // STAGE 1: Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
-    GET_PER_BASE_STATS(
+    GET_PER_BASE_STATS (
         targets_bed,
         bam_ch,
         params.min_bq_per_read,
         params.min_mq_per_read
     )
-    ADD_TARGET_LABELS(
-        targets_bed,
-        GET_PER_BASE_STATS.out.parsed_pileup
+    ADD_TARGET_LABELS (
+        GET_PER_BASE_STATS.out.parsed_pileup,
+        targets_bed
     )
 
     // normalize if target coverage provided
     if (!params.normalize_to_target_coverage) {
         sample_stage_output = ADD_TARGET_LABELS.out.labelled_pileup
     } else {
-        NORMALIZE_COVERAGE_TO_TARGET(
-            targets_bed,
+        NORMALIZE_COVERAGE_TO_TARGET (
             ADD_TARGET_LABELS.out.labelled_pileup,
-            params.normalize_to_target_coverage,
+            targets_bed,
+            params.normalize_to_target_coverage
         )
         sample_stage_output = NORMALIZE_COVERAGE_TO_TARGET.out.normalized_pileup
     }
@@ -126,26 +126,29 @@ workflow gene_target_evaluation_workflow {
 
     // aside: output raw mpileup if needed (troubleshooting option)
     if (params.output_raw_mpileup) {
-        GET_PER_BASE_STATS_NO_PARSE(
+        GET_PER_BASE_STATS_NO_PARSE (
             targets_bed,
             bam_ch
         )
     }
 
     // STAGE 2: Aggregate per target (percentile of per-base stats)
-    GET_PER_TARGET_AGGREGATED_STATS(
-        targets_bed,
+    GET_PER_TARGET_AGGREGATED_STATS (
         SCORE_BASES_PER_LIBRARY.out.scored_output,
+        targets_bed,
         params.target_fail_tolerance //percentile - >= X% of bases are above this value
     )
 
     // score based on PCT_FAIL/TARGET
-    SCORE_TARGETS_PER_LIBRARY (GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated, scoring_params[0])
+    SCORE_TARGETS_PER_LIBRARY (
+        GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated,
+        scoring_params[0]
+    )
 
     // STAGE 3: Aggregate per base across libraries (percentile of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
         SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: "combined_labelled_pileups.txt"){it[1]},
-        metrics_scoring_thresholds, //detailed output: num libraries failed/metric
+        metrics_scoring_thresholds, //for detailed output: num libraries failed/metric
         params.base_fail_tolerance //percentile - >= X% of libraries above this value
         //TODO: should display percentile be separate from threshold/tolerance percentile?
     )

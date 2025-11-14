@@ -2,8 +2,8 @@ process NORMALIZE_COVERAGE_TO_TARGET {
     tag "${sample_name}"
 
     input:
-    path(targets_bed)
     tuple val(sample_name), path(parsed_pileup), val(pool_id)
+    path(targets_bed)
     val(target_coverage)
 
     output:
@@ -40,8 +40,8 @@ process ADD_TARGET_LABELS {
     tag "${sample_name}"
 
     input:
-    path(targets_bed)
     tuple val(sample_name), path(parsed_pileup), val(pool_id)
+    path(targets_bed)
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: labelled_pileup
@@ -66,8 +66,8 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     tag "${sample_name}"
 
     input:
-    path(targets_bed)
     tuple val(sample_name), path(labelled_pileup), val(pool_id)
+    path(targets_bed)
     val agg_percentile
 
     output:
@@ -243,7 +243,7 @@ process GENERATE_TRACTS {
         print \$1,\$2,\$2+1,\$3,\$col[col_tag]
     }' ${scored_file} |
     bedtools merge -d ${gap_tolerance} -c 4,5 -o distinct,mean |
-    awk '{ \$5 = sprintf("%.${params.decimals}f", \$5); print }' > ${OUT}
+    awk -v OFS='\\t' '{ \$5 = sprintf("%.${params.decimals}f", \$5); print }' > ${OUT}
     """
 }
 
