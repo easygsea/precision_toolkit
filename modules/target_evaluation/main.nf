@@ -113,7 +113,7 @@ process GENERATE_PER_BASE_SUMMARY {
     tuple val("All_Samples"), path(OUT), val("All_Pools"), emit: all_libraries_per_base
 
     script:
-    OUT="summary_per_base_median.txt"
+    OUT="all_libraries_per_base.txt"
     """
     grep -v '^#' ${combined_labelled_pileups} |
     sort -k1,1 -k2,2 -k3,3 |
