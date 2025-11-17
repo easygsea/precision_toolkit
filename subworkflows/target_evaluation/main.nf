@@ -174,7 +174,8 @@ workflow gene_target_evaluation_workflow {
             GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[1]},
             GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[2]},
             "plot",
-            metrics_scoring_thresholds
+            metrics_scoring_thresholds,
+            params.target_fail_tolerance*100 as int
         )
     }
 }

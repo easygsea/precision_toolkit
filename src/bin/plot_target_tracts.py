@@ -78,14 +78,20 @@ def main() -> None:
         help="MAPQ threshold to plot.",
         required=True,
     )
+    parser.add_argument(
+        "--centile",
+        type=int,
+        help="Percentile of target reported.",
+        required=True,
+    )
 
     args = parser.parse_args()
 
     # Make metrics and thresholds dictionary
     METRICS_THRESHOLDS = {
-        "COVERAGE_Q1": args.coverage_threshold,
-        "BASEQ_Q1_Q1": args.baseq_threshold,
-        "MAPQ_Q1_Q1": args.mapq_threshold,
+        f"CENTILE{args.centile}(COV)": args.coverage_threshold,
+        f"CENTILE{args.centile}(BQ_Q1)": args.baseq_threshold,
+        f"CENTILE{args.centile}(MQ_Q1)": args.mapq_threshold,
     }
 
     # Convert all filepaths to Path type
