@@ -159,7 +159,7 @@ process GENERATE_PER_BASE_SUMMARY {
 
 process SCORE_OUTPUT_ON_METRICS {
     tag "${sample_name}"
-    publishDir "${params.output_dir}/target_eval_results/library_level", mode: 'copy'
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/library_level", mode: 'copy'
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
@@ -188,7 +188,7 @@ process SCORE_OUTPUT_ON_METRICS {
 
 process SCORE_OUTPUT_ON_FIELD {
     tag "${sample_name}"
-    publishDir "${params.output_dir}/target_eval_results/${sample_name=='All_Samples' ? '' : 'library_level'}", mode: 'copy'
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/${sample_name=='All_Samples' ? '' : 'library_level'}", mode: 'copy'
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
@@ -220,7 +220,7 @@ process SCORE_OUTPUT_ON_FIELD {
 
 process GENERATE_TRACTS {
     tag "${sample_name}"
-    publishDir "${params.output_dir}/target_eval_results/tracts", mode: 'copy'
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/tracts", mode: 'copy'
 
     input:
     tuple val(sample_name), path(scored_file), val(pool_id)
@@ -256,7 +256,7 @@ process GENERATE_TRACTS {
 
 process UNIONIZE_TRACTS {
     tag "All_Three_Metrics"
-    publishDir "${params.output_dir}/target_eval_results/tracts", mode: 'copy'
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/tracts", mode: 'copy'
 
     input:
     path(all_tracts_bed)
@@ -272,7 +272,7 @@ process UNIONIZE_TRACTS {
 }
 
 process GENERATE_VISUALIZATION {
-    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/plots", mode: 'copy'
 
     input:
     path(input_files)

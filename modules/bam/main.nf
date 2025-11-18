@@ -97,7 +97,7 @@ process GET_PER_BASE_STATS {
 process GET_PER_BASE_STATS_NO_PARSE {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}/target_eval_results/raw_mpileups/", mode: 'copy'
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/raw_mpileups", mode: 'copy'
 
     input:
     path(targets_bed)
