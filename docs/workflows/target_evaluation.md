@@ -15,7 +15,10 @@ Per-base metrics are further aggregated on two rules to provide reliable perform
 
 Visualization on per-target level optionally enabled by `--visualize` option.
 
-Coverage normalization per-sample can be optionally enabled by `--normalize_to_target_coverage` option.
+Coverage can be scaled to center on a specific target value with `--normalize_coverage`
+to improve comparability across samples and mirror expected sequencing depth.
+
+See [Target Evaluation Parameters](#target-evaluation-parameters) for details.
 
 
 ## Quick Start
@@ -33,14 +36,13 @@ nextflow run main.nf \
 --visualize
 ```
 
-Custom pass/fail scoring by setting three threshold parameters with coverage normalization: coverage, BASEQ, and MAPQ.
+Custom pass/fail scoring by setting three threshold parameters: coverage, BASEQ, and MAPQ.
 ```bash
 nextflow run main.nf \
 --workflows target_evaluation \
 --aligned_files '<path/to/alignment_files_dir/*.bam>' \
 --targets_bed <path/to/targets_bed> \
 --output_dir <path/to/output_dir> \
---normalize_to_target_coverage <target_reads_per_base> \
 --coverage_threshold <min_coverage> \
 --baseq_threshold <min_baseq> \
 --mapq_threshold <min_mapq>
@@ -57,12 +59,13 @@ nextflow run main.nf \
 ### Target Evaluation Parameters
 
 **Required Parameters:**
+- `--workflows target_evaluation`: Required parameter to run target evaluation workflow.
 - `--aligned_files`: Glob including BAM and/or CRAM files to be processed (eg. '/path/to/dir/*'). Any other filetypes ignored. If CRAM files included, also provide `--genome_ref`.
 - `--targets_bed`: Target regions in BED format.
 - `--genome_ref`: Reference genome FASTA file. Required to process any input CRAM files.
 
 **Optional Parameters:**
-- `--normalize_to_target_coverage`: Target mean coverage for target regions. If set, coverage is normalized by a factor of [target_cov/panel_avg].
+- `--normalize_coverage`: If set, coverage across the targets bed for every sample is normalized and scaled to center on this value.
 - `--coverage_threshold`: Minimum coverage threshold for pass (default = 25).
 - `--baseq_threshold`: Minimum BASEQ threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--mapq_threshold`: Minimum MAPQ score threshold for pass, scored on first quartile of all reads per base (default = 30).

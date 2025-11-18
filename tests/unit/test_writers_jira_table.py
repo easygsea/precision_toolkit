@@ -1,5 +1,7 @@
 """Tests for JIRA table writer."""
 
+import re
+
 import pandas as pd
 import pytest
 
@@ -34,7 +36,7 @@ from clinical_tools.core.writers.jira_table import (  # type: ignore[import-not-
 def test_pandas_to_jira_table(table_input: dict[str, list[str | float | bool]]) -> None:
     """Test pandas_to_jira_table function."""
     df = pd.DataFrame(table_input)
-    result = pandas_to_jira_table(df)
+    result = pandas_to_jira_table(df, None, False)
     for key, values in table_input.items():
         assert key.replace("|", "\\|") in result
         for value in values:
@@ -49,9 +51,28 @@ def test_pandas_to_jira_table(table_input: dict[str, list[str | float | bool]]) 
 def test_empty_pandas_to_jira_table() -> None:
     """Test empty DataFrame handling."""
     df = pd.DataFrame()
-    result = pandas_to_jira_table(df)
+    result = pandas_to_jira_table(df, None, False)
     expected = "||No data available||"
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    "float_format, expected_pattern",
+    [
+        (None, r"12345\.678947"),  # raw formatting
+        (0, r"1\.234568e\+04"),  # scientific notation
+        (2, r"12345\.68"),  # float with 2 decimals
+        (4, r"12345\.6789"),  # float with 4 decimals
+    ],
+    ids=["default", "scientific", "2_decimal", "4_decimal"],
+)
+def test_pandas_to_jira_table_float_format(
+    float_format: int | None, expected_pattern: str
+) -> None:
+    """Test pandas_to_jira_table function with various float_format settings."""
+    df = pd.DataFrame({"Value": [12345.678947, 0.0001234]})
+    result = pandas_to_jira_table(df, float_format, False)
+    assert re.search(expected_pattern, result) is not None
 
 
 @pytest.fixture
@@ -81,16 +102,16 @@ def test_populate_jira_table(
     expected: list[str],
 ) -> None:
     """Test populate_jira_table function."""
-    result = populate_jira_table(basic_df, heading, summary)
+    result = populate_jira_table(basic_df, heading, summary, None, False)
     for value in expected:
         if value is not None:
             assert value in result
-    assert pandas_to_jira_table(basic_df) in result
+    assert pandas_to_jira_table(basic_df, None, False) in result
 
 
 def test_empty_populate_jira_table() -> None:
     """Test empty DataFrame handling."""
     empty_df = pd.DataFrame()
-    result = populate_jira_table(empty_df, None, None)
+    result = populate_jira_table(empty_df, None, None, None, False)
     expected = "||No data available||"
     assert result == expected
