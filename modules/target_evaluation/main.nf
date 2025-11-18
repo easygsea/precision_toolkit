@@ -42,6 +42,7 @@ process ADD_TARGET_LABELS {
     input:
     tuple val(sample_name), path(parsed_pileup), val(pool_id)
     path(targets_bed)
+    val(metrics_thresholds_and_headings)
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: labelled_pileup
@@ -54,7 +55,10 @@ process ADD_TARGET_LABELS {
     bedtools intersect -a - -b ${targets_bed} -wa -wb |
     awk -v OFS='\\t' '
     BEGIN {
-        print "#CHROM","POS","TRACT","POOL","COVERAGE","BASEQ_Q1","MAPQ_Q1";
+        print "#CHROM","POS","TRACT","POOL",
+        "${metrics_thresholds_and_headings.cov.library_header}",
+        "${metrics_thresholds_and_headings.bq.library_header}",
+        "${metrics_thresholds_and_headings.mq.library_header}";
     }
     {
         print \$4,\$5,\$13,\$9,\$6,\$7,\$8;
@@ -68,7 +72,8 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     input:
     tuple val(sample_name), path(labelled_pileup), val(pool_id)
     path(targets_bed)
-    val agg_percentile
+    val(target_fail_tolerance)
+    val(metrics_thresholds_and_headings)
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: per_target_aggregated
@@ -83,16 +88,16 @@ process GET_PER_TARGET_AGGREGATED_STATS {
     BEGIN {
         OFMT = "%.${params.decimals}f"
         print "#CHROM","POS","TRACT","POOL",
-            "CENTILE"int(${agg_percentile}*100)"(COV)",
-            "CENTILE"int(${agg_percentile}*100)"(BQ_Q1)",
-            "CENTILE"int(${agg_percentile}*100)"(MQ_Q1)",
+            "${metrics_thresholds_and_headings.cov.target_header}",
+            "${metrics_thresholds_and_headings.bq.target_header}",
+            "${metrics_thresholds_and_headings.mq.target_header}",
             "LEN","NUM_BASES_FAIL","PCT_BASES_FAIL";
     }
     {
         n=split(\$4, coverages, ","); split(\$5, baseQ1s, ","); split(\$6, mapQ1s, ",");
         bases_failed = gsub(/FAIL/, "", \$7);
         asort(coverages); asort(baseQ1s); asort(mapQ1s);
-        p=int( ${agg_percentile} * (n-1) + 1.5 );
+        p=int( ${target_fail_tolerance} * (n-1) + 1.5 );
         print \$1,"NA",\$2,\$3,
             coverages[p],baseQ1s[p],mapQ1s[p],
             n,bases_failed,bases_failed/n*100;
@@ -106,8 +111,8 @@ process GENERATE_PER_BASE_SUMMARY {
 
     input:
     path(combined_labelled_pileups)
-    tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
     val(agg_percentile)
+    val(metrics_thresholds_and_headings)
 
     output:
     tuple val("All_Samples"), path(OUT), val("All_Pools"), emit: all_libraries_per_base
@@ -122,11 +127,13 @@ process GENERATE_PER_BASE_SUMMARY {
     BEGIN {
         OFMT = "%.${params.decimals}f"
         print "#CHROM","POS","TRACT","POOL",
-            "CENTILE"int(${agg_percentile}*100)"(COV)",
-            "CENTILE"int(${agg_percentile}*100)"(BQ_Q1)",
-            "CENTILE"int(${agg_percentile}*100)"(MQ_Q1)",
+            "${metrics_thresholds_and_headings.cov.base_header}",
+            "${metrics_thresholds_and_headings.bq.base_header}",
+            "${metrics_thresholds_and_headings.mq.base_header}",
             "NUM_LIB_FAIL(COV)","NUM_LIB_FAIL(BQ)","NUM_LIB_FAIL(MQ)",
-            "PCT_LIB_FAIL(COV)","PCT_LIB_FAIL(BQ)","PCT_LIB_FAIL(MQ)";
+            "${metrics_thresholds_and_headings.cov.base_score_header}",
+            "${metrics_thresholds_and_headings.bq.base_score_header}",
+            "${metrics_thresholds_and_headings.mq.base_score_header}";
     }
     {
         n=split(\$4, coverages, ","); split(\$5, baseQ1s, ","); split(\$6, mapQ1s, ",");
@@ -136,9 +143,9 @@ process GENERATE_PER_BASE_SUMMARY {
 
         lib_fail_cov=0; lib_fail_bq=0; lib_fail_mq=0;
         for (i = 1; i <= n; i++){
-            if (coverages[i] < ${cov_threshold}) lib_fail_cov++;
-            if (baseQ1s[i] < ${bq_threshold}) lib_fail_bq++;
-            if (mapQ1s[i] < ${mq_threshold}) lib_fail_mq++;
+            if (coverages[i] < ${metrics_thresholds_and_headings.cov.threshold}) lib_fail_cov++;
+            if (baseQ1s[i] < ${metrics_thresholds_and_headings.bq.threshold}) lib_fail_bq++;
+            if (mapQ1s[i] < ${metrics_thresholds_and_headings.mq.threshold}) lib_fail_mq++;
         }
 
         print \$1,\$2,\$3,"AGGREGATE",coverages[p],baseQ1s[p],mapQ1s[p],
@@ -156,7 +163,7 @@ process SCORE_OUTPUT_ON_METRICS {
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
-    tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
+    val(metrics_thresholds_and_headings)
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: scored_output
@@ -170,7 +177,7 @@ process SCORE_OUTPUT_ON_METRICS {
         next;
     }
     {
-        if (\$5>=${cov_threshold} && \$6>=${bq_threshold} && \$7>=${mq_threshold}) {
+        if (\$5>=${metrics_thresholds_and_headings.cov.threshold} && \$6>=${metrics_thresholds_and_headings.bq.threshold} && \$7>=${metrics_thresholds_and_headings.mq.threshold}) {
             print \$0,"PASS";
         } else {
             print \$0,"FAIL";
@@ -185,7 +192,9 @@ process SCORE_OUTPUT_ON_FIELD {
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
-    tuple val(output_col_name), val(col_to_score), val(scoring_threshold)
+    val(col_to_score)
+    val(output_col_name)
+    val(scoring_threshold)
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: scored_output
@@ -195,7 +204,6 @@ process SCORE_OUTPUT_ON_FIELD {
     """
     awk -v OFS='\\t' '
     /^#/ {
-        # Handle headers
         for (i=1; i<=NF; i++) col[\$i] = i
         print \$0,"${output_col_name}";
         next;
@@ -216,34 +224,33 @@ process GENERATE_TRACTS {
 
     input:
     tuple val(sample_name), path(scored_file), val(pool_id)
-    each(metric)
+    each(headers_dict)
     val(gap_tolerance)
-    val(centile)
 
     output:
     path(OUT), emit: tract_bed
 
     script:
-    OUT="tracts.${metric.toLowerCase()}.bed"
+    OUT="tracts.${headers_dict.base_score_output_header.toLowerCase()}.bed"
     //TODO: also target/all library file
     """
     awk -v OFS='\\t' '
     /^#/ {
-        # Handle headers
         for (i=1; i<=NF; i++) col[\$i] = i
-        print "# chrom start end name mean_score"
-        next
     }
-    \$col["${metric}"] ~ /FAIL/ {
-        # Match tag of values column to calc mean of failed centile
-        col_tag="CENTILE" int(${centile}*100) \
-            "(${metric.replaceFirst("_SCORE","")}" \
-            (("${metric}"!="COV_SCORE") ? "_Q1)" : ")")
+    \$col["${headers_dict.base_score_output_header}"] ~ /FAIL/ {
         # Convert to bed format
-        print \$1,\$2,\$2+1,\$3,\$col[col_tag]
+        print \$1,\$2,\$2+1,\$3,\$col["${headers_dict.base_header}"]
     }' ${scored_file} |
     bedtools merge -d ${gap_tolerance} -c 4,5 -o distinct,mean |
-    awk -v OFS='\\t' '{ \$5 = sprintf("%.${params.decimals}f", \$5); print }' > ${OUT}
+    awk -v OFS='\\t' '
+    BEGIN {
+        print "#chrom", "start", "end", "name", "mean_fail_centile_score"
+    }
+    {
+        \$5 = sprintf("%.${params.decimals}f", \$5)
+        print
+    }' > ${OUT}
     """
 }
 
@@ -271,7 +278,7 @@ process GENERATE_VISUALIZATION {
     path(input_files)
     val(pool_ids)
     val(prefix)
-    tuple val(cov_threshold), val(bq_threshold), val(mq_threshold)
+    val(metrics_thresholds_and_headings)
 
     output:
     path(OUT)
@@ -283,10 +290,6 @@ process GENERATE_VISUALIZATION {
     --input-files ${input_files} \
     --pool-ids ${pool_ids.join(' ')} \
     --prefix ${prefix} \
-    --coverage-threshold ${cov_threshold} \
-    --baseq-threshold ${bq_threshold} \
-    --mapq-threshold ${mq_threshold} \
+    --metrics-thresholds-and-headings ${metrics_thresholds_and_headings}
     """
 }
-
-//TODO: process generate_metrics_tracts{}

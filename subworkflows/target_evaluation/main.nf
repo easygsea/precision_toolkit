@@ -34,24 +34,42 @@ workflow gene_target_evaluation_workflow {
     */
 
     // define workflow variables
-    def metrics_scoring_thresholds = tuple (
-        params.coverage_threshold,
-        params.baseq_threshold,
-        params.mapq_threshold
-    )
-    def scoring_params = [
-        tuple ("SCORE", "PCT_BASES_FAIL", params.target_fail_tolerance),
-        tuple ("COV_SCORE", "PCT_LIB_FAIL(COV)", params.base_fail_tolerance),
-        tuple ("BQ_SCORE", "PCT_LIB_FAIL(BQ)", params.base_fail_tolerance),
-        tuple ("MQ_SCORE", "PCT_LIB_FAIL(MQ)", params.base_fail_tolerance)
+    def metrics_thresholds_and_headings = [
+        cov: [
+            library_header: "COVERAGE",
+            target_header: "CENTILE${params.target_fail_tolerance*100 as int}(COV)",
+            base_header: "CENTILE${params.base_fail_tolerance*100 as int}(COV)",
+            base_score_header: "PCT_LIB_FAIL(COV)",
+            base_score_output_header: "COV_SCORE",
+            threshold: params.coverage_threshold
+        ],
+        bq: [
+            library_header: "BASEQ_Q1",
+            target_header: "CENTILE${params.target_fail_tolerance*100 as int}(BQ_Q1)",
+            base_header: "CENTILE${params.base_fail_tolerance*100 as int}(BQ_Q1)",
+            base_score_header: "PCT_LIB_FAIL(BQ)",
+            base_score_output_header: "BQ_SCORE",
+            threshold: params.baseq_threshold
+        ],
+        mq: [
+            library_header: "MAPQ_Q1",
+            target_header: "CENTILE${params.target_fail_tolerance*100 as int}(MQ_Q1)",
+            base_header: "CENTILE${params.base_fail_tolerance*100 as int}(MQ_Q1)",
+            base_score_header: "PCT_LIB_FAIL(MQ)",
+            base_score_output_header: "MQ_SCORE",
+            threshold: params.mapq_threshold
+        ],
+        gen: [
+            target_score_header: "PCT_BASES_FAIL",
+            target_score_output_header: "SCORE"
+        ]
     ]
-    def tract_params = channel.of ("COV_SCORE", "BQ_SCORE", "MQ_SCORE")
 
     // make sure bed is sorted
     targets_bed = SORT_BED(file(params.targets_bed)).sorted_bed
 
     // build input channel & branch based on filetype
-    mixed_aligned_ch = channel
+    mixed_aligned_ch = Channel
         .fromPath(params.aligned_files)
         .map{file_path ->
             def sample_name = file_path.getName().replaceFirst(/\..*$/, "")
@@ -103,7 +121,8 @@ workflow gene_target_evaluation_workflow {
     )
     ADD_TARGET_LABELS (
         GET_PER_BASE_STATS.out.parsed_pileup,
-        targets_bed
+        targets_bed,
+        metrics_thresholds_and_headings
     )
 
     // normalize if target coverage provided
@@ -121,7 +140,7 @@ workflow gene_target_evaluation_workflow {
     // score based on metrics thresholds
     SCORE_BASES_PER_LIBRARY (
         sample_stage_output,
-        metrics_scoring_thresholds
+        metrics_thresholds_and_headings
     )
 
     // aside: output raw mpileup if needed (troubleshooting option)
@@ -136,34 +155,55 @@ workflow gene_target_evaluation_workflow {
     GET_PER_TARGET_AGGREGATED_STATS (
         SCORE_BASES_PER_LIBRARY.out.scored_output,
         targets_bed,
-        params.target_fail_tolerance //percentile - >= X% of bases are above this value
+        params.target_fail_tolerance,
+        metrics_thresholds_and_headings
     )
 
     // score based on PCT_FAIL/TARGET
     SCORE_TARGETS_PER_LIBRARY (
         GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated,
-        scoring_params[0]
+        metrics_thresholds_and_headings.gen.target_score_header,
+        metrics_thresholds_and_headings.gen.target_score_output_header,
+        params.target_fail_tolerance
+        //TODO: should display percentile be separate from threshold/tolerance percentile?
     )
 
     // STAGE 3: Aggregate per base across libraries (percentile of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
         SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: "combined_labelled_pileups.txt"){it[1]},
-        metrics_scoring_thresholds, //for detailed output: num libraries failed/metric
-        params.base_fail_tolerance //percentile - >= X% of libraries above this value
+        params.base_fail_tolerance,
+        metrics_thresholds_and_headings //for detailed output: num libraries failed/metric
         //TODO: should display percentile be separate from threshold/tolerance percentile?
     )
 
     // score each base on how many libraries passed for each metric
-    SCORE_PER_BASE_SUMMARY_ON_COV (GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base, scoring_params[1])
-    SCORE_PER_BASE_SUMMARY_ON_BQ (SCORE_PER_BASE_SUMMARY_ON_COV.out.scored_output, scoring_params[2])
-    SCORE_PER_BASE_SUMMARY_ON_MQ (SCORE_PER_BASE_SUMMARY_ON_BQ.out.scored_output, scoring_params[3])
+    SCORE_PER_BASE_SUMMARY_ON_COV (
+        GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base,
+        metrics_thresholds_and_headings.cov.base_score_header,
+        metrics_thresholds_and_headings.cov.base_score_output_header,
+        params.base_fail_tolerance
+     )
+    SCORE_PER_BASE_SUMMARY_ON_BQ (
+        SCORE_PER_BASE_SUMMARY_ON_COV.out.scored_output,
+        metrics_thresholds_and_headings.bq.base_score_header,
+        metrics_thresholds_and_headings.bq.base_score_output_header,
+        params.base_fail_tolerance
+    )
+    SCORE_PER_BASE_SUMMARY_ON_MQ (
+        SCORE_PER_BASE_SUMMARY_ON_BQ.out.scored_output,
+        metrics_thresholds_and_headings.mq.base_score_header,
+        metrics_thresholds_and_headings.mq.base_score_output_header,
+        params.base_fail_tolerance
+    )
 
     // generate tracts per metric
     GENERATE_TRACTS (
         SCORE_PER_BASE_SUMMARY_ON_MQ.out.scored_output,
-        tract_params,
-        params.tract_gap_tolerance,
-        params.base_fail_tolerance
+        Channel.from(
+            metrics_thresholds_and_headings
+                .findAll { k, v -> ['cov','bq','mq'].contains(k) }
+                .values() ),
+        params.tract_gap_tolerance
     )
     // generate unionized tract
     UNIONIZE_TRACTS (GENERATE_TRACTS.out.tract_bed.collectFile())
@@ -174,8 +214,9 @@ workflow gene_target_evaluation_workflow {
             GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[1]},
             GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[2]},
             "plot",
-            metrics_scoring_thresholds,
-            params.target_fail_tolerance*100 as int
+            metrics_thresholds_and_headings
+                .findAll { k, v -> ['cov','bq','mq'].contains(k) }
+                .collectEntries {  k,v -> [ (v.target_header): v.threshold ] }
         )
     }
 }

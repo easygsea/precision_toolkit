@@ -18,6 +18,7 @@ Example:
 """
 
 import argparse
+import json
 from pathlib import Path
 
 import matplotlib.colors
@@ -61,38 +62,13 @@ def main() -> None:
         help="Prefix for output filenames. Default is 'target_eval'.",
     )
     parser.add_argument(
-        "--coverage-threshold",
-        type=int,
-        help="Coverage threshold to plot.",
-        required=True,
-    )
-    parser.add_argument(
-        "--baseq-threshold",
-        type=int,
-        help="BASEQ threshold to plot.",
-        required=True,
-    )
-    parser.add_argument(
-        "--mapq-threshold",
-        type=int,
-        help="MAPQ threshold to plot.",
-        required=True,
-    )
-    parser.add_argument(
-        "--centile",
-        type=int,
-        help="Percentile of target reported.",
+        "--metrics-thresholds-and-headings",
+        type=json.loads,
+        help="Dictionary of metric name and threshold.",
         required=True,
     )
 
     args = parser.parse_args()
-
-    # Make metrics and thresholds dictionary
-    METRICS_THRESHOLDS = {
-        f"CENTILE{args.centile}(COV)": args.coverage_threshold,
-        f"CENTILE{args.centile}(BQ_Q1)": args.baseq_threshold,
-        f"CENTILE{args.centile}(MQ_Q1)": args.mapq_threshold,
-    }
 
     # Convert all filepaths to Path type
     input_files = [Path(file_path) for file_path in args.input_files]
@@ -107,7 +83,7 @@ def main() -> None:
     # Initialize figure
     plt.figure(figsize=(120, 50))
 
-    for metric, threshold in METRICS_THRESHOLDS.items():
+    for metric, threshold in args.metrics_thresholds_and_headings.items():
         for file, pool in zip(input_files, pool_ids):
             # Read data
             df = pd.read_csv(file, sep="\t", comment=None)
