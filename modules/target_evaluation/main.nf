@@ -290,6 +290,6 @@ process GENERATE_VISUALIZATION {
     --input-files ${input_files} \
     --pool-ids ${pool_ids.join(' ')} \
     --prefix ${prefix} \
-    --metrics-thresholds-and-headings ${metrics_thresholds_and_headings}
+    --metrics-thresholds-and-headings '${groovy.json.JsonOutput.toJson(metrics_thresholds_and_headings)}'
     """
 }
