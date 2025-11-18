@@ -255,7 +255,7 @@ process GENERATE_TRACTS {
 }
 
 process UNIONIZE_TRACTS {
-    tag "${sample_name}"
+    tag "All_Three_Metrics"
     publishDir "${params.output_dir}/target_eval_results/tracts", mode: 'copy'
 
     input:
