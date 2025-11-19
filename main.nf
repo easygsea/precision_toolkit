@@ -86,17 +86,25 @@ def helpMessage() {
             --targets_bed                   BED file of genomic targets
 
         Optional Parameters:
-            --genome_ref                    Reference genome for CRAM files. CRAM files skipped if not provided.
-            --coverage_threshold            Minimum acceptable coverage per base (default: 25)
-            --baseq_threshold               Minimum acceptable first-quartile(Q1) of BASEQ scores per base (default: 30)
-            --mapq_threshold                Minimum acceptable first-quartile(Q1) of MAPQ scores per base (default: 30)
-            --visualize                     Flag to generate per-target plots for all input files per stat
+            --target_evaluation_subdir      Subdirectory for target evaluation results (default: target_evaluation)
             --output_raw_mpileup            Flag to output raw/un-parsed mpileup file (note that this file is large)
-            --mpileup_baseq_min             Adjust minimum baseq for a base to be considered in a read (default: 10)
-            --mpileup_mapq_min              Adjust minimum mapq for a read to be considered (default: 1)
-        In Development:
-            --normalize_to_mean_coverage    Bam files will be normalized to the provided mean coverage
-            --aligned_files_comparator      Glob expression (similar to --aligned_files) to compare against
+            --normalize_coverage            If set, coverage across the targets bed for every sample is normalized and scaled to center on this value
+            --genome_ref                    Reference genome for CRAM files. CRAM files skipped if not provided.
+            --visualize                     Flag to generate per-target plots for all input files per stat
+
+        Fine-Tuning Parameters:
+            --coverage_threshold                    Minimum acceptable coverage per base (default: 25)
+            --baseq_threshold                       Minimum acceptable first-quartile(Q1) of BASEQ scores per base (default: 30)
+            --mapq_threshold                        Minimum acceptable first-quartile(Q1) of MAPQ scores per base (default: 30)
+            --target_fail_tolerance                 Maximum tolerable percentage of bases failed for target-level PASS per sample (default: 0.25)
+            --base_fail_tolerance                   Maximum tolerable percentage of libraries failing at a base for base-level PASS across all libraries (default: 0.25)
+            --tract_gap_tolerance                   Maximum gap tolerance between fail regions when building tracts (default: 2)
+            --min_bq_per_read.coverage_analysis     Minimum BASEQ for read to be included in coverage count at each position (default: 10)
+            --min_bq_per_read.mapq_analysis         Minimum BASEQ for read to be included in MAPQ Q1 analysis at each position (default: 10)
+            --min_bq_per_read.baseq_analysis        Minimum BASEQ for read to be included in BASEQ Q1 analysis at each position (default: 0)
+            --min_mq_per_read.coverage_analysis     Minimum MAPQ for read to be included in coverage count at each position (default: 1)
+            --min_mq_per_read.mapq_analysis         Minimum MAPQ for read to be included in MAPQ Q1 analysis at each position (default: 0)
+            --min_mq_per_read.baseq_analysis        Minimum MAPQ for read to be included in BASEQ Q1 analysis at each position (default: 1)
 
     ====================
     Resource Management
