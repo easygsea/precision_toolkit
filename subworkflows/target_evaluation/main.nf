@@ -170,7 +170,7 @@ workflow gene_target_evaluation_workflow {
 
     // STAGE 3: Aggregate per base across libraries (percentile of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
-        SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: "combined_labelled_pileups.txt"){it[1]},
+        SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: 'combined_labelled_pileups.txt'){it[1]},
         params.base_fail_tolerance,
         metrics_thresholds_and_headings //for detailed output: num libraries failed/metric
         //TODO: should display percentile be separate from threshold/tolerance percentile?
@@ -206,7 +206,7 @@ workflow gene_target_evaluation_workflow {
         params.tract_gap_tolerance
     )
     // generate unionized tract
-    UNIONIZE_TRACTS (GENERATE_TRACTS.out.tract_bed.collectFile())
+    UNIONIZE_TRACTS (GENERATE_TRACTS.out.tract_bed.collectFile(name: 'combined.bed', skip: 1))
 
     // Stage 5: Generate visualization per target
     if (params.visualize) {

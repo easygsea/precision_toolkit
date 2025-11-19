@@ -9,18 +9,18 @@
     --visualize
     --output_raw_mpileup
   files:
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/raw_mpileups/library_level/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.raw.txt
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/raw_mpileups/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.raw.txt
       md5sum: 8427b632988de76cac2d6b3c1e1be9fe
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/library_level/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.scored.txt
       md5sum: f33f5f9de445f022267b48aabec8e4f6
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/library_level/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: a899f874ee71e85c22b66166c8fff928
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/raw_mpileups/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.raw.txt
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/raw_mpileups/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.raw.txt
       md5sum: 03730089af68497d87ac2cba7496f568
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.scored.txt
       md5sum: 3c7e8a07282043a044cae55266b93a8e
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
-      md5sum: 5912bfb06b42d77b53468346a761668d
+      md5sum: d5dea9304f8ccbc962561d7c08496449
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.cov_score.bed
       md5sum: c06d211e849be29daa47d68a988e7f6a
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.bq_score.bed
@@ -28,7 +28,7 @@
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.mq_score.bed
       md5sum: fb43c1115d65e7d9a1fb00353e18d72d
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.unionized.bed
-      md5sum: c78d758f8e6d9fcf69150f89579ce443
+      md5sum: b671115b95bc1df7703b18d69c2dab6f
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/all_libraries_per_base_metrics.scored.txt
       md5sum: 70d4cd9f4b5ead9f17e469c95047312c
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/plot_CENTILE25(COV).png
@@ -46,14 +46,12 @@
     --targets_bed tests_data/target_evaluation/test_targets.bed
     --output_dir target_evaluation_test_mixed_noref
   files:
-    - path: target_evaluation_test_mixed_noref/target_evaluation
+    - path: target_evaluation_test_mixed_noref/target_evaluation/raw_mpileups
       should_exist: false
     - path: target_evaluation_test_mixed_noref/target_evaluation/library_level/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.scored.txt
       md5sum: f33f5f9de445f022267b48aabec8e4f6
     - path: target_evaluation_test_mixed_noref/target_evaluation/library_level/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: a899f874ee71e85c22b66166c8fff928
-    - path: target_evaluation_test_mixed_noref/target_evaluation/raw_mpileups/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.raw.txt
-      should_exist: false
     - path: target_evaluation_test_mixed_noref/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.scored.txt
       should_exist: false
     - path: target_evaluation_test_mixed_noref/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
@@ -65,14 +63,10 @@
     - path: target_evaluation_test_mixed_noref/target_evaluation/tracts/tracts.mq_score.bed
       md5sum: 7be4a9bff2688937b4ed3f9b0596981c
     - path: target_evaluation_test_mixed_noref/target_evaluation/tracts/tracts.unionized.bed
-      md5sum: a15a847a48b1369aefac7e39efa58b12
+      md5sum: b671115b95bc1df7703b18d69c2dab6f
     - path: target_evaluation_test_mixed_noref/target_evaluation/all_libraries_per_base_metrics.scored.txt
       md5sum: 00701f711e5f6674ccbd0fa0a2f3612e
-    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/plot_CENTILE25(COV).png
-      should_exist: false
-    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/plot_CENTILE25(BQ_Q1).png
-      should_exist: false
-    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/plot_CENTILE25(MQ_Q1).png
+    - path: target_evaluation_test_mixed_noref/target_evaluation/plots
       should_exist: false
 
 - name: target_evaluation_test_bam_only
@@ -154,14 +148,14 @@
       md5sum: d25f56130f4db6d7d6ea159f59adf9b0
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: 8ea8f1a020075f78b874b89ee6ecb6b2
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.cov_score.bed
+    - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.cov_score.bed
       md5sum: 7fbcb716211c74c9f9f61ece929a1d48
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.bq_score.bed
+    - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.bq_score.bed
       md5sum: 1544b16d8b49f04654531d5e6c34da02
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.mq_score.bed
+    - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.mq_score.bed
       md5sum: 1aba511ebc9656168eb7ef0999d9d16f
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.unionized.bed
-      md5sum: 3102dfc38b66455caee0d4400b696d41
+    - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.unionized.bed
+      md5sum: 756330758029932d53ff0e07ca5fd8e3
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_CENTILE50(COV).png
       md5sum: a76ad4dbf16f90773cfa1dcdf2b83fbb
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_CENTILE50(BQ_Q1).png
@@ -190,14 +184,14 @@
       md5sum: 3c7e8a07282043a044cae55266b93a8e
     - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: 5912bfb06b42d77b53468346a761668d
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.cov_score.bed
+    - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/tracts/tracts.cov_score.bed
       md5sum: c06d211e849be29daa47d68a988e7f6a
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.bq_score.bed
-      md5sum: 71ae2f3e96ab675b10f15a622e7fdc4c
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.mq_score.bed
+    - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/tracts/tracts.bq_score.bed
+      md5sum: 4f70bf4abb32e2bf99be84e558af91ef
+    - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/tracts/tracts.mq_score.bed
       md5sum: fb43c1115d65e7d9a1fb00353e18d72d
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.unionized.bed
-      md5sum: c78d758f8e6d9fcf69150f89579ce443
+    - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/tracts/tracts.unionized.bed
+      md5sum: b671115b95bc1df7703b18d69c2dab6f
     - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/all_libraries_per_base_metrics.scored.txt
       md5sum: 70d4cd9f4b5ead9f17e469c95047312c
 
