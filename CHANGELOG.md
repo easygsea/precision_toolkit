@@ -19,7 +19,7 @@
 ---
 
 ### v1.1.0 - 2025-10-15
-- New Workflow: Added new target evaluation workflow for analyzing per-base stats across target regions.
+- New Workflow: Introduced target evaluation workflow for analyzing per-base stats across target regions.
 - New Standalone Utility: Added `jira-table` to convert structured data files into a formatted JIRA table.
 - New Standalone Utility: Added `liftover_sv_vcf.sh` helper.
 - Feature: Added GitHub Actions to automatically sync changes from Bitbucket.
