@@ -5,8 +5,8 @@
 ### v1.1.1 - 2025-11-05
 - New Standalone Utility: Added new utility to reformat BED files in BED6+4 format into a 4-column BED file and standardizes feature names.
 - Feature: Introduced coverage normalization option in target evaluation workflow.
-- Feature: Reworked target evaluation workflow with more intuitive and robust scoring and analysis. See docs for more details.
 - Feature: Added track building functionality to target evaluation workflow.
+- Improvement: Reworked target evaluation workflow with more intuitive and robust scoring and analysis. See docs for more details.
 - Improvement: Restructured target evaluation directory for ease of access when working with large datasets.
 - Improvement: Added two arguments in jira-table to control float formatting and text output formatting.
 - Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in nextflow.config.

@@ -85,6 +85,9 @@ nextflow run main.nf \
 
 ### Variant Benchmark Parameters
 
+**Workflow Parameters**
+- Please see [General Workflow Parameters](./README.md#general-workflow-parameters) for workflow-level parameters.
+
 **Required Parameters:**
 - `--workflows variant_benchmark`: Required parameter to run target evaluation workflow.
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.

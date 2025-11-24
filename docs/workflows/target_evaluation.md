@@ -54,6 +54,9 @@ nextflow run main.nf \
 
 ### Target Evaluation Parameters
 
+**Workflow Parameters**
+- Please see [General Workflow Parameters](./README.md#general-workflow-parameters) for workflow-level parameters.
+
 **Required Parameters:**
 - `--aligned_files`: Glob including BAM and/or CRAM files to be processed (eg. '/path/to/dir/*'). Any other filetypes ignored. If CRAM files included, also provide `--genome_ref`.
 - `--targets_bed`: Target regions in BED format.
@@ -70,7 +73,7 @@ nextflow run main.nf \
 - `--baseq_threshold`: Minimum BASEQ threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--mapq_threshold`: Minimum MAPQ score threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--target_fail_tolerance`: Maximum tolerable percentage of bases failed for target-level PASS per sample (default = 0.25, non-inclusive).
-- `--base_fail_tolerance`: Maximum tolerable percentage of libraries failing at a base for base-level PASS across all libraries (default = 0.25, non-inclusive).
+- `--base_fail_tolerance`: Maximum tolerable percentage of libraries failing at a base (default = 0.25, non-inclusive).
 - `--tract_gap_tolerance`: Maximum gap tolerance between fail regions when building tracts (default = 2).
 
 **Custom Metric Parameters** (optional parameters to fine-tune filtering of raw mpileup output for each metric):
