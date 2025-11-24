@@ -5,8 +5,8 @@ Visualize tract/target scores output from target evaluation workflow, grouped by
 
 Usage:
     plot-target-tracts --input-files <input_files> --pool-ids <pool_ids>
-   --prefix <prefix> --coverage-threshold <coverage-threshold>
-   --baseq-threshold <baseq-threshold> --mapq-threshold <mapq-threshold>
+    --metrics-thresholds-and-headings <JSON map of column header to threshold>
+    --prefix <prefix>
 
 Example:
     plot-target-tracts --input-files
@@ -14,7 +14,8 @@ Example:
     B.mpileup.per_base.parsed.labelled.target_aggregated.txt
     C.mpileup.per_base.parsed.labelled.target_aggregated.txt
     --pool-ids IX00001 IX00000 IX12265 --prefix target_eval_visual
-    --coverage-threshold 25 --baseq-threshold 30 --mapq-threshold 30
+    --metrics-thresholds-and-headings
+    {"CENTILE100(COV)":25,"CENTILE100(BQ_Q1)":30,"CENTILE100(MQ_Q1)":30}
 """
 
 import argparse
