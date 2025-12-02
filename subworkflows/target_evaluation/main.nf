@@ -117,7 +117,8 @@ workflow gene_target_evaluation_workflow {
         targets_bed,
         bam_ch,
         params.min_bq_per_read,
-        params.min_mq_per_read
+        params.min_mq_per_read,
+        params.read_fail_tolerance
     )
     ADD_TARGET_LABELS (
         GET_PER_BASE_STATS.out.parsed_pileup,

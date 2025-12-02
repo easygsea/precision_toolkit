@@ -72,6 +72,7 @@ nextflow run main.nf \
 - `--coverage_threshold`: Minimum coverage threshold for pass (default = 25).
 - `--baseq_threshold`: Minimum BASEQ threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--mapq_threshold`: Minimum MAPQ score threshold for pass, scored on first quartile of all reads per base (default = 30).
+- `--read_fail_tolerance`: Maximum acceptable percentage of reads per base failing baseq and mapq thresholds (default = 0.25, non-inclusive).
 - `--target_fail_tolerance`: Maximum tolerable percentage of bases failed for target-level PASS per sample (default = 0.25, non-inclusive).
 - `--base_fail_tolerance`: Maximum tolerable percentage of libraries failing at a base (default = 0.25, non-inclusive).
 - `--tract_gap_tolerance`: Maximum gap tolerance between fail regions when building tracts (default = 2).
@@ -117,19 +118,21 @@ For example, when `--output_raw_mpileup` and `--visualize` is flagged:
 *NOTE: Output files are 1-indexed. If no bases pass the minimum metric parameters, then Q1 will be reported as -1 (no valid reads for this parameter).*
 
 1. Per-base output
+
+_Note: BaseQ and MapQ here represents the centile provided by `--read_fail_tolerance` for each base._
 ```bash
-#CHROM	POS	TRACT	POOL	COVERAGE	BASEQ_Q1	MAPQ_Q1	SCORE
+#CHROM	POS	TRACT	POOL	COVERAGE	BASEQ_P25	MAPQ_P25	SCORE
 chr5	664	MSH3_NM_002439_EXON01_2	IX00001	1	40	60	FAIL
 chr5	665	MSH3_NM_002439_EXON01_2	IX00001	1	-1	60	FAIL
 ```
 2. Per-target output
 ```bash
-#CHROM	POS	TRACT	POOL	CENTILE25(COV)	CENTILE25(BQ_Q1)	CENTILE25(MQ_Q1)	LEN	NUM_BASES_FAIL	PCT_BASES_FAIL	SCORE
+#CHROM	POS	TRACT	POOL	CENTILE25(COV)	CENTILE25(BQ)	CENTILE25(MQ)	LEN	NUM_BASES_FAIL	PCT_BASES_FAIL	SCORE
 chr5	NA	MSH3_NM_002439_EXON01_2	IX00001	0	-1	-1	61	61	100	FAIL
 ```
 3. Per-base aggregated across libraries
 ```bash
-#CHROM	POS	TRACT	POOL	CENTILE25(COV)	CENTILE25(BQ_Q1)	CENTILE25(MQ_Q1)	NUM_LIB_FAIL(COV)	NUM_LIB_FAIL(BQ)	NUM_LIB_FAIL(MQ)	PCT_LIB_FAIL(COV)	PCT_LIB_FAIL(BQ)	PCT_LIB_FAIL(MQ)	COV_SCORE	BQ_SCORE	MQ_SCORE
+#CHROM	POS	TRACT	POOL	CENTILE25(COV)	CENTILE25(BQ)	CENTILE25(MQ)	NUM_LIB_FAIL(COV)	NUM_LIB_FAIL(BQ)	NUM_LIB_FAIL(MQ)	PCT_LIB_FAIL(COV)	PCT_LIB_FAIL(BQ)	PCT_LIB_FAIL(MQ)	COV_SCORE	BQ_SCORE	MQ_SCORE
 chr5	664	MSH3_NM_002439_EXON01_2	AGGREGATE	0	-1	-1	2	1	1	100	50	50	FAIL	FAIL	FAIL
 chr5	665	MSH3_NM_002439_EXON01_2	AGGREGATE	0	-1	-1	2	1	1	100	50	50	FAIL	FAIL	FAIL
 ```
