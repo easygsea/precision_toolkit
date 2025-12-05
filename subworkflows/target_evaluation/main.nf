@@ -36,25 +36,25 @@ workflow gene_target_evaluation_workflow {
     // define workflow variables
     def metrics_thresholds_and_headings = [
         cov: [
-            library_header: "COVERAGE",
-            target_header: "CENTILE${params.target_fail_tolerance*100 as int}(COV)",
-            base_header: "CENTILE${params.base_fail_tolerance*100 as int}(COV)",
+            library_header: "COVERAGE_P${params.read_fail_tolerance*100 as int}",
+            target_header: "TARGET_P${params.target_fail_tolerance*100 as int}(BASE_COV)",
+            base_header: "SAMPLES_P${params.base_fail_tolerance*100 as int}(BASE_COV)",
             base_score_header: "PCT_LIB_FAIL(COV)",
             base_score_output_header: "COV_SCORE",
             threshold: params.coverage_threshold
         ],
         bq: [
-            library_header: "BASEQ_Q1",
-            target_header: "CENTILE${params.target_fail_tolerance*100 as int}(BQ_Q1)",
-            base_header: "CENTILE${params.base_fail_tolerance*100 as int}(BQ_Q1)",
+            library_header: "BASEQ_P${params.read_fail_tolerance*100 as int}",
+            target_header: "TARGET_P${params.target_fail_tolerance*100 as int}(BASE_BQ_P${params.read_fail_tolerance*100 as int})",
+            base_header: "SAMPLES_P${params.base_fail_tolerance*100 as int}(BASE_BQ_Q${params.read_fail_tolerance*100 as int})",
             base_score_header: "PCT_LIB_FAIL(BQ)",
             base_score_output_header: "BQ_SCORE",
             threshold: params.baseq_threshold
         ],
         mq: [
-            library_header: "MAPQ_Q1",
-            target_header: "CENTILE${params.target_fail_tolerance*100 as int}(MQ_Q1)",
-            base_header: "CENTILE${params.base_fail_tolerance*100 as int}(MQ_Q1)",
+            library_header: "MAPQ_P${params.read_fail_tolerance*100 as int}",
+            target_header: "TARGET_P${params.target_fail_tolerance*100 as int}(BASE_MQ_P${params.read_fail_tolerance*100 as int})",
+            base_header: "SAMPLES_P${params.base_fail_tolerance*100 as int}(BASE_MQ_P${params.read_fail_tolerance*100 as int})",
             base_score_header: "PCT_LIB_FAIL(MQ)",
             base_score_output_header: "MQ_SCORE",
             threshold: params.mapq_threshold
