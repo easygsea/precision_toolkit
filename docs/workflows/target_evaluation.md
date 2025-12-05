@@ -58,10 +58,11 @@ nextflow run main.nf \
 - Please see [General Workflow Parameters](./README.md#general-workflow-parameters) for workflow-level parameters.
 
 **Required Parameters:**
+- `--workflows target_evaluation`: Required parameter to run target evaluation workflow.
 - `--aligned_files`: Glob including BAM and/or CRAM files to be processed (eg. '/path/to/dir/*'). Any other filetypes ignored. If CRAM files included, also provide `--genome_ref`.
 - `--targets_bed`: Target regions in BED format.
 - `--genome_ref`: Reference genome FASTA file. Required to process any input CRAM files.
-
+- `--workflows target_evaluation`: Required parameter to run target evaluation workflow.
 **Optional Parameters:**
 - `--target_evaluation_subdir`: Subdirectory for target evaluation results (default: target_evaluation)
 - `--output_raw_mpileup`: Flag to output raw mpileup file.
@@ -100,9 +101,9 @@ For example, when `--output_raw_mpileup` and `--visualize` is flagged:
     │   ├── WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.scored.txt
     │   └── WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
     ├── plots           # Per-target plots (if '--visualize' enabled)
-    │   ├── plot_CENTILE25(BQ_Q1).png
-    │   ├── plot_CENTILE25(COV).png
-    │   └── plot_CENTILE25(MQ_Q1).png
+    │   ├── plot_TARGET_P25(BASE_COV).png
+    │   ├── plot_TARGET_P25(BASE_BQ_P25).png
+    │   └── plot_TARGET_P25(BASE_MQ_P25).png
     ├── raw_mpileups    # Raw mpileup output per-library (if '--output_raw_mpilups' enabled)
     │   ├── PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.raw.txt
     │   └── WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.raw.txt
