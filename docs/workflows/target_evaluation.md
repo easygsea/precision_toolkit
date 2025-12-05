@@ -149,10 +149,12 @@ Scoring is conducted based on the following metrics for each file
 
 #### A) Library-level, per-base
    - COVERAGE: Each base has a coverage count of all aligned reads covering the base that fulfill the coverage analysis requirements.
-   - BASEQ_Q1: Calculated as the first quartile of all BASEQ scores at each loci, of reads that fulfill the BASEQ analysis requirements.
-   - MAPQ_Q1: Calculated as the first quartile of all MAPQ score at each loci of reads that fulfill the MAPQ analysis requirements.
+   - BASEQ_Q1: Calculated as the X percentile (defined by `--read_fail_tolerance`) of all BASEQ scores at each loci, of reads that fulfill the BASEQ analysis requirements.
+   - MAPQ_Q1: Calculated as the X percentile (defined by `--read_fail_tolerance`) of all MAPQ score at each loci of reads that fulfill the MAPQ analysis requirements.
 
-_Overall, a `FAIL` here tells us that this base has a problem in this library. For details about analysis fine-tuning and metrica analysis requirements, see [custom metric parameters](#target-evaluation-parameters)._
+The three metrics are compared with `--coverage_threshold`, `--baseq_threshold`, and `--mapq_threshold` respectively as criteria for failing the base.
+
+_Overall, a `FAIL` here tells us that this base has a problem in this library. For details about analysis fine-tuning and metrics analysis requirements, see [custom metric parameters](#target-evaluation-parameters)._
 
 #### B) Library-level, per-target
    - PCT_BASES_FAIL: Each target per libary passes only of the percent of bases failing within the target's region is less than `--target_fail_tolerance`.

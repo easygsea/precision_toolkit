@@ -96,6 +96,7 @@ def helpMessage() {
             --coverage_threshold                    Minimum acceptable coverage per base (default: 25)
             --baseq_threshold                       Minimum acceptable first-quartile(Q1) of BASEQ scores per base (default: 30)
             --mapq_threshold                        Minimum acceptable first-quartile(Q1) of MAPQ scores per base (default: 30)
+            --read_fail_tolerance                   Maximum tolerable percentage of reads per base failing baseq and mapq thresholds (default: 0.25)
             --target_fail_tolerance                 Maximum tolerable percentage of bases failed for target-level PASS per sample (default: 0.25)
             --base_fail_tolerance                   Maximum tolerable percentage of libraries failing at a base for base-level PASS across all libraries (default: 0.25)
             --tract_gap_tolerance                   Maximum gap tolerance between fail regions when building tracts (default: 2)
