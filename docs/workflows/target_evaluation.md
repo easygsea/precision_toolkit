@@ -62,7 +62,7 @@ nextflow run main.nf \
 - `--aligned_files`: Glob including BAM and/or CRAM files to be processed (eg. '/path/to/dir/*'). Any other filetypes ignored. If CRAM files included, also provide `--genome_ref`.
 - `--targets_bed`: Target regions in BED format.
 - `--genome_ref`: Reference genome FASTA file. Required to process any input CRAM files.
-- `--workflows target_evaluation`: Required parameter to run target evaluation workflow.
+
 **Optional Parameters:**
 - `--target_evaluation_subdir`: Subdirectory for target evaluation results (default: target_evaluation)
 - `--output_raw_mpileup`: Flag to output raw mpileup file.
