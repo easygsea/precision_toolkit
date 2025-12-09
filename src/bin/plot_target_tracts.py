@@ -5,8 +5,8 @@ Visualize tract/target scores output from target evaluation workflow, grouped by
 
 Usage:
     plot-target-tracts --input-files <input_files> --pool-ids <pool_ids>
-   --prefix <prefix> --coverage-threshold <coverage-threshold>
-   --baseq-threshold <baseq-threshold> --mapq-threshold <mapq-threshold>
+    --metrics-thresholds-and-headings <JSON map of column header to threshold>
+    --prefix <prefix>
 
 Example:
     plot-target-tracts --input-files
@@ -14,10 +14,12 @@ Example:
     B.mpileup.per_base.parsed.labelled.target_aggregated.txt
     C.mpileup.per_base.parsed.labelled.target_aggregated.txt
     --pool-ids IX00001 IX00000 IX12265 --prefix target_eval_visual
-    --coverage-threshold 25 --baseq-threshold 30 --mapq-threshold 30
+    --metrics-thresholds-and-headings
+    {"CENTILE100(COV)":25,"CENTILE100(BQ_Q1)":30,"CENTILE100(MQ_Q1)":30}
 """
 
 import argparse
+import json
 from pathlib import Path
 
 import matplotlib.colors
@@ -61,32 +63,13 @@ def main() -> None:
         help="Prefix for output filenames. Default is 'target_eval'.",
     )
     parser.add_argument(
-        "--coverage-threshold",
-        type=int,
-        help="Coverage threshold to plot.",
-        required=True,
-    )
-    parser.add_argument(
-        "--baseq-threshold",
-        type=int,
-        help="BASEQ threshold to plot.",
-        required=True,
-    )
-    parser.add_argument(
-        "--mapq-threshold",
-        type=int,
-        help="MAPQ threshold to plot.",
+        "--metrics-thresholds-and-headings",
+        type=json.loads,
+        help="Dictionary of metric name and threshold.",
         required=True,
     )
 
     args = parser.parse_args()
-
-    # Make metrics and thresholds dictionary
-    METRICS_THRESHOLDS = {
-        "COVERAGE_Q1": args.coverage_threshold,
-        "BASEQ_Q1_Q1": args.baseq_threshold,
-        "MAPQ_Q1_Q1": args.mapq_threshold,
-    }
 
     # Convert all filepaths to Path type
     input_files = [Path(file_path) for file_path in args.input_files]
@@ -101,7 +84,7 @@ def main() -> None:
     # Initialize figure
     plt.figure(figsize=(120, 50))
 
-    for metric, threshold in METRICS_THRESHOLDS.items():
+    for metric, threshold in args.metrics_thresholds_and_headings.items():
         for file, pool in zip(input_files, pool_ids):
             # Read data
             df = pd.read_csv(file, sep="\t", comment=None)
