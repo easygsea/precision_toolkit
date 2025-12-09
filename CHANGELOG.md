@@ -5,13 +5,13 @@
 ---
 
 ### v1.1.1 - 2025-12-09
-- New Standalone Utility: Added `generate-standardized-bed` to reformat BED files in BED6+4 format into a 4-column BED file and standardizes feature names.
+- New Standalone Utility: Added `generate-standardized-bed` to reformat BED files in BED6+4 format into a 4-column BED file and standardize feature names.
 - Feature: Introduced coverage normalization option in target evaluation workflow.
 - Feature: Introduced tract building functionality to target evaluation workflow.
 - Improvement: Added two arguments in jira-table to control float formatting and text output formatting.
 - Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in `nextflow.config`.
 - Improvement: Restructured target evaluation directory for ease of access when working with large datasets.
-- Improvement: Reworked target evaluation workflow with more intuitive and robust scoring and analysis. Added three arguments to control fail tolerance and percentile output. See docs for more details.
+- Improvement: Reworked target evaluation workflow with more intuitive and robust scoring and analysis. Added three arguments to allow fine-tuning of fail tolerance and percentile output.
 - Improvement: Set time limit for local execution in `nextflow.config`.
 - Bugfix: Fixed circular dependency in resource allocation.
 - Bugfix: Fixed container link in local deployment's `nextflow.config`.
