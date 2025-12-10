@@ -4,7 +4,7 @@
 
 ---
 
-### v1.1.1 - 2025-12-09
+### v1.1.1 - 2025-12-10
 - New Standalone Utility: Added `generate-standardized-bed` to reformat BED files in BED6+4 format into a 4-column BED file and standardize feature names.
 - Feature: Introduced coverage normalization option in target evaluation workflow.
 - Feature: Introduced tract building functionality to target evaluation workflow.
