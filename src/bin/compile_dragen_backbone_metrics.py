@@ -41,6 +41,9 @@ class DragenMetric:
             divide, subtract).
         num_decimal_places: Number of decimal places metric value should have.
         unit: Unit of measurement for the metric.
+        fail_threshold: Threshold value for metric to be considered failing.
+        fail_direction: Direction relative to threshold for metric value to be
+            considered failing.
         other_properties: Dictionary mapping additional properties to corresponding
             values.
     """
@@ -53,6 +56,8 @@ class DragenMetric:
     scale_factor_op: str
     num_decimal_places: int | None
     unit: str
+    fail_threshold: float | None
+    fail_direction: str
     other_properties: dict[str, Any] = field(default_factory=dict)
 
 
@@ -86,6 +91,8 @@ OPERATIONS = {
     "multiply": operator.mul,
     "divide": operator.truediv,
     "subtract": operator.sub,
+    "greater_than": operator.gt,
+    "less_than": operator.lt,
 }
 
 
@@ -140,17 +147,17 @@ class DragenMetricsParser:
         metric_name: str,
         all_metric_properties: dict[str, float | str],
         all_factor_operations: dict[str, str],
-    ) -> tuple[float | None, str, int | None, str, dict[str, Any]]:
+    ) -> tuple[float | None, str, int | None, str, float | None, str, dict[str, Any]]:
         """
         Get properties for all metrics in a source file.
 
-        Properties includes key-value pairs stored under 'Constants' and
+        Properties includes key-value pairs stored under 'Constants', 'Failures', and
         'FactorOperations' in JSON spec.
 
         Args:
             metric_name: Metric name (e.g. "MAPPED_READS").
             all_metric_properties: Dictionary mapping metric properties to
-                value (i.e. 'Constants' section).
+                value (i.e. 'Constants' and 'Failures' section).
             all_factor_operations: Dictionary mapping metric factor (e.g.
                 "<dragen_metric>.FACTOR") to operation (i.e. 'FactorOperations'
                 section).
@@ -165,6 +172,9 @@ class DragenMetricsParser:
                 - scale_factor_op: Operation to apply with the scale factor.
                 - num_decimal_places: Number of decimal places metric value should have.
                 - unit: Unit of measurement for the metric.
+                - fail_threshold: Threshold value for metric to be considered failing.
+                - fail_direction: Direction relative to threshold for metric value to be
+                    considered failing.
                 - other_properties: Dictionary mapping additional properties to
                     corresponding values.
         """
@@ -172,6 +182,7 @@ class DragenMetricsParser:
         scale_factor, scale_factor_op = None, ""
         num_decimal_places = None
         unit = "NA"
+        fail_threshold, fail_direction = None, ""
         other_properties: dict[str, Any] = {}
 
         other_properties = {}
@@ -191,6 +202,10 @@ class DragenMetricsParser:
                     num_decimal_places = int(val)
                 elif attribute == "UOM":
                     unit = str(val)
+                elif attribute == "THRESHOLD":
+                    fail_threshold = float(val)
+                elif attribute == "DIRECTION":
+                    fail_direction = str(val)
                 else:
                     other_properties[attribute] = val
         return (
@@ -198,6 +213,8 @@ class DragenMetricsParser:
             scale_factor_op,
             num_decimal_places,
             unit,
+            fail_threshold,
+            fail_direction,
             other_properties,
         )
 
@@ -225,7 +242,9 @@ class DragenMetricsParser:
 
             # Get metric configuration
             base_metric_mappings = config.get("Mappings", {})
-            reported_metric_properties = config.get("Constants", {})
+            reported_metric_properties = config.get("Constants", {}) | config.get(
+                "Failures", {}
+            )
             factor_property_operations = config.get("FactorOperations", {})
 
             # Create DragenMetric objects for base metrics (those with mapping specs)
@@ -521,6 +540,39 @@ def calc_derived_pct_metric(
         return format_metric(derived_metric_obj, scaled_derived_metric_val)
 
 
+def classify_metric(
+    dragen_metrics_parser: DragenMetricsParser,
+    metric_name: str,
+    metric_val: float | None,
+) -> str:
+    """
+    Classify metric depending on whether value satisfies threshold condition.
+
+    A metric is classified as 'Production' if condition is met, otherwise it's
+    classified as 'Monitoring'.
+
+    Args:
+        dragen_metrics_parser: DragenMetricsParser object.
+        metric_name: Name of metric to classify.
+        metric_val: Value of dragen metric.
+
+    Returns:
+        String, either 'Production' or 'Monitoring'.
+    """
+    metric_obj = dragen_metrics_parser.metric_to_metric_obj[metric_name]
+
+    if (
+        metric_val
+        and metric_obj.fail_threshold
+        and OPERATIONS[metric_obj.fail_direction](
+            float(metric_val), metric_obj.fail_threshold
+        )
+    ):
+        return "Production"
+    else:
+        return "Monitoring"
+
+
 def main() -> None:
     """
     Parse DRAGEN output files and compile backbone metrics.
@@ -584,13 +636,18 @@ def main() -> None:
     out_filename = output_folder / f"{sample_id}_MetricsOutput.tsv"
     with open(out_filename, "w") as out_dragen_metrics_tsv:
         # Write header
-        out_dragen_metrics_tsv.write(f"Metric (UOM)\t{sample_id}\n")
+        out_dragen_metrics_tsv.write(f"Metric (UOM)\t{sample_id}\tCategory\n")
         for metric_name, (
             formatted_metric_name,
             metric_val,
         ) in all_dragen_metrics.items():
             if metric_name in dragen_metrics_parser.get_reported_metrics():
-                out_dragen_metrics_tsv.write(f"{formatted_metric_name}\t{metric_val}\n")
+                category = classify_metric(
+                    dragen_metrics_parser, metric_name, metric_val
+                )
+                out_dragen_metrics_tsv.write(
+                    f"{formatted_metric_name}\t{metric_val}\t{category}\n"
+                )
 
 
 if __name__ == "__main__":
