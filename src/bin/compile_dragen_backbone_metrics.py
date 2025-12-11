@@ -74,7 +74,6 @@ class SourceFile:
         default_val: Default value to use if the source file or any metrics are
             missing.
         dragen_metrics: Dictionary mapping metric names to DragenMetric objects.
-        reported_metric_names: Set of metric names to be reported.
     """
 
     filename: str
@@ -82,7 +81,6 @@ class SourceFile:
     allow_missing: bool
     default_val: float | None
     dragen_metrics: dict[str, DragenMetric]
-    reported_metric_names: set[str]
 
 
 # Valid operations to apply with scale factors
@@ -117,6 +115,7 @@ class DragenMetricsParser:
 
         # Initialize parser with modified JSON content
         source_to_config = json.loads(content).get("DataSources", {})
+        self.reported_metric_names = json.loads(content).get("ReportedMetrics", [])
         self.metric_group_to_sourcefile = self._build_metric_group_sources(
             source_to_config
         )
@@ -250,14 +249,12 @@ class DragenMetricsParser:
             # Create DragenMetric objects for base metrics (those with mapping specs)
             # and derived metrics (those with properties, but no mapping specs)
             all_metric_mappings = {}
-            reported_metric_names = set()  # attribute for SourceFile object
             for metric_name in base_metric_mappings.keys():
                 all_metric_mappings[metric_name] = base_metric_mappings[metric_name]
             for property in reported_metric_properties.keys():
                 metric_name = self._split_metric_property(property)[0]
                 if metric_name not in all_metric_mappings.keys():
                     all_metric_mappings[metric_name] = None
-                reported_metric_names.add(metric_name)
 
             valid_dragen_metrics = {}  # attribute for SourceFile object
             for metric_name, mapping_spec_str in all_metric_mappings.items():
@@ -287,7 +284,6 @@ class DragenMetricsParser:
                 allow_missing,
                 default_val,
                 valid_dragen_metrics,
-                reported_metric_names,
             )
 
         return metric_group_to_sourcefile
@@ -300,14 +296,6 @@ class DragenMetricsParser:
             for metric_name, dragen_metric_obj in (
                 source_file_obj.dragen_metrics.items()
             )
-        }
-
-    def get_reported_metrics(self) -> set[str]:
-        """Retrieve set of all reported metric names."""
-        return {
-            metric
-            for source_file_obj in self.metric_group_to_sourcefile.values()
-            for metric in source_file_obj.reported_metric_names
         }
 
     def _parse_csv(
@@ -534,7 +522,7 @@ def calc_derived_pct_metric(
             mapped_reads_metric_obj, mapped_reads_val
         )
 
-        derived_metric_val = float(base_metric_val) / float(scaled_mapped_reads_val)
+        derived_metric_val = base_metric_val / scaled_mapped_reads_val
         scaled_derived_metric_val = scale_metric(derived_metric_obj, derived_metric_val)
 
         return format_metric(derived_metric_obj, scaled_derived_metric_val)
@@ -619,12 +607,15 @@ def main() -> None:
     all_dragen_metrics = dragen_metrics_parser.parse_metrics()
 
     # Calculate remaining metrics not directly output by DRAGEN
-    derived_metric_names = [
-        "PCT_CONTAMINATION_EST",
+    derived_metric_names = {
         "PCT_CHIMERIC_READS",
         "PCT_READ_ENRICHMENT",
-    ]
-    for metric_name in derived_metric_names:
+    }
+    # Only calculate if derived_metric_name is valid (i.e. in JSON config)
+    valid_derived_metric_names = (
+        derived_metric_names & dragen_metrics_parser.metric_to_metric_obj.keys()
+    )
+    for metric_name in valid_derived_metric_names:
         all_dragen_metrics[metric_name] = calc_derived_pct_metric(
             dragen_metrics_parser,
             all_dragen_metrics,
@@ -641,7 +632,7 @@ def main() -> None:
             formatted_metric_name,
             metric_val,
         ) in all_dragen_metrics.items():
-            if metric_name in dragen_metrics_parser.get_reported_metrics():
+            if metric_name in dragen_metrics_parser.reported_metric_names:
                 category = classify_metric(
                     dragen_metrics_parser, metric_name, metric_val
                 )
