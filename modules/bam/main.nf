@@ -30,6 +30,7 @@ process GET_PER_BASE_STATS {
     tuple val(sample_name), path(in_bam), val(pool_id)
     val min_bq_per_read
     val min_mq_per_read
+    val output_percentile
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: parsed_pileup
@@ -84,11 +85,11 @@ process GET_PER_BASE_STATS {
             }
         }
         asort(baseQs); asort(mapQs);
-        q1_index_baseq=int((baseQ_count+3)/4);
-        q1_index_mapq=int((mapQ_count+3)/4);
-        if (baseQ_count==0) {q1_index_baseq=1}
-        if (mapQ_count==0) {q1_index_mapq=1}
-        print(\$1,\$2,coverage,baseQs[q1_index_baseq],mapQs[q1_index_mapq],"${pool_id}")
+        p_index_baseq=int( ${output_percentile} * (baseQ_count-1) + 1.5 );
+        p_index_mapq=int( ${output_percentile} * (mapQ_count-1) + 1.5 );
+        if (baseQ_count==0) {p_index_baseq=1}
+        if (mapQ_count==0) {p_index_mapq=1}
+        print(\$1,\$2,coverage,baseQs[p_index_baseq],mapQs[p_index_mapq],"${pool_id}")
         delete baseQs; delete mapQs;
     }' - > ${OUT}
     """
@@ -97,7 +98,7 @@ process GET_PER_BASE_STATS {
 process GET_PER_BASE_STATS_NO_PARSE {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}/target_eval_results", mode: 'copy'
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/raw_mpileups", mode: 'copy'
 
     input:
     path(targets_bed)

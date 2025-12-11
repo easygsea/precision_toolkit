@@ -10,6 +10,7 @@ By default, all metrics, and their confidence intervals (CIs) wherever applicabl
 Small variant benchmark:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine happy \
@@ -19,6 +20,7 @@ nextflow run main.nf \
 Large variant benchmark:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine wittyer
@@ -27,6 +29,7 @@ nextflow run main.nf \
 Small variant benchmark excluding spurious variants:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine happy \
@@ -37,6 +40,7 @@ nextflow run main.nf \
 Large variant benchmark excluding spurious variants:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine wittyer \
@@ -46,6 +50,7 @@ nextflow run main.nf \
 Custom small variant benchmark:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine happy \
@@ -57,6 +62,7 @@ nextflow run main.nf \
 Custom large variant benchmark:
 ```bash
 nextflow run main.nf \
+--workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine wittyer \
@@ -79,7 +85,11 @@ nextflow run main.nf \
 
 ### Variant Benchmark Parameters
 
+**Workflow Parameters**
+- Please see [General Workflow Parameters](./README.md#general-workflow-parameters) for workflow-level parameters.
+
 **Required Parameters:**
+- `--workflows variant_benchmark`: Required parameter to run variant_benchmark workflow.
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
 - `--query_dir`: The directory containing query VCF files (the test or experimental dataset). These must be named as <sample>.query.vcf or <sample>.query.vcf.gz.
 - `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, or `wittyer`, default: `happy`).
@@ -87,8 +97,8 @@ nextflow run main.nf \
 
 **Optional Parameters:**
 - `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
-- `--output_dir`: Base output directory (default: `output_clinical_tools`)
-- `--variant_benchmark_dir`: Subdirectory for variant benchmark results (default: `variant_benchmark`)
+- `--output_dir`: Base output directory (default: `output_clinical_tools`).
+- `--variant_benchmark_subdir`: Subdirectory for variant benchmark results (default: `variant_benchmark`).
 - `--happy_engine`: hap.py engine to use (default: `vcfeval`) Options: `vcfeval`, `xcmp`, `scmp-distance`, `scmp-somatic`. Note: `vcfeval` mode only evaluates PASS variants as hap.py does not support `vcfeval --all-records`.
 - `--happy_options`: Additional hap.py options (default: `--write-vcf --write-counts`). Must quote the string and use = to assign the value.
 - `--sompy_options`: Additional som.py options (default: `--include-nonpass`). Must quote the string and use = to assign the value.
@@ -196,7 +206,7 @@ The pipeline records reports from variant benchmark analysis engines and generat
 For example, when spurious_variants_vcf is supplied:
 ```bash
 <output_dir>/
-    └── <variant_benchmark_dir>/
+    └── <variant_benchmark_subdir>/
         ├── raw/                # Raw engine reports
         │   ├── happy/          # hap.py reports if using happy engine
         │   │   ├── summary.csv # hap.py statistics per sample

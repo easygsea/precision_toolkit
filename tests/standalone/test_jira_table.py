@@ -55,7 +55,7 @@ def test_jira_table_formats(sample_files: dict[str, Path], file_format: str) -> 
     )
     assert (
         result.stdout.strip()
-        == populate_jira_table(sample_files["df"], None, None).strip()
+        == populate_jira_table(sample_files["df"], None, None, None, False).strip()
     )
 
 
@@ -70,7 +70,7 @@ def test_jira_table_stdin(sample_files: dict[str, Path]) -> None:
     )
     assert (
         result.stdout.strip()
-        == populate_jira_table(sample_files["df"], None, None).strip()
+        == populate_jira_table(sample_files["df"], None, None, None, False).strip()
     )
 
 
@@ -88,6 +88,8 @@ def test_jira_table_args(sample_files: dict[str, Path]) -> None:
             "My Table",
             "--summary",
             "This is a summary",
+            "--float-format",
+            "2",
         ],
         check=True,
         capture_output=True,
@@ -96,7 +98,7 @@ def test_jira_table_args(sample_files: dict[str, Path]) -> None:
     assert (
         result.stdout.strip()
         == populate_jira_table(
-            sample_files["df"], "My Table", "This is a summary"
+            sample_files["df"], "My Table", "This is a summary", 2, False
         ).strip()
     )
 

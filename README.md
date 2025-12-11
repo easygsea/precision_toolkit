@@ -9,21 +9,32 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 ## Dependencies
 
 - Java (>=17.0.2)
-- Nextflow (>=24.10.3)
+- Nextflow (>=25.04.6)
 - Apptainer (>=1.3.1) or Singularity (>=3.8.7)
 
-Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3.15 htslib 1.21 (bgzip tabix) witty.er 0.5.2.0 Python 3.11.7 RTG Tools 3.12.1 samtools 1.21
+Containerized dependencies (no installation required):
+- Python 3.11.7
+- RTG Tools 3.12.1
+- bcftools 1.21
+- bedops 2.4.41
+- bedtools 2.31.0
+- hap.py 0.3.15
+- htslib 1.21 (bgzip tabix)
+- samtools 1.21
+- witty.er 0.5.2.0
 
 ## Quick Start
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/easygsea/clinical_tools.git
    ```
 
 2. Run specific workflow(s). Example:
    ```bash
-   nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
+   nextflow run <path/to/clinical_tools>/main.nf \
+       --workflows variant_benchmark \
        --truth_dir <path/to/truth_vcfs/> \
        --query_dir <path/to/query_vcfs/> \
        --variant_benchmark_engine happy \
@@ -31,18 +42,19 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
    ```
 
 > **Note:**
-Nextflow saves Apptainer images to a `.apptainer` folder in each `work` directory, using extra disk space.
-See [Nextflow docs](https://nextflow.io/docs/latest/container.html).
+> Nextflow saves Apptainer images to a `.apptainer` folder in each `work` directory, using extra disk space.
+> See [Nextflow docs](https://nextflow.io/docs/latest/container.html).
 >
->To avoid this, set a shared cache by exporting before running the workflow:
->```bash
->export NXF_APPTAINER_CACHEDIR="/shared/nextflow_apptainer_cache"
->```
+> To avoid this, set a shared cache by exporting before running the workflow:
 >
->Or set `apptainer.cacheDir` in `nextflow.config`.
+> ```bash
+> export NXF_APPTAINER_CACHEDIR="/shared/nextflow_apptainer_cache"
+> ```
+>
+> Or set `apptainer.cacheDir` in `nextflow.config`.
 >
 > **Advanced users:**
-If you have deployed clinical_tools using the recommended [deployment and Bamboo plans](deployment/README.md), you do **not** need to manually set up the Apptainer cache.
+> If you have deployed clinical_tools using the recommended [deployment and Bamboo plans](deployment/README.md), you do **not** need to manually set up the Apptainer cache.
 
 ### Using Containerized Tools
 
@@ -51,17 +63,20 @@ If you have deployed clinical_tools using the recommended [deployment and Bamboo
    > **Tip:** If you have already run a workflow with Clinical Tools, you likely have a cached Apptainer image (see notes above), so you may not need to download it again.
 
    For the latest version, run:
+
    ```bash
    apptainer pull docker://quay.io/easygsea/clinical_tools
    ```
+
    To get a specific version, use:
+
    ```bash
    apptainer pull docker://quay.io/easygsea/clinical_tools:v1.0.1
    ```
 
 2. Run specific tools inside the container. Example:
    ```bash
-   apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-sensitivity-curation -h
+   apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-diagnostic-metric-curation -h
    ```
    See the official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for more details on running commands within a container.
 
@@ -79,8 +94,10 @@ Clinical Tools are rigorously tested at both unit and integration levels. Integr
 Example:
 [Variant Benchmark Tests](./tests/workflow/test_variant_benchmark.yml)
 Demo of customized benchmarking small variant calls across multiple samples and calculating variant concordance, sensitivity, precision, confidence intervals (Jeffreys method, 99% CI; default: Wilson method, 95% CI), and F1 score reported to 1 (default: 2) decimal place:
+
 ```bash
-nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
+nextflow run <path/to/clinical_tools>/main.nf \
+    --workflows variant_benchmark \
     --variant_benchmark_engine happy \
     --truth_dir <path/to/clinical_tools>/tests_data/snv_truth_vcfs \
     --query_dir <path/to/clinical_tools>/tests_data/snv_query_vcfs \
@@ -96,6 +113,7 @@ nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
 Example:
 [Manual Diagnostic Metric Curation Tests](./tests/standalone/test_manual_diagnostic_metric_curation.py)
 Demo of manual sensitivity curation:
+
 ```bash
 apptainer exec \
     -B <path/to/clinical_tools> \
@@ -105,7 +123,6 @@ apptainer exec \
     --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" \
     --output-prefix manually_curated_sensitivity
 ```
-
 
 # Contents
 
@@ -125,21 +142,23 @@ The pipeline's architecture supports execution across various computing environm
 
 The manual is detailed in the [docs](./docs/README.md) directory, including:
 
-- [Workflows](./docs/README.md#workflows)
-  - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
+- [Workflows](./docs/workflows/README.md)
   - [Signal Correlation](./docs/workflows/signal_correlation.md)
   - [Target Evaluation](./docs/workflows/target_evaluation.md)
-- [Standalone Utilities](./docs/README.md#standalone-utilities)
-  - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
-    - `manual-diagnostic-metric-curation`
+  - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
+- [Standalone Utilities](./docs/standalone_utilities/README.md)
   - [Convert Multi-Sample VCF File into Single-Sample VCF files](./docs/standalone_utilities/README.md#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
     - `convert-multi-sample-vcf`
   - [Count Variants By Size](./docs/standalone_utilities/README.md#count-variants-by-size)
     - `count-variants-by-size`
-  - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
-    - `liftover_sv_vcf.sh`
+  - [Generate Standardized BED](./docs/standalone_utilities/README.md#generate-standardized-bed)
+    - `generate-standardized-bed`
   - [Jira Table Converter ](./docs/standalone_utilities/README.md#jira-table-converter)
     - `jira-table`
+  - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
+    - `manual-diagnostic-metric-curation`
+  - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
+    - `liftover_sv_vcf.sh`
 
 ## Resource Optimization and High-Performance Computing
 
@@ -156,6 +175,8 @@ Its workflows implement several resource optimization strategies:
      - Second attempt: 4 CPUs, 8GB memory
      - Third attempt: 6 CPUs, 16GB memory
      - Subsequent attempts: Up to 8 CPUs, 32GB memory
+   - Note that the retry pathway only applies to cluster execution
+   - For local execution, a maximum time limit of 24 hours is set per task with no retry options
 
 2. **Containerization**:
    - All dependencies are containerized using Docker/Singularity
@@ -173,8 +194,7 @@ It supports seamless integration with HPC environments:
    - Customizable parameters:
      ```bash
      --slurm_account <account_name>
-     --slurm_partition <partition_name>
-     --slurm_queue <queue_name>
+     --slurm_queue <partition_name>
      ```
    - Automatic job submission and monitoring
 
@@ -203,7 +223,7 @@ It supports seamless integration with HPC environments:
    ```bash
    nextflow run main.nf -profile slurm \
        --slurm_account <your_account> \
-       --slurm_partition <partition_name>
+       --slurm_queue <partition_name>
    ```
 
 3. **Resource Monitoring**:
