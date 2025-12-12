@@ -184,7 +184,6 @@ class DragenMetricsParser:
         fail_threshold, fail_direction = None, ""
         other_properties: dict[str, Any] = {}
 
-        other_properties = {}
         for property, val in all_metric_properties.items():
             metric, attribute = self._split_metric_property(property)
             if metric == metric_name:
@@ -298,9 +297,7 @@ class DragenMetricsParser:
             )
         }
 
-    def _parse_csv(
-        self, source_file_obj: SourceFile
-    ) -> dict[str, tuple[str, float | None]]:
+    def _parse_csv(self, source_file_obj: SourceFile) -> dict[str, float | None]:
         """
         Parse CSV source file for metrics.
 
@@ -308,8 +305,8 @@ class DragenMetricsParser:
             source_file_obj: SourceFile object.
 
         Returns:
-            Dictionary mapping metric names to tuples of formatted metric name and
-            value.
+            Dictionary mapping metric names to transformed value after applying scale
+            factor.
         """
         source_csv_path = source_file_obj.filename
         name_to_metric_obj = source_file_obj.dragen_metrics
@@ -330,7 +327,7 @@ class DragenMetricsParser:
                 )
 
         # Iterate through CSV
-        name_to_parsed_metrics = {}
+        metric_name_to_value: dict[str, float | None] = {}
         with open(source_csv_path, "r") as source_file:
             csv_reader = csv.reader(source_file)
             for row in csv_reader:
@@ -353,17 +350,15 @@ class DragenMetricsParser:
                                 f"default missing value: "
                                 f"{dragen_metric_obj.default_val}."
                             )
-                            formatted_metric_name, formatted_value = (
-                                format_missing_metric(dragen_metric_obj)
-                            )
+                            scaled_value = dragen_metric_obj.default_val
                         else:
                             # With missing values handled, all values should be float
                             try:
-                                # Cast and apply any necessary formatting
                                 metric_val_float = float(metric_val)
-                                formatted_metric_name, formatted_value = format_metric(
+                                scaled_value = scale_metric(
                                     dragen_metric_obj, metric_val_float
                                 )
+
                             except ValueError:
                                 # Invalid value; replace with default missing value
                                 logging.warning(
@@ -372,18 +367,24 @@ class DragenMetricsParser:
                                     f"Replacing with default missing value: "
                                     f"{dragen_metric_obj.default_val}."
                                 )
-                                formatted_metric_name, formatted_value = (
-                                    format_missing_metric(dragen_metric_obj)
-                                )
+                                scaled_value = dragen_metric_obj.default_val
 
-                        name_to_parsed_metrics[metric_name] = (
-                            formatted_metric_name,
-                            formatted_value,
-                        )
+                        # TODO: Warn of rows with the same metric description
+                        if metric_name in metric_name_to_value.keys():
+                            # Rows with the same metric group (first column) and metric
+                            # description (third column) are present in DRAGEN output
+                            # file
+                            logging.warning(
+                                f"{metric_name} is extracted from rows with "
+                                f"description '{metric_description}', but multiple "
+                                f"matching rows were found in {source_csv_path}. Using "
+                                f"last occurrence."
+                            )
+                        metric_name_to_value[metric_name] = scaled_value
 
-        return name_to_parsed_metrics
+        return metric_name_to_value
 
-    def parse_metrics(self) -> dict[str, tuple[str, float | None]]:
+    def parse_metrics(self) -> dict[str, float | None]:
         """
         Parse metrics from all source files.
 
@@ -391,14 +392,14 @@ class DragenMetricsParser:
             FileNotFoundError: When a required source file is missing.
 
         Returns:
-            Dictionary mapping metric names to formatted metric name and value tuples.
+            Dictionary mapping metric names to values.
         """
-        name_to_parsed_metrics = {}
+        metric_name_to_value = {}
         for source_file_obj in self.metric_group_to_sourcefile.values():
             if Path(source_file_obj.filename).is_file():
                 if source_file_obj.filetype == "CSV":
                     parsed_metrics = self._parse_csv(source_file_obj)
-                    name_to_parsed_metrics.update(parsed_metrics)
+                    metric_name_to_value.update(parsed_metrics)
                 elif source_file_obj.filetype == "JSON":
                     # TODO: Implement JSON parsing for <DNASAMPLEID>_contamination.json,
                     # though not output by somatic workflow currently
@@ -412,18 +413,17 @@ class DragenMetricsParser:
 
             # Set default values for any metrics missing in source file
             expected_metrics = set(source_file_obj.dragen_metrics.keys())
-            missing_metrics = set(expected_metrics) - set(name_to_parsed_metrics.keys())
+            missing_metrics = set(expected_metrics) - set(metric_name_to_value.keys())
             for metric_name in missing_metrics:
                 dragen_metric_obj = source_file_obj.dragen_metrics[metric_name]
-                name_to_parsed_metrics[metric_name] = format_missing_metric(
-                    dragen_metric_obj
-                )
-        return name_to_parsed_metrics
+                metric_name_to_value[metric_name] = dragen_metric_obj.default_val
+
+        return metric_name_to_value
 
 
 def format_metric(
-    dragen_metric_obj: DragenMetric, metric_val: float
-) -> tuple[str, float]:
+    dragen_metric_obj: DragenMetric, metric_val: float | None
+) -> tuple[str, float | None]:
     """
     Format metric value based on properties stored in DragenMetric object.
 
@@ -443,24 +443,10 @@ def format_metric(
     # Apply formatting, if applicable
     formatted_metric_name = f"{metric_name} ({unit})"
     formatted_metric_val = metric_val
-    if num_decimal_places is not None:
+    if formatted_metric_val is not None and num_decimal_places is not None:
         formatted_metric_val = round(formatted_metric_val, num_decimal_places)
 
     return formatted_metric_name, formatted_metric_val
-
-
-def format_missing_metric(dragen_metric_obj: DragenMetric) -> tuple[str, float | None]:
-    """
-    Format missing metric based on properties stored in DragenMetric object.
-
-    This only requires addition of unit to metric name. Default missing value is used
-    as metric value.
-    """
-    formatted_derived_metric_name = (
-        f"{dragen_metric_obj.name} ({dragen_metric_obj.unit})"
-    )
-    metric_val = dragen_metric_obj.default_val
-    return formatted_derived_metric_name, metric_val
 
 
 def scale_metric(dragen_metric_obj: DragenMetric, metric_val: float) -> float:
@@ -486,10 +472,10 @@ def scale_metric(dragen_metric_obj: DragenMetric, metric_val: float) -> float:
 
 def calc_derived_pct_metric(
     dragen_metrics_parser: DragenMetricsParser,
-    all_dragen_metrics: dict[str, tuple[str, float | None]],
+    all_dragen_metrics: dict[str, float | None],
     derived_metric_name: str,
     base_metric_name: str,
-) -> tuple[str, float | None]:
+) -> float | None:
     """
     Calculate derived percentage metric.
 
@@ -498,34 +484,24 @@ def calc_derived_pct_metric(
 
     Args:
         dragen_metrics_parser: DragenMetricsParser object.
-        all_dragen_metrics: Dictionary mapping metric names to metric name and value
-            tuples.
+        all_dragen_metrics: Dictionary mapping metric names to values.
         derived_metric_name: Name of metric to calculate.
-        base_dragen_metric: Name of base metric derived_metric_name is calculated
+        base_metric_name: Name of base metric derived_metric_name is calculated
         from.
 
     Returns:
         Tuple of formatted metric name and value.
     """
-    base_metric_val = all_dragen_metrics[base_metric_name][1]
-    mapped_reads_val = all_dragen_metrics["MAPPED_READS"][1]
+    base_metric_val = all_dragen_metrics[base_metric_name]
+    mapped_reads_val = all_dragen_metrics["MAPPED_READS"]
     derived_metric_obj = dragen_metrics_parser.metric_to_metric_obj[derived_metric_name]
 
     if not base_metric_val or not mapped_reads_val:
-        return format_missing_metric(derived_metric_obj)
+        return derived_metric_obj.default_val
     else:
         # Calculate derived metric value
-        mapped_reads_metric_obj = dragen_metrics_parser.metric_to_metric_obj[
-            "MAPPED_READS"
-        ]
-        scaled_mapped_reads_val = scale_metric(
-            mapped_reads_metric_obj, mapped_reads_val
-        )
-
-        derived_metric_val = base_metric_val / scaled_mapped_reads_val
-        scaled_derived_metric_val = scale_metric(derived_metric_obj, derived_metric_val)
-
-        return format_metric(derived_metric_obj, scaled_derived_metric_val)
+        derived_metric_val = base_metric_val / mapped_reads_val
+        return scale_metric(derived_metric_obj, derived_metric_val)
 
 
 def classify_metric(
@@ -600,21 +576,21 @@ def main() -> None:
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True, parents=True)
 
-    # Parse metrics from DRAGEN output files
+    # Parse valid metrics (specified in JSON config) from DRAGEN output files or replace
+    # with default value if not present
     dragen_metrics_parser = DragenMetricsParser(
         metrics_json_config_path, analysis_folder, sample_id
     )
     all_dragen_metrics = dragen_metrics_parser.parse_metrics()
+    print(all_dragen_metrics)
 
-    # Calculate remaining metrics not directly output by DRAGEN
+    # Calculate remaining metrics not directly output by DRAGEN, if valid (i.e. in JSON
+    # config)
     derived_metric_names = {
         "PCT_CHIMERIC_READS",
         "PCT_READ_ENRICHMENT",
     }
-    # Only calculate if derived_metric_name is valid (i.e. in JSON config)
-    valid_derived_metric_names = (
-        derived_metric_names & dragen_metrics_parser.metric_to_metric_obj.keys()
-    )
+    valid_derived_metric_names = derived_metric_names & all_dragen_metrics.keys()
     for metric_name in valid_derived_metric_names:
         all_dragen_metrics[metric_name] = calc_derived_pct_metric(
             dragen_metrics_parser,
@@ -623,21 +599,35 @@ def main() -> None:
             f"{metric_name}_BASE",
         )
 
-    # Filter for reported metrics and write to file
     out_filename = output_folder / f"{sample_id}_MetricsOutput.tsv"
     with open(out_filename, "w") as out_dragen_metrics_tsv:
         # Write header
         out_dragen_metrics_tsv.write(f"Metric (UOM)\t{sample_id}\tCategory\n")
-        for metric_name, (
-            formatted_metric_name,
-            metric_val,
-        ) in all_dragen_metrics.items():
+
+        for metric_name, metric_val in all_dragen_metrics.items():
+            # Filter for reported metrics only
             if metric_name in dragen_metrics_parser.reported_metric_names:
+                dragen_metric_obj = dragen_metrics_parser.metric_to_metric_obj[
+                    metric_name
+                ]
+
+                # Format metric names (append unit) and values (appropriate number of
+                # decimal places)
+                if metric_val:
+                    formatted_metrics = format_metric(dragen_metric_obj, metric_val)
+                else:
+                    formatted_metrics = (
+                        f"{metric_name} ({dragen_metric_obj.unit})",
+                        metric_val,
+                    )
+
+                # Classify metric as either 'Monitoring' or 'Production'
                 category = classify_metric(
                     dragen_metrics_parser, metric_name, metric_val
                 )
+
                 out_dragen_metrics_tsv.write(
-                    f"{formatted_metric_name}\t{metric_val}\t{category}\n"
+                    f"{formatted_metrics[0]}\t{formatted_metrics[1]}\t{category}\n"
                 )
 
 
