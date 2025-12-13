@@ -2,6 +2,11 @@
 
 ## Version History
 
+### v1.1.2 - 2025-XX-XX
+- New Standalone Utility: Added `compile-dragen-backbone-metrics` to extract and format backbone QC metrics from DRAGEN output files.
+
+---
+
 ### v1.1.1 - 2025-11-05
 - New Standalone Utility: Added new utility to reformat BED files in BED6+4 format into a 4-column BED file and standardizes feature names.
 - Feature: Introduced coverage normalization option in target evaluation workflow.
