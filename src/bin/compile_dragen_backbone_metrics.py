@@ -582,7 +582,6 @@ def main() -> None:
         metrics_json_config_path, analysis_folder, sample_id
     )
     all_dragen_metrics = dragen_metrics_parser.parse_metrics()
-    print(all_dragen_metrics)
 
     # Calculate remaining metrics not directly output by DRAGEN, if valid (i.e. in JSON
     # config)
