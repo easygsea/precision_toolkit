@@ -65,7 +65,7 @@ workflow variant_benchmark_workflow {
                     genome_fai_path,
                     params.happy_engine,
                     params.happy_options,
-                    "${params.variant_benchmark_dir}/raw",
+                    "${params.variant_benchmark_subdir}/raw",
                     "raw"
                 ).happy_summary.collect()
             }
@@ -78,7 +78,7 @@ workflow variant_benchmark_workflow {
                     genome_fai_path,
                     params.happy_engine,
                     params.happy_options,
-                    "${params.variant_benchmark_dir}/curated",
+                    "${params.variant_benchmark_subdir}/curated",
                     "curated"
                 ).happy_summary.collect()
             }
@@ -100,7 +100,7 @@ workflow variant_benchmark_workflow {
                     genome_ref_path,
                     genome_fai_path,
                     params.sompy_options,
-                    "${params.variant_benchmark_dir}/raw",
+                    "${params.variant_benchmark_subdir}/raw",
                     "raw"
                 ).sompy_summary.collect()
             }
@@ -112,7 +112,7 @@ workflow variant_benchmark_workflow {
                     genome_ref_path,
                     genome_fai_path,
                     params.sompy_options,
-                    "${params.variant_benchmark_dir}/curated",
+                    "${params.variant_benchmark_subdir}/curated",
                     "curated"
                 ).sompy_summary.collect()
             }
@@ -122,7 +122,7 @@ workflow variant_benchmark_workflow {
                 summary_files = run_wittyer_raw(
                     vcf_pairs,
                     params.wittyer_options,
-                    "${params.variant_benchmark_dir}/raw",
+                    "${params.variant_benchmark_subdir}/raw",
                     "raw"
                 ).wittyer_summary.collect()
             }
@@ -132,7 +132,7 @@ workflow variant_benchmark_workflow {
                 summary_files_curated = run_wittyer_curated(
                     curated_vcf_pairs,
                     params.wittyer_options,
-                    "${params.variant_benchmark_dir}/curated",
+                    "${params.variant_benchmark_subdir}/curated",
                     "curated"
                 ).wittyer_summary.collect()
             }
@@ -146,7 +146,7 @@ workflow variant_benchmark_workflow {
             params.concordance_tp,
             params.ci_method,
             params.ci_level,
-            params.variant_benchmark_dir,
+            params.variant_benchmark_subdir,
             params.decimals,
             params.include_all_data_csv
         )

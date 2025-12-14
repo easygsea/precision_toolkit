@@ -9,10 +9,19 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 ## Dependencies
 
 - Java (>=17.0.2)
-- Nextflow (>=24.10.3)
+- Nextflow (>=25.04.6)
 - Apptainer (>=1.3.1) or Singularity (>=3.8.7)
 
-Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3.15 htslib 1.21 (bgzip tabix) witty.er 0.5.2.0 Python 3.11.7 RTG Tools 3.12.1 samtools 1.21
+Containerized dependencies (no installation required):
+- Python 3.11.7
+- RTG Tools 3.12.1
+- bcftools 1.21
+- bedops 2.4.41
+- bedtools 2.31.0
+- hap.py 0.3.15
+- htslib 1.21 (bgzip tabix)
+- samtools 1.21
+- witty.er 0.5.2.0
 
 ## Quick Start
 
@@ -24,7 +33,8 @@ Containerized dependencies (no installation required): bcftools 1.21 hap.py v0.3
 
 2. Run specific workflow(s). Example:
    ```bash
-   nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
+   nextflow run <path/to/clinical_tools>/main.nf \
+       --workflows variant_benchmark \
        --truth_dir <path/to/truth_vcfs/> \
        --query_dir <path/to/query_vcfs/> \
        --variant_benchmark_engine happy \
@@ -86,7 +96,8 @@ Example:
 Demo of customized benchmarking small variant calls across multiple samples and calculating variant concordance, sensitivity, precision, confidence intervals (Jeffreys method, 99% CI; default: Wilson method, 95% CI), and F1 score reported to 1 (default: 2) decimal place:
 
 ```bash
-nextflow run <path/to/clinical_tools>/main.nf --workflows variant_benchmark \
+nextflow run <path/to/clinical_tools>/main.nf \
+    --workflows variant_benchmark \
     --variant_benchmark_engine happy \
     --truth_dir <path/to/clinical_tools>/tests_data/snv_truth_vcfs \
     --query_dir <path/to/clinical_tools>/tests_data/snv_query_vcfs \
@@ -131,7 +142,7 @@ The pipeline's architecture supports execution across various computing environm
 
 The manual is detailed in the [docs](./docs/README.md) directory, including:
 
-- [Workflows](./docs/README.md#workflows)
+- [Workflows](./docs/workflows/README.md)
   - [Signal Correlation](./docs/workflows/signal_correlation.md)
   - [Target Evaluation](./docs/workflows/target_evaluation.md)
   - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
