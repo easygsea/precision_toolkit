@@ -21,7 +21,7 @@
                 "PCT_CHIMERIC_READS.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.UOM": "%",
-                "PCT_CONTAMINATION_EST.RAD": 1
+                "PCT_CONTAMINATION_EST.RAD": 2
             },
             "FactorOperations": {
                 "MAPPED_READS.FACTOR": "add",

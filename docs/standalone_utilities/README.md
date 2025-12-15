@@ -12,7 +12,7 @@
 
 The `compile-dragen-backbone-metrics` tool extracts and formats backbone QC metrics from relevant DRAGEN output files based on the source files (`SourceName`), columns (`Mappings` section), and attributes (`Constants` section) specified in a JSON-formatted configuration file.
 
-Metrics will also be classified as either "Monitoring" or "Production", with "Monitoring" as the default. Metrics with failure threhsolds defined in the `Failures` section are classified as "Production" if the threshold condition is met.
+Metrics will also be classified as either "Monitoring" or "Production", with "Monitoring" as the default. Metrics with failure threhsolds defined in the `Failures` section are classified as "Production", and assigned "Pass" or "Fail" status depending on whether the threshold condition is met.
 
 Example configuration file:
 ```json
@@ -30,7 +30,7 @@ Example configuration file:
             "Constants": {
                 "PCT_CONTAMINATION_EST.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.UOM": "%",
-                "PCT_CONTAMINATION_EST.RAD": 1
+                "PCT_CONTAMINATION_EST.RAD": 2
             },
             "FactorOperations": {
                 "PCT_CONTAMINATION_EST.FACTOR": "multiply"
@@ -51,8 +51,8 @@ compile-dragen-backbone-metrics --metrics-json-config <json_config> --analysis-d
 
 Example output:
 ```bash
-Metric (UOM)    <rgsm_id>   Category
-PCT_CONTAMINATION_EST (%)   0.1 Production
+Metric (UOM)    <rgsm_id>   Category    Status
+PCT_CONTAMINATION_EST (%)   0.01 Production Pass
 ```
 
 ## Convert Multi-Sample VCF File into Single-Sample VCF files

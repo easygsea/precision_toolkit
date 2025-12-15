@@ -369,7 +369,6 @@ class DragenMetricsParser:
                                 )
                                 scaled_value = dragen_metric_obj.default_val
 
-                        # TODO: Warn of rows with the same metric description
                         if metric_name in metric_name_to_value.keys():
                             # Rows with the same metric group (first column) and metric
                             # description (third column) are present in DRAGEN output
@@ -508,12 +507,13 @@ def classify_metric(
     dragen_metrics_parser: DragenMetricsParser,
     metric_name: str,
     metric_val: float | None,
-) -> str:
+) -> tuple[str, str | None]:
     """
     Classify metric depending on whether value satisfies threshold condition.
 
-    A metric is classified as 'Production' if condition is met, otherwise it's
-    classified as 'Monitoring'.
+    A metric is classified as 'Production' if a fail threshold is defined, otherwise
+    it's classified as 'Monitoring'. Production metrics are further evaluated as 'Pass'
+    or 'Fail' based on whether the metric value meets the threshold condition.
 
     Args:
         dragen_metrics_parser: DragenMetricsParser object.
@@ -521,20 +521,24 @@ def classify_metric(
         metric_val: Value of dragen metric.
 
     Returns:
-        String, either 'Production' or 'Monitoring'.
+        Tuple of (category, status) where:
+        - category: Either 'Production' or 'Monitoring'.
+        - status: Either 'Pass', 'Fail', or None (for Monitoring metrics).
     """
     metric_obj = dragen_metrics_parser.metric_to_metric_obj[metric_name]
 
-    if (
-        metric_val
-        and metric_obj.fail_threshold
-        and OPERATIONS[metric_obj.fail_direction](
+    category = "Monitoring"
+    status = None
+    if metric_obj.fail_threshold:
+        category = "Production"
+        if not metric_val or OPERATIONS[metric_obj.fail_direction](
             float(metric_val), metric_obj.fail_threshold
-        )
-    ):
-        return "Production"
-    else:
-        return "Monitoring"
+        ):
+            status = "Fail"
+        else:
+            status = "Pass"
+
+    return category, status
 
 
 def main() -> None:
@@ -601,7 +605,7 @@ def main() -> None:
     out_filename = output_folder / f"{sample_id}_MetricsOutput.tsv"
     with open(out_filename, "w") as out_dragen_metrics_tsv:
         # Write header
-        out_dragen_metrics_tsv.write(f"Metric (UOM)\t{sample_id}\tCategory\n")
+        out_dragen_metrics_tsv.write(f"Metric (UOM)\t{sample_id}\tCategory\tStatus\n")
 
         for metric_name, metric_val in all_dragen_metrics.items():
             # Filter for reported metrics only
@@ -620,13 +624,15 @@ def main() -> None:
                         metric_val,
                     )
 
-                # Classify metric as either 'Monitoring' or 'Production'
-                category = classify_metric(
+                # Classify metric as either 'Monitoring' or 'Production' and if
+                # 'Production', PASS/FAIL based on threshold
+                category, status = classify_metric(
                     dragen_metrics_parser, metric_name, metric_val
                 )
 
                 out_dragen_metrics_tsv.write(
-                    f"{formatted_metrics[0]}\t{formatted_metrics[1]}\t{category}\n"
+                    f"{formatted_metrics[0]}\t{formatted_metrics[1]}\t{category}"
+                    f"\t{status}\n"
                 )
 
 
