@@ -4,8 +4,8 @@
 
 ---
 
-### v1.1.2 - 2025-12-15
-- Bugfix: Sorted scored metrics file prior to `bedtools merge` when generating tracts.
+### v1.1.2 - 2025-12-16
+- Hotfix: Sorted scored metrics file prior to `bedtools merge` when generating tracts.
 
 ---
 
