@@ -242,6 +242,7 @@ process GENERATE_TRACTS {
         # Convert to bed format
         print \$1,\$2,\$2+1,\$3,\$col["${headers_dict.base_header}"]
     }' ${scored_file} |
+    sort -k1,1 -k2,2n |
     bedtools merge -d ${gap_tolerance} -c 4,5 -o distinct,mean |
     awk -v OFS='\\t' '
     BEGIN {
