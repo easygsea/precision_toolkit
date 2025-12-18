@@ -93,8 +93,8 @@ class Transcript:
             for i in range(len(sorted_exons) - 1):
                 prev_exon = sorted_exons[i]
                 next_exon = sorted_exons[i + 1]
-                intron_start = prev_exon.range[1] + 1
-                intron_end = next_exon.range[0] - 1
+                intron_start = prev_exon.range[1]
+                intron_end = next_exon.range[0]
 
                 # Determine which exon precedes intron based on strand
                 if self.strand == Strand.MINUS:
