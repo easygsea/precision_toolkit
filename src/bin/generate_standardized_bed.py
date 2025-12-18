@@ -415,10 +415,8 @@ def generate_modified_target_bed(
             attributes = fields[9]
             exon_num = extract_exon_number(attributes)
 
-            # Skip feature if not in target_genes or features
+            # Skip feature if not in target_genes
             if target_genes and feature_name not in target_genes:
-                continue
-            if genomic_feature not in target_features:
                 continue
 
             # Extract refseq accession
@@ -437,7 +435,10 @@ def generate_modified_target_bed(
 
             # Apply flags
             # Default to original coordinates
-            out_bed_entries = f"{chr}\t{start}\t{end}\t{updated_feature_name}\n"
+            out_bed_entries = []
+            out_bed_entries.append(
+                (genomic_feature, f"{chr}\t{start}\t{end}\t{updated_feature_name}\n")
+            )
             if refseq_acc:
                 transcript_obj = refseq_accession_to_transcript_obj[refseq_acc]
 
@@ -456,10 +457,13 @@ def generate_modified_target_bed(
                             updated_end = transcript_obj.stop_codon.range[1]
                         else:
                             updated_start = transcript_obj.stop_codon.range[0]
-                        out_bed_entries = (
-                            f"{chr}\t{updated_start}\t"
-                            f"{updated_end}\t{updated_feature_name}\n"
-                        )
+                        out_bed_entries = [
+                            (
+                                genomic_feature,
+                                f"{chr}\t{updated_start}\t"
+                                f"{updated_end}\t{updated_feature_name}\n",
+                            )
+                        ]
 
                 elif genomic_feature == "exon":
                     exon_range = (int(start), int(end))
@@ -467,14 +471,20 @@ def generate_modified_target_bed(
                     if not include_utrs:
                         coding_exon = trim_utr_exon(transcript_obj, exon_range)
                         if coding_exon:
-                            out_bed_entries = (
-                                f"{chr}\t{coding_exon.range[0]}\t"
-                                f"{coding_exon.range[1]}\t{updated_feature_name}\n"
-                            )
+                            out_bed_entries = [
+                                (
+                                    genomic_feature,
+                                    f"{chr}\t{coding_exon.range[0]}\t"
+                                    f"{coding_exon.range[1]}\t{updated_feature_name}\n",
+                                )
+                            ]
                         else:
                             continue  # skip UTR-only exon
 
                     if output_introns:
+                        if "intron" not in target_features:
+                            target_features.append("intron")
+
                         # Calculate introns if not done previously
                         if transcript_obj.introns is None:
                             if not include_utrs:
@@ -504,13 +514,18 @@ def generate_modified_target_bed(
                                     refseq_accession_to_transcript_obj,
                                     zero_pad_names,
                                 )
-                                intron_entry = (
-                                    f"{chr}\t{intron.range[0]}\t"
-                                    f"{intron.range[1]}\t{intron_feature_name}\n"
+                                out_bed_entries.append(
+                                    (
+                                        "intron",
+                                        f"{chr}\t{intron.range[0]}\t"
+                                        f"{intron.range[1]}\t{intron_feature_name}\n",
+                                    )
                                 )
-                                out_bed_entries += intron_entry
 
-            out_bed.write(out_bed_entries)
+            # Skip feature if not in target_features
+            for entry in out_bed_entries:
+                if entry[0] in target_features:
+                    out_bed.write(entry[1])
 
 
 def main() -> None:
@@ -652,6 +667,14 @@ def main() -> None:
         args.output_introns,
         args.zero_pad_names,
     )
+
+    # Output warning if introns are output but exons are not
+    # Has been observed when CDS and intron features are output
+    if args.output_introns and "exon" not in feature_list:
+        logging.warning(
+            "Output standardized BED file may not be in sorted order. Check before "
+            "utilizing BED file in downstream applications.",
+        )
 
     # If gene_list provided, output warning if any genes in target gene list
     # were not found in input BED file
