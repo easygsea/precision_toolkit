@@ -14,7 +14,8 @@ Etc.
 Usage:
     generate-standardized-bed --bed-file <bed> --output-folder <output_folder>
     [--attribute-key <refseq_accession_attribute_key>]
-    [--gene-list <target_gene_file>] [--output-introns] [--zero-pad-names]
+    [--features <comma_separated_feature_list>] [--gene-list <target_gene_file>]
+    [--extend-cds-to-stop] [--include-utrs] [--output-introns] [--zero-pad-names]
 """
 
 import argparse
@@ -330,11 +331,6 @@ def construct_feature_name(
         return f"{gene_symbol}_{refseq_acc}_{feature_id}"
 
 
-def replace_exon_number(bed_attributes: str, new_exon_num: int) -> str:
-    """Replace exon number in BED attributes with specified value."""
-    return re.sub(r"(exon_number.*?)(\d+)", rf"\g<1>{new_exon_num}", bed_attributes)
-
-
 def get_corresponding_intron(
     exon_range: tuple[int, int], exon_to_intron: dict[tuple[int, int], GenomicRange]
 ) -> GenomicRange | None:
@@ -495,9 +491,7 @@ def generate_modified_target_bed(
                             else:
                                 transcript_obj.calc_intron_ranges(transcript_obj.exons)
 
-                        # Check if transcript has introns (i.e. > 1 exon) and write
-                        # Attributes are inherited from exon, but exon_number is
-                        # replaced with intron's number_attribute
+                        # Check if transcript has introns (i.e. > 1 exon); if so, write
                         if transcript_obj.introns:
                             exon_to_intron = transcript_obj.exon_to_intron
                             exon_range = (int(start), int(end))
@@ -523,6 +517,7 @@ def generate_modified_target_bed(
                                 )
 
             # Skip feature if not in target_features
+            # Filtering done last to ensure introns can be output independent of exons
             for entry in out_bed_entries:
                 if entry[0] in target_features:
                     out_bed.write(entry[1])
