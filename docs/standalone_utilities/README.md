@@ -38,7 +38,7 @@ Example output:
 
 ## Generate Standardized BED
 
-The `generate-standardized-bed` tool reformats a BED file in BED6+4 format into a 4-column BED file and standardizes feature names. As intron features are not typically included in BED files, users can enable intron calculation using `--output_introns`.
+The `generate-standardized-bed` tool takes a BED file in BED6+4 format as input and excludes UTRs prior to reformatting into a 4-column BED file and standardizing feature names. Exclusion of UTRs can be disabled by supplying `--include-utrs`. Furthermore, as intron features are not typically included in BED files, users can enable intron calculation using `--output-introns`.
 
 Specifically, the input BED file should have the following columns:
 
@@ -60,7 +60,7 @@ This will be converted into a 4-column BED file consisting of:
 3. chromEnd: end position
 4. featureName: feature name with the format `<gene_symbol>_<refseq_accession>_<feature><exon_number>`
 
-By default, `refseq_accession` is parsed from the `db_xref` attribute; however, another attribute can be specified using `--attribute-key`. For features lacking the `refseq_accession` value, the feature name will be `<gene_symbol>_<feature>`.
+By default, `refseq_accession` is parsed from the `transcript_id` attribute; however, another attribute can be specified using `--attribute-key`. For features lacking the `refseq_accession` value, the feature name will be `<gene_symbol>_<feature>`.
 
 `exon_number`, if present in the attributes together with `refseq_accession`, is optionally dynamically zero-padded (when `--zero-pad-names` is specified) based on the total number of genomic features present for the gene/transcript:
 
@@ -73,31 +73,30 @@ For features without `exon_number`, the feature name will simply be `<gene_symbo
 
 Usage:
 ```bash
-generate-standardized-bed --bed-file <bed> --output-folder <output_folder> [--attribute-key <refseq_accession_attribute_key>] [--gene-list <target_gene_file>] [--output-introns] [--zero-pad-names]
+generate-standardized-bed --bed-file <bed> --output-folder <output_folder> [--attribute-key <refseq_accession_attribute_key>] [--features <comma_separated_feature_list>] [--gene-list <target_gene_file>] [--extend-cds-to-stop] [--include-utrs] [--output-introns] [--zero-pad-names]
 ```
 
 Example output:
 ```bash
-chrX	154021572	154031450	MECP2_NM_001110792.2_EXON3
-chrX	154021572	154031450	MECP2_NM_004992.4_EXON4
+chrX	154030366	154031450	MECP2_NM_001110792.2_EXON3
+chrX	154030366	154031450	MECP2_NM_004992.4_EXON4
 chrX	154021572	154097717	MECP2_NM_001110792.2_TRANSCRIPT
 chrX	154021572	154097717	MECP2_NM_004992.4_TRANSCRIPT
 chrX	154021572	154097717	MECP2_GENE
-chrX	154030366	154030369	MECP2_NP_001104262.1_STOP_CODON3
-chrX	154030366	154030369	MECP2_NP_004983.1_STOP_CODON4
-chrX	154030369	154031450	MECP2_NP_001104262.1_CDS3
-chrX	154030369	154031450	MECP2_NP_004983.1_CDS4
-chrX	154032206	154032557	MECP2_NP_001104262.1_CDS2
-chrX	154032206	154032557	MECP2_NP_004983.1_CDS3
+chrX	154030366	154030369	MECP2_NM_001110792.2_STOP_CODON3
+chrX	154030366	154030369	MECP2_NM_004992.4_STOP_CODON4
+chrX	154030369	154031450	MECP2_NM_001110792.2_CDS3
+chrX	154030369	154031450	MECP2_NM_004992.4_CDS4
+chrX	154032206	154032557	MECP2_NM_001110792.2_CDS2
+chrX	154032206	154032557	MECP2_NM_004992.4_CDS3
 chrX	154032206	154032557	MECP2_NM_001110792.2_EXON2
 chrX	154032206	154032557	MECP2_NM_004992.4_EXON3
-chrX	154092183	154092209	MECP2_NP_004983.1_CDS2
-chrX	154092183	154092307	MECP2_NM_004992.4_EXON2
-chrX	154092206	154092209	MECP2_NP_004983.1_START_CODON2
-chrX	154097603	154097665	MECP2_NP_001104262.1_CDS1
-chrX	154097603	154097717	MECP2_NM_001110792.2_EXON1
-chrX	154097603	154097717	MECP2_NM_004992.4_EXON1
-chrX	154097662	154097665	MECP2_NP_001104262.1_START_CODON1
+chrX	154092183	154092209	MECP2_NM_004992.4_CDS2
+chrX	154092183	154092209	MECP2_NM_004992.4_EXON2
+chrX	154092206	154092209	MECP2_NM_004992.4_START_CODON2
+chrX	154097603	154097665	MECP2_NM_001110792.2_CDS1
+chrX	154097603	154097665	MECP2_NM_001110792.2_EXON1
+chrX	154097662	154097665	MECP2_NM_001110792.2_START_CODON1
 ```
 
 ### Interpretation of `exon_number`
