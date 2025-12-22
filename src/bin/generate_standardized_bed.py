@@ -140,6 +140,8 @@ class Transcript:
                 f"stop codon information, thus cannot determine non-coding "
                 f"portions of exon... skipping exclusion of UTRs."
             )
+            for exon in self.exons:
+                self.exon_to_coding_exon[exon.range] = exon
             return
 
         if self.strand == Strand.PLUS:
