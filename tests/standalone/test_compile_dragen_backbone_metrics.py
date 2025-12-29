@@ -9,9 +9,9 @@ import pytest
 
 
 @pytest.fixture
-def test_data_dir() -> Path:
+def test_data_dir(pytestconfig: pytest.Config) -> Path:
     """Fixture for the test data directory."""
-    return Path(__file__).parent / "data"
+    return pytestconfig.rootpath / "tests_data/dragen_metrics"
 
 
 def _parse_script_output(
@@ -110,7 +110,7 @@ def test_compile_dragen_metrics(
 ) -> None:
     """Test compilation of dragen metrics with various input scenarios."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        json_config_file = test_data_dir / "minimal_dragen_metrics_config.json"
+        json_config_file = test_data_dir / "minimal_config.json"
         output_prefix = Path(tmpdir) / "compile_dragen_backbone_metrics"
 
         subprocess.run(

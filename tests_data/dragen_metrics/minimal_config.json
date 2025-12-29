@@ -1,5 +1,9 @@
 {
-    "ReportedMetrics": ["TOTAL_PF_READS", "PCT_CHIMERIC_READS", "PCT_CONTAMINATION_EST"], 
+    "ReportedMetrics": [
+        "TOTAL_PF_READS",
+        "PCT_CHIMERIC_READS",
+        "PCT_CONTAMINATION_EST"
+    ],
     "DataSources": {
         "MAPPING/ALIGNING SUMMARY": {
             "SourceName": "<DRAGEN_ANALYSIS_DIR>/<SAMPLE_ID>.mapping_metrics.csv",
