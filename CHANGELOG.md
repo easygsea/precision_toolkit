@@ -4,8 +4,13 @@
 
 ---
 
-### v1.1.2 - 2025-XX-XX
+### v1.1.3 - 2026-XX-XX
 - New Standalone Utility: Added `compile-dragen-backbone-metrics` to extract and format backbone QC metrics from DRAGEN output files.
+
+---
+
+### v1.1.2 - 2025-12-16
+- Hotfix: Sorted scored metrics file prior to `bedtools merge` when generating tracts.
 
 ---
 
