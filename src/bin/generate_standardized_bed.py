@@ -401,6 +401,9 @@ def generate_modified_target_bed(
     Returns:
         None, standardized BED file is written to out_bed_file_path.
     """
+    if output_introns:
+        target_features.append("intron")
+
     out_bed = open_file(out_bed_file_path, FileMode.WRITE)
     with open_file(bed_file_path, FileMode.READ) as in_bed:
         for line in in_bed:
@@ -480,9 +483,6 @@ def generate_modified_target_bed(
                             continue  # skip UTR-only exon
 
                     if output_introns:
-                        if "intron" not in target_features:
-                            target_features.append("intron")
-
                         # Calculate introns if not done previously
                         if transcript_obj.introns is None:
                             if not include_utrs:
