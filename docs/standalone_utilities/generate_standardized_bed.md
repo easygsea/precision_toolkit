@@ -1,6 +1,6 @@
 # BED Standardization Tool
 
-`generate_standardized_bed.py` is a Python script that reformats BED files in BED6+4 format to a 4-column BED file with standardized feature names and excludes UTRs in the final BED. It primarily accepts BED files converted from GTF files using `bedops gtf2bed` as input; thus, the BED6+4 input file should have the following columns:
+`generate_standardized_bed.py` is a Python script that reformats BED files in BED6+4 format to a 4-column BED file with standardized feature names. It primarily accepts BED files converted from GTF files using `bedops gtf2bed` as input; thus, the BED6+4 input file should have the following columns:
 
 1. chrom: chromosome
 2. chromStart: start position
@@ -73,16 +73,10 @@ chr20	50960222	50960225	MOCS3	.	+	BestRefSeq	stop_codon	0	gene_id "MOCS3"; trans
 
 #### Standardize target BED file
 
-Following this, the `generate_standardized_bed.py` script can be used to exclude UTRs and standardize the BED file.
+Following this, the `generate_standardized_bed.py` script can be used to standardize the BED file.
 
 ```
 python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY>
-```
-
-By default, UTRs are excluded - exons that fall entirely within UTRs are excluded, and exons that span coding/non-coding boundaries are trimmed to remove UTR portions. To disable this, `--include-utrs` can be supplied:
-
-```
-python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --include-utrs
 ```
 
 By definition, CDS features do not include stop codons. To extend CDS intervals to include stop codons, use `--extend-cds-to-stop`:
@@ -97,6 +91,12 @@ To calculate and include intron features in the standardized BED, use `--output-
 python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --output-introns
 ```
 
+By default, exon features include UTRs. Supplying `--exclude-utrs` will remove exons that fall entirely within UTRs and trim exons that span coding/non-coding boundaries to remove UTR portions.
+
+```
+python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --exclude-utrs
+```
+
 The flags above require most feature types to be present in `MANE_BED`; however, these may not be needed in the final target BED. Users may restrict the output to a subset of features by providing a comma-separated list via `--features` (valid values: `CDS`, `exon`, `gene`, `start_codon`, `stop_codon`, `transcript`). Similarly, users can filter for genes of interest by providing a file containing target gene symbols (one per line) to `--gene-list`. A warning is output if any genes in this list are not found in `MANE_BED`.
 
 ```
@@ -106,7 +106,7 @@ python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUT
 That's it! The standardized BED file should look something like this:
 
 ```
-chr20	50958842	50960225	MOCS3_NM_014484.5_EXON1
+chr20	50958817	50963929	MOCS3_NM_014484.5_EXON1
 chr20	50958817	50963929	MOCS3_GENE
 chr20	50958817	50963929	MOCS3_NM_014484.5_TRANSCRIPT
 chr20	50958842	50958845	MOCS3_NM_014484.5_START_CODON1

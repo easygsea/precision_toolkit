@@ -38,7 +38,7 @@ Example output:
 
 ## Generate Standardized BED
 
-The `generate-standardized-bed` tool takes a BED file in BED6+4 format as input and excludes UTRs prior to reformatting into a 4-column BED file and standardizing feature names. Exclusion of UTRs can be disabled by supplying `--include-utrs`. Furthermore, as intron features are not typically included in BED files, users can enable intron calculation using `--output-introns`.
+The `generate-standardized-bed` tool reformats a BED file in BED6+4 format into a 4-column BED file and standardizes feature names. As intron features are not typically included in BED files, users can enable intron calculation using `--output-introns`.
 
 Specifically, the input BED file should have the following columns:
 
@@ -73,13 +73,13 @@ For features without `exon_number`, the feature name will simply be `<gene_symbo
 
 Usage:
 ```bash
-generate-standardized-bed --bed-file <bed> --output-folder <output_folder> [--attribute-key <refseq_accession_attribute_key>] [--features <comma_separated_feature_list>] [--gene-list <target_gene_file>] [--extend-cds-to-stop] [--include-utrs] [--output-introns] [--zero-pad-names]
+generate-standardized-bed --bed-file <bed> --output-folder <output_folder> [--attribute-key <refseq_accession_attribute_key>] [--features <comma_separated_feature_list>] [--gene-list <target_gene_file>] [--extend-cds-to-stop] [--exclude-utrs] [--output-introns] [--zero-pad-names]
 ```
 
 Example output:
 ```bash
-chrX	154030366	154031450	MECP2_NM_001110792.2_EXON3
-chrX	154030366	154031450	MECP2_NM_004992.4_EXON4
+chrX	154021572	154031450	MECP2_NM_001110792.2_EXON3
+chrX	154021572	154031450	MECP2_NM_004992.4_EXON4
 chrX	154021572	154097717	MECP2_NM_001110792.2_TRANSCRIPT
 chrX	154021572	154097717	MECP2_NM_004992.4_TRANSCRIPT
 chrX	154021572	154097717	MECP2_GENE
@@ -92,10 +92,11 @@ chrX	154032206	154032557	MECP2_NM_004992.4_CDS3
 chrX	154032206	154032557	MECP2_NM_001110792.2_EXON2
 chrX	154032206	154032557	MECP2_NM_004992.4_EXON3
 chrX	154092183	154092209	MECP2_NM_004992.4_CDS2
-chrX	154092183	154092209	MECP2_NM_004992.4_EXON2
+chrX	154092183	154092307	MECP2_NM_004992.4_EXON2
 chrX	154092206	154092209	MECP2_NM_004992.4_START_CODON2
 chrX	154097603	154097665	MECP2_NM_001110792.2_CDS1
-chrX	154097603	154097665	MECP2_NM_001110792.2_EXON1
+chrX	154097603	154097717	MECP2_NM_001110792.2_EXON1
+chrX	154097603	154097717	MECP2_NM_004992.4_EXON1
 chrX	154097662	154097665	MECP2_NM_001110792.2_START_CODON1
 ```
 
