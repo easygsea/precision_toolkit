@@ -82,9 +82,9 @@ class Transcript:
             [GenomicRange((100, 200), "1"), GenomicRange((300, 400), "2")]
             >> transcript.calc_intron_ranges()
             >> transcript.introns
-            [GenomicRange((201, 299), "1")]
+            [GenomicRange((200, 300), "1")]
             >> transcript.exon_to_intron
-            {(100, 200): GenomicRange((201, 299), "1")}
+            {(100, 200): GenomicRange((200, 300), "1")}
         """
         self.introns = []
         if len(exon_ranges) > 1:
