@@ -15,7 +15,7 @@ Usage:
     generate-standardized-bed --bed-file <bed> --output-folder <output_folder>
     [--attribute-key <refseq_accession_attribute_key>]
     [--features <comma_separated_feature_list>] [--gene-list <target_gene_file>]
-    [--extend-cds-to-stop] [--include-utrs] [--output-introns] [--zero-pad-names]
+    [--extend-cds-to-stop] [--exclude-utrs] [--output-introns] [--zero-pad-names]
 """
 
 import argparse
@@ -375,7 +375,7 @@ def generate_modified_target_bed(
     refseq_accession_to_transcript_obj: dict[str, Transcript],
     out_bed_file_path: Path,
     extend_cds_to_stop: bool,
-    include_utrs: bool,
+    exclude_utrs: bool,
     output_introns: bool,
     zero_pad_names: bool,
 ) -> None:
@@ -395,7 +395,7 @@ def generate_modified_target_bed(
             corresponding Transcript objects.
         out_bed_file_path: Path to output standardized BED file.
         extend_cds_to_stop: If True, extend CDS features to include stop codons.
-        include_utrs: If True, do not exclude/trim UTRs from exons.
+        exclude_utrs: If True, exclude/trim UTRs from exons.
         output_introns: If True, calculate introns and output to target BED file.
 
     Returns:
@@ -469,7 +469,7 @@ def generate_modified_target_bed(
                 elif genomic_feature == "exon":
                     exon_range = (int(start), int(end))
 
-                    if not include_utrs:
+                    if exclude_utrs:
                         coding_exon = trim_utr_exon(transcript_obj, exon_range)
                         if coding_exon:
                             out_bed_entries = [
@@ -485,7 +485,7 @@ def generate_modified_target_bed(
                     if output_introns:
                         # Calculate introns if not done previously
                         if transcript_obj.introns is None:
-                            if not include_utrs:
+                            if exclude_utrs:
                                 # Calculate introns based on coding exons
                                 transcript_obj.calc_intron_ranges(
                                     list(transcript_obj.exon_to_coding_exon.values())
@@ -574,12 +574,10 @@ def main() -> None:
         action="store_true",
     )
     parser.add_argument(
-        "--include-utrs",
+        "--exclude-utrs",
         help=(
-            "By default, only coding regions are included for each transcript "
-            "in target BED file (i.e. exon features will be excluded or "
-            "trimmed to exclude UTRs). Supplying this flag will disable this "
-            "functionality."
+            "By definition, exons include UTRs. Supplying this flag will exclude "
+            "UTR-only exons and trim non-coding exonic regions."
         ),
         action="store_true",
     )
@@ -660,7 +658,7 @@ def main() -> None:
         refseq_accession_to_transcript_obj,
         output_folder / out_filename,
         args.extend_cds_to_stop,
-        args.include_utrs,
+        args.exclude_utrs,
         args.output_introns,
         args.zero_pad_names,
     )

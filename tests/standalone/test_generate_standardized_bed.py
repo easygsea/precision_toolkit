@@ -26,8 +26,98 @@ def _extract_exon_number(feature_name: str) -> str:
     return feature_name_search.group(1)
 
 
-def test_exclude_utrs_and_unpadded_names(test_data_dir: Path) -> None:
-    """Test default behaviour - UTRs are excluded, names are not zero-padded."""
+def test_include_utrs_and_unpadded_names(test_data_dir: Path) -> None:
+    """Test default behaviour - UTRs are included, names are not zero-padded."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        input_bed_file = test_data_dir / "features_lt10.bed"
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
+
+        subprocess.run(
+            [
+                "generate-standardized-bed",
+                "--bed-file",
+                str(input_bed_file),
+                "--output-folder",
+                str(output_prefix),
+            ],
+            check=True,
+        )
+
+        output_file = output_prefix / "features_lt10.reformatted.bed"
+        assert output_file.exists()
+
+        # Check that chr, start, and stop coordinates match input - no change
+        with open(input_bed_file) as input_bed, open(output_file) as reformatted_bed:
+            for input_line, reformatted_line in zip(input_bed, reformatted_bed):
+                input_coords = input_line.split("\t")[:3]
+                reformatted_coords = reformatted_line.split("\t")[:3]
+                assert input_coords == reformatted_coords, (
+                    f"All coordinates should not change when UTRs are included; "
+                    f"however, a mismatch was detected - Expected {input_coords}, "
+                    f"but got {reformatted_coords}."
+                )
+
+
+@pytest.mark.parametrize(
+    "bed_filename, expected_digits",
+    [
+        ("features_lt10.bed", 1),
+        ("features_lt100.bed", 2),
+        ("features_lt1000.bed", 3),
+    ],
+)
+def test_zeropad_name(
+    test_data_dir: Path, bed_filename: str, expected_digits: int
+) -> None:
+    """Test renaming of BED features with zero-padding as needed."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Filter for exon features only - sufficient to check padding for one feature
+        exons_only_bed_filename = bed_filename.replace("features_", "exons_")
+        input_bed_file = Path(tmpdir) / exons_only_bed_filename
+
+        with (
+            open(test_data_dir / bed_filename, "r") as all_features_bed,
+            open(input_bed_file, "w") as exons_bed,
+        ):
+            for line in all_features_bed:
+                fields = line.strip().split("\t")
+                if fields[8] == "exon":
+                    exons_bed.write(line)
+        output_prefix = Path(tmpdir) / "generate_standardized_bed"
+
+        subprocess.run(
+            [
+                "generate-standardized-bed",
+                "--bed-file",
+                str(input_bed_file),
+                "--output-folder",
+                str(output_prefix),
+                "--zero-pad-names",
+            ],
+            check=True,
+        )
+
+        output_file = output_prefix / exons_only_bed_filename.replace(
+            ".bed", ".reformatted.bed"
+        )
+        assert output_file.exists()
+
+        # Extract ending digits from each line and check it matches expected number
+        with open(output_file) as reformatted_bed:
+            for line in reformatted_bed:
+                fields = line.strip().split("\t")
+                feature_name = fields[3]
+
+                exon_number = _extract_exon_number(feature_name)
+
+                assert len(exon_number) == expected_digits, (
+                    f"Exon number '{exon_number}' in '{feature_name}' should be "
+                    f"{expected_digits}"
+                )
+
+
+def test_exclude_utrs(test_data_dir: Path) -> None:
+    """Test exclusion of UTRs."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "features_lt100.bed"
         output_prefix = Path(tmpdir) / "generate_standardized_bed"
@@ -39,6 +129,7 @@ def test_exclude_utrs_and_unpadded_names(test_data_dir: Path) -> None:
                 str(input_bed_file),
                 "--output-folder",
                 str(output_prefix),
+                "--exclude-utrs",
             ],
             check=True,
         )
@@ -106,99 +197,8 @@ def test_exclude_utrs_and_unpadded_names(test_data_dir: Path) -> None:
         )
 
 
-@pytest.mark.parametrize(
-    "bed_filename, expected_digits",
-    [
-        ("features_lt10.bed", 1),
-        ("features_lt100.bed", 2),
-        ("features_lt1000.bed", 3),
-    ],
-)
-def test_zeropad_name(
-    test_data_dir: Path, bed_filename: str, expected_digits: int
-) -> None:
-    """Test renaming of BED features with zero-padding as needed."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        # Filter for exon features only - sufficient to check padding for one feature
-        exons_only_bed_filename = bed_filename.replace("features_", "exons_")
-        input_bed_file = Path(tmpdir) / exons_only_bed_filename
-
-        with (
-            open(test_data_dir / bed_filename, "r") as all_features_bed,
-            open(input_bed_file, "w") as exons_bed,
-        ):
-            for line in all_features_bed:
-                fields = line.strip().split("\t")
-                if fields[8] == "exon":
-                    exons_bed.write(line)
-        output_prefix = Path(tmpdir) / "generate_standardized_bed"
-
-        subprocess.run(
-            [
-                "generate-standardized-bed",
-                "--bed-file",
-                str(input_bed_file),
-                "--output-folder",
-                str(output_prefix),
-                "--zero-pad-names",
-            ],
-            check=True,
-        )
-
-        output_file = output_prefix / exons_only_bed_filename.replace(
-            ".bed", ".reformatted.bed"
-        )
-        assert output_file.exists()
-
-        # Extract ending digits from each line and check it matches expected number
-        with open(output_file) as reformatted_bed:
-            for line in reformatted_bed:
-                fields = line.strip().split("\t")
-                feature_name = fields[3]
-
-                exon_number = _extract_exon_number(feature_name)
-
-                assert len(exon_number) == expected_digits, (
-                    f"Exon number '{exon_number}' in '{feature_name}' should be "
-                    f"{expected_digits}"
-                )
-
-
-def test_include_utrs(test_data_dir: Path) -> None:
-    """Test inclusion of UTRs."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        input_bed_file = test_data_dir / "features_lt10.bed"
-        output_prefix = Path(tmpdir) / "generate_standardized_bed"
-
-        subprocess.run(
-            [
-                "generate-standardized-bed",
-                "--bed-file",
-                str(input_bed_file),
-                "--output-folder",
-                str(output_prefix),
-                "--include-utrs",
-            ],
-            check=True,
-        )
-
-        output_file = output_prefix / "features_lt10.reformatted.bed"
-        assert output_file.exists()
-
-        # Check that chr, start, and stop coordinates match input - no change
-        with open(input_bed_file) as input_bed, open(output_file) as reformatted_bed:
-            for input_line, reformatted_line in zip(input_bed, reformatted_bed):
-                input_coords = input_line.split("\t")[:3]
-                reformatted_coords = reformatted_line.split("\t")[:3]
-                assert input_coords == reformatted_coords, (
-                    f"All coordinates should not change when UTRs are included; "
-                    f"however, a mismatch was detected - Expected {input_coords}, "
-                    f"but got {reformatted_coords}."
-                )
-
-
 def test_extend_cds_to_stop(test_data_dir: Path) -> None:
-    """Test inclusion of UTRs."""
+    """Test extension of CDS to include stop codons."""
     with tempfile.TemporaryDirectory() as tmpdir:
         input_bed_file = test_data_dir / "features_lt10.bed"
         output_prefix = Path(tmpdir) / "generate_standardized_bed"
@@ -398,6 +398,7 @@ def test_exclude_utrs_with_introns(test_data_dir: Path) -> None:
                 str(input_bed_file),
                 "--output-folder",
                 str(output_prefix),
+                "--exclude-utrs",
                 "--output-introns",
             ],
             check=True,
