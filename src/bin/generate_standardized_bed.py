@@ -323,11 +323,6 @@ def construct_feature_name(
         feature_id = genomic_feature.upper()
 
     if refseq_acc is None:
-        logging.warning(
-            f"RefSeq accession not found for {genomic_feature.upper()} feature "
-            f"belonging to {gene_symbol}... standardized name won't "
-            f"include RefSeq accession."
-        )
         return f"{gene_symbol}_{feature_id}"
     else:
         return f"{gene_symbol}_{refseq_acc}_{feature_id}"
