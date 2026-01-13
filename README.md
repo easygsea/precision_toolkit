@@ -155,6 +155,8 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
     - `generate-standardized-bed`
   - [Jira Table Converter ](./docs/standalone_utilities/README.md#jira-table-converter)
     - `jira-table`
+  - [Pull Request Fetcher ](./docs/standalone_utilities/README.md#pull-request-fetcher)
+    - `fetch-prs`
   - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
     - `manual-diagnostic-metric-curation`
   - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
