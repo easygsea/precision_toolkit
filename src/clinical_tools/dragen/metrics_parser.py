@@ -294,16 +294,6 @@ class DragenMetricsParser:
                                 )
                                 scaled_value = dragen_metric_obj.default_val
 
-                        if metric_name in metric_name_to_value.keys():
-                            # Rows with the same metric group (first column) and metric
-                            # description (third column) are present in DRAGEN output
-                            # file
-                            logging.warning(
-                                f"{metric_name} is extracted from rows with "
-                                f"description '{metric_description}', but multiple "
-                                f"matching rows were found in {source_csv_path}. Using "
-                                f"last occurrence."
-                            )
                         metric_name_to_value[metric_name] = scaled_value
 
         return metric_name_to_value
