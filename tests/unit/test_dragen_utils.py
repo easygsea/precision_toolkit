@@ -99,9 +99,9 @@ def name_to_metric_obj() -> dict[str, DragenMetric]:
 @pytest.mark.parametrize(
     "dragen_metric_fixture,metric_val,expected_name,expected_val",
     [
-        ("pct_contamination_est", 0.0001, "PCT_CONTAMINATION_EST (%)", 0.00),
-        ("pct_contamination_est_none", 0.0001, "PCT_CONTAMINATION_EST (%)", 0.0001),
-        ("pct_contamination_est", None, "PCT_CONTAMINATION_EST (%)", None),
+        ("pct_contamination_est", 0.125, "PCT_CONTAMINATION_EST (%)", "0.13"),
+        ("pct_contamination_est_none", 0.0001, "PCT_CONTAMINATION_EST (%)", "0.0001"),
+        ("pct_contamination_est", None, "PCT_CONTAMINATION_EST (%)", "None"),
     ],
 )
 def test_format_metric(

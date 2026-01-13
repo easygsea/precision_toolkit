@@ -1,6 +1,7 @@
 """Utility functions and constants for DRAGEN metrics processing."""
 
 import operator
+from decimal import ROUND_HALF_UP, Decimal
 
 from clinical_tools.dragen.models import DragenMetric
 
@@ -17,7 +18,7 @@ OPERATIONS = {
 
 def format_metric(
     dragen_metric_obj: DragenMetric, metric_val: float | None
-) -> tuple[str, float | None]:
+) -> tuple[str, str]:
     """
     Format metric value based on properties stored in DragenMetric object.
 
@@ -27,7 +28,7 @@ def format_metric(
 
     Returns:
         Tuple of metric name with the format <metric> (<unit>) and metric value with
-        specified number of decimal places.
+        specified number of decimal places, represented a a string.
     """
     # Get dragen metric properties
     metric_name = dragen_metric_obj.name
@@ -36,9 +37,13 @@ def format_metric(
 
     # Apply formatting, if applicable
     formatted_metric_name = f"{metric_name} ({unit})"
-    formatted_metric_val = metric_val
-    if formatted_metric_val is not None and num_decimal_places is not None:
-        formatted_metric_val = round(formatted_metric_val, num_decimal_places)
+    formatted_metric_val = str(metric_val)
+    if metric_val is not None and num_decimal_places is not None:
+        precision = Decimal(10) ** -num_decimal_places
+        rounded_val = Decimal(formatted_metric_val).quantize(
+            precision, rounding=ROUND_HALF_UP
+        )
+        formatted_metric_val = f"{rounded_val:.{num_decimal_places}f}"
 
     return formatted_metric_name, formatted_metric_val
 
