@@ -28,11 +28,15 @@ def _parse_script_output(
                 metric_name = fields[0]
                 value = None if fields[1] == "None" else float(fields[1])
                 category = fields[2]
-                status = None if fields[3] == "None" else fields[3]
+                threshold = None if fields[3] == "None" else float(fields[3])
+                failure_direction = None if fields[4] == "None" else fields[4]
+                status = None if fields[5] == "None" else fields[5]
 
             parsed_metrics[metric_name] = {
                 "value": value,
                 "category": category,
+                "threshold": threshold,
+                "failure_direction": failure_direction,
                 "status": status,
             }
 
@@ -48,16 +52,22 @@ def _parse_script_output(
                 "TOTAL_PF_READS (Count)": {
                     "value": 100.0,
                     "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
                     "status": None,
                 },
                 "PCT_CONTAMINATION_EST (%)": {
                     "value": 0.01,
                     "category": "Production",
+                    "threshold": 0.02,
+                    "failure_direction": "greater_than",
                     "status": "Pass",
                 },
                 "PCT_CHIMERIC_READS (%)": {
                     "value": 25.0,
                     "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
                     "status": None,
                 },
             },
@@ -68,16 +78,22 @@ def _parse_script_output(
                 "TOTAL_PF_READS (Count)": {
                     "value": 100.0,
                     "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
                     "status": None,
                 },
                 "PCT_CONTAMINATION_EST (%)": {
                     "value": None,
                     "category": "Production",
+                    "threshold": 0.02,
+                    "failure_direction": "greater_than",
                     "status": "Fail",
                 },
                 "PCT_CHIMERIC_READS (%)": {
                     "value": 25.0,
                     "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
                     "status": None,
                 },
             },
@@ -88,16 +104,22 @@ def _parse_script_output(
                 "TOTAL_PF_READS (Count)": {
                     "value": None,
                     "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
                     "status": None,
                 },
                 "PCT_CONTAMINATION_EST (%)": {
                     "value": None,
                     "category": "Production",
+                    "threshold": 0.02,
+                    "failure_direction": "greater_than",
                     "status": "Fail",
                 },
                 "PCT_CHIMERIC_READS (%)": {
                     "value": None,
                     "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
                     "status": None,
                 },
             },
@@ -133,7 +155,14 @@ def test_compile_dragen_metrics(
 
         # Compare parsed to expected values
         parsed_colnames, parsed_metrics = _parse_script_output(output_file)
-        expected_colnames = ["Metric (UOM)", sample, "Category", "Status"]
+        expected_colnames = [
+            "Metric (UOM)",
+            sample,
+            "Category",
+            "Threshold",
+            "FailureDirection",
+            "Status",
+        ]
 
         # Ensure parsed values match expected
         assert parsed_colnames == expected_colnames

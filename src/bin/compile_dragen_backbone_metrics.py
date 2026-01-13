@@ -91,7 +91,10 @@ def main() -> None:
     out_filename = output_folder / f"{sample_id}_MetricsOutput.tsv"
     with open(out_filename, "w") as out_dragen_metrics_tsv:
         # Write header
-        out_dragen_metrics_tsv.write(f"Metric (UOM)\t{sample_id}\tCategory\tStatus\n")
+        out_dragen_metrics_tsv.write(
+            f"Metric (UOM)\t{sample_id}\tCategory\tThreshold\tFailureDirection"
+            f"\tStatus\n"
+        )
 
         for metric_name, metric_val in all_dragen_metrics.items():
             # Filter for reported metrics only
@@ -116,7 +119,8 @@ def main() -> None:
 
                 out_dragen_metrics_tsv.write(
                     f"{formatted_metrics[0]}\t{formatted_metrics[1]}\t{category}"
-                    f"\t{status}\n"
+                    f"\t{dragen_metric_obj.fail_threshold}\t"
+                    f"{dragen_metric_obj.fail_direction or 'None'}\t{status}\n"
                 )
 
 
