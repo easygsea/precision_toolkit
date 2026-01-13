@@ -12,8 +12,8 @@ import argparse
 import logging
 from pathlib import Path
 
-from clinical_tools.dragen.metrics_parser import DragenMetricsParser  # type: ignore
-from clinical_tools.dragen.utils import (  # type: ignore
+from clinical_tools.dragen.metrics_parser import DragenMetricsParser
+from clinical_tools.dragen.utils import (
     calc_derived_pct_metric,
     classify_metric,
     format_metric,
