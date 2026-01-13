@@ -1,28 +1,46 @@
-import requests
+"""Fetch Daily Pull Requests."""
 
-BITBUCKET_URL = "<YOUR URL HERE>"
-PROJECT = "<YOUR PROJECT HERE>"
-REPO = "<YOUR REPO HERE>"
-TOKEN = "<YOUR TOKEN HERE>"
+import requests  # type: ignore[import-untyped]
 
-headers = {"Authorization": f"Bearer {TOKEN}"}
 
-url = f"{BITBUCKET_URL}/rest/api/1.0/projects/{PROJECT}/repos/"
+def fetch_prs(bit_bucket_url: str, project: str, repo: str, token: str) -> None:
+    """
+    Fetch Pull Requests.
 
-r = requests.get(url, headers=headers)
-data_repos = r.json()
+    Args:
+        bit_bucket_url: URL for the BitBucket to fetch PR's from.
+        project: Name of the project.
+        repo: Name of the repository.
+        token: Authorization bearer token to access the repository.
+    """
+    headers = {"Authorization": f"Bearer {token}"}
 
-for repo in data_repos['values']:
-    url = f"{BITBUCKET_URL}/rest/api/1.0/projects/{PROJECT}/repos/{repo['slug']}/pull-requests"
+    url = f"{bit_bucket_url}/rest/api/1.0/projects/{project}/repos/"
 
     r = requests.get(url, headers=headers)
-    data = r.json()
+    data_repos = r.json()
 
-    for pr in data["values"]:
-        pr_id = pr["id"]
-        title = pr["title"]
-        state = pr["state"]
-        pr_link = f"{BITBUCKET_URL}/projects/{PROJECT}/repos/{repo['name']}/pull-requests/{pr_id}/overview"
+    for repo in data_repos["values"]:
+        if isinstance(repo, dict):
+            url = (
+                f"{bit_bucket_url}/rest"
+                f"/api/1.0/projects/{project}"
+                f"/repos/{repo['slug']}/pull-requests"
+            )
 
-        print(title)
-        print(f"[{repo['name']}#{pr_id}]({pr_link})\n")
+            r = requests.get(url, headers=headers)
+            data = r.json()
+
+            for pr in data["values"]:
+                pr_id = pr["id"]
+                title = pr["title"]
+                pr_link = (
+                    f"{bit_bucket_url}/projects/"
+                    f"{project}/repos/{repo['name']})"
+                    f"/pull-requests/{pr_id}/overview"
+                )
+
+                print(title)
+                print(f"[{repo['name']}#{pr_id}]({pr_link})\n")
+        else:
+            print(f"Expected dict, got {type(repo)}")

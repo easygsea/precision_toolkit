@@ -4,6 +4,7 @@
 - [Count Variants By Size](#count-variants-by-size)
 - [Generate Standardized BED](#generate-standardized-bed)
 - [Jira Table Converter](#jira-table-converter)
+- [Pull Request Fetcher](#pull-request-fetcher)
 - [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
 - [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
 
@@ -121,6 +122,15 @@ jira-table <PATH/TO/INPUT_FILE>
 - `--summary`: Add a short description along with the table.
 - `--float-format`: Control output format for float values.
 - `--pretty-print`: Pad columns with spaces for readability.
+
+## Pull Request Fetcher
+
+The `fetch-prs` tool fetches daily pull requests for PR reviewers.
+
+Example Usage:
+```bash
+fetch-prs <URL_TO_BIT_BUCKET> <PROJECT_NAME> <REPO_NAME> <TOKEN>
+```
 
 ## Manual Diagnostic Metric Curation
 
