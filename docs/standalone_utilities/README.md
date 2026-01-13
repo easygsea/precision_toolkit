@@ -10,14 +10,21 @@
 
 ## Compile DRAGEN Backbone Metrics
 
-The `compile-dragen-backbone-metrics` tool extracts and formats backbone QC metrics from relevant DRAGEN output files based on the source files (`SourceName`), columns (`Mappings` section), and attributes (`Constants` section) specified in a JSON-formatted configuration file.
+The `compile-dragen-backbone-metrics` tool extracts backbone QC metrics from DRAGEN output files based on a JSON-formatted configuration file that specifies the source files (`SourceName`) and column mappings (`Mappings`). The extracted metrics are written to `<RGSM_ID>_MetricsOutput.tsv`, with metric names and values formatted according to attributes defined in the `Constants` section of the configuration file. Common attributes include:
+* `FACTOR`: scale **factor**
+* `RAD`: **r**ounding **a**t **d**isplay
+* `UOM`: **u**nit **o**f **m**easurement
 
 Metrics will also be classified as either "Monitoring" or "Production", with "Monitoring" as the default. Metrics with failure threhsolds defined in the `Failures` section are classified as "Production", and assigned "Pass" or "Fail" status depending on whether the threshold condition is met.
 
 Example configuration file:
 ```json
 {
-    "ReportedMetrics": ["PCT_CONTAMINATION_EST"]
+    "ReportedMetrics": [
+        "TOTAL_PF_READS",
+        "PCT_CHIMERIC_READS",
+        "PCT_CONTAMINATION_EST"
+    ],
     "DataSources": {
         "MAPPING/ALIGNING SUMMARY": {
             "SourceName": "<DRAGEN_ANALYSIS_DIR>/<SAMPLE_ID>.mapping_metrics.csv",
@@ -25,14 +32,25 @@ Example configuration file:
             "AllowSourceFileToBeMissing": true,
             "DefaultValueOnMissing": null,
             "Mappings": {
+                "TOTAL_PF_READS": "{'Row':['Total input reads', 2],'Col':[3]}",
+                "MAPPED_READS": "{'Row':['Mapped reads', 2],'Col':[3]}",
+                "PCT_CHIMERIC_READS_BASE": "{'Row':['Supplementary (chimeric) alignments', 2],'Col':[3]}",
                 "PCT_CONTAMINATION_EST": "{'Row':['Estimated sample contamination', 2],'Col':[3]}"
             },
             "Constants": {
+                "TOTAL_PF_READS.UOM": "Count",
+                "TOTAL_PF_READS.RAD": 0,
+                "MAPPED_READS.FACTOR": 0.0001,
+                "PCT_CHIMERIC_READS.UOM": "%",
+                "PCT_CHIMERIC_READS.RAD": 2,
+                "PCT_CHIMERIC_READS.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.UOM": "%",
                 "PCT_CONTAMINATION_EST.RAD": 2
             },
             "FactorOperations": {
+                "MAPPED_READS.FACTOR": "add",
+                "PCT_CHIMERIC_READS.FACTOR": "multiply",
                 "PCT_CONTAMINATION_EST.FACTOR": "multiply"
             },
             "Failures": {
@@ -51,8 +69,10 @@ compile-dragen-backbone-metrics --metrics-json-config <json_config> --analysis-d
 
 Example output:
 ```bash
-Metric (UOM)    <rgsm_id>   Category    Status
-PCT_CONTAMINATION_EST (%)   0.01 Production Pass
+Metric (UOM)	sample	Category	Threshold	FailureDirection	Status
+TOTAL_PF_READS (Count)	100	Monitoring	None	None	None
+PCT_CONTAMINATION_EST (%)	0.01	Production	0.02	greater_than	Pass
+PCT_CHIMERIC_READS (%)	25.00	Monitoring	None	None	None
 ```
 
 ## Convert Multi-Sample VCF File into Single-Sample VCF files
