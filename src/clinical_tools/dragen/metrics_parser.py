@@ -10,6 +10,13 @@ from typing import Any
 from clinical_tools.dragen.models import DragenMetric, SourceFile
 from clinical_tools.dragen.utils import scale_metric
 
+# Configure logging
+logging.basicConfig(
+    level=logging.WARNING,
+    format="[%(asctime)s] %(levelname)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 
 class DragenMetricsParser:
     """Parser for extracting metrics from DRAGEN analysis output files."""
@@ -294,6 +301,18 @@ class DragenMetricsParser:
                                 )
                                 scaled_value = dragen_metric_obj.default_val
 
+                        if metric_name in metric_name_to_value.keys():
+                            # Rows with the same metric group (first column) and metric
+                            # description (third column) are present in DRAGEN output
+                            # file (e.g. *.mapping_metrics.csv contains stats per read
+                            # group, thus the metric description "Mapped reads" appears
+                            # multiple times for metric group "MAPPING/ALIGNING PER RG")
+                            logging.warning(
+                                f"{metric_name} is extracted from rows with "
+                                f"description '{metric_description}', but multiple "
+                                f"matching rows were found in {source_csv_path}. Using "
+                                f"last occurrence."
+                            )
                         metric_name_to_value[metric_name] = scaled_value
 
         return metric_name_to_value

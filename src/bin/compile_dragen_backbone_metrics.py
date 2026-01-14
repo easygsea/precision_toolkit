@@ -9,7 +9,6 @@ Usage:
 """
 
 import argparse
-import logging
 from pathlib import Path
 
 from clinical_tools.dragen.metrics_parser import DragenMetricsParser
@@ -17,13 +16,6 @@ from clinical_tools.dragen.utils import (
     calc_derived_pct_metric,
     classify_metric,
     format_metric,
-)
-
-# Configure logging
-logging.basicConfig(
-    level=logging.WARNING,
-    format="[%(asctime)s] %(levelname)s %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
 )
 
 
