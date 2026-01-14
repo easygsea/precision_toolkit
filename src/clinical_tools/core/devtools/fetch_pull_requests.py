@@ -1,10 +1,15 @@
 """Fetch Daily Pull Requests."""
 
+import logging
+
 import requests  # type: ignore[import-untyped]
 from requests.exceptions import (  # type: ignore[import-untyped]
     MissingSchema,
     RequestException,
 )
+
+logging.basicConfig(format="%(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def fetch_prs(bit_bucket_url: str, project: str, repo: str, token: str) -> None:
@@ -44,9 +49,9 @@ def fetch_prs(bit_bucket_url: str, project: str, repo: str, token: str) -> None:
                             title = pr.get("title", "No Title Provided")
 
                             if "id" not in pr or "title" not in pr:
-                                print(
-                                    f"Warning: PR {title} with ID: {pr_id}",
-                                    "is missing expected fields.",
+                                logging.warning(
+                                    f"Warning: PR {title} with ID: {pr_id}"
+                                    "is missing expected fields."
                                 )
                             else:
                                 pr_link = (
@@ -54,15 +59,15 @@ def fetch_prs(bit_bucket_url: str, project: str, repo: str, token: str) -> None:
                                     f"{project}/repos/{repo['name']}"
                                     f"/pull-requests/{pr_id}/overview"
                                 )
-                                print(title)
-                                print(f"[{repo['name']}#{pr_id}]({pr_link})\n")
+                                logging.info(title)
+                                logging.info(f"[{repo['name']}#{pr_id}]({pr_link})\n")
                     else:
-                        print(f"Expected dict, got {type(repo)}")
+                        logging.warning(f"Expected dict, got {type(repo)}")
             else:
-                print("No pull requests found")
+                logging.info("No pull requests found")
         else:
-            print(f"Request failed with status code {r.status_code}")
-    except MissingSchema:
-        print(f"Invalid URL: '{url}'")
+            logging.warning(f"Request failed with status code {r.status_code}")
+    except MissingSchema as e:
+        logging.error(f"Invalid URL: '{url}': {str(e)}")
     except RequestException as e:
-        print(f"An error occurred while fetching data: {e}")
+        logging.error(f"An error occurred while fetching data: {str(e)}")

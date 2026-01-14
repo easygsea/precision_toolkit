@@ -3,7 +3,8 @@
 Standalone PR fetching utility script for command line usage.
 
 Usage:
-    fetch-prs <URL_TO_BIT_BUCKET> <PROJECT_NAME> <REPO_NAME> <TOKEN>
+    fetch-prs [--bit_bucket_url <URL_TO_BIT_BUCKET>]
+    [--project <PROJECT_NAME>] [--repo <REPO_NAME>] [--token <TOKEN>]
 
 Arguments:
     bit_bucket_url: URL for the BitBucket to fetch PR's from.
@@ -14,7 +15,7 @@ Arguments:
 
 import argparse
 
-from clinical_tools.core.devtools.fetch_prs import fetch_prs
+from clinical_tools.core.devtools.fetch_pull_requests import fetch_prs
 
 
 def main() -> None:
@@ -32,23 +33,26 @@ def main() -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "bit_bucket_url",
+        "--bit_bucket_url",
         type=str,
+        required=True,
         help="URL for the BitBucket to fetch PR's from.",
     )
     parser.add_argument(
-        "project",
+        "--project",
         type=str,
+        required=True,
         help="Name of the project.",
     )
     parser.add_argument(
-        "repo",
+        "--repo",
         type=str,
-        help="Name of the repository.",
+        help="Optional name of the repository.",
     )
     parser.add_argument(
-        "token",
+        "--token",
         type=str,
+        required=True,
         help="Authorization bearer token to access the repository.",
     )
 

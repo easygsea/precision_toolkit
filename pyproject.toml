@@ -38,7 +38,7 @@ manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
 plot-signal-correlation = "bin.plot_signal_correlation:main"
 plot-target-tracts = "bin.plot_target_tracts:main"
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
-fetch-prs = "bin.fetch_prs:main"
+fetch-prs = "bin.fetch_pull_requests:main"
 
 [build-system]
 requires = ["poetry-core"]
