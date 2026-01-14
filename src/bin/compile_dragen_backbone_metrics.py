@@ -110,7 +110,7 @@ def main() -> None:
                 else:
                     formatted_metrics = (
                         f"{metric_name} ({dragen_metric_obj.unit})",
-                        metric_val,
+                        str(metric_val),
                     )
 
                 # Classify metric as either 'Monitoring' or 'Production' and if
