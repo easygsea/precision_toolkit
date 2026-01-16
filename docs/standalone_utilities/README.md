@@ -1,6 +1,6 @@
 # Standalone Utilities
 
-- [Compile DRAGEN Backbone Metrics](#compile-dragen-backbone-metrics)
+- [Compile DRAGEN Metrics](#compile-dragen-metrics)
 - [Convert Multi-Sample VCF File into Single-Sample VCF files](#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
 - [Count Variants By Size](#count-variants-by-size)
 - [Generate Standardized BED](#generate-standardized-bed)
@@ -8,9 +8,9 @@
 - [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
 - [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
 
-## Compile DRAGEN Backbone Metrics
+## Compile DRAGEN Metrics
 
-The `compile-dragen-backbone-metrics` tool extracts backbone QC metrics per [read group sample name (RGSM)](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) from DRAGEN output files based on a JSON-formatted configuration file that specifies the source files (`SourceName`) and column mappings (`Mappings`). RGSM is an identifier used by DRAGEN to link multiple read groups to a single sample. This ensures that reads from the same sample, despite being distributed across multiple lanes or libraries, are processed collectively. Extracted QC metrics for each RGSM are written to `<RGSM_ID>_MetricsOutput.tsv`, with metric names and values formatted according to attributes defined in the `Constants` section of the configuration file. Common attributes include:
+The `compile-dragen-metrics` tool extracts backbone QC metrics per [read group sample name (RGSM)](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) from DRAGEN output files based on a JSON-formatted configuration file that specifies the source files (`SourceName`) and column mappings (`Mappings`). RGSM is an identifier used by DRAGEN to link multiple read groups to a single sample. This ensures that reads from the same sample, despite being distributed across multiple lanes or libraries, are processed collectively. Extracted QC metrics for each RGSM are written to `<RGSM_ID>_MetricsOutput.tsv`, with metric names and values formatted according to attributes defined in the `Constants` section of the configuration file. Common attributes include:
 * `FACTOR`: scale **factor**
 * `RAD`: **r**ounding **a**t **d**isplay
 * `UOM`: **u**nit **o**f **m**easurement
@@ -64,7 +64,7 @@ Example configuration file:
 
 Usage:
 ```bash
-compile-dragen-backbone-metrics --metrics-json-config <json_config> --analysis-dir <dragen_backbone_analysis_dir> --sample <rgsm_id> --output-folder <output_folder>
+compile-dragen-metrics --metrics-json-config <json_config> --analysis-dir <dragen_backbone_analysis_dir> --sample <rgsm_id> --output-folder <output_folder>
 ```
 
 Example output:

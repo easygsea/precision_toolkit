@@ -17,7 +17,7 @@ def test_data_dir(pytestconfig: pytest.Config) -> Path:
 def _parse_script_output(
     metrics_output: Path,
 ) -> tuple[list[str], dict[str, dict[str, Any]]]:
-    """Parse header and metrics from compile-dragen-backbone-metrics output."""
+    """Parse header and metrics from compile-dragen-metrics output."""
     with open(metrics_output, "r") as metrics_tsv:
         colnames = metrics_tsv.readline().strip().split("\t")
 
@@ -133,11 +133,11 @@ def test_compile_dragen_metrics(
     """Test compilation of dragen metrics with various input scenarios."""
     with tempfile.TemporaryDirectory() as tmpdir:
         json_config_file = test_data_dir / "minimal_config.json"
-        output_prefix = Path(tmpdir) / "compile_dragen_backbone_metrics"
+        output_prefix = Path(tmpdir) / "compile_dragen_metrics"
 
         subprocess.run(
             [
-                "compile-dragen-backbone-metrics",
+                "compile-dragen-metrics",
                 "-j",
                 str(json_config_file),
                 "-a",

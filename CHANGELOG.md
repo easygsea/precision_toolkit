@@ -5,7 +5,7 @@
 ---
 
 ### v1.1.3 - 2026-XX-XX
-- New Standalone Utility: Added `compile-dragen-backbone-metrics` to extract and format backbone QC metrics from DRAGEN output files.
+- New Standalone Utility: Added `compile-dragen-metrics` to extract and format backbone QC metrics from DRAGEN output files.
 
 ---
 

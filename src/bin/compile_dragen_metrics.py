@@ -3,7 +3,7 @@
 Parse DRAGEN output files to compile backbone-level metrics specified in JSON config.
 
 Usage:
-    compile-backbone-metrics --metrics-json-config <json_config>
+    compile-dragen-metrics --metrics-json-config <json_config>
     --analysis-dir <dragen_backbone_analysis_dir> --sample <rgsm_id>
     --output-folder <output_folder>
 """
