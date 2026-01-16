@@ -10,7 +10,7 @@
 
 ## Compile DRAGEN Backbone Metrics
 
-The `compile-dragen-backbone-metrics` tool extracts backbone QC metrics from DRAGEN output files based on a JSON-formatted configuration file that specifies the source files (`SourceName`) and column mappings (`Mappings`). The extracted metrics are written to `<RGSM_ID>_MetricsOutput.tsv`, with metric names and values formatted according to attributes defined in the `Constants` section of the configuration file. Common attributes include:
+The `compile-dragen-backbone-metrics` tool extracts backbone QC metrics per [read group sample name (RGSM)](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) from DRAGEN output files based on a JSON-formatted configuration file that specifies the source files (`SourceName`) and column mappings (`Mappings`). RGSM is an identifier used by DRAGEN to link multiple read groups to a single sample. This ensures that reads from the same sample, despite being distributed across multiple lanes or libraries, are processed collectively. Extracted QC metrics for each RGSM are written to `<RGSM_ID>_MetricsOutput.tsv`, with metric names and values formatted according to attributes defined in the `Constants` section of the configuration file. Common attributes include:
 * `FACTOR`: scale **factor**
 * `RAD`: **r**ounding **a**t **d**isplay
 * `UOM`: **u**nit **o**f **m**easurement
