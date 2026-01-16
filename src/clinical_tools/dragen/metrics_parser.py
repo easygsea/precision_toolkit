@@ -21,27 +21,25 @@ logging.basicConfig(
 class DragenMetricsParser:
     """Parser for extracting metrics from DRAGEN analysis output files."""
 
-    def __init__(self, config_path: Path, analysis_dir: str, sample_id: str):
+    def __init__(self, config_path: Path, analysis_dir: str, rgsm: str):
         """
         Initialize parser for DRAGEN output files.
 
         Args:
             config_path: Path to JSON configuration specifying source files and metrics.
-            analysis_dir: Path to directory with DRAGEN analysis results used to replace
-                placeholders in config.
-            sample_id: Sample ID used to replace placeholders in config.
+            analysis_dir: Path to directory with DRAGEN analysis directory containing
+                source files.
+            rgsm: RGSM prefixed to DRAGEN source file names
+                (e.g. <rgsm>.mapping_metrics.csv).
         """
-        # Replace all instances of <DRAGEN_ANALYSIS_DIR> and <SAMPLE_ID>
         with open(config_path, "r") as f:
-            content = f.read()
-            content = content.replace("<DRAGEN_ANALYSIS_DIR>", analysis_dir)
-            content = content.replace("<SAMPLE_ID>", sample_id)
+            content = json.load(f)
 
-        # Initialize parser with modified JSON content
-        source_to_config = json.loads(content).get("DataSources", {})
-        self.reported_metric_names = json.loads(content).get("ReportedMetrics", [])
+        # Initialize parser with JSON content
+        source_to_config = content.get("DataSources", {})
+        self.reported_metric_names = content.get("ReportedMetrics", [])
         self.metric_group_to_sourcefile = self._build_metric_group_sources(
-            source_to_config
+            source_to_config, analysis_dir, rgsm
         )
         self.metric_to_metric_obj = self._build_metric_lookup()
 
@@ -151,7 +149,7 @@ class DragenMetricsParser:
         )
 
     def _build_metric_group_sources(
-        self, source_to_config: dict[str, Any]
+        self, source_to_config: dict[str, Any], analysis_dir: str, rgsm: str
     ) -> dict[str, SourceFile]:
         """
         Create SourceFile objects for each metric group.
@@ -162,7 +160,7 @@ class DragenMetricsParser:
         metric_group_to_sourcefile = {}
         for metric_group, config in source_to_config.items():
             # Prepare source file attributes
-            filename = config.get("SourceName")
+            filename = f"{analysis_dir}/{rgsm}.{config.get('SourceName')}"
             filetype = config.get("SourceType")
             allow_missing = config.get("AllowSourceFileToBeMissing")
             default_val = config.get("DefaultValueOnMissing")
@@ -334,7 +332,7 @@ class DragenMetricsParser:
                     parsed_metrics = self._parse_csv(source_file_obj)
                     metric_name_to_value.update(parsed_metrics)
                 elif source_file_obj.filetype == "JSON":
-                    # TODO: Implement JSON parsing for <DNASAMPLEID>_contamination.json,
+                    # TODO: Implement JSON parsing for <RGSM>_contamination.json,
                     # though not output by somatic workflow currently
                     pass
             elif source_file_obj.allow_missing:

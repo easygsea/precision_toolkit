@@ -4,7 +4,7 @@ Parse DRAGEN output files to compile backbone-level metrics specified in JSON co
 
 Usage:
     compile-dragen-metrics --metrics-json-config <json_config>
-    --analysis-dir <dragen_backbone_analysis_dir> --sample <rgsm_id>
+    --analysis-dir <dragen_backbone_analysis_dir> --rgsm <rgsm>
     --output-folder <output_folder>
 """
 
@@ -42,7 +42,9 @@ def main() -> None:
         help="Path to directory with DRAGEN analysis results.",
         required=True,
     )
-    parser.add_argument("-s", "--sample", help="Sample ID.", required=True)
+    parser.add_argument(
+        "-r", "--rgsm", help="Read group sample name (RGSM).", required=True
+    )
     parser.add_argument(
         "-o",
         "--output-folder",
@@ -54,14 +56,14 @@ def main() -> None:
     args = parser.parse_args()
     metrics_json_config_path = Path(args.metrics_json_config)
     analysis_folder = args.analysis_dir
-    sample_id = args.sample
+    rgsm = args.rgsm
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True, parents=True)
 
     # Parse valid metrics (specified in JSON config) from DRAGEN output files or replace
     # with default value if not present
     dragen_metrics_parser = DragenMetricsParser(
-        metrics_json_config_path, analysis_folder, sample_id
+        metrics_json_config_path, analysis_folder, rgsm
     )
     all_dragen_metrics = dragen_metrics_parser.parse_metrics()
 
@@ -80,12 +82,11 @@ def main() -> None:
             f"{metric_name}_BASE",
         )
 
-    out_filename = output_folder / f"{sample_id}_MetricsOutput.tsv"
+    out_filename = output_folder / f"{rgsm}_MetricsOutput.tsv"
     with open(out_filename, "w") as out_dragen_metrics_tsv:
         # Write header
         out_dragen_metrics_tsv.write(
-            f"Metric (UOM)\t{sample_id}\tCategory\tThreshold\tFailureDirection"
-            f"\tStatus\n"
+            f"Metric (UOM)\t{rgsm}\tCategory\tThreshold\tFailureDirection\tStatus\n"
         )
 
         for metric_name, metric_val in all_dragen_metrics.items():

@@ -4,7 +4,7 @@
     ],
     "DataSources": {
         "MAPPING/ALIGNING SUMMARY": {
-            "SourceName": "<DRAGEN_ANALYSIS_DIR>/<SAMPLE_ID>.mapping_metrics.csv",
+            "SourceName": "mapping_metrics.csv",
             "SourceType": "CSV",
             "AllowSourceFileToBeMissing": true,
             "DefaultValueOnMissing": null,

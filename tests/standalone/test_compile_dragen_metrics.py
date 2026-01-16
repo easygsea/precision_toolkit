@@ -44,7 +44,7 @@ def _parse_script_output(
 
 
 @pytest.mark.parametrize(
-    "sample,expected_metrics",
+    "rgsm,expected_metrics",
     [
         (
             "sample",
@@ -128,7 +128,7 @@ def _parse_script_output(
     ids=["valid_metrics", "missing_values", "missing_sourcefile"],
 )
 def test_compile_dragen_metrics(
-    test_data_dir: Path, sample: str, expected_metrics: dict[str, dict[str, Any]]
+    test_data_dir: Path, rgsm: str, expected_metrics: dict[str, dict[str, Any]]
 ) -> None:
     """Test compilation of dragen metrics with various input scenarios."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -142,22 +142,22 @@ def test_compile_dragen_metrics(
                 str(json_config_file),
                 "-a",
                 str(test_data_dir),
-                "-s",
-                sample,
+                "-r",
+                rgsm,
                 "-o",
                 str(output_prefix),
             ],
             check=True,
         )
 
-        output_file = output_prefix / f"{sample}_MetricsOutput.tsv"
+        output_file = output_prefix / f"{rgsm}_MetricsOutput.tsv"
         assert output_file.exists()
 
         # Compare parsed to expected values
         parsed_colnames, parsed_metrics = _parse_script_output(output_file)
         expected_colnames = [
             "Metric (UOM)",
-            sample,
+            rgsm,
             "Category",
             "Threshold",
             "FailureDirection",
