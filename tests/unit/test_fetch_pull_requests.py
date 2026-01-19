@@ -4,7 +4,7 @@ import logging
 from typing import Any
 from unittest.mock import MagicMock, patch
 
-import requests 
+import requests
 
 from clinical_tools.core.devtools.fetch_pull_requests import (  # noqa: E501
     fetch_pull_requests as fetch_pull_requests,

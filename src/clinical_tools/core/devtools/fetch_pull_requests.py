@@ -2,8 +2,8 @@
 
 import logging
 
-import requests  
-from requests.exceptions import (  
+import requests
+from requests.exceptions import (
     MissingSchema,
     RequestException,
 )
