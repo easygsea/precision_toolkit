@@ -32,7 +32,7 @@ def fetch_pull_requests(
 
         if repo_response.status_code == 200:
             repositories = repo_response.json().get("values", [])
-            print("reps: ", repositories)
+
             all_prs = []
 
             for repo_data in repositories:
@@ -49,7 +49,6 @@ def fetch_pull_requests(
 
                 if pr_response.status_code == 200:
                     pull_requests = pr_response.json().get("values", [])
-                    print("\n\npull reqs: ", pull_requests)
 
                     for pr in pull_requests:
                         repo_name_context = (
