@@ -2,8 +2,8 @@
 
 import logging
 
-import requests  # type: ignore[import-untyped]
-from requests.exceptions import (  # type: ignore[import-untyped]
+import requests  
+from requests.exceptions import (  
     MissingSchema,
     RequestException,
 )
@@ -12,7 +12,9 @@ logging.basicConfig(format="%(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def fetch_prs(bit_bucket_url: str, project: str, repo: str, token: str) -> None:
+def fetch_pull_requests(
+    bit_bucket_url: str, project: str, repo: str, token: str
+) -> None:
     """
     Fetch Pull Requests.
 
@@ -22,52 +24,77 @@ def fetch_prs(bit_bucket_url: str, project: str, repo: str, token: str) -> None:
         repo: Name of the repository.
         token: Authorization bearer token to access the repository.
     """
-    url = f"{bit_bucket_url}/rest/api/1.0/projects/{project}/repos/"
+    base_api_url = f"{bit_bucket_url}/rest/api/1.0/projects/{project}/repos"
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
-        r = requests.get(url, headers=headers)
+        repo_response = requests.get(base_api_url, headers=headers)
 
-        if r.status_code == 200:
-            data_repos = r.json()
-            repositories = data_repos.get("values", [])
+        if repo_response.status_code == 200:
+            repositories = repo_response.json().get("values", [])
+            print("reps: ", repositories)
+            all_prs = []
 
-            if repositories:
-                for repo in data_repos["values"]:
-                    if isinstance(repo, dict):
-                        url = (
-                            f"{bit_bucket_url}/rest"
-                            f"/api/1.0/projects/{project}"
-                            f"/repos/{repo['slug']}/pull-requests"
+            for repo_data in repositories:
+                if not isinstance(repo_data, dict):
+                    continue
+
+                if repo and repo_data.get("name") != repo:
+                    continue
+
+                repo_slug = repo_data.get("slug")
+                pr_url = f"{base_api_url}/{repo_slug}/pull-requests"
+
+                pr_response = requests.get(pr_url, headers=headers)
+
+                if pr_response.status_code == 200:
+                    pull_requests = pr_response.json().get("values", [])
+                    print("\n\npull reqs: ", pull_requests)
+
+                    for pr in pull_requests:
+                        repo_name_context = (
+                            pr.get("fromRef", {}).get("repository", {}).get("name")
                         )
 
-                        r = requests.get(url, headers=headers)
-                        data = r.json()
+                        all_prs.append(
+                            {
+                                "pr_data": pr,
+                                "repo_name": repo_name_context or repo_data.get("name"),
+                            }
+                        )
+                else:
+                    logging.warning(
+                        f"Failed to fetch PRs for {repo_slug}:{pr_response.status_code}"
+                    )
 
-                        for pr in data["values"]:
-                            pr_id = pr.get("id", "Unknown ID")
-                            title = pr.get("title", "No Title Provided")
+            if all_prs:
+                for item in all_prs:
+                    pr = item["pr_data"]
+                    r_name = item["repo_name"]
 
-                            if "id" not in pr or "title" not in pr:
-                                logging.warning(
-                                    f"Warning: PR {title} with ID: {pr_id}"
-                                    "is missing expected fields."
-                                )
-                            else:
-                                pr_link = (
-                                    f"{bit_bucket_url}/projects/"
-                                    f"{project}/repos/{repo['name']}"
-                                    f"/pull-requests/{pr_id}/overview"
-                                )
-                                logging.info(title)
-                                logging.info(f"[{repo['name']}#{pr_id}]({pr_link})\n")
-                    else:
-                        logging.warning(f"Expected dict, got {type(repo)}")
+                    pr_id = pr.get("id")
+                    title = pr.get("title")
+
+                    if pr_id is None or title is None:
+                        logging.warning(
+                            f"Warning: PR {title or 'Unknown'} is missing fields."
+                        )
+                        continue
+
+                    pr_link = (
+                        f"{bit_bucket_url}/projects/{project}/repos/{r_name}"
+                        f"/pull-requests/{pr_id}/overview"
+                    )
+                    logging.info(title)
+                    logging.info(f"[{r_name}#{pr_id}]({pr_link})\n")
             else:
-                logging.info("No pull requests found")
+                logging.info("No pull requests found.")
         else:
-            logging.warning(f"Request failed with status code {r.status_code}")
+            logging.warning(
+                f"Repo request failed with status code {repo_response.status_code}"
+            )
+
     except MissingSchema as e:
-        logging.error(f"Invalid URL: '{url}': {str(e)}")
+        logging.error(f"Invalid URL: '{base_api_url}': {str(e)}")
     except RequestException as e:
         logging.error(f"An error occurred while fetching data: {str(e)}")

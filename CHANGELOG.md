@@ -5,7 +5,7 @@
 ---
 
 ### v1.1.3 - 2026-01-XX
-- New Standalone Utility: Added `fetch-prs` to fetch pull requests from a given bitbucket url, project, repo, and authentication token.
+- New Standalone Utility: Added `fetch-pull-requests` to fetch pull requests from a given bitbucket url, project, repo, and authentication token.
 - Improvement: Added arguments in `generate-standardized-bed` to optionally adjust CDS/exon boundaries and filter for genes/features of interest.
 
 ---

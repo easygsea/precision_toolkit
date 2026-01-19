@@ -3,7 +3,7 @@
 Standalone PR fetching utility script for command line usage.
 
 Usage:
-    fetch-prs [--bit_bucket_url <URL_TO_BIT_BUCKET>]
+    fetch-pull-requests [--bit_bucket_url <URL_TO_BIT_BUCKET>]
     [--project <PROJECT_NAME>] [--repo <REPO_NAME>] [--token <TOKEN>]
 
 Arguments:
@@ -15,7 +15,7 @@ Arguments:
 
 import argparse
 
-from clinical_tools.core.devtools.fetch_pull_requests import fetch_prs
+from clinical_tools.core.devtools.fetch_pull_requests import fetch_pull_requests
 
 
 def main() -> None:
@@ -58,7 +58,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    fetch_prs(args.bit_bucket_url, args.project, args.repo, args.token)
+    fetch_pull_requests(args.bit_bucket_url, args.project, args.repo, args.token)
 
 
 if __name__ == "__main__":

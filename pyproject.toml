@@ -34,11 +34,11 @@ convert-multi-sample-vcf = "bin.convert_multi_sample_vcf:main"
 count-variants-by-size = "bin.count_variants_by_size:main"
 generate-standardized-bed = "bin.generate_standardized_bed:main"
 jira-table = "bin.jira_table:main"
+fetch-pull-requests = "bin.fetch_pull_requests:main"
 manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
 plot-signal-correlation = "bin.plot_signal_correlation:main"
 plot-target-tracts = "bin.plot_target_tracts:main"
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
-fetch-prs = "bin.fetch_pull_requests:main"
 
 [build-system]
 requires = ["poetry-core"]

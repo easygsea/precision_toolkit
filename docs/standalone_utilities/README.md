@@ -4,8 +4,8 @@
 - [Count Variants By Size](#count-variants-by-size)
 - [Generate Standardized BED](#generate-standardized-bed)
 - [Jira Table Converter](#jira-table-converter)
-- [Pull Request Fetcher](#pull-request-fetcher)
 - [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
+- [Pull Request Fetcher](#pull-request-fetcher)
 - [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
 
 ## Convert Multi-Sample VCF File into Single-Sample VCF files
@@ -123,15 +123,6 @@ jira-table <PATH/TO/INPUT_FILE>
 - `--float-format`: Control output format for float values.
 - `--pretty-print`: Pad columns with spaces for readability.
 
-## Pull Request Fetcher
-
-The `fetch-prs` tool fetches daily pull requests for PR reviewers.
-
-Example Usage:
-```bash
-fetch-prs --bit_bucket_url <URL_TO_BIT_BUCKET> --project <PROJECT_NAME> --repo <REPO_NAME> --token <TOKEN>
-```
-
 ## Manual Diagnostic Metric Curation
 
 We provide a handy tool to manually curate a diagnostic metric (concordance, sensitivity, precision, or f1_score) after the variant benchmark (diagnostic metrics) workflow has been run.
@@ -144,6 +135,15 @@ apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-cura
 ```
 
 Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
+
+## Pull Request Fetcher
+
+The `fetch-pull-requests` tool fetches daily pull requests for PR reviewers.
+
+Example Usage:
+```bash
+fetch-pull-requests --bit_bucket_url <URL_TO_BIT_BUCKET> --project <PROJECT_NAME> --repo <REPO_NAME> --token <TOKEN>
+```
 
 ## Structural Variant VCF Liftover
 
