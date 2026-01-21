@@ -1,7 +1,6 @@
 """Fetch Daily Pull Requests."""
 
 import logging
-import json
 
 import requests
 from requests.exceptions import (
@@ -38,7 +37,9 @@ def fetch_pull_requests(
 
             for repo_data in repositories:
                 if not isinstance(repo_data, dict):
-                    logging.warning(f"Repository at provided link is an unexpected type.")
+                    logging.warning(
+                        "Repository at provided link is an unexpected type."
+                    )
                     continue
 
                 if repo and repo_data.get("name") != repo:
@@ -53,7 +54,6 @@ def fetch_pull_requests(
                     pull_requests = pr_response.json().get("values", [])
 
                     for pr in pull_requests:
-
                         all_prs.append(
                             {
                                 "pr_data": pr,
