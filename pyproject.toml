@@ -29,10 +29,12 @@ pytest = "8.3.4"
 pytest-cov = "4.0.0"
 pytest-workflow = "2.0.1"
 pytest-xdist = "3.6.1"
+types-requests = "^2.32.4.20260107"
 
 [tool.poetry.scripts]
 convert-multi-sample-vcf = "bin.convert_multi_sample_vcf:main"
 count-variants-by-size = "bin.count_variants_by_size:main"
+fetch-pull-requests = "bin.fetch_pull_requests:main"
 generate-standardized-bed = "bin.generate_standardized_bed:main"
 jira-table = "bin.jira_table:main"
 fetch-pull-requests = "bin.fetch_pull_requests:main"
