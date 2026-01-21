@@ -3,37 +3,33 @@
 Standalone PR fetching utility script for command line usage.
 
 Usage:
-    fetch-pull-requests [--bit_bucket_url <URL_TO_BIT_BUCKET>]
-    [--project <PROJECT_NAME>] [--repo <REPO_NAME>] [--token <TOKEN>]
+    fetch-pull-requests --bitbucket_url <URL_TO_BITBUCKET>
+    --project <PROJECT_NAME> [--repo <REPO_NAME>] --token <TOKEN>
 
 Arguments:
-    bit_bucket_url: URL for the BitBucket to fetch PR's from.
+    bitbucket_url: URL for the BitBucket to fetch PR's from.
     project: Name of the project.
     repo: Name of the repository.
     token: Authorization bearer token to access the repository.
+
+Example:
+    fetch-pull-requests --bitbucket_url "https://svn.test.ca/bitbucket"
+    --project "projects" --repo "project1" --token $TOKEN
 """
 
 import argparse
 
-from clinical_tools.core.devtools.fetch_pull_requests import fetch_pull_requests
+from clinical_tools.core.devtools.pr_fetcher import fetch_pull_requests
 
 
 def main() -> None:
-    """
-    Fetch Pull Requests.
-
-    Args:
-        bit_bucket_url: URL for the BitBucket to fetch PR's from.
-        project: Name of the project.
-        repo: Name of the repository.
-        token: Authorization bearer token to access the repository.
-    """
+    """Fetch Pull Requests."""
     parser = argparse.ArgumentParser(
         description="Fetch today's pull requests.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "--bit_bucket_url",
+        "--bitbucket_url",
         type=str,
         required=True,
         help="URL for the BitBucket to fetch PR's from.",
@@ -58,7 +54,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    fetch_pull_requests(args.bit_bucket_url, args.project, args.repo, args.token)
+    fetch_pull_requests(args.bitbucket_url, args.project, args.repo, args.token)
 
 
 if __name__ == "__main__":

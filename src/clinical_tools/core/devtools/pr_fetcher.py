@@ -1,6 +1,7 @@
 """Fetch Daily Pull Requests."""
 
 import logging
+import json
 
 import requests
 from requests.exceptions import (
@@ -13,18 +14,18 @@ logger = logging.getLogger(__name__)
 
 
 def fetch_pull_requests(
-    bit_bucket_url: str, project: str, repo: str, token: str
+    bitbucket_url: str, project: str, repo: str, token: str
 ) -> None:
     """
     Fetch Pull Requests.
 
     Args:
-        bit_bucket_url: URL for the BitBucket to fetch PR's from.
+        bitbucket_url: URL for the BitBucket to fetch PR's from.
         project: Name of the project.
         repo: Name of the repository.
         token: Authorization bearer token to access the repository.
     """
-    base_api_url = f"{bit_bucket_url}/rest/api/1.0/projects/{project}/repos"
+    base_api_url = f"{bitbucket_url}/rest/api/1.0/projects/{project}/repos"
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
@@ -37,6 +38,7 @@ def fetch_pull_requests(
 
             for repo_data in repositories:
                 if not isinstance(repo_data, dict):
+                    logging.warning(f"Repository at provided link is an unexpected type.")
                     continue
 
                 if repo and repo_data.get("name") != repo:
@@ -51,14 +53,11 @@ def fetch_pull_requests(
                     pull_requests = pr_response.json().get("values", [])
 
                     for pr in pull_requests:
-                        repo_name_context = (
-                            pr.get("fromRef", {}).get("repository", {}).get("name")
-                        )
 
                         all_prs.append(
                             {
                                 "pr_data": pr,
-                                "repo_name": repo_name_context or repo_data.get("name"),
+                                "repo_name": repo_data.get("name"),
                             }
                         )
                 else:
@@ -81,7 +80,7 @@ def fetch_pull_requests(
                         continue
 
                     pr_link = (
-                        f"{bit_bucket_url}/projects/{project}/repos/{r_name}"
+                        f"{bitbucket_url}/projects/{project}/repos/{r_name}"
                         f"/pull-requests/{pr_id}/overview"
                     )
                     logging.info(title)

@@ -142,7 +142,7 @@ The `fetch-pull-requests` tool fetches daily pull requests for PR reviewers.
 
 Example Usage:
 ```bash
-fetch-pull-requests --bit_bucket_url <URL_TO_BIT_BUCKET> --project <PROJECT_NAME> --repo <REPO_NAME> --token <TOKEN>
+fetch-pull-requests --bitbucket_url <URL_TO_BITBUCKET> --project <PROJECT_NAME> [--repo <REPO_NAME>] --token <TOKEN>
 ```
 
 ## Structural Variant VCF Liftover

@@ -1,33 +1,52 @@
 """Unit Tests for Pull Request Fetcher."""
 
 import logging
-from typing import Any
-from unittest.mock import MagicMock, patch
+from types import SimpleNamespace
+from typing import Any, NoReturn
 
+import pytest
 import requests
 
-from clinical_tools.core.devtools.fetch_pull_requests import (  # noqa: E501
+from clinical_tools.core.devtools.pr_fetcher import (
     fetch_pull_requests as fetch_pull_requests,
 )
 
 
-@patch("clinical_tools.core.devtools.fetch_pull_requests.requests.get")
-def test_fetch_prs_success(mock_get: MagicMock) -> None:
-    """Test the mock function gets called."""
-    # 1. Setup the Mock
-    mock_response = MagicMock()
-    mock_response.status_code = 200
-    # Values returned from first API request, the "Get Repositories" call
-    mock_response.json.return_value = {
-        "values": [{"slug": "repo-a", "id": 100, "name": "Beta", "hierarchyId": 123}]
-    }
-    mock_get.return_value = mock_response
+def test_fetch_repos_success_no_prs(
+    monkeypatch: pytest.MonkeyPatch, caplog: Any
+) -> None:
+    """Test that correct calls is made for existing repo with no prs."""
+    caplog.set_level(logging.INFO)
+    # Response for the first call (Fetch Repos)
+    repo_response = SimpleNamespace(
+        status_code=200,
+        json=lambda: {
+            "values": [{"slug": "repo-a", "id": 100, "name": "R", "hierarchyId": 123}]
+        },
+    )
 
-    # 2. Call the function
-    fetch_pull_requests(bit_bucket_url="http://fake", project="P", repo="R", token="T")
+    # Response for the second call (Fetch PRs for repo-a)
+    pr_response = SimpleNamespace(status_code=200, json=lambda: {"values": []})
 
-    # 3. Assertions
-    assert mock_get.called
+    # Call tracker to manage multiple calls and count them
+    responses = [repo_response, pr_response]
+    calls = []
+
+    def mock_get(url: str, **kwargs: Any) -> Any:
+        calls.append(url)
+        return responses.pop(0) if responses else repo_response
+
+    # Apply the monkeypatch
+    monkeypatch.setattr(
+        "clinical_tools.core.devtools.pr_fetcher.requests.get", mock_get
+    )
+
+    # Call the function
+    fetch_pull_requests(bitbucket_url="http://fake", project="P", repo="R", token="T")
+
+    assert len(calls) == 2, f"Expected 2 calls, but got {len(calls)}: {calls}"
+    assert "repo-a" in calls[1]
+    assert "No pull requests found" in caplog.text
 
 
 def test_fetch_prs_empty_args(caplog: Any) -> None:
@@ -48,31 +67,74 @@ def test_fetch_prs_invalid_args(caplog: Any) -> None:
     assert "Invalid URL" in caplog.text
 
 
-@patch("clinical_tools.core.devtools.fetch_pull_requests.requests.get")
-def test_fetch_prs_none_found(mock_get: MagicMock, caplog: Any) -> None:
-    """Test valid url but no pull requests returned."""
+def test_fetch_repos_success_with_prs(
+    monkeypatch: pytest.MonkeyPatch, caplog: Any
+) -> None:
+    """Test that correct calls is made for repo with prs."""
     caplog.set_level(logging.INFO)
-    # Setup the Mock for a successful connection but empty data
-    mock_response = MagicMock()
-    mock_response.status_code = 200
-    # Simulating the structure of a standard API response with no items
-    mock_response.json.return_value = {"values": []}
-    mock_get.return_value = mock_response
+    # Response for the first call (Fetch Repos)
+    repo_response = SimpleNamespace(
+        status_code=200,
+        json=lambda: {
+            "values": [
+                {"slug": "repo-a", "id": 100, "name": "My_Repo", "hierarchyId": 123}
+            ]
+        },
+    )
 
-    # Call the function with a "valid" looking URL
-    fetch_pull_requests(bit_bucket_url="http://fake", project="P", repo="R", token="T")
+    # Response for the second call (Fetch PRs for repo-a)
+    pr_response = SimpleNamespace(
+        status_code=200,
+        json=lambda: {
+            "values": [
+                {
+                    "id": 72,
+                    "title": "Valid PR",
+                    "fromRef": {"repository": {"name": "My_Repo"}},
+                },
+            ]
+        },
+    )
 
-    assert "No pull requests found" in caplog.text
+    # Call tracker to manage multiple calls and count them
+    responses = [repo_response, pr_response]
+    calls = []
+
+    def mock_get(url: str, **kwargs: Any) -> Any:
+        calls.append(url)
+        return responses.pop(0) if responses else repo_response
+
+    # Apply the monkeypatch
+    monkeypatch.setattr(
+        "clinical_tools.core.devtools.pr_fetcher.requests.get", mock_get
+    )
+
+    fetch_pull_requests(
+        bitbucket_url="http://fake", project="P", repo="My_Repo", token="T"
+    )
+
+    expected_link = "http://fake/projects/P/repos/My_Repo/pull-requests/72/overview"
+
+    assert len(calls) == 2, f"Expected 2 calls, but got {len(calls)}: {calls}"
+    assert "repo-a" in calls[1]
+    assert "Valid PR" in caplog.text
+    assert f"[My_Repo#72]({expected_link})" in caplog.text
 
 
-@patch("clinical_tools.core.devtools.fetch_pull_requests.requests.get")
-def test_fetch_prs_request_exception(mock_get: MagicMock, caplog: Any) -> None:
+def test_fetch_prs_request_exception(
+    monkeypatch: pytest.MonkeyPatch, caplog: Any
+) -> None:
     """Test request exception error handling when calling PR fetching function."""
     caplog.set_level(logging.WARNING)
     # Setup: Make the mock "throw" a ConnectionError
-    mock_get.side_effect = requests.exceptions.ConnectionError("Connection refused")
 
-    fetch_pull_requests(bit_bucket_url="http://fake", project="P", repo="R", token="T")
+    def mock_get_exception(*args: Any, **kwargs: Any) -> NoReturn:
+        """Mock function to raise a ConnectionError."""
+        raise requests.exceptions.ConnectionError("Connection refused")
+
+    monkeypatch.setattr(requests, "get", mock_get_exception)
+
+    fetch_pull_requests(bitbucket_url="http://fake", project="P", repo="R", token="T")
 
     # Check if 'except' block caught it and printed the error
     assert (
@@ -81,33 +143,55 @@ def test_fetch_prs_request_exception(mock_get: MagicMock, caplog: Any) -> None:
     )
 
 
-@patch("clinical_tools.core.devtools.fetch_pull_requests.requests.get")
-def test_fetch_prs_missing_fields(mock_get: MagicMock, caplog: Any) -> None:
+def test_fetch_prs_missing_fields(monkeypatch: pytest.MonkeyPatch, caplog: Any) -> None:
     """Test print behavior for multiple PR's containing valid/invalid fields."""
     caplog.set_level(logging.INFO)
 
-    # 1. Mock response for the "Get Repositories" call
-    mock_repos = MagicMock()
-    mock_repos.status_code = 200
-    mock_repos.json.return_value = {
-        "values": [{"slug": "my-repo", "id": 200, "name": "My Repo"}]
-    }
+    # Response for the first call (Fetch Repos)
+    repo_response = SimpleNamespace(
+        status_code=200,
+        json=lambda: {
+            "values": [
+                {"slug": "my-repo", "id": 100, "name": "My_Repo", "hierarchyId": 123}
+            ]
+        },
+    )
 
-    # 2. Mock response for the "Get Pull Requests" call
-    mock_prs = MagicMock()
-    mock_prs.status_code = 200
-    # Values written here are used for fetching and printing PRs (not exhuastive)
-    mock_prs.json.return_value = {
-        "values": [
-            {"id": 72, "title": "Valid PR", "fromRef": {"r": {"name": "My Repo"}}},
-            {"title": "Broken PR"},  # Missing required fields such as id and fromRef
-        ]
-    }
+    # Response for the second call (Fetch PRs for repo-a)
+    pr_response = SimpleNamespace(
+        status_code=200,
+        json=lambda: {
+            "values": [
+                {
+                    "id": 72,
+                    "title": "Valid PR",
+                    "fromRef": {"repository": {"name": "My_Repo"}},
+                },
+                {
+                    "title": "Broken PR"
+                },  # Missing required fields such as id and fromRef
+            ]
+        },
+    )
 
-    # First call gets repos, second call gets PRs
-    mock_get.side_effect = [mock_repos, mock_prs]
+    # Call tracker to manage multiple calls and count them
+    responses = [repo_response, pr_response]
+    calls = []
 
-    fetch_pull_requests(bit_bucket_url="http://fake", project="P", repo=None, token="T")
+    def mock_get(url: str, **kwargs: Any) -> Any:
+        calls.append(url)
+        return responses.pop(0) if responses else repo_response
+
+    # Apply the monkeypatch
+    monkeypatch.setattr(
+        "clinical_tools.core.devtools.pr_fetcher.requests.get", mock_get
+    )
+
+    fetch_pull_requests(bitbucket_url="http://fake", project="P", repo="", token="T")
+
+    expected_link = "http://fake/projects/P/repos/My_Repo/pull-requests/72/overview"
 
     assert "Valid PR" in caplog.text
-    assert "Warning" in caplog.text
+    assert f"[My_Repo#72]({expected_link})" in caplog.text
+    assert "my-repo" in calls[1]
+    assert "Warning: PR Broken PR is missing fields." in caplog.text
