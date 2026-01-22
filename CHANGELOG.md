@@ -4,8 +4,9 @@
 
 ---
 
-### v1.1.3 - 2026-XX-XX
+### v1.1.3 - 2026-01-XX
 - New Standalone Utility: Added `compile-dragen-metrics` to extract and format backbone QC metrics from DRAGEN output files.
+- Improvement: Added arguments in `generate-standardized-bed` to optionally adjust CDS/exon boundaries and filter for genes/features of interest.
 
 ---
 
@@ -18,7 +19,7 @@
 - New Standalone Utility: Added `generate-standardized-bed` to reformat BED files in BED6+4 format into a 4-column BED file and standardize feature names.
 - Feature: Introduced coverage normalization option in target evaluation workflow.
 - Feature: Introduced tract building functionality to target evaluation workflow.
-- Improvement: Added two arguments in jira-table to control float formatting and text output formatting.
+- Improvement: Added two arguments in `jira-table` to control float formatting and text output formatting.
 - Improvement: Removed redundant slurm partition setting and removed time limit for slurm execution in `nextflow.config`.
 - Improvement: Restructured target evaluation directory for ease of access when working with large datasets.
 - Improvement: Reworked target evaluation workflow with more intuitive and robust scoring and analysis. Added three arguments to allow fine-tuning of fail tolerance and percentile output.
