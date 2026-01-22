@@ -75,7 +75,7 @@ def test_dragen_metric_obj_creation(
     """
     json_config_file = test_data_dir / "minimal_config.json"
     dragen_metrics_parser = DragenMetricsParser(
-        json_config_file, str(test_data_dir), "sample"
+        json_config_file, test_data_dir, "sample"
     )
     metric_obj = dragen_metrics_parser.metric_to_metric_obj[metric_name]
 
@@ -88,7 +88,7 @@ def test_invalid_config_missing_factor_operation(test_data_dir: Path) -> None:
     """Test that metric with FACTOR but no FactorOperation raises ValueError."""
     json_config_file = test_data_dir / "missing_factor_operation_config.json"
     with pytest.raises(ValueError, match="Factor operation not specified"):
-        DragenMetricsParser(json_config_file, str(test_data_dir), "sample")
+        DragenMetricsParser(json_config_file, test_data_dir, "sample")
 
 
 @pytest.mark.parametrize(
@@ -109,7 +109,7 @@ def test_invalid_config_incomplete_failure_spec(
         ValueError,
         match="Only one of fail_threshold and fail_direction is specified.",
     ):
-        DragenMetricsParser(json_config_file, str(test_data_dir), "sample")
+        DragenMetricsParser(json_config_file, test_data_dir, "sample")
 
 
 @pytest.mark.parametrize(
@@ -164,9 +164,7 @@ def test_dragen_metrics_parser(
     """
     # Create parser and parse metrics
     json_config_file = test_data_dir / "minimal_config.json"
-    dragen_metrics_parser = DragenMetricsParser(
-        json_config_file, str(test_data_dir), sample
-    )
+    dragen_metrics_parser = DragenMetricsParser(json_config_file, test_data_dir, sample)
     parsed_metrics = dragen_metrics_parser.parse_metrics()
 
     # Check that expected metrics are parsed
