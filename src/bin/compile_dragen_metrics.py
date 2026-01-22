@@ -27,8 +27,11 @@ def main() -> None:
         None, writes metrics to a TSV file.
     """
     parser = argparse.ArgumentParser(
-        "Parse DRAGEN analysis files for a given sample, then compile and format "
-        "metrics based on provided specification."
+        description=(
+            "Parse DRAGEN analysis files for a given sample, then compile and format "
+            "metrics based on provided specification."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "-j",
