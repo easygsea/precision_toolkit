@@ -21,7 +21,7 @@ logging.basicConfig(
 class DragenMetricsParser:
     """Parser for extracting metrics from DRAGEN analysis output files."""
 
-    def __init__(self, config_path: Path, analysis_dir: str, rgsm: str):
+    def __init__(self, config_path: Path, analysis_dir: Path, rgsm: str):
         """
         Initialize parser for DRAGEN output files.
 
@@ -149,7 +149,7 @@ class DragenMetricsParser:
         )
 
     def _build_metric_group_sources(
-        self, source_to_config: dict[str, Any], analysis_dir: str, rgsm: str
+        self, source_to_config: dict[str, Any], analysis_dir: Path, rgsm: str
     ) -> dict[str, SourceFile]:
         """
         Create SourceFile objects for each metric group.
@@ -160,7 +160,7 @@ class DragenMetricsParser:
         metric_group_to_sourcefile = {}
         for metric_group, config in source_to_config.items():
             # Prepare source file attributes
-            filename = f"{analysis_dir}/{rgsm}.{config.get('SourceName')}"
+            filename = analysis_dir / f"{rgsm}.{config.get('SourceName')}"
             filetype = config.get("SourceType")
             allow_missing = config.get("AllowSourceFileToBeMissing")
             default_val = config.get("DefaultValueOnMissing")
@@ -327,7 +327,7 @@ class DragenMetricsParser:
         """
         metric_name_to_value = {}
         for source_file_obj in self.metric_group_to_sourcefile.values():
-            if Path(source_file_obj.filename).is_file():
+            if source_file_obj.filename.is_file():
                 if source_file_obj.filetype == "CSV":
                     parsed_metrics = self._parse_csv(source_file_obj)
                     metric_name_to_value.update(parsed_metrics)

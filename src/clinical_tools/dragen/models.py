@@ -1,6 +1,7 @@
 """Data models for parsing DRAGEN metrics."""
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 
@@ -54,7 +55,7 @@ class SourceFile:
         dragen_metrics: Dictionary mapping metric names to DragenMetric objects.
     """
 
-    filename: str
+    filename: Path
     filetype: str
     allow_missing: bool
     default_val: float | None

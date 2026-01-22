@@ -58,7 +58,7 @@ def main() -> None:
     # Parse args
     args = parser.parse_args()
     metrics_json_config_path = Path(args.metrics_json_config)
-    analysis_folder = args.analysis_dir
+    analysis_folder = Path(args.analysis_dir)
     rgsm = args.rgsm
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True, parents=True)
