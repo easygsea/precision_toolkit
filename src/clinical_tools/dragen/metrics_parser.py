@@ -331,10 +331,12 @@ class DragenMetricsParser:
                 if source_file_obj.filetype == "CSV":
                     parsed_metrics = self._parse_csv(source_file_obj)
                     metric_name_to_value.update(parsed_metrics)
-                elif source_file_obj.filetype == "JSON":
-                    # TODO: Implement JSON parsing for <RGSM>_contamination.json,
-                    # though not output by somatic workflow currently
-                    pass
+                else:
+                    logging.warning(
+                        f"Only CSV filetype is currently supported. Skipping "
+                        f"{source_file_obj.filename} with specified filetype: "
+                        f"{source_file_obj.filetype}."
+                    )
             elif source_file_obj.allow_missing:
                 logging.warning(f"Source file {source_file_obj.filename} not found.")
             else:
