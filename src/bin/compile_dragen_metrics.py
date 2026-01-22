@@ -72,18 +72,16 @@ def main() -> None:
 
     # Calculate remaining metrics not directly output by DRAGEN, if valid (i.e. in JSON
     # config)
-    derived_metric_names = {
-        "PCT_CHIMERIC_READS",
-        "PCT_READ_ENRICHMENT",
-    }
-    valid_derived_metric_names = derived_metric_names & all_dragen_metrics.keys()
-    for metric_name in valid_derived_metric_names:
-        all_dragen_metrics[metric_name] = calc_derived_pct_metric(
-            dragen_metrics_parser.metric_to_metric_obj,
-            all_dragen_metrics,
-            metric_name,
-            f"{metric_name}_BASE",
-        )
+    for metric_name in all_dragen_metrics.keys():
+        if metric_name.endswith("_BASE"):
+            derived_metric_name = metric_name
+            metric_name = metric_name.removesuffix("_BASE")
+            all_dragen_metrics[metric_name] = calc_derived_pct_metric(
+                dragen_metrics_parser.metric_to_metric_obj,
+                all_dragen_metrics,
+                metric_name,
+                derived_metric_name,
+            )
 
     out_filename = output_folder / f"{rgsm}_MetricsOutput.tsv"
     with open(out_filename, "w") as out_dragen_metrics_tsv:
