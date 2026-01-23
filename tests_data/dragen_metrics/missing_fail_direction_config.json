@@ -1,0 +1,19 @@
+{
+    "ReportedMetrics": [
+        "PCT_CONTAMINATION_EST"
+    ],
+    "DataSources": {
+        "MAPPING/ALIGNING SUMMARY": {
+            "SourceName": "<DRAGEN_ANALYSIS_DIR>/<SAMPLE_ID>.mapping_metrics.csv",
+            "SourceType": "CSV",
+            "AllowSourceFileToBeMissing": true,
+            "DefaultValueOnMissing": null,
+            "Mappings": {
+                "PCT_CONTAMINATION_EST": "{'Row':['Estimated sample contamination', 2],'Col':[3]}"
+            },
+            "Failures": {
+                "PCT_CONTAMINATION_EST.THRESHOLD": 0.02
+            }
+        }
+    }
+}

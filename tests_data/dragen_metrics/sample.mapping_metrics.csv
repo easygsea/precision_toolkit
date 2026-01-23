@@ -1,0 +1,5 @@
+MAPPING/ALIGNING SUMMARY,,Total input reads,100,100.0
+MAPPING/ALIGNING SUMMARY,,Mapped reads,80,80.0
+MAPPING/ALIGNING SUMMARY,,Supplementary (chimeric) alignments,20
+MAPPING/ALIGNING SUMMARY,,Estimated sample contamination,0.0001
+MAPPING/ALIGNING PER RG,1,Mapped reads,50
