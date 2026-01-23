@@ -46,7 +46,10 @@ def main() -> None:
         required=True,
     )
     parser.add_argument(
-        "-r", "--rgsm", help="Read group sample name (RGSM).", required=True
+        "-r",
+        "--rgsm",
+        help="Read group sample name (RGSM).",
+        required=True,
     )
     parser.add_argument(
         "-o",
