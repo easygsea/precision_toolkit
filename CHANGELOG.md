@@ -4,7 +4,8 @@
 
 ---
 
-### v1.1.3 - 2026-01-XX
+### v1.1.3 - 2026-01-23
+- New Standalone Utility: Added `compile-dragen-metrics` to extract and format backbone QC metrics from DRAGEN output files.
 - Improvement: Added arguments in `generate-standardized-bed` to optionally adjust CDS/exon boundaries and filter for genes/features of interest.
 
 ---

@@ -1,0 +1,19 @@
+{
+    "ReportedMetrics": [
+        "PCT_CONTAMINATION_EST"
+    ],
+    "DataSources": {
+        "MAPPING/ALIGNING SUMMARY": {
+            "SourceName": "mapping_metrics.csv",
+            "SourceType": "CSV",
+            "AllowSourceFileToBeMissing": true,
+            "DefaultValueOnMissing": null,
+            "Mappings": {
+                "PCT_CONTAMINATION_EST": "{'Row':['Estimated sample contamination', 2],'Col':[3]}"
+            },
+            "Constants": {
+                "PCT_CONTAMINATION_EST.FACTOR": 100
+            }
+        }
+    }
+}

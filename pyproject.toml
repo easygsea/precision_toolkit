@@ -29,6 +29,7 @@ pytest-workflow = "2.0.1"
 pytest-xdist = "3.6.1"
 
 [tool.poetry.scripts]
+compile-dragen-metrics = "bin.compile_dragen_metrics:main"
 convert-multi-sample-vcf = "bin.convert_multi_sample_vcf:main"
 count-variants-by-size = "bin.count_variants_by_size:main"
 generate-standardized-bed = "bin.generate_standardized_bed:main"
