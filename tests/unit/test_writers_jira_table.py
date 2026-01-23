@@ -5,7 +5,7 @@ import re
 import pandas as pd
 import pytest
 
-from clinical_tools.core.writers.jira_table import (  # type: ignore[import-not-found]
+from clinical_tools.core.writers.jira_table import (
     pandas_to_jira_table,
     populate_jira_table,
 )

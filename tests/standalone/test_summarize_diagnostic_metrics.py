@@ -6,10 +6,10 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from clinical_tools.core.constants import (  # type: ignore
+from clinical_tools.core.constants import (
     DEFAULT_DECIMALS,
 )
-from clinical_tools.core.statistics.proportion import (  # type: ignore
+from clinical_tools.core.statistics.proportion import (
     ProportionConfidenceIntervalMethod,
 )
 

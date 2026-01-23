@@ -5,7 +5,7 @@ Concordance, Sensitivity, Precision, F1 Score, Confidence Intervals
 
 import pytest
 
-from clinical_tools.core.metrics.variant import (  # type: ignore[import-not-found]
+from clinical_tools.core.metrics.variant import (
     ConcordanceMetrics,
     ConcordanceTPMethod,
     F1ScoreMetrics,
@@ -165,7 +165,7 @@ def test_concordance_metrics(
     query_total: int,
     query_tp: int,
     query_fp: int,
-    tp_method: str,
+    tp_method: ConcordanceTPMethod,
     expected_concordance: float,
 ) -> None:
     """
@@ -723,7 +723,7 @@ def test_confidence_interval_concordance(
         QueryFP=query_fp,
     )
     concordance_metrics = ConcordanceMetrics(
-        metrics, tp_method=ConcordanceTPMethod.MinTP.value
+        metrics, tp_method=ConcordanceTPMethod.MinTP
     )
     ci_lower, ci_upper = concordance_metrics.confidence_interval(
         method=ci_method,
