@@ -2,7 +2,6 @@
 
 import subprocess
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 import pytest
@@ -46,7 +45,9 @@ def sample_files(tmp_path: Path) -> dict[str, Path | pd.DataFrame]:
     ["csv_file", "tsv_file", "excel_file", "json_file"],
     ids=["csv", "tsv", "excel", "json"],
 )
-def test_jira_table_formats(sample_files: dict[str, Any], file_format: str) -> None:
+def test_jira_table_formats(
+    sample_files: dict[str, Path | pd.DataFrame], file_format: str
+) -> None:
     """Test basic jira-table command with all allowed file formats."""
     result = subprocess.run(
         ["jira-table", str(sample_files[file_format])],
@@ -57,13 +58,16 @@ def test_jira_table_formats(sample_files: dict[str, Any], file_format: str) -> N
 
     df = sample_files["df"]
 
+    if not isinstance(df, pd.DataFrame):
+        pytest.fail(f"Expected a DataFrame for 'df', but got {type(df)}")
+
     assert (
         result.stdout.strip()
         == populate_jira_table(df, None, None, None, False).strip()
     )
 
 
-def test_jira_table_stdin(sample_files: dict[str, Any]) -> None:
+def test_jira_table_stdin(sample_files: dict[str, Path | pd.DataFrame]) -> None:
     """Test basic jira-table command with stdin."""
     result = subprocess.run(
         f"cat {sample_files['csv_file']} | jira-table",
@@ -75,13 +79,16 @@ def test_jira_table_stdin(sample_files: dict[str, Any]) -> None:
 
     df = sample_files["df"]
 
+    if not isinstance(df, pd.DataFrame):
+        pytest.fail(f"Expected a DataFrame for 'df', but got {type(df)}")
+
     assert (
         result.stdout.strip()
         == populate_jira_table(df, None, None, None, False).strip()
     )
 
 
-def test_jira_table_args(sample_files: dict[str, Any]) -> None:
+def test_jira_table_args(sample_files: dict[str, Path | pd.DataFrame]) -> None:
     """Test jira-table command with all the arguments."""
     result = subprocess.run(
         [
@@ -104,6 +111,9 @@ def test_jira_table_args(sample_files: dict[str, Any]) -> None:
     )
 
     df = sample_files["df"]
+
+    if not isinstance(df, pd.DataFrame):
+        pytest.fail(f"Expected a DataFrame for 'df', but got {type(df)}")
 
     assert (
         result.stdout.strip()
