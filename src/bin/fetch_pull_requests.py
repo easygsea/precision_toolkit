@@ -14,7 +14,7 @@ Arguments:
 
 Example:
     fetch-pull-requests --bitbucket_url "https://svn.test.ca/bitbucket"
-    --project "projects" --repo "project1" --token $TOKEN
+    --project "projects" --repo "project1" --token "${TOKEN}"
 """
 
 import argparse
