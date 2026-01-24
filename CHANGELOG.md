@@ -5,9 +5,9 @@
 ---
 
 ### v1.1.3 - 2026-01-23
-- Bugfix: Removed `# type: ignore's` by updating `.pre-commit-config.yaml` to account for these types, and updated test files accordingly to pass pre-commit and testing.
 - New Standalone Utility: Added `compile-dragen-metrics` to extract and format backbone QC metrics from DRAGEN output files.
 - Improvement: Added arguments in `generate-standardized-bed` to optionally adjust CDS/exon boundaries and filter for genes/features of interest.
+- Bugfix: Removed `# type: ignore's` by updating `.pre-commit-config.yaml` to account for these types, and updated test files accordingly to pass pre-commit and testing.
 
 ---
 
