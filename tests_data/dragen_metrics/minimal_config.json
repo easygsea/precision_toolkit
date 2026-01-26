@@ -1,0 +1,41 @@
+{
+    "ReportedMetrics": [
+        "TOTAL_PF_READS",
+        "PCT_CHIMERIC_READS",
+        "PCT_CONTAMINATION_EST"
+    ],
+    "DataSources": {
+        "MAPPING/ALIGNING SUMMARY": {
+            "SourceName": "mapping_metrics.csv",
+            "SourceType": "CSV",
+            "AllowSourceFileToBeMissing": true,
+            "DefaultValueOnMissing": null,
+            "Mappings": {
+                "TOTAL_PF_READS": "{'Row':['Total input reads', 2],'Col':[3]}",
+                "MAPPED_READS": "{'Row':['Mapped reads', 2],'Col':[3]}",
+                "PCT_CHIMERIC_READS_BASE": "{'Row':['Supplementary (chimeric) alignments', 2],'Col':[3]}",
+                "PCT_CONTAMINATION_EST": "{'Row':['Estimated sample contamination', 2],'Col':[3]}"
+            },
+            "Constants": {
+                "TOTAL_PF_READS.UOM": "Count",
+                "TOTAL_PF_READS.RAD": 0,
+                "MAPPED_READS.FACTOR": 0.0001,
+                "PCT_CHIMERIC_READS.UOM": "%",
+                "PCT_CHIMERIC_READS.RAD": 2,
+                "PCT_CHIMERIC_READS.FACTOR": 100,
+                "PCT_CONTAMINATION_EST.FACTOR": 100,
+                "PCT_CONTAMINATION_EST.UOM": "%",
+                "PCT_CONTAMINATION_EST.RAD": 2
+            },
+            "FactorOperations": {
+                "MAPPED_READS.FACTOR": "add",
+                "PCT_CHIMERIC_READS.FACTOR": "multiply",
+                "PCT_CONTAMINATION_EST.FACTOR": "multiply"
+            },
+            "Failures": {
+                "PCT_CONTAMINATION_EST.THRESHOLD": 0.02,
+                "PCT_CONTAMINATION_EST.DIRECTION": "greater_than"
+            }
+        }
+    }
+}

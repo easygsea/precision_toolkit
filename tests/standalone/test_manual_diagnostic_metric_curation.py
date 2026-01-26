@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from clinical_tools.core.constants import (  # type: ignore[import-not-found]
+from clinical_tools.core.constants import (
     DEFAULT_CI_LEVEL,
     DEFAULT_CI_METHOD,
 )

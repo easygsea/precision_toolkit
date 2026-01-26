@@ -147,6 +147,8 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
   - [Target Evaluation](./docs/workflows/target_evaluation.md)
   - [Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)](./docs/workflows/variant_benchmark.md)
 - [Standalone Utilities](./docs/standalone_utilities/README.md)
+  - [Compile DRAGEN metrics](./docs/standalone_utilities/README.md#compile-dragen-metrics)
+    - `compile-dragen-metrics`
   - [Convert Multi-Sample VCF File into Single-Sample VCF files](./docs/standalone_utilities/README.md#convert-multi-sample-vcf-file-into-single-sample-vcf-files)
     - `convert-multi-sample-vcf`
   - [Count Variants By Size](./docs/standalone_utilities/README.md#count-variants-by-size)
