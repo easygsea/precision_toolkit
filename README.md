@@ -159,6 +159,8 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
     - `jira-table`
   - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
     - `manual-diagnostic-metric-curation`
+  - [Pull Request Fetcher](./docs/standalone_utilities/README.md#pull-request-fetcher)
+    - `fetch-pull-requests`
   - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
     - `liftover_sv_vcf.sh`
 

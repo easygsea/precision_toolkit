@@ -6,6 +6,7 @@
 - [Generate Standardized BED](#generate-standardized-bed)
 - [Jira Table Converter](#jira-table-converter)
 - [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
+- [Pull Request Fetcher](#pull-request-fetcher)
 - [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
 
 ## Compile DRAGEN Metrics
@@ -215,6 +216,15 @@ apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-cura
 ```
 
 Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
+
+## Pull Request Fetcher
+
+The `fetch-pull-requests` tool fetches daily pull requests for PR reviewers.
+
+Example Usage:
+```bash
+fetch-pull-requests --bitbucket_url <URL_TO_BITBUCKET> --project <PROJECT_NAME> [--repo <REPO_NAME>] --token <TOKEN>
+```
 
 ## Structural Variant VCF Liftover
 

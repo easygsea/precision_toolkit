@@ -6,6 +6,7 @@
 
 ### v1.1.3 - 2026-01-26
 - New Standalone Utility: Added `compile-dragen-metrics` to extract and format backbone QC metrics from DRAGEN output files.
+- New Standalone Utility: Added `fetch-pull-requests` to fetch pull requests using a given bitbucket url, project, repo (optional), and authentication token.
 - Improvement: Added arguments in `generate-standardized-bed` to optionally adjust CDS/exon boundaries and filter for genes/features of interest.
 - Bugfix: Removed `# type: ignore` by updating `.pre-commit-config.yaml` to account for these types, and updated test files accordingly to pass pre-commit and testing.
 
