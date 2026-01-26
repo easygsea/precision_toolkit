@@ -19,7 +19,7 @@ Example:
 
 import argparse
 
-from clinical_tools.core.devtools.pr_fetcher import fetch_pull_requests
+from clinical_tools.core.devtools.pull_request_fetcher import fetch_pull_requests
 
 
 def main() -> None:

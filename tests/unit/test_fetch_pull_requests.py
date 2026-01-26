@@ -7,7 +7,7 @@ from typing import Any, NoReturn
 import pytest
 import requests
 
-from clinical_tools.core.devtools.pr_fetcher import (
+from clinical_tools.core.devtools.pull_request_fetcher import (
     fetch_pull_requests as fetch_pull_requests,
 )
 
@@ -38,7 +38,7 @@ def test_fetch_repos_success_no_prs(
 
     # Apply the monkeypatch
     monkeypatch.setattr(
-        "clinical_tools.core.devtools.pr_fetcher.requests.get", mock_get
+        "clinical_tools.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
 
     # Call the function
@@ -106,7 +106,7 @@ def test_fetch_repos_success_with_prs(
 
     # Apply the monkeypatch
     monkeypatch.setattr(
-        "clinical_tools.core.devtools.pr_fetcher.requests.get", mock_get
+        "clinical_tools.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
 
     fetch_pull_requests(
@@ -184,7 +184,7 @@ def test_fetch_prs_missing_fields(monkeypatch: pytest.MonkeyPatch, caplog: Any) 
 
     # Apply the monkeypatch
     monkeypatch.setattr(
-        "clinical_tools.core.devtools.pr_fetcher.requests.get", mock_get
+        "clinical_tools.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
 
     fetch_pull_requests(bitbucket_url="http://fake", project="P", repo="", token="T")
