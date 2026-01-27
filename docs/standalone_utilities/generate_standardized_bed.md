@@ -30,7 +30,7 @@ The following are required for target BED generation:
 - Files:
   - MANE GTF/GFF file (`MANE_GTF`)
     - **Note:** It is recommended to use the MANE Ensembl/Refseq GTF files due to issues encountered when converting GFF files with `bedops gff2bed`
-  - File with a list of target gene symbols, one per line (`TARGET_GENES_FILE`)
+  - Optional file containing a list of target gene symbols, one per line (`TARGET_GENES_FILE`)
 - Tools:
   - `bedops` (tested with `2.4.41--h4ac6f70_2`)
     - **Note:** For reproducibility and cross-platform compatibility, we recommend using the `bedops` container image available from [quay.io](https://quay.io/repository/biocontainers/bedops)
@@ -71,32 +71,36 @@ chr20	50958842	50960222	MOCS3	.	+	BestRefSeq	CDS	0	gene_id "MOCS3"; transcript_i
 chr20	50960222	50960225	MOCS3	.	+	BestRefSeq	stop_codon	0	gene_id "MOCS3"; transcript_id "NM_014484.5"; db_xref "CCDS:CCDS13435.1"; db_xref "Ensembl:ENSP00000244051.1"; db_xref "GeneID:27304"; db_xref "GenBank:NP_055299.1"; db_xref "HGNC:HGNC:15765"; db_xref "MIM:609277"; gbkey "CDS"; gene "MOCS3"; product "adenylyltransferase and sulfurtransferase MOCS3"; protein_id "NP_055299.1"; tag "MANE Select"; exon_number "1";
 ```
 
-#### (Optional) Extract features for genes of interest
-
-Once converted, features for genes of interest can be extracted by filtering on the fourth column, which contains the gene symbol. Furthermore, certain features can be retained/omitted by filtering on the eigth column. While this can be done using various methods, an example to extract exon features for genes of interest using `awk` is shown below:
-
-```
-awk 'NR==FNR{genes[$1]++; next} $8 == "exon" && $4 in genes' <TARGET_GENES_FILE> <MANE_BED> > <TARGET_BED>
-```
-
 #### Standardize target BED file
 
-Following this, the `generate_bed_script.py` script can be used to standardize the BED file.
+Following this, the `generate_standardized_bed.py` script can be used to standardize the BED file.
 
 ```
 python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY>
 ```
 
-If intron features are of interest, users may enable the calculation and output of introns in the standardized BED with `--output-introns`:
+By definition, CDS features do not include stop codons. To extend CDS intervals to include stop codons, use `--extend-cds-to-stop`:
+
+```
+python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --extend-cds-to-stop
+```
+
+To calculate and include intron features in the standardized BED, use `--output-introns`:
 
 ```
 python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --output-introns
 ```
 
-If `MANE_BED` was previously filtered for genes of interest, as outlined in the [previous section](#optional-extract-features-for-genes-of-interest), `TARGET_GENES_FILE` can be provided to `--gene-list`  to output a warning if any genes in this list are not found in `MANE_BED`:
+By default, exon features include UTRs. Supplying `--exclude-utrs` will remove exons that fall entirely within UTRs and trim exons that span coding/non-coding boundaries to remove UTR portions.
 
 ```
-python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --gene-list <TARGET_GENES_FILE>
+python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --exclude-utrs
+```
+
+The flags above require most feature types to be present in `MANE_BED`; however, these may not be needed in the final target BED. Users may restrict the output to a subset of features by providing a comma-separated list via `--features` (valid values: `CDS`, `exon`, `gene`, `start_codon`, `stop_codon`, `transcript`). Similarly, users can filter for genes of interest by providing a file containing target gene symbols (one per line) to `--gene-list`. A warning is output if any genes in this list are not found in `MANE_BED`.
+
+```
+python generate_standardized_bed.py --bed-file <TARGET_BED> --output-folder <OUTPUT_DIRECTORY> --gene-list <TARGET_GENES_FILE> --features <FEATURES_LIST>
 ```
 
 That's it! The standardized BED file should look something like this:
@@ -105,9 +109,9 @@ That's it! The standardized BED file should look something like this:
 chr20	50958817	50963929	MOCS3_NM_014484.5_EXON1
 chr20	50958817	50963929	MOCS3_GENE
 chr20	50958817	50963929	MOCS3_NM_014484.5_TRANSCRIPT
-chr20	50958842	50958845	MOCS3_NP_055299.1_START_CODON1
-chr20	50958842	50960222	MOCS3_NP_055299.1_CDS1
-chr20	50960222	50960225	MOCS3_NP_055299.1_STOP_CODON1
+chr20	50958842	50958845	MOCS3_NM_014484.5_START_CODON1
+chr20	50958842	50960222	MOCS3_NM_014484.5_CDS1
+chr20	50960222	50960225	MOCS3_NM_014484.5_STOP_CODON1
 ```
 
 ## Troubleshooting
