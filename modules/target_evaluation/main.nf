@@ -294,3 +294,20 @@ process GENERATE_VISUALIZATION {
     --metrics-thresholds-and-headings '${groovy.json.JsonOutput.toJson(metrics_thresholds_and_headings)}'
     """
 }
+
+process GENERATE_COMMON_REGIONS_FAIL {
+    tag "All_Samples"
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}", mode: 'copy'
+
+    input:
+    path(all_libraries_per_base)
+
+    output:
+    path("common_fail_regions.bed"), emit: common_fail_regions
+
+    script:
+    OUT="common_fail_regions.bed"
+    """
+    awk -v OFS="\t" '{if (\$11 > ${params.fail_percent_threshold} || \$12 > ${params.fail_percent_threshold} || \$13 > ${params.fail_percent_threshold}) print \$1,\$2,\$2+1,\$3}' ${all_libraries_per_base} | sort-bed - | bedtools merge -c 4 -o distinct > ${OUT}
+    """
+}

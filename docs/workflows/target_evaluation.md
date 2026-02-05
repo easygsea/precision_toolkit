@@ -95,6 +95,7 @@ For example, when `--output_raw_mpileup` and `--visualize` is flagged:
 <output_dir>
 └── <target_evaluation_subdir>
     ├── all_libraries_per_base_metrics.scored.txt
+    ├── common_fail_regions.bed # Finds all libraries meeting a user specified failing threshold percent (default = 10%)
     ├── library_level   # Library specific per-base and per-target outputs
     │   ├── PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.scored.txt
     │   ├── PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
