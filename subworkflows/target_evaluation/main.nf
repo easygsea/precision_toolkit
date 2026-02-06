@@ -223,7 +223,5 @@ workflow gene_target_evaluation_workflow {
     }
 
     // STAGE 6: Generate common regions failing at a certain percent threshold
-    GENERATE_COMMON_REGIONS_FAIL(
-        GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base.map{it -> it[1]}
-    )
+    GENERATE_COMMON_REGIONS_FAIL(GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base)
 }

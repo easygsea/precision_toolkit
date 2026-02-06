@@ -296,14 +296,14 @@ process GENERATE_VISUALIZATION {
 }
 
 process GENERATE_COMMON_REGIONS_FAIL {
-    tag "All_Samples"
+    tag "${sample_name}"
     publishDir "${params.output_dir}/${params.target_evaluation_subdir}", mode: 'copy'
 
     input:
-    path(all_libraries_per_base)
+    tuple val(sample_name), path(all_libraries_per_base), val(pool)
 
     output:
-    path("common_fail_regions.bed"), emit: common_fail_regions
+    path(OUT), emit: common_fail_regions
 
     script:
     OUT="common_fail_regions.bed"
