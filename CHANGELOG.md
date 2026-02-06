@@ -5,7 +5,7 @@
 ---
 
 ### v1.1.4 - 2026-XX-XX
-- Improvement: Added `GENERATE_COMMON_REGIONS_FAIL` process in `modules/target_evaluation/main.nf` called in `subworkflows/target_evaluation/main.nf` to generate the `common_fail_regions.bed` file.
+- Feature: Added `GENERATE_COMMON_REGIONS_FAIL` process in `modules/target_evaluation/main.nf` called in `subworkflows/target_evaluation/main.nf` to generate the `common_fail_regions.bed` file.
 
 ---
 
