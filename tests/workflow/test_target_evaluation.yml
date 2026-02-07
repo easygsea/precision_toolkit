@@ -10,13 +10,13 @@
     --output_raw_mpileup
   files:
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/raw_mpileups/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.raw.txt
-      md5sum: 8427b632988de76cac2d6b3c1e1be9fe
+      md5sum: bb5ccfd664f51276df1fb4dc77c78fdd
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/library_level/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.scored.txt
       md5sum: ebde6db824c345ca8d1914be8c39ac15
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/library_level/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: cc08e4634cb4a8a1787a9c3c36a1f6f0
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/raw_mpileups/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.raw.txt
-      md5sum: 03730089af68497d87ac2cba7496f568
+      md5sum: 271fb9c7117f31fde096c01e2c56aa2f
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.scored.txt
       md5sum: ee557bfff814156963393c3a1ce2efa1
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt

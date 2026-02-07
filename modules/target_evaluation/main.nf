@@ -78,7 +78,7 @@ process GET_PER_BASE_STATS {
     OUT="${in_bam.baseName}.mpileup.per_base.parsed.txt"
     cram_extra_param = cram_fasta ? "--fasta-ref ${cram_fasta}" : " "
     """
-    samtools mpileup -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
+    samtools mpileup -B -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
     --no-output-ends --no-output-ins --no-output-ins --no-output-del --no-output-del \
     ${cram_extra_param} --positions ${targets_bed} ${in_bam} |
     gawk -v OFS='\\t' '
@@ -152,10 +152,9 @@ process GET_PER_BASE_STATS_NO_PARSE {
     OUT="${in_bam.baseName}.mpileup.raw.txt"
     cram_extra_param = cram_fasta ? "--fasta-ref ${cram_fasta}" : " "
     """
-    samtools mpileup -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
+    samtools mpileup -B -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
     --no-output-ends --no-output-ins --no-output-ins --no-output-del --no-output-del \
     ${cram_extra_param} --positions ${targets_bed} ${in_bam} > ${OUT}
-    echo ${cram_extra_param} >> ${OUT}
     """
 }
 
