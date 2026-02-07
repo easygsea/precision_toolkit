@@ -1,5 +1,7 @@
 include {
     NORMALIZE_COVERAGE_TO_TARGET
+    GET_PER_BASE_STATS
+    GET_PER_BASE_STATS_NO_PARSE
     ADD_TARGET_LABELS
     GET_PER_TARGET_AGGREGATED_STATS
     GENERATE_PER_BASE_SUMMARY
@@ -13,14 +15,8 @@ include {
     GENERATE_VISUALIZATION
 } from '../../modules/target_evaluation/main'
 
-include {
-    INDEX_BAM_FILE as INDEX_BAM_FILES
-    GET_PER_BASE_STATS
-    GET_PER_BASE_STATS_NO_PARSE
-} from '../../modules/bam/main'
-
-include { SUBSET_CRAM_TO_BAM    } from '../../modules/cram/main'
-include { SORT_BED              } from '../../modules/bed/main'
+include { INDEX_BAM_FILE    } from '../../modules/bam/main'
+include { SORT_BED          } from '../../modules/bed/main'
 
 
 // Main variant gene target evaluation workflow
@@ -92,17 +88,9 @@ workflow gene_target_evaluation_workflow {
                 "SKIPPING ${no_ref_cram}" }
        bam_ch = mixed_aligned_ch.bam
     }
-    // else, do conversion for any cram files
+    // else, include cram files
     else {
-        bam_ch = mixed_aligned_ch.bam
-            .concat(
-                SUBSET_CRAM_TO_BAM (
-                    mixed_aligned_ch.cram,
-                    file(params.genome_ref),
-                    targets_bed,
-                    32
-                )
-            )
+        bam_ch = mixed_aligned_ch.bam.concat(mixed_aligned_ch.cram)
     }
 
     /*
@@ -110,7 +98,7 @@ workflow gene_target_evaluation_workflow {
         Process BAM files to extract metrics
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
-    INDEX_BAM_FILES (bam_ch)
+    INDEX_BAM_FILE (bam_ch)
 
     // STAGE 1: Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
     GET_PER_BASE_STATS (
@@ -118,7 +106,8 @@ workflow gene_target_evaluation_workflow {
         bam_ch,
         params.min_bq_per_read,
         params.min_mq_per_read,
-        params.read_fail_tolerance
+        params.read_fail_tolerance,
+        file(params.genome_ref)
     )
     ADD_TARGET_LABELS (
         GET_PER_BASE_STATS.out.parsed_pileup,
@@ -148,7 +137,8 @@ workflow gene_target_evaluation_workflow {
     if (params.output_raw_mpileup) {
         GET_PER_BASE_STATS_NO_PARSE (
             targets_bed,
-            bam_ch
+            bam_ch,
+            file(params.genome_ref)
         )
     }
 
