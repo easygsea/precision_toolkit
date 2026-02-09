@@ -68,9 +68,9 @@ nextflow run main.nf \
 - `--output_raw_mpileup`: Flag to output raw mpileup file.
 - `--normalize_coverage`: If set, coverage across the targets bed for every sample is normalized and scaled to center on this value. This function is provided to improve comparability and adjust for variations in sequencing depth cross samples if needed.
 - `--visualize`: Flag to generate per-target level plots for each stat.
-- `--fail_percent_threshold`: Filtering threshold used for generating the 'common_regions_fail.bed' file (default: 10)
 
 **Fine-Tuning Parameters**
+- `--fail_percent_threshold`: Filtering threshold used for generating the 'common_regions_fail.bed' file (default: 10)
 - `--coverage_threshold`: Minimum coverage threshold for pass (default = 25).
 - `--baseq_threshold`: Minimum BASEQ threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--mapq_threshold`: Minimum MAPQ score threshold for pass, scored on first quartile of all reads per base (default = 30).

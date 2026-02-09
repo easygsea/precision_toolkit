@@ -5,7 +5,7 @@
 ---
 
 ### v1.1.4 - 2026-XX-XX
-- Feature: Added `GENERATE_COMMON_REGIONS_FAIL` process in `modules/target_evaluation/main.nf` called in `subworkflows/target_evaluation/main.nf` to generate the `common_fail_regions.bed` file.
+- Feature: Added functionality to compile a systemic fail tract (`common_fail_regions.bed`) using cohort-level base-specific fail data. Threshold can be adjusted with `--fail_percent_threshold` parameter (default: 10).
 
 ---
 
