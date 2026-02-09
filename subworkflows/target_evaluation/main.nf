@@ -82,15 +82,17 @@ workflow gene_target_evaluation_workflow {
 
     // if no genome_ref, skip any cram file & output warning for each file not processed
     if (!params.genome_ref) {
-       mixed_aligned_ch.cram
+        mixed_aligned_ch.cram
             .view {sample_name, no_ref_cram, pool_id ->
                 log.warn "No genome reference provided for cram files. \n" +
                 "SKIPPING ${no_ref_cram}" }
-       bam_ch = mixed_aligned_ch.bam
+        bam_ch = mixed_aligned_ch.bam
+        genome_ref = []
     }
     // else, include cram files
     else {
         bam_ch = mixed_aligned_ch.bam.concat(mixed_aligned_ch.cram)
+        genome_ref = [file(params.genome_ref)]
     }
 
     /*
@@ -107,7 +109,7 @@ workflow gene_target_evaluation_workflow {
         params.min_bq_per_read,
         params.min_mq_per_read,
         params.read_fail_tolerance,
-        file(params.genome_ref)
+        genome_ref
     )
     ADD_TARGET_LABELS (
         GET_PER_BASE_STATS.out.parsed_pileup,
@@ -138,7 +140,7 @@ workflow gene_target_evaluation_workflow {
         GET_PER_BASE_STATS_NO_PARSE (
             targets_bed,
             bam_ch,
-            file(params.genome_ref)
+            genome_ref
         )
     }
 
