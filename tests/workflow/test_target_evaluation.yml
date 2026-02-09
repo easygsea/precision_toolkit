@@ -32,11 +32,11 @@
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/all_libraries_per_base_metrics.scored.txt
       md5sum: 160769495c06b8fa9003ec0cbb269d38
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/plot_TARGET_P25(BASE_COV).png
-      md5sum: 34c94c88fb8afff648e8ed77b0abe4d9
+      md5sum: b50e55f9f99af9e186536d1e7666f111
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/plot_TARGET_P25(BASE_BQ_P25).png
-      md5sum: d90a778ba31dcff7710c9f83c73575ef
+      md5sum: e613f75ece6af2315bd80e9107e00d36
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/plot_TARGET_P25(BASE_MQ_P25).png
-      md5sum: 69798172bac92137a5a90fe63a9850e1
+      md5sum: d9c5931e8c4c6fc9e99ca471dae4497a
 
 - name: target_evaluation_test_mixed_noref
   command: >
@@ -157,11 +157,11 @@
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.unionized.bed
       md5sum: 756330758029932d53ff0e07ca5fd8e3
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_COV).png
-      md5sum: 54e1c00afc4a8d019707e5fba4af0d5a
+      md5sum: 14fd110e0ac9961ee27a0205618949d2
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_BQ_P25).png
-      md5sum: b1e83dc7a9eb89af5f31017aa7988607
+      md5sum: a834607c2f8cd5af24369238ba1005c7
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_MQ_P25).png
-      md5sum: c558013805494b777c87f018aceaff88
+      md5sum: bf5b1e7bd9d332908c95399ddebd5b32
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/all_libraries_per_base_metrics.scored.txt
       md5sum: 28ed4da4db215bab2d7496991819463d
 

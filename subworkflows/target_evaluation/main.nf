@@ -203,9 +203,14 @@ workflow gene_target_evaluation_workflow {
 
     // Stage 5: Generate visualization per target
     if (params.visualize) {
+
+        // sort plot data prior to plotting
+        plot_data_ch = GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.toSortedList { a, b -> a[2] <=> b[2] }.flatMap()
+
+        // visualization of target quality (target-level)
         GENERATE_VISUALIZATION (
-            GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[1]},
-            GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[2]},
+            plot_data_ch.collect{it[1]},
+            plot_data_ch.collect{it[2]},
             "plot",
             metrics_thresholds_and_headings
                 .findAll { k, v -> ['cov','bq','mq'].contains(k) }
