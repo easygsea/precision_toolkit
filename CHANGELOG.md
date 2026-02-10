@@ -5,6 +5,7 @@
 ---
 
 ### v1.1.4 - 2026-XX-XX
+- Feature: Added functionality to compile a systemic fail tract (`common_fail_regions.bed`) using cohort-level base-specific fail data. Threshold can be adjusted with `--fail_percent_threshold` parameter (default: 10).
 
 ---
 

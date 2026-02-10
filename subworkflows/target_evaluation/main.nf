@@ -11,6 +11,7 @@ include {
     GENERATE_TRACTS
     UNIONIZE_TRACTS
     GENERATE_VISUALIZATION
+    GENERATE_COMMON_REGIONS_FAIL
 } from '../../modules/target_evaluation/main'
 
 include {
@@ -220,4 +221,7 @@ workflow gene_target_evaluation_workflow {
                 .collectEntries {  k,v -> [ (v.target_header): v.threshold ] }
         )
     }
+
+    // STAGE 6: Generate common regions failing at a certain percent threshold
+    GENERATE_COMMON_REGIONS_FAIL(GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base)
 }
