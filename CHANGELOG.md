@@ -5,7 +5,8 @@
 ---
 
 ### v1.1.4 - 2026-XX-XX
-- Improvement: Updated workflow to allow direct CRAM injection into mpileup, bypassing intermediate BAM generation and reducing overhead. - Bugfix: Fixed sorting inconsistency during plotting (now deterministic).
+- Improvement: Updated workflow to allow direct CRAM injection into mpileup, bypassing intermediate BAM generation and reducing overhead.
+- Bugfix: Fixed sorting inconsistency during plotting (now deterministic).
 
 ---
 
