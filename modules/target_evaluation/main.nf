@@ -308,6 +308,15 @@ process GENERATE_COMMON_REGIONS_FAIL {
     script:
     OUT="common_fail_regions.bed"
     """
-    awk -v OFS="\t" '{if (\$11 > ${params.fail_percent_threshold} || \$12 > ${params.fail_percent_threshold} || \$13 > ${params.fail_percent_threshold}) print \$1,\$2,\$2+1,\$3}' ${all_libraries_per_base} | sort-bed - | bedtools merge -c 4 -o distinct > ${OUT}
+    awk -v OFS="\\t" '
+        \$11 > ${params.fail_percent_threshold} ||
+        \$12 > ${params.fail_percent_threshold} ||
+        \$13 > ${params.fail_percent_threshold} {
+            print \$1,\$2,\$2+1,\$3
+        }
+        ' ${all_libraries_per_base} |
+        sort-bed - |
+        bedtools merge -c 4 -o distinct \
+        > ${OUT}
     """
 }
