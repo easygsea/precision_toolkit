@@ -5,6 +5,7 @@ ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
 ARG JOBLIB_VERSION=0.14.1
+ARG MAFFT_VERSION=7.505-1
 ARG PSUTIL_VERSION=6.1.1
 ARG PYTHON_VERSION=3.13.12
 ARG TRUVARI_VERSION=5.4.0
@@ -47,6 +48,7 @@ ARG BEDTOOLS_VERSION
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
 ARG JOBLIB_VERSION
+ARG MAFFT_VERSION
 ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
 ARG TRUVARI_VERSION
@@ -84,6 +86,10 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     wget --quiet "https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb" && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && apt-get install -y --no-install-recommends "dotnet-sdk-${DOTNET_VERSION}" && \
+    # Install mafft (dependency for truvari)
+    wget --quiet "https://mafft.cbrc.jp/alignment/software/mafft_${MAFFT_VERSION}_amd64.deb" && \
+    dpkg -i "mafft_${MAFFT_VERSION}_amd64.deb" && \
+    rm "mafft_${MAFFT_VERSION}_amd64.deb" && \
     # Build htslib (dependency for bcftools and samtools)
     wget --quiet "https://github.com/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "htslib-${HTSLIB_VERSION}.tar.bz2" && \
