@@ -56,8 +56,20 @@ def test_data_dir(pytestconfig: pytest.Config) -> Path:
                 "fail_direction": "",
             },
         ),
+        (
+            "PCT_TARGET_250X",
+            {
+                "mapping_spec": "$.PCT_TARGET_250X",
+                "scale_factor": None,
+                "scale_factor_op": "",
+                "unit": "%",
+                "num_decimal_places": 1,
+                "fail_threshold": None,
+                "fail_direction": "",
+            },
+        ),
     ],
-    ids=["full_properties", "missing_properties", "derived_metric"],
+    ids=["full_properties", "missing_properties", "derived_metric", "json_metric"],
 )
 def test_dragen_metric_obj_creation(
     test_data_dir: Path, metric_name: str, expected_properties: dict
@@ -69,6 +81,7 @@ def test_dragen_metric_obj_creation(
     - Metric with all properties
     - Metric with missing properties (i.e. factor, failure threshold and direction)
     - Derived metric (i.e. no mapping spec)
+    - Metric extracted from JSON sourcefile
 
     Expected behaviour:
     - DragenMetric object is created and any missing properties are set to "" or None
@@ -123,6 +136,7 @@ def test_invalid_config_incomplete_failure_spec(
                 "PCT_CONTAMINATION_EST": 0.01,
                 "PCT_CHIMERIC_READS_BASE": 20,
                 "PCT_CHIMERIC_READS": None,
+                "PCT_TARGET_250X": 86.345000,
             },
         ),
         (
@@ -133,6 +147,7 @@ def test_invalid_config_incomplete_failure_spec(
                 "PCT_CONTAMINATION_EST": None,
                 "PCT_CHIMERIC_READS_BASE": 20,
                 "PCT_CHIMERIC_READS": None,
+                "PCT_TARGET_250X": None,
             },
         ),
         (
@@ -143,6 +158,7 @@ def test_invalid_config_incomplete_failure_spec(
                 "PCT_CONTAMINATION_EST": None,
                 "PCT_CHIMERIC_READS_BASE": None,
                 "PCT_CHIMERIC_READS": None,
+                "PCT_TARGET_250X": None,
             },
         ),
     ],

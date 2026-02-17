@@ -70,6 +70,13 @@ def _parse_script_output(
                     "failure_direction": None,
                     "status": None,
                 },
+                "PCT_TARGET_250X (%)": {
+                    "value": 86.3,
+                    "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
+                    "status": None,
+                },
             },
         ),
         (
@@ -96,6 +103,13 @@ def _parse_script_output(
                     "failure_direction": None,
                     "status": None,
                 },
+                "PCT_TARGET_250X (%)": {
+                    "value": None,
+                    "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
+                    "status": None,
+                },
             },
         ),
         (
@@ -116,6 +130,13 @@ def _parse_script_output(
                     "status": "Fail",
                 },
                 "PCT_CHIMERIC_READS (%)": {
+                    "value": None,
+                    "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
+                    "status": None,
+                },
+                "PCT_TARGET_250X (%)": {
                     "value": None,
                     "category": "Monitoring",
                     "threshold": None,
