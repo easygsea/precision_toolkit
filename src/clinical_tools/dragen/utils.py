@@ -12,7 +12,9 @@ OPERATIONS = {
     "divide": operator.truediv,
     "subtract": operator.sub,
     "greater_than": operator.gt,
+    "greater_than_or_equal": operator.ge,
     "less_than": operator.lt,
+    "less_than_or_equal": operator.le,
 }
 
 
