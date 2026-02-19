@@ -42,9 +42,9 @@ process GET_PER_BASE_STATS {
 
     // Current specs used here:
     // 1. Output all positions in bed file
-    // 2. Min BQ of 10 consider BQ in calculations (ref old) (TODO: pass in values, with default here, caveat 0 for baseq in docs)
-    // 3. Min MQ of 1 (ref old)
-    // 4. -A count anomalous reads pairs -x turn off overlaps removal
+    // 2. Min BQ and MQ of 0
+    // 3. -A count anomalous reads pairs -x turn off overlaps removal (BQ 0 acceptable)
+    // 4. -B to turn off BAQ recalculations based on reference genome
     // 5. Custom gawk to adjust for deletions & parse
 
     input:

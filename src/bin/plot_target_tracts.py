@@ -120,7 +120,7 @@ def main() -> None:
         plt.savefig(f"{args.prefix}_{metric}.png")
         plt.clf()
 
-    print("done")
+    print(f"DONE: All metrics processed and figures saved with prefix {args.prefix}")
 
 
 if __name__ == "__main__":
