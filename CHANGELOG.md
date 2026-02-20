@@ -5,6 +5,7 @@
 ---
 
 ### v1.1.4 - 2026-XX-XX
+- New Standalone Utility: Added `plot-dragen-metrics` to plot backbone QC metrics in DRAGEN's `MetricsOutput.tsv`.
 
 ---
 
