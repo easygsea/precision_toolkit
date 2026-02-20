@@ -6,6 +6,7 @@
 - [Generate Standardized BED](#generate-standardized-bed)
 - [Jira Table Converter](#jira-table-converter)
 - [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
+- [Plot DRAGEN Metrics](#plot-dragen-metrics)
 - [Pull Request Fetcher](#pull-request-fetcher)
 - [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
 
@@ -216,6 +217,23 @@ apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-cura
 ```
 
 Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
+
+## Plot DRAGEN Metrics
+
+The `plot-dragen-metrics` tool generates summary plots for backbone QC metrics in the `MetricsOutput.tsv` file(s) output by DRAGEN. Plot settings (i.e. metrics to plot, thresholds, proposed thresholds) are specified in a JSON-formatted configuration file. If `compile-dragen-metrics` was used previously, the same configuration file can be supplied to `plot-dragen-metrics` — refer to the [`compile-dragen-metrics` documentation](#compile-dragen-metrics) for an example.
+
+Of particular importance for `plot-dragen-metrics` is the `ReportedMetrics` section, which specifies the metrics to plot, and the following attributes defined in the `Constants` section, as these are used to annotate plots with threshold lines:
+- `LSL`: lower specification limit
+- `USL`: upper specification limit
+- `PROPOSED_LSL`: proposed lower specification limit
+- `PROPOSED_USL`: proposed upper specification limit
+
+Metrics can be aggregated across runs and plotted together if multiple `MetricsOutput.tsv` files are supplied to `--metrics-files`. Within these plots, samples can be grouped and coloured by pool if a [FASTQ list](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files), which should contain columns mapping each `RGSM` to its corresponding `Pool`, is passed to `--fastq-list`.
+
+Usage:
+```bash
+plot-dragen-metrics --metrics-json-config <json_config> --metrics-files <metrics_output_tsv> [<metrics_output_tsv> ...] --output-folder <output_folder> [--fastq-list <dragen_fastq_list>] [--sort-by <metric_to_sort_by>]
+```
 
 ## Pull Request Fetcher
 
