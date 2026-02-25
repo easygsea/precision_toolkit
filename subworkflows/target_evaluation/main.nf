@@ -1,5 +1,7 @@
 include {
     NORMALIZE_COVERAGE_TO_TARGET
+    GET_PER_BASE_STATS
+    GET_PER_BASE_STATS_NO_PARSE
     ADD_TARGET_LABELS
     GET_PER_TARGET_AGGREGATED_STATS
     GENERATE_PER_BASE_SUMMARY
@@ -14,14 +16,8 @@ include {
     GENERATE_COMMON_REGIONS_FAIL
 } from '../../modules/target_evaluation/main'
 
-include {
-    INDEX_BAM_FILE as INDEX_BAM_FILES
-    GET_PER_BASE_STATS
-    GET_PER_BASE_STATS_NO_PARSE
-} from '../../modules/bam/main'
-
-include { SUBSET_CRAM_TO_BAM    } from '../../modules/cram/main'
-include { SORT_BED              } from '../../modules/bed/main'
+include { INDEX_BAM_FILE    } from '../../modules/bam/main'
+include { SORT_BED          } from '../../modules/bed/main'
 
 
 // Main variant gene target evaluation workflow
@@ -87,23 +83,17 @@ workflow gene_target_evaluation_workflow {
 
     // if no genome_ref, skip any cram file & output warning for each file not processed
     if (!params.genome_ref) {
-       mixed_aligned_ch.cram
+        mixed_aligned_ch.cram
             .view {sample_name, no_ref_cram, pool_id ->
                 log.warn "No genome reference provided for cram files. \n" +
                 "SKIPPING ${no_ref_cram}" }
-       bam_ch = mixed_aligned_ch.bam
-    }
-    // else, do conversion for any cram files
-    else {
         bam_ch = mixed_aligned_ch.bam
-            .concat(
-                SUBSET_CRAM_TO_BAM (
-                    mixed_aligned_ch.cram,
-                    file(params.genome_ref),
-                    targets_bed,
-                    32
-                )
-            )
+        genome_ref = []
+    }
+    // else, include cram files
+    else {
+        bam_ch = mixed_aligned_ch.bam.concat(mixed_aligned_ch.cram)
+        genome_ref = [file(params.genome_ref)]
     }
 
     /*
@@ -111,7 +101,7 @@ workflow gene_target_evaluation_workflow {
         Process BAM files to extract metrics
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
-    INDEX_BAM_FILES (bam_ch)
+    INDEX_BAM_FILE (bam_ch)
 
     // STAGE 1: Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
     GET_PER_BASE_STATS (
@@ -119,7 +109,8 @@ workflow gene_target_evaluation_workflow {
         bam_ch,
         params.min_bq_per_read,
         params.min_mq_per_read,
-        params.read_fail_tolerance
+        params.read_fail_tolerance,
+        genome_ref
     )
     ADD_TARGET_LABELS (
         GET_PER_BASE_STATS.out.parsed_pileup,
@@ -149,7 +140,8 @@ workflow gene_target_evaluation_workflow {
     if (params.output_raw_mpileup) {
         GET_PER_BASE_STATS_NO_PARSE (
             targets_bed,
-            bam_ch
+            bam_ch,
+            genome_ref
         )
     }
 
@@ -212,9 +204,14 @@ workflow gene_target_evaluation_workflow {
 
     // Stage 5: Generate visualization per target
     if (params.visualize) {
+
+        // sort plot data prior to plotting
+        plot_data_ch = GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.toSortedList { a, b -> a[2] <=> b[2] }.flatMap()
+
+        // visualization of target quality (target-level)
         GENERATE_VISUALIZATION (
-            GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[1]},
-            GET_PER_TARGET_AGGREGATED_STATS.out.per_target_aggregated.collect{it[2]},
+            plot_data_ch.collect{it[1]},
+            plot_data_ch.collect{it[2]},
             "plot",
             metrics_thresholds_and_headings
                 .findAll { k, v -> ['cov','bq','mq'].contains(k) }
