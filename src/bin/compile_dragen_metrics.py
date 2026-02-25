@@ -90,7 +90,7 @@ def main() -> None:
     with open(out_filename, "w") as out_dragen_metrics_tsv:
         # Write header
         out_dragen_metrics_tsv.write(
-            f"Metric (UOM)\t{rgsm}\tCategory\tThreshold\tFailureDirection\tStatus\n"
+            f"Metric (UOM)\tCategory\t{rgsm}\tFailureDirection\tThreshold\tStatus\n"
         )
 
         for metric_name, metric_val in all_dragen_metrics.items():
@@ -115,9 +115,9 @@ def main() -> None:
                 category, status = classify_metric(dragen_metric_obj, metric_val)
 
                 out_dragen_metrics_tsv.write(
-                    f"{formatted_metrics[0]}\t{formatted_metrics[1]}\t{category}"
-                    f"\t{dragen_metric_obj.fail_threshold}\t"
-                    f"{dragen_metric_obj.fail_direction or 'None'}\t{status}\n"
+                    f"{formatted_metrics[0]}\t{category}\t{formatted_metrics[1]}"
+                    f"\t{dragen_metric_obj.fail_direction or 'None'}\t"
+                    f"{dragen_metric_obj.fail_threshold}\t{status}\n"
                 )
 
 

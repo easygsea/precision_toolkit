@@ -64,12 +64,13 @@ nextflow run main.nf \
 - `--genome_ref`: Reference genome FASTA file. Required to process any input CRAM files.
 
 **Optional Parameters:**
-- `--target_evaluation_subdir`: Subdirectory for target evaluation results (default: target_evaluation)
+- `--target_evaluation_subdir`: Subdirectory for target evaluation results (default: target_evaluation).
 - `--output_raw_mpileup`: Flag to output raw mpileup file.
 - `--normalize_coverage`: If set, coverage across the targets bed for every sample is normalized and scaled to center on this value. This function is provided to improve comparability and adjust for variations in sequencing depth cross samples if needed.
 - `--visualize`: Flag to generate per-target level plots for each stat.
 
 **Fine-Tuning Parameters**
+- `--fail_percent_threshold`: Filtering threshold used for generating the 'common_regions_fail.bed' file (default = 10).
 - `--coverage_threshold`: Minimum coverage threshold for pass (default = 25).
 - `--baseq_threshold`: Minimum BASEQ threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--mapq_threshold`: Minimum MAPQ score threshold for pass, scored on first quartile of all reads per base (default = 30).
@@ -95,6 +96,7 @@ For example, when `--output_raw_mpileup` and `--visualize` is flagged:
 <output_dir>
 └── <target_evaluation_subdir>
     ├── all_libraries_per_base_metrics.scored.txt
+    ├── common_fail_regions.bed # Finds all libraries meeting a user specified failing threshold percent (default = 10%)
     ├── library_level   # Library specific per-base and per-target outputs
     │   ├── PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.scored.txt
     │   ├── PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
