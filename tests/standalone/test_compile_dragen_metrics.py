@@ -26,10 +26,10 @@ def _parse_script_output(
             fields = line.strip().split("\t")
             if len(fields) >= 3:
                 metric_name = fields[0]
-                value = None if fields[1] == "None" else float(fields[1])
-                category = fields[2]
-                threshold = None if fields[3] == "None" else float(fields[3])
-                failure_direction = None if fields[4] == "None" else fields[4]
+                category = fields[1]
+                value = None if fields[2] == "None" else float(fields[2])
+                failure_direction = None if fields[3] == "None" else fields[3]
+                threshold = None if fields[4] == "None" else float(fields[4])
                 status = None if fields[5] == "None" else fields[5]
 
             parsed_metrics[metric_name] = {
@@ -70,6 +70,13 @@ def _parse_script_output(
                     "failure_direction": None,
                     "status": None,
                 },
+                "PCT_TARGET_250X (%)": {
+                    "value": 86.3,
+                    "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
+                    "status": None,
+                },
             },
         ),
         (
@@ -96,6 +103,13 @@ def _parse_script_output(
                     "failure_direction": None,
                     "status": None,
                 },
+                "PCT_TARGET_250X (%)": {
+                    "value": None,
+                    "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
+                    "status": None,
+                },
             },
         ),
         (
@@ -116,6 +130,13 @@ def _parse_script_output(
                     "status": "Fail",
                 },
                 "PCT_CHIMERIC_READS (%)": {
+                    "value": None,
+                    "category": "Monitoring",
+                    "threshold": None,
+                    "failure_direction": None,
+                    "status": None,
+                },
+                "PCT_TARGET_250X (%)": {
                     "value": None,
                     "category": "Monitoring",
                     "threshold": None,
@@ -157,10 +178,10 @@ def test_compile_dragen_metrics(
         parsed_colnames, parsed_metrics = _parse_script_output(output_file)
         expected_colnames = [
             "Metric (UOM)",
-            rgsm,
             "Category",
-            "Threshold",
+            rgsm,
             "FailureDirection",
+            "Threshold",
             "Status",
         ]
 

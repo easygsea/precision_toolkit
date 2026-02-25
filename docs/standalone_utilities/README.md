@@ -74,10 +74,10 @@ compile-dragen-metrics --metrics-json-config <json_config> --analysis-dir <drage
 
 Example output:
 ```bash
-Metric (UOM)	<RGSM>	Category	Threshold	FailureDirection	Status
-TOTAL_PF_READS (Count)	100	Monitoring	None	None	None
-PCT_CONTAMINATION_EST (%)	0.01	Production	0.02	greater_than	Pass
-PCT_CHIMERIC_READS (%)	25.00	Monitoring	None	None	None
+Metric (UOM)	Category	<RGSM>	FailureDirection	Threshold   Status
+TOTAL_PF_READS (Count)	Monitoring  100 None	None	None
+PCT_CONTAMINATION_EST (%)	Production  0.01    greater_than    0.02	Pass
+PCT_CHIMERIC_READS (%)	Monitoring	25.00	None	None	None
 ```
 
 ## Convert Multi-Sample VCF File into Single-Sample VCF files

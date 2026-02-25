@@ -194,13 +194,16 @@ class DragenMetricsParser:
                     metric_properties,
                     factor_property_operations,
                 )
-                mapping_spec_dict = (
-                    ast.literal_eval(mapping_spec_str) if mapping_spec_str else {}
-                )
+                if filetype == "JSON":
+                    mapping_spec = mapping_spec_str if mapping_spec_str else ""
+                else:
+                    mapping_spec = (
+                        ast.literal_eval(mapping_spec_str) if mapping_spec_str else {}
+                    )
                 dragen_metric_obj = DragenMetric(
                     metric_group,
                     metric_name,
-                    mapping_spec_dict,
+                    mapping_spec,
                     default_val,
                     *properties,
                 )
@@ -246,7 +249,9 @@ class DragenMetricsParser:
         for dragen_metric_obj in name_to_metric_obj.values():
             metric_name = dragen_metric_obj.name
             spec_dict = dragen_metric_obj.mapping_spec
-            if spec_dict:  # skip derived metrics (don't have mapping specs)
+            if spec_dict and isinstance(
+                spec_dict, dict
+            ):  # skip derived metrics (don't have mapping specs)
                 metric_description = spec_dict["Row"][0]
                 metric_description_index = spec_dict["Row"][1]
                 metric_val_index = spec_dict["Col"][0]
@@ -315,6 +320,84 @@ class DragenMetricsParser:
 
         return metric_name_to_value
 
+    def _get_value_by_jsonpath_expr(self, json_data: dict, jsonpath_expr: str) -> str:
+        """
+        Extract value from nested JSON data using JSONPath expression.
+
+        Args:
+            json_data: Dictionary with data loaded from JSON source file.
+            jsonpath_expr: JSONPath expression (e.g., "$.PCT_EXON_50X").
+
+        Returns:
+            Value specified by JSONPath expression or "None" if not found.
+        """
+        # Remove '$' prefix and split into individual keys
+        keys = jsonpath_expr.removeprefix("$.").split(".")
+
+        # Traverse levels of nested JSON data by key
+        current_level_data = json_data
+        for key in keys:
+            if key in current_level_data.keys():
+                current_level_data = current_level_data[key]
+
+        return "None" if current_level_data == json_data else str(current_level_data)
+
+    def _parse_json(self, source_file_obj: SourceFile) -> dict[str, float | None]:
+        """
+        Parse JSON source file for metrics.
+
+        Args:
+            source_file_obj: SourceFile object.
+
+        Returns:
+            Dictionary mapping metric names to transformed value after applying scale
+            factor.
+        """
+        source_json_path = source_file_obj.filename
+        name_to_metric_obj = source_file_obj.dragen_metrics
+
+        # Load JSON file
+        with open(source_json_path, "r") as source_file:
+            json_data = json.load(source_file)
+
+        # Extract metrics using JSONPath expressions
+        metric_name_to_value: dict[str, float | None] = {}
+        for dragen_metric_obj in name_to_metric_obj.values():
+            metric_name = dragen_metric_obj.name
+            spec_jsonpath_expr = dragen_metric_obj.mapping_spec
+            if spec_jsonpath_expr and isinstance(
+                spec_jsonpath_expr, str
+            ):  # skip derived metrics (don't have mapping specs)
+                metric_val = self._get_value_by_jsonpath_expr(
+                    json_data, spec_jsonpath_expr
+                )
+                if metric_val in ("NA", "None", "nan"):
+                    # "Missing" value; replace with default missing value
+                    logging.warning(
+                        f"DRAGEN returned {metric_val} for {metric_name}. "
+                        f"Standardizing missing values and replacing with "
+                        f"default missing value: {dragen_metric_obj.default_val}."
+                    )
+                    scaled_value = dragen_metric_obj.default_val
+                else:
+                    # With missing values handled, all values should be float
+                    try:
+                        metric_val_float = float(metric_val)
+                        scaled_value = scale_metric(dragen_metric_obj, metric_val_float)
+
+                    except ValueError:
+                        # Invalid value; replace with default missing value
+                        logging.warning(
+                            f"Numeric type expected for {metric_name}, "
+                            f"but an invalid value was detected: {metric_val}. "
+                            f"Replacing with default missing value: "
+                            f"{dragen_metric_obj.default_val}."
+                        )
+                        scaled_value = dragen_metric_obj.default_val
+                metric_name_to_value[metric_name] = scaled_value
+
+        return metric_name_to_value
+
     def parse_metrics(self) -> dict[str, float | None]:
         """
         Parse metrics from all source files.
@@ -331,10 +414,13 @@ class DragenMetricsParser:
                 if source_file_obj.filetype == "CSV":
                     parsed_metrics = self._parse_csv(source_file_obj)
                     metric_name_to_value.update(parsed_metrics)
+                elif source_file_obj.filetype == "JSON":
+                    parsed_metrics = self._parse_json(source_file_obj)
+                    metric_name_to_value.update(parsed_metrics)
                 else:
                     logging.warning(
-                        f"Only CSV filetype is currently supported. Skipping "
-                        f"{source_file_obj.filename} with specified filetype: "
+                        f"Only CSV and JSON filetypes are currently supported. "
+                        f"Skipping {source_file_obj.filename} with specified filetype: "
                         f"{source_file_obj.filetype}."
                     )
             elif source_file_obj.allow_missing:
