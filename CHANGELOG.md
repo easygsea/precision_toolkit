@@ -9,6 +9,7 @@
 - Improvement: Added support for parsing metrics from JSON files in `compile-dragen-metrics`.
 - Improvement: Updated workflow to allow direct CRAM injection into mpileup, bypassing intermediate BAM generation and reducing overhead.
 - Bugfix: Fixed sorting inconsistency during plotting (now deterministic).
+- Bugfix: Fixed tract generation bug causing off-by-one error (indexing concordance now aligned).
 
 ---
 
