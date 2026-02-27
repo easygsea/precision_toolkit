@@ -367,6 +367,9 @@ def main() -> None:
             index=["RGSM"] + ([valid_group_col] if valid_group_col else []),
             columns="Metric (UOM)",
             values="Value",
+        ).reset_index().to_csv(
+            library_output_folder / "plot_data.csv",
+            index=False,
         )
 
 
