@@ -85,21 +85,25 @@ def parse_metrics_output_tsv(
     return pd.DataFrame(all_metrics)
 
 
-def parse_fastq_list_csv(fastq_list_file: Path, group_by: str) -> pd.DataFrame:
-    """Return a dataframe mapping RGSM to RGLB and group_by columns."""
+def get_rgsm_groupings(
+    fastq_list_file: Path, group_by: str
+) -> tuple[pd.DataFrame, str | None]:
+    """Validate group_by column name, then return a dataframe mapping RGSM to column."""
     fastq_list_df = pd.read_csv(fastq_list_file)
 
-    # Check if group_by column is present, otherwise set to None
+    # Check if group_by column is present
     if group_by not in fastq_list_df.columns:
         logging.warning(
-            f"'{group_by}' column not found in FASTQ list, thus plots will use default "
-            f"hue instead of grouping by {group_by}."
+            f"'{group_by}' column not found in FASTQ list, grouping won't be applied."
         )
-        fastq_list_df[group_by] = None
+        valid_group_col = None
+    else:
+        valid_group_col = group_by
 
-    # Return dataframe mapping RGSM to RGLB and group_by columns
+    # Return dataframe mapping RGSM to group_by column
     fastq_list_df_unique = fastq_list_df.drop_duplicates(subset=["RGSM"], keep="first")
-    return fastq_list_df_unique[["RGSM", "RGLB", group_by]]
+    cols = ["RGSM"] + ([valid_group_col] if valid_group_col else [])
+    return fastq_list_df_unique[cols], valid_group_col
 
 
 def determine_rgsm_order(df: pd.DataFrame, sort_metric: str | None) -> list[str]:
@@ -124,7 +128,7 @@ def plot_metrics(
     metrics_df: pd.DataFrame,
     thresholds: dict[str, list[float | None]],
     proposed_thresholds: dict[str, list[float | None]],
-    group_by: str,
+    group_col: str | None,
     sort_metric: str | None,
     output_folder: Path,
 ) -> None:
@@ -137,7 +141,7 @@ def plot_metrics(
         thresholds: Dictionary mapping metric names to threshold values (LSL and USL).
         proposed_thresholds: Dictionary mapping metric names to proposed threshold
             values (PROPOSED_LSL, PROPOSED_USL).
-        group_by: Column name to group samples by in plots.
+        group_col: Column name to group samples by in plots or None.
         sort_metric: Metric to sort plots by, in descending order, or None to sort by
             RGSM alphabetically.
         output_folder: Directory to save plots to.
@@ -170,23 +174,21 @@ def plot_metrics(
             data=plot_data,
             x="Value",
             y="RGSM",
-            hue=group_by,
+            hue=group_col,
             ax=axes[0],
             order=rgsm_order,
         )
         axes[0].grid(True, axis="both", ls="-")
         axes[0].set(xlabel=metric_name)
         axes[1] = sns.boxplot(
-            data=plot_data, x="Value", y=group_by, hue=group_by, ax=axes[1]
+            data=plot_data, x="Value", y=group_col, hue=group_col, ax=axes[1]
         )
         axes[1].grid(True, which="both", axis="both", ls="-")
         axes[1].set(xlabel=metric_name)
 
         # Add thresholds, if available
         if metric_name in thresholds.keys():
-            label_added = (
-                False  # keep track of this to avoid duplicate labels in legend
-            )
+            label_added = False  # track to avoid duplicate labels in legend
             for threshold in thresholds[metric_name]:
                 if threshold is not None:
                     label = "Threshold" if not label_added else None
@@ -198,9 +200,7 @@ def plot_metrics(
             axes[0].legend()
 
         if metric_name in proposed_thresholds.keys():
-            label_added = (
-                False  # keep track of this to avoid duplicate labels in legend
-            )
+            label_added = False  # # track to avoid duplicate labels in legend
             for threshold in proposed_thresholds[metric_name]:
                 if threshold is not None:
                     label = "Proposed" if not label_added else None
@@ -212,9 +212,14 @@ def plot_metrics(
             axes[0].legend()
 
         # Adjust legend
-        sns.move_legend(
-            axes[0], "center right", bbox_to_anchor=(1.54, 0.5), ncol=1, title=group_by
-        )
+        if group_col:
+            sns.move_legend(
+                axes[0],
+                "center right",
+                bbox_to_anchor=(1.54, 0.5),
+                ncol=1,
+                title=group_col,
+            )
 
         # Save plots and clean space
         plt.savefig(
@@ -273,19 +278,14 @@ def main() -> None:
     # Parse args
     args = parser.parse_args()
     metrics_json_config_path = Path(args.metrics_json_config)
+    group_by = args.group_by
     fastq_list_file_path = Path(args.fastq_list) if args.fastq_list else None
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True, parents=True)
 
-    # Validate --group-by
-    if args.group_by and not fastq_list_file_path:
+    # Validate args
+    if group_by and not fastq_list_file_path:
         logging.error("--group-by requires --fastq-list to be provided.")
-        exit()
-
-    # Default to grouping by "Pool", if --group-by is not set
-    group_by = args.group_by or "Pool"
-    if group_by in ("RGSM", "RGLB"):
-        logging.error("--group-by cannot be 'RGSM' or 'RGLB'.")
         exit()
 
     # Create parser just to get metrics to plot and metadata (e.g. UOM, LSL, etc.)
@@ -322,11 +322,13 @@ def main() -> None:
         )
     metrics_df = pd.concat(metrics_dfs, ignore_index=True)
 
-    # Parse FASTQ list (if provided) to reliably get library (RGLB) and group_by value
-    # for each RGSM
-    rgsm_to_metadata_df = pd.DataFrame(columns=["RGSM", "RGLB", group_by])
-    if fastq_list_file_path:
-        rgsm_to_metadata_df = parse_fastq_list_csv(fastq_list_file_path, group_by)
+    # If grouping is desired, parse FASTQ list to reliably get groupings for each RGSM
+    rgsm_to_metadata_df = pd.DataFrame(columns=["RGSM"])
+    valid_group_col = None
+    if group_by and fastq_list_file_path:
+        rgsm_to_metadata_df, valid_group_col = get_rgsm_groupings(
+            fastq_list_file_path, group_by
+        )
 
     # Generate plots and write plot data to file
     for library_type, library_metrics_df in metrics_df.groupby(
@@ -335,7 +337,7 @@ def main() -> None:
         metrics_with_metadata_df = (
             library_metrics_df.drop(columns="Library type")
             .merge(rgsm_to_metadata_df, on="RGSM", how="left")
-            .fillna({"RGLB": "Unknown", group_by: "Unknown"})
+            .fillna({valid_group_col: "Unknown"} if valid_group_col else {})
         )
 
         # Set output folder depending on library_type
@@ -349,16 +351,15 @@ def main() -> None:
             metrics_with_metadata_df,
             thresholds,
             proposed_thresholds,
-            group_by,
+            valid_group_col,
             args.sort_by,
             library_output_folder,
         )
 
         metrics_with_metadata_df.pivot(
-            index=["RGSM", "RGLB", group_by], columns="Metric (UOM)", values="Value"
-        ).reset_index().to_csv(
-            library_output_folder / "plot_data.csv",
-            index=False,
+            index=["RGSM"] + ([valid_group_col] if valid_group_col else []),
+            columns="Metric (UOM)",
+            values="Value",
         )
 
 
