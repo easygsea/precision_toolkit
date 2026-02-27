@@ -228,7 +228,7 @@ Of particular importance for `plot-dragen-metrics` is the `ReportedMetrics` sect
 - `PROPOSED_LSL`: proposed lower specification limit
 - `PROPOSED_USL`: proposed upper specification limit
 
-Metrics can be aggregated across runs and plotted together if multiple `MetricsOutput.tsv` files are supplied to `--metrics-files`. Within these plots, samples can be grouped and coloured by a column specified by `--group-by` if a [FASTQ list](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) is passed to `--fastq-list`. This FASTQ list should contain columns mapping each `RGSM` to its corresponding group. By default, samples are grouped by `Pool`.
+Metrics can be aggregated across runs and plotted together if multiple `MetricsOutput.tsv` files are supplied to `--metrics-files`. Within these plots, samples can be grouped and coloured by a column specified by `--group-by` if a [FASTQ list](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) is passed to `--fastq-list`. This FASTQ list should contain columns mapping each `RGSM` to its corresponding group.
 
 Usage:
 ```bash
