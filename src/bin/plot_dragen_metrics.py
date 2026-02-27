@@ -141,7 +141,7 @@ def plot_metrics(
         thresholds: Dictionary mapping metric names to threshold values (LSL and USL).
         proposed_thresholds: Dictionary mapping metric names to proposed threshold
             values (PROPOSED_LSL, PROPOSED_USL).
-        group_col: Column name to group samples by in plots or None.
+        group_col: Column name to group samples by in plots, or None.
         sort_metric: Metric to sort plots by, in descending order, or None to sort by
             RGSM alphabetically.
         output_folder: Directory to save plots to.
@@ -188,31 +188,30 @@ def plot_metrics(
 
         # Add thresholds, if available
         if metric_name in thresholds.keys():
-            label_added = False  # track to avoid duplicate labels in legend
             for threshold in thresholds[metric_name]:
                 if threshold is not None:
-                    label = "Threshold" if not label_added else None
                     axes[0].axvline(
-                        x=threshold, linewidth=2, color="orange", ls=":", label=label
+                        x=threshold,
+                        linewidth=2,
+                        color="orange",
+                        ls=":",
+                        label="Threshold",
                     )
                     axes[1].axvline(x=threshold, linewidth=2, color="orange", ls=":")
-                    label_added = True
-            axes[0].legend()
 
         if metric_name in proposed_thresholds.keys():
-            label_added = False  # # track to avoid duplicate labels in legend
             for threshold in proposed_thresholds[metric_name]:
                 if threshold is not None:
-                    label = "Proposed" if not label_added else None
                     axes[0].axvline(
-                        x=threshold, linewidth=2, color="blue", ls=":", label=label
+                        x=threshold, linewidth=2, color="blue", ls=":", label="Proposed"
                     )
                     axes[1].axvline(x=threshold, linewidth=2, color="blue", ls=":")
-                    label_added = True
-            axes[0].legend()
 
-        # Adjust legend
-        if group_col:
+        # Add and adjust position of legend if there are any handles
+        # (i.e. thresholds or groupings)
+        handles, _ = axes[0].get_legend_handles_labels()
+        if handles:
+            axes[0].legend()
             sns.move_legend(
                 axes[0],
                 "center right",
