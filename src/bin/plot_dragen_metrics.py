@@ -6,6 +6,11 @@ Usage:
     --metrics-files <metrics_output_tsv> [<metrics_output_tsv> ...]
     --output-folder <output_folder> [--fastq-list <dragen_fastq_list>]
     [--group-by <fastq_list_column_to_group_by>] [--sort-by <metric_to_sort_by>]
+
+Example usage:
+    plot-dragen-metrics --metrics-json-config minimal_config.json
+    --metrics-files TSO500_MetricsOutput.tsv --output-folder metrics_plots
+    --fastq-list /path/to/fastq_list.csv --group-by Pool --sort-by PCT_TARGET_50X (%)
 """
 
 import argparse
