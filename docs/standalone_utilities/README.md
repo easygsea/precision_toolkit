@@ -228,11 +228,11 @@ Of particular importance for `plot-dragen-metrics` is the `ReportedMetrics` sect
 - `PROPOSED_LSL`: proposed lower specification limit
 - `PROPOSED_USL`: proposed upper specification limit
 
-Metrics can be aggregated across runs and plotted together if multiple `MetricsOutput.tsv` files are supplied to `--metrics-files`. Within these plots, samples can be grouped and coloured by pool if a [FASTQ list](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files), which should contain columns mapping each `RGSM` to its corresponding `Pool`, is passed to `--fastq-list`.
+Metrics can be aggregated across runs and plotted together if multiple `MetricsOutput.tsv` files are supplied to `--metrics-files`. Within these plots, samples can be grouped and coloured by a column specified by `--group-by` if a [FASTQ list](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) is passed to `--fastq-list`. This FASTQ list should contain columns mapping each `RGSM` to its corresponding group. By default, samples are grouped by `Pool`.
 
 Usage:
 ```bash
-plot-dragen-metrics --metrics-json-config <json_config> --metrics-files <metrics_output_tsv> [<metrics_output_tsv> ...] --output-folder <output_folder> [--fastq-list <dragen_fastq_list>] [--sort-by <metric_to_sort_by>]
+plot-dragen-metrics --metrics-json-config <json_config> --metrics-files <metrics_output_tsv> [<metrics_output_tsv> ...] --output-folder <output_folder> [--fastq-list <dragen_fastq_list>] [--group-by <fastq_list_column_to_group_by>][--sort-by <metric_to_sort_by>]
 ```
 
 ## Pull Request Fetcher
