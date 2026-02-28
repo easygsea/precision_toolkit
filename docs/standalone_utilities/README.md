@@ -58,7 +58,7 @@ For example, given the following configuration file:
 }
 ```
 
-`compile-dragen-metrics` will look for the source file `<RGSM>_mapping_metrics.csv` in the directory passed to `--analysis-dir` and extract values for the metrics `TOTAL_PF_READS`, `MAPPED_READS`, `PCT_CHIMERIC_READS_BASE`, and `PCT_CONTAMINATION_EST`. As many metrics expressed as percentages are reported as counts in DRAGEN source files, further calculation is required. These metrics are specified with the `_BASE` suffix (e.g. `PCT_CHIMERIC_READS_BASE`), indicating that the reported count must be divided by `MAPPED_READS` to compute the corresponding percentage.
+`compile-dragen-metrics` will look for the source file `<RGSM>_mapping_metrics.csv` in each directory passed to `--analysis-dirs` and extract values for the metrics `TOTAL_PF_READS`, `MAPPED_READS`, `PCT_CHIMERIC_READS_BASE`, and `PCT_CONTAMINATION_EST`. As many metrics expressed as percentages are reported as counts in DRAGEN source files, further calculation is required. These metrics are specified with the `_BASE` suffix (e.g. `PCT_CHIMERIC_READS_BASE`), indicating that the reported count must be divided by `MAPPED_READS` to compute the corresponding percentage.
 
 Extracted QC metrics are written to `<RGSM>_MetricsOutput.tsv`, with metric names and values formatted according to attributes defined in the `Constants` section of the configuration file. Common attributes include:
 * `FACTOR`: scale **factor**
@@ -69,7 +69,7 @@ Metrics will also be classified as either "Monitoring" or "Production", with "Mo
 
 Usage:
 ```bash
-compile-dragen-metrics --metrics-json-config <json_config> --analysis-dir <dragen_backbone_analysis_dir> --rgsm <rgsm> --output-folder <output_folder>
+compile-dragen-metrics --metrics-json-config <json_config> --analysis-dirs <dragen_backbone_analysis_dir> [<dragen_backbone_analysis_dir> ...] --rgsm <rgsm> --output-folder <output_folder>
 ```
 
 Example output:
