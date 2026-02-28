@@ -21,14 +21,12 @@ logging.basicConfig(
 class DragenMetricsParser:
     """Parser for extracting metrics from DRAGEN analysis output files."""
 
-    def __init__(self, config_path: Path, analysis_dir: Path, rgsm: str):
+    def __init__(self, config_path: Path, rgsm: str):
         """
         Initialize parser for DRAGEN output files.
 
         Args:
             config_path: Path to JSON configuration specifying source files and metrics.
-            analysis_dir: Path to directory with DRAGEN analysis directory containing
-                source files.
             rgsm: RGSM prefixed to DRAGEN source file names
                 (e.g. <rgsm>.mapping_metrics.csv).
         """
@@ -39,7 +37,7 @@ class DragenMetricsParser:
         source_to_config = content.get("DataSources", {})
         self.reported_metric_names = content.get("ReportedMetrics", [])
         self.metric_group_to_sourcefile = self._build_metric_group_sources(
-            source_to_config, analysis_dir, rgsm
+            source_to_config, rgsm
         )
         self.metric_to_metric_obj = self._build_metric_lookup()
 
@@ -149,7 +147,7 @@ class DragenMetricsParser:
         )
 
     def _build_metric_group_sources(
-        self, source_to_config: dict[str, Any], analysis_dir: Path, rgsm: str
+        self, source_to_config: dict[str, Any], rgsm: str
     ) -> dict[str, SourceFile]:
         """
         Create SourceFile objects for each metric group.
@@ -160,7 +158,7 @@ class DragenMetricsParser:
         metric_group_to_sourcefile = {}
         for metric_group, config in source_to_config.items():
             # Prepare source file attributes
-            filename = analysis_dir / f"{rgsm}.{config.get('SourceName')}"
+            filename = Path(f"{rgsm}.{config.get('SourceName')}")
             filetype = config.get("SourceType")
             allow_missing = config.get("AllowSourceFileToBeMissing")
             default_val = config.get("DefaultValueOnMissing")
@@ -220,6 +218,16 @@ class DragenMetricsParser:
 
         return metric_group_to_sourcefile
 
+    def _resolve_source_filepath(
+        self, analysis_dirs: list[Path], source_filename: Path
+    ) -> Path | None:
+        """Return path to source file if it exists, otherwise None."""
+        for dir in analysis_dirs:
+            candidate_filepath = dir / source_filename
+            if candidate_filepath.is_file():
+                return candidate_filepath
+        return None
+
     def _build_metric_lookup(self) -> dict[str, DragenMetric]:
         """Map metric names to DragenMetric objects for quick lookup."""
         return {
@@ -230,20 +238,21 @@ class DragenMetricsParser:
             )
         }
 
-    def _parse_csv(self, source_file_obj: SourceFile) -> dict[str, float | None]:
+    def _parse_csv(
+        self, source_csv_path: Path, name_to_metric_obj: dict[str, DragenMetric]
+    ) -> dict[str, float | None]:
         """
         Parse CSV source file for metrics.
 
         Args:
-            source_file_obj: SourceFile object.
+            source_csv_path: Path to CSV source file.
+            name_to_metric_obj: Dictionary mapping metric names in source file to
+                DragenMetric objects.
 
         Returns:
             Dictionary mapping metric names to transformed value after applying scale
             factor.
         """
-        source_csv_path = source_file_obj.filename
-        name_to_metric_obj = source_file_obj.dragen_metrics
-
         # Create lookup dictionary from mapping specifications
         metric_lookup = {}
         for dragen_metric_obj in name_to_metric_obj.values():
@@ -342,20 +351,21 @@ class DragenMetricsParser:
 
         return "None" if current_level_data == json_data else str(current_level_data)
 
-    def _parse_json(self, source_file_obj: SourceFile) -> dict[str, float | None]:
+    def _parse_json(
+        self, source_json_path: Path, name_to_metric_obj: dict[str, DragenMetric]
+    ) -> dict[str, float | None]:
         """
         Parse JSON source file for metrics.
 
         Args:
-            source_file_obj: SourceFile object.
+            source_json_path: Path to JSON source file.
+            name_to_metric_obj: Dictionary mapping metric names in source file to
+                DragenMetric objects.
 
         Returns:
             Dictionary mapping metric names to transformed value after applying scale
             factor.
         """
-        source_json_path = source_file_obj.filename
-        name_to_metric_obj = source_file_obj.dragen_metrics
-
         # Load JSON file
         with open(source_json_path, "r") as source_file:
             json_data = json.load(source_file)
@@ -398,9 +408,13 @@ class DragenMetricsParser:
 
         return metric_name_to_value
 
-    def parse_metrics(self) -> dict[str, float | None]:
+    def parse_metrics(self, analysis_dirs: list[Path]) -> dict[str, float | None]:
         """
-        Parse metrics from all source files.
+        Resolve paths to all source files, then parse metrics.
+
+        Args:
+            analysis_dirs: Path(s) to one or more DRAGEN analysis directories containing
+                source files.
 
         Raises:
             FileNotFoundError: When a required source file is missing.
@@ -410,12 +424,19 @@ class DragenMetricsParser:
         """
         metric_name_to_value = {}
         for source_file_obj in self.metric_group_to_sourcefile.values():
-            if source_file_obj.filename.is_file():
+            source_filepath = self._resolve_source_filepath(
+                analysis_dirs, source_file_obj.filename
+            )
+            if source_filepath:
                 if source_file_obj.filetype == "CSV":
-                    parsed_metrics = self._parse_csv(source_file_obj)
+                    parsed_metrics = self._parse_csv(
+                        source_filepath, source_file_obj.dragen_metrics
+                    )
                     metric_name_to_value.update(parsed_metrics)
                 elif source_file_obj.filetype == "JSON":
-                    parsed_metrics = self._parse_json(source_file_obj)
+                    parsed_metrics = self._parse_json(
+                        source_filepath, source_file_obj.dragen_metrics
+                    )
                     metric_name_to_value.update(parsed_metrics)
                 else:
                     logging.warning(
@@ -424,10 +445,16 @@ class DragenMetricsParser:
                         f"{source_file_obj.filetype}."
                     )
             elif source_file_obj.allow_missing:
-                logging.warning(f"Source file {source_file_obj.filename} not found.")
+                logging.warning(
+                    f"Source file {source_file_obj.filename} not found in "
+                    f"any of the provided analysis directories: "
+                    f"{', '.join(str(d) for d in analysis_dirs)}."
+                )
             else:
                 raise FileNotFoundError(
-                    f"Source file {source_file_obj.filename} not found and is required."
+                    f"Source file {source_file_obj.filename} not found in "
+                    f"any of the provided analysis directories and is required: "
+                    f"{', '.join(str(d) for d in analysis_dirs)}."
                 )
 
             # Set default values for any metrics missing in source file
