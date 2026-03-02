@@ -195,3 +195,14 @@ def test_dragen_metrics_parser(
             assert parsed_val is None
         else:
             assert expected_val == pytest.approx(parsed_val)
+
+
+def test_dragen_metrics_parser_multiple_analysis_dirs(test_data_dir: Path) -> None:
+    """Test DragenMetricsParser resolves source file path."""
+    json_config_file = test_data_dir / "minimal_config.json"
+    dragen_metrics_parser = DragenMetricsParser(json_config_file, "sample")
+    parsed_metrics = dragen_metrics_parser.parse_metrics(
+        [Path("nonexistent_dir"), test_data_dir]
+    )
+
+    assert parsed_metrics["TOTAL_PF_READS"] == pytest.approx(100)
