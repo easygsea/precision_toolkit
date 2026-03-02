@@ -92,32 +92,33 @@ def main() -> None:
             f"Metric (UOM)\tCategory\t{rgsm}\tFailureDirection\tThreshold\tStatus\n"
         )
 
-        for metric_name, metric_val in all_dragen_metrics.items():
-            # Filter for reported metrics only
-            if metric_name in dragen_metrics_parser.reported_metric_names:
-                dragen_metric_obj = dragen_metrics_parser.metric_to_metric_obj[
-                    metric_name
-                ]
+        # Iterate through reported metric names to ensure consistent output order
+        # across samples
+        for reported_metric_name in dragen_metrics_parser.reported_metric_names:
+            dragen_metric_obj = dragen_metrics_parser.metric_to_metric_obj[
+                reported_metric_name
+            ]
+            metric_val = all_dragen_metrics[reported_metric_name]
 
-                # Format metric names (append unit) and values (appropriate number of
-                # decimal places)
-                if metric_val:
-                    formatted_metrics = format_metric(dragen_metric_obj, metric_val)
-                else:
-                    formatted_metrics = (
-                        f"{metric_name} ({dragen_metric_obj.unit})",
-                        str(metric_val),
-                    )
-
-                # Classify metric as either 'Monitoring' or 'Production' and if
-                # 'Production', PASS/FAIL based on threshold
-                category, status = classify_metric(dragen_metric_obj, metric_val)
-
-                out_dragen_metrics_tsv.write(
-                    f"{formatted_metrics[0]}\t{category}\t{formatted_metrics[1]}"
-                    f"\t{dragen_metric_obj.fail_direction or 'None'}\t"
-                    f"{dragen_metric_obj.fail_threshold}\t{status}\n"
+            # Format metric names (append unit) and values (appropriate number of
+            # decimal places)
+            if metric_val:
+                formatted_metrics = format_metric(dragen_metric_obj, metric_val)
+            else:
+                formatted_metrics = (
+                    f"{reported_metric_name} ({dragen_metric_obj.unit})",
+                    str(metric_val),
                 )
+
+            # Classify metric as either 'Monitoring' or 'Production' and if
+            # 'Production', PASS/FAIL based on threshold
+            category, status = classify_metric(dragen_metric_obj, metric_val)
+
+            out_dragen_metrics_tsv.write(
+                f"{formatted_metrics[0]}\t{category}\t{formatted_metrics[1]}"
+                f"\t{dragen_metric_obj.fail_direction or 'None'}\t"
+                f"{dragen_metric_obj.fail_threshold}\t{status}\n"
+            )
 
 
 if __name__ == "__main__":

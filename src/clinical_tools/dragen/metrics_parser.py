@@ -40,6 +40,7 @@ class DragenMetricsParser:
             source_to_config, rgsm
         )
         self.metric_to_metric_obj = self._build_metric_lookup()
+        self._validate_reported_metrics()
 
     def _split_metric_property(self, metric_property: str) -> tuple[str, str]:
         """
@@ -217,6 +218,23 @@ class DragenMetricsParser:
             )
 
         return metric_group_to_sourcefile
+
+    def _validate_reported_metrics(self) -> None:
+        """Filter reported_metric_names to only those present in JSON configuration."""
+        valid_metrics = self.metric_to_metric_obj.keys()
+        all_reported_metrics = set(self.reported_metric_names)
+        invalid_metrics = all_reported_metrics - valid_metrics
+        self.reported_metric_names = [
+            metric_name
+            for metric_name in self.reported_metric_names
+            if metric_name in valid_metrics
+        ]
+
+        if invalid_metrics:
+            logging.warning(
+                f"The following metrics will not be reported as source file details "
+                f"are not contained in JSON configuration: {invalid_metrics}."
+            )
 
     def _resolve_source_filepath(
         self, analysis_dirs: list[Path], source_filename: Path
