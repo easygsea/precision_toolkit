@@ -10,11 +10,12 @@ Usage:
 Example usage:
     plot-dragen-metrics --metrics-json-config minimal_config.json
     --metrics-files TSO500_MetricsOutput.tsv --output-folder metrics_plots
-    --fastq-list /path/to/fastq_list.csv --group-by Pool --sort-by PCT_TARGET_50X (%)
+    --fastq-list fastq_list.csv --group-by Sex --sort-by 'PCT_TARGET_250X (%)'
 """
 
 import argparse
 import logging
+import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -293,7 +294,7 @@ def main() -> None:
     # Validate args
     if group_by and not fastq_list_file_path:
         logging.error("--group-by requires --fastq-list to be provided.")
-        exit()
+        sys.exit(1)
 
     # Create parser just to get metrics to plot and metadata (e.g. UOM, LSL, etc.)
     # for each metric
