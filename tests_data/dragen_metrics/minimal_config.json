@@ -23,6 +23,7 @@
                 "MAPPED_READS.FACTOR": 0.0001,
                 "PCT_CHIMERIC_READS.UOM": "%",
                 "PCT_CHIMERIC_READS.RAD": 2,
+                "PCT_CHIMERIC_READS.USL": 8.0,
                 "PCT_CHIMERIC_READS.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.UOM": "%",
