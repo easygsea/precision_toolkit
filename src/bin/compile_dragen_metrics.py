@@ -4,8 +4,8 @@ Parse DRAGEN output files to compile backbone-level metrics specified in JSON co
 
 Usage:
     compile-dragen-metrics --metrics-json-config <json_config>
-    --analysis-dir <dragen_backbone_analysis_dir> --rgsm <rgsm>
-    --output-folder <output_folder>
+    --analysis-dirs <dragen_backbone_analysis_dir> [<dragen_backbone_analysis_dir> ...]
+    --rgsm <rgsm> --output-folder <output_folder>
 """
 
 import argparse
@@ -41,8 +41,9 @@ def main() -> None:
     )
     parser.add_argument(
         "-a",
-        "--analysis-dir",
-        help="Path to directory with DRAGEN analysis results.",
+        "--analysis-dirs",
+        nargs="+",
+        help="Path(s) to one or more directories with DRAGEN analysis results.",
         required=True,
     )
     parser.add_argument(
@@ -61,17 +62,15 @@ def main() -> None:
     # Parse args
     args = parser.parse_args()
     metrics_json_config_path = Path(args.metrics_json_config)
-    analysis_folder = Path(args.analysis_dir)
+    analysis_folders = [Path(dir) for dir in args.analysis_dirs]
     rgsm = args.rgsm
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True, parents=True)
 
     # Parse valid metrics (specified in JSON config) from DRAGEN output files or replace
     # with default value if not present
-    dragen_metrics_parser = DragenMetricsParser(
-        metrics_json_config_path, analysis_folder, rgsm
-    )
-    all_dragen_metrics = dragen_metrics_parser.parse_metrics()
+    dragen_metrics_parser = DragenMetricsParser(metrics_json_config_path, rgsm)
+    all_dragen_metrics = dragen_metrics_parser.parse_metrics(analysis_folders)
 
     # Calculate remaining metrics not directly output by DRAGEN, if valid (i.e. in JSON
     # config)
@@ -93,32 +92,33 @@ def main() -> None:
             f"Metric (UOM)\tCategory\t{rgsm}\tFailureDirection\tThreshold\tStatus\n"
         )
 
-        for metric_name, metric_val in all_dragen_metrics.items():
-            # Filter for reported metrics only
-            if metric_name in dragen_metrics_parser.reported_metric_names:
-                dragen_metric_obj = dragen_metrics_parser.metric_to_metric_obj[
-                    metric_name
-                ]
+        # Iterate through reported metric names to ensure consistent output order
+        # across samples
+        for reported_metric_name in dragen_metrics_parser.reported_metric_names:
+            dragen_metric_obj = dragen_metrics_parser.metric_to_metric_obj[
+                reported_metric_name
+            ]
+            metric_val = all_dragen_metrics[reported_metric_name]
 
-                # Format metric names (append unit) and values (appropriate number of
-                # decimal places)
-                if metric_val:
-                    formatted_metrics = format_metric(dragen_metric_obj, metric_val)
-                else:
-                    formatted_metrics = (
-                        f"{metric_name} ({dragen_metric_obj.unit})",
-                        str(metric_val),
-                    )
-
-                # Classify metric as either 'Monitoring' or 'Production' and if
-                # 'Production', PASS/FAIL based on threshold
-                category, status = classify_metric(dragen_metric_obj, metric_val)
-
-                out_dragen_metrics_tsv.write(
-                    f"{formatted_metrics[0]}\t{category}\t{formatted_metrics[1]}"
-                    f"\t{dragen_metric_obj.fail_direction or 'None'}\t"
-                    f"{dragen_metric_obj.fail_threshold}\t{status}\n"
+            # Format metric names (append unit) and values (appropriate number of
+            # decimal places)
+            if metric_val:
+                formatted_metrics = format_metric(dragen_metric_obj, metric_val)
+            else:
+                formatted_metrics = (
+                    f"{reported_metric_name} ({dragen_metric_obj.unit})",
+                    str(metric_val),
                 )
+
+            # Classify metric as either 'Monitoring' or 'Production' and if
+            # 'Production', PASS/FAIL based on threshold
+            category, status = classify_metric(dragen_metric_obj, metric_val)
+
+            out_dragen_metrics_tsv.write(
+                f"{formatted_metrics[0]}\t{category}\t{formatted_metrics[1]}"
+                f"\t{dragen_metric_obj.fail_direction or 'None'}\t"
+                f"{dragen_metric_obj.fail_threshold}\t{status}\n"
+            )
 
 
 if __name__ == "__main__":
