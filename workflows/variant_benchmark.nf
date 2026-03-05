@@ -100,7 +100,8 @@ def validate_ci_method(method) {
     }
 }
 
-// Include the variant benchmark subworkflow
+// Include the prepare_variant_benchmark_inputs and variant benchmark subworkflows
+include { prepare_variant_benchmark_inputs } from '../subworkflows/prepare_variant_benchmark_inputs/main'
 include { variant_benchmark_workflow } from '../subworkflows/variant_benchmark/main'
 
 workflow variant_benchmark {
@@ -112,5 +113,11 @@ workflow variant_benchmark {
     if (params.variant_benchmark_engine in ['happy', 'sompy']) {
         validate_genome_ref(params.genome_ref)
     }
-    variant_benchmark_workflow()
+    def variant_benchmark_inputs = prepare_variant_benchmark_inputs()
+    variant_benchmark_workflow(
+        variant_benchmark_inputs.vcf_pairs,
+        variant_benchmark_inputs.vcf_tbi_pairs,
+        variant_benchmark_inputs.curated_vcf_pairs,
+        variant_benchmark_inputs.curated_vcf_tbi_pairs,
+    )
 }

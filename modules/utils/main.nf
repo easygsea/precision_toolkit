@@ -22,7 +22,7 @@ def build_vcf_pair_channels(truth_dir, query_dir) {
             def sample_name = truth_vcf.getName().replaceFirst(/\..*$/, "")
             def query_vcf = file("${query_dir}/${sample_name}.*.vcf.gz") ?:
                             file("${query_dir}/${sample_name}.*.vcf")
-            return tuple(sample_name, truth_vcf, query_vcf)
+            return tuple(sample_name, truth_vcf, query_vcf[0])
         }
 }
 
