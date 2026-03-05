@@ -5,7 +5,9 @@
 ---
 
 ### v1.2.1 - 2026-04-XX
+- Improvement: Add `length` tag to contig header lines in lifted VCF output by `liftover_sv_vcf.sh`.
 - Improvement: Refactor container creation to use a cached base image.
+
 ---
 
 ### v1.2.0 - 2026-03-27
