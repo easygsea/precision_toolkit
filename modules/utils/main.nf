@@ -46,20 +46,26 @@ def process_spurious_variants(vcf_pairs, spurious_variants_vcf_path, collapse) {
     def spurious_variants_vcf_gz = spurious_variants_vcf.toString().endsWith('.gz') ?
         spurious_variants_vcf : file("${spurious_variants_vcf}.gz")
     if (!spurious_variants_vcf_gz.exists()) {
-        spurious_variants_vcf_gz = bgzip_vcf(file(spurious_variants_vcf)).gzipped_vcf
+        spurious_variants_vcf_gz = bgzip_vcf(
+            tuple("spurious_variants", file(spurious_variants_vcf))
+        ).gzipped_vcf.map { label, vcf -> vcf }
     }
 
     // Check and index spurious variants VCF
     def spurious_variants_vcf_tbi = file("${spurious_variants_vcf_gz}.tbi")
     if (!spurious_variants_vcf_tbi.exists()) {
-        spurious_variants_vcf_tbi = index_spurious_variants_original_vcf(spurious_variants_vcf_gz).indexed_vcf
+        spurious_variants_vcf_tbi = index_spurious_variants_original_vcf(
+            tuple("spurious_variants", spurious_variants_vcf_gz)
+        ).indexed_vcf.map { label, tbi -> tbi}
     }
 
     // Normalize spurious variants VCF
     def normalized_spurious_variants_vcf = normalize_vcf(spurious_variants_vcf_gz, spurious_variants_vcf_tbi).normalized_vcf
 
     // Index normalized spurious variants VCF
-    def normalized_spurious_variants_vcf_tbi = index_spurious_variants_normalized_vcf(normalized_spurious_variants_vcf).indexed_vcf
+    def normalized_spurious_variants_vcf_tbi = index_spurious_variants_normalized_vcf(
+        tuple("spurious_variants_normalized", normalized_spurious_variants_vcf)
+    ).indexed_vcf.map { label, tbi -> tbi}
 
     def truth_vcfs = vcf_pairs.map { sample_name, truth_vcf, query_vcf -> tuple(sample_name, truth_vcf) }
     def query_vcfs = vcf_pairs.map { sample_name, truth_vcf, query_vcf -> tuple(sample_name, query_vcf) }
