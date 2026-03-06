@@ -13,19 +13,30 @@ class TruvariDataParser:
 
     @staticmethod
     def process_truvari_output(
-        summary_file_path: Path | str, params_file_path: Path | str
+        file_path: Path | str,
     ) -> Sequence[VariantCallMetrics]:
         """
         Process the Truvari output files to extract metrics information.
 
         Args:
-            summary_file_path: Path to the summary.json output file
-            params_file_path: Path to the params.json output file
+            file_path: Path to the summary.json output file.
+
+        Raises:
+            FileNotFoundError: When params.json is not found in the same directory as
+                file_path.
 
         Returns:
-            Sequence of VariantCallMetrics objects containing processed data
+            Sequence of VariantCallMetrics objects containing processed data.
         """
-        # Get VariantCallFilter from params JSON
+        # Derive path to params.json which truvari outputs alongside summary.json
+        params_file_path = Path(file_path).parent / "params.json"
+        if not params_file_path.exists():
+            raise FileNotFoundError(
+                f"{params_file_path} not found. Ensure params.json is present in the "
+                f"same directory as {file_path}. "
+            )
+
+        # Get VariantCallFilter from params.json
         try:
             with open(params_file_path, "r") as params_file:
                 params_data = json.load(params_file)
@@ -35,9 +46,9 @@ class TruvariDataParser:
             logging.error(f"Failed to process file {params_file_path}: {str(e)}")
             raise
 
-        # Parse VCFs to remaining metrics
+        # Parse summary.json to get remaining metrics
         try:
-            with open(summary_file_path, "r") as summary_file:
+            with open(file_path, "r") as summary_file:
                 summary_data = json.load(summary_file)
 
             try:
@@ -59,5 +70,5 @@ class TruvariDataParser:
             return [metrics]
 
         except Exception as e:
-            logging.error(f"Failed to process file {summary_file_path}: {str(e)}")
+            logging.error(f"Failed to process file {file_path}: {str(e)}")
             raise
