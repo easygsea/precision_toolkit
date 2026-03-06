@@ -98,7 +98,7 @@ process run_truvari_bench {
     publishDir "${params.output_dir}/${output_dir ?: ''}/truvari", mode: 'copy'
 
     input:
-    tuple val(sample_name), path(truth_vcf), path(query_vcf)
+    tuple val(sample_name), path(truth_vcf), path(truth_tbi), path(query_vcf), path(query_tbi)
     path genome_ref
     path genome_fai
     val truvari_options
@@ -106,9 +106,9 @@ process run_truvari_bench {
     val label
 
     output:
-    path("*summary.json"), emit: truvari_bench_summary
-    path("*params.json"), emit: truvari_bench_parameters
-    path("${sample_name}.${label}"), emit: truvari_output_dir
+    path("*/*summary.json"), emit: truvari_bench_summary
+    path("*/params.json"), emit: truvari_bench_parameters
+    tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
 
     script:
     PREFIX = "${sample_name}.${label}"
@@ -118,7 +118,7 @@ process run_truvari_bench {
         --comp "${query_vcf}" \
         --reference "${genome_ref}" \
         --output "${PREFIX}" \
-        "${truvari_options}"
+        ${truvari_options}
     mv "${PREFIX}/summary.json" "${PREFIX}/${PREFIX}.summary.json"
     """
 }
@@ -129,19 +129,31 @@ process run_truvari_refine {
     publishDir "${params.output_dir}/${output_dir ?: ''}/truvari", mode: 'copy'
 
     input:
-    val sample_name
+    tuple val(sample_name), path(truvari_bench_results)
+    path genome_ref
+    path genome_fai
     val truvari_options
-    path truvari_output_dir
     val output_dir
+    val label
 
     output:
-    path("*refine.variant_summary.json"), emit: truvari_refine_summary
+    path("*/*refine.variant_summary.json"), emit: truvari_refine_summary
+    tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
 
     script:
+    PREFIX = "${sample_name}.${label}"
     """
     truvari refine \
-        "${truvari_output_dir}" \
-        "${truvari_options}"
+        --reference "${genome_ref}" \
+        ${truvari_options} \
+        "${truvari_bench_results}"
+
+    # Rename file if regions were refined, otherwise copy original truvari bench summmary as refine outputs are not generated when unsuccessful
+    if [[ -f "${PREFIX}/refine.variant_summary.json" ]]; then
+        mv "${PREFIX}/refine.variant_summary.json" "${PREFIX}/${PREFIX}.refine.variant_summary.json"
+    else
+        cp "${PREFIX}/${PREFIX}.summary.json" "${PREFIX}/${PREFIX}.refine.variant_summary.json"
+    fi
     """
 }
 
