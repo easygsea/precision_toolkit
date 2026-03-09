@@ -16,6 +16,7 @@ Example usage:
 import argparse
 import logging
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -28,7 +29,7 @@ from clinical_tools.dragen.utils import format_metric
 
 def parse_metrics_output_tsv(
     metrics_file: Path, reported_metrics: list[str]
-) -> pd.DataFrame:
+) -> tuple[pd.DataFrame, dict[str, set[float]]]:
     """
     Parse specified metrics from MetricsOutput.tsv and returns dataframes.
 
@@ -38,15 +39,22 @@ def parse_metrics_output_tsv(
             (e.g. PCT_TARGET_50X (%)).
 
     Returns:
-        Long-format dataframe of metrics with columns RGSM, Metrics (UOM), Value, and
-        Library type.
+        - Long-format dataframe of metrics with columns RGSM, Metrics (UOM), Value, and
+            Library type.
+        - Dictionary mapping metric names to sets of LSL/USL values.
     """
     all_metrics = []
+    parsed_suggested_limits: dict[str, set[float]] = defaultdict(set)
 
     library_type = None
+    nan_vals = {"NA", "None", "nan"}
     with open(metrics_file, "r") as metrics_tsv:
         # Tracking per table in case rgsm are not ordered the same between tables
         index_to_rgsm_col = {}
+        # Refers to LSL/USL Guidelines only present in TSO500's MetricsOutput.tsv;
+        # this, in addition to other suggested limits provided in the JSON config, are
+        # used for plot annotation later
+        specification_limit_col_indices = []
         for line in metrics_tsv:
             if line.startswith("[") and line.strip().endswith("]"):
                 # This applies to TSO500's MetricOutput.tsv where headers preceding
@@ -56,12 +64,11 @@ def parse_metrics_output_tsv(
                 library_type = "RNA" if "RNA" in line else "DNA"
             elif line.startswith("Metric (UOM)"):
                 col_names = line.strip().split("\t")
-                index_to_rgsm_col = {
-                    idx: col_name
-                    for idx, col_name in enumerate(col_names)
-                    if col_name
-                    not in ("USL Guideline", "LSL Guideline", "Metric (UOM)")
-                }
+                for idx, col_name in enumerate(col_names):
+                    if col_name in ("LSL Guideline", "USL Guideline"):
+                        specification_limit_col_indices.append(idx)
+                    elif col_name != "Metric (UOM)":
+                        index_to_rgsm_col[idx] = col_name
             else:
                 fields = line.strip().split("\t")
                 metric = fields[0]
@@ -69,21 +76,27 @@ def parse_metrics_output_tsv(
                 if metric not in reported_metrics:
                     continue
                 else:
-                    # Create a separate row for each RGSM's value then append to
-                    # appropriate list (dna/rna_library_metrics)
+                    parsed_suggested_limits[metric].update(
+                        float(fields[idx])
+                        for idx in specification_limit_col_indices
+                        if fields[idx] not in nan_vals
+                    )
+
+                    # Create a separate row for each RGSM's metric value, resulting in a
+                    # long-formatted dataframe
                     for idx, rgsm in index_to_rgsm_col.items():
                         row = {
                             "RGSM": rgsm,
                             "Metric (UOM)": metric,
                             "Value": (
-                                float(fields[idx]) if fields[idx] != "None" else None
+                                None if fields[idx] in nan_vals else float(fields[idx])
                             ),
                             "Library type": library_type,
                         }
 
                         all_metrics.append(row)
 
-    return pd.DataFrame(all_metrics)
+    return pd.DataFrame(all_metrics), parsed_suggested_limits
 
 
 def get_rgsm_groupings(
@@ -127,8 +140,8 @@ def determine_rgsm_order(df: pd.DataFrame, sort_metric: str | None) -> list[str]
 
 def plot_metrics(
     metrics_df: pd.DataFrame,
-    thresholds: dict[str, list[float | None]],
-    proposed_thresholds: dict[str, list[float | None]],
+    fail_thresholds: dict[str, float | None],
+    suggested_limits: dict[str, set[float | None]],
     group_col: str | None,
     sort_metric: str | None,
     output_folder: Path,
@@ -139,9 +152,9 @@ def plot_metrics(
     Args:
         metrics_df: Long-format dataframe with columns RGSM, Metric (UOM), Value, and
             group_by column.
-        thresholds: Dictionary mapping metric names to threshold values (LSL and USL).
-        proposed_thresholds: Dictionary mapping metric names to proposed threshold
-            values (PROPOSED_LSL, PROPOSED_USL).
+        fail_thresholds: Dictionary mapping metric names to threshold values.
+        suggested_limits: Dictionary mapping metric names to suggested limit
+            values (LSL, USL).
         group_col: Column name to group samples by in plots, or None.
         sort_metric: Metric to sort plots by, in descending order, or None to sort by
             RGSM alphabetically.
@@ -195,26 +208,29 @@ def plot_metrics(
         axes[1].grid(True, which="both", axis="both", ls="-")
         axes[1].set(xlabel=metric_name)
 
-        # Add thresholds, if available
-        if metric_name in thresholds.keys():
-            for threshold in thresholds[metric_name]:
+        if metric_name in fail_thresholds.keys():
+            threshold = fail_thresholds[metric_name]
+            if threshold is not None:
+                axes[0].axvline(
+                    x=threshold,
+                    linewidth=2,
+                    color="orange",
+                    ls=":",
+                    label="Failure\nthreshold",
+                )
+                axes[1].axvline(x=threshold, linewidth=2, color="orange", ls=":")
+
+        if metric_name in suggested_limits.keys():
+            for threshold in suggested_limits[metric_name]:
                 if threshold is not None:
                     axes[0].axvline(
                         x=threshold,
                         linewidth=2,
-                        color="orange",
+                        color="blue",
                         ls=":",
-                        label="Threshold",
+                        label="Suggested\nlimit",
                     )
-                    axes[1].axvline(x=threshold, linewidth=2, color="orange", ls=":")
-
-        if metric_name in proposed_thresholds.keys():
-            for threshold in proposed_thresholds[metric_name]:
-                if threshold is not None:
-                    axes[0].axvline(
-                        x=threshold, linewidth=2, color="blue", ls=":", label="Proposed"
-                    )
-                    axes[1].axvline(x=threshold, linewidth=2, color="blue", ls=":")
+                    axes[1].axvline(x=threshold, linewidth=2, color="black", ls=":")
 
         # Add and adjust position of legend if there are any handles
         # (i.e. thresholds or groupings)
@@ -301,8 +317,8 @@ def main() -> None:
     dragen_metrics_parser = DragenMetricsParser(metrics_json_config_path, Path(), "")
 
     metrics_to_plot = []
-    thresholds = {}
-    proposed_thresholds = {}
+    fail_thresholds = {}
+    suggested_limits = {}
     for metric_name in dragen_metrics_parser.reported_metric_names:
         dragen_metric_obj = dragen_metrics_parser.metric_to_metric_obj[metric_name]
 
@@ -310,24 +326,24 @@ def main() -> None:
         formatted_metric_name, _ = format_metric(dragen_metric_obj, None)
         metrics_to_plot.append(formatted_metric_name)
 
-        # Set thresholds and proposed thresholds; default to None if not present
+        # Set thresholds and limits; default to None if not present
+        fail_thresholds[formatted_metric_name] = dragen_metric_obj.fail_threshold
         metric_attributes = dragen_metric_obj.other_properties
-        thresholds[formatted_metric_name] = [
+        suggested_limits[formatted_metric_name] = {
             metric_attributes.get("LSL"),
             metric_attributes.get("USL"),
-        ]
-        proposed_thresholds[formatted_metric_name] = [
-            metric_attributes.get("PROPOSED_LSL"),
-            metric_attributes.get("PROPOSED_USL"),
-        ]
+        }
 
     # Parse each MetricsOutput.tsv and convert into a dataframe with columns RGSM,
     # Metric (UOM), Value, and Library type
     metrics_dfs = []
     for metrics_file in args.metrics_files:
-        metrics_dfs.append(
-            parse_metrics_output_tsv(Path(metrics_file), metrics_to_plot)
+        parsed_metrics_df, parsed_suggested_limits = parse_metrics_output_tsv(
+            Path(metrics_file), metrics_to_plot
         )
+        for metric, limits in parsed_suggested_limits.items():
+            suggested_limits[metric] |= limits
+        metrics_dfs.append(parsed_metrics_df)
     metrics_df = pd.concat(metrics_dfs, ignore_index=True)
 
     # If grouping is desired, parse FASTQ list to reliably get groupings for each RGSM
@@ -357,8 +373,8 @@ def main() -> None:
 
         plot_metrics(
             metrics_with_metadata_df,
-            thresholds,
-            proposed_thresholds,
+            fail_thresholds,
+            suggested_limits,
             valid_group_col,
             args.sort_by,
             library_output_folder,
