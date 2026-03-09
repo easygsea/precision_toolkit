@@ -2,15 +2,15 @@
 Plot backbone-level metrics in DRAGEN's MetricsOutput.tsv file(s).
 
 Usage:
-    plot-dragen-metrics --metrics-json-config <json_config>
+    plot-dragen-metrics --metrics-json-config <config_json>
     --metrics-files <metrics_output_tsv> [<metrics_output_tsv> ...]
-    --output-folder <output_folder> [--fastq-list <dragen_fastq_list>]
-    [--group-by <fastq_list_column_to_group_by>] [--sort-by <metric_to_sort_by>]
+    --output-folder <output_folder> [--fastq-list <dragen_fastq_list_csv>]
+    [--group-by <column_name_from_fastq_list>] [--sort-by <metric_from_metrics_files>]
 
 Example usage:
     plot-dragen-metrics --metrics-json-config minimal_config.json
     --metrics-files TSO500_MetricsOutput.tsv --output-folder metrics_plots
-    --fastq-list fastq_list.csv --group-by Sex --sort-by 'PCT_TARGET_250X (%)'
+    --fastq-list fastq_list.csv --group-by 'Sex' --sort-by 'PCT_TARGET_250X (%)'
 """
 
 import argparse
@@ -36,7 +36,7 @@ def parse_metrics_output_tsv(
     Args:
         metrics_file: Path to MetricsOutput.tsv.
         reported_metrics: List of metrics to plot, where names should include the units
-            (e.g. PCT_TARGET_50X (%)).
+            (e.g. 'PCT_TARGET_50X (%)').
 
     Returns:
         - Long-format dataframe of metrics with columns RGSM, Metrics (UOM), Value, and
@@ -296,7 +296,8 @@ def main() -> None:
     parser.add_argument(
         "-s",
         "--sort-by",
-        help="Metric name to sort plots by (e.g. PCT_TARGET_50X (%)).",
+        help="Metric name in DRAGEN's MetricsOutput.tsv to sort plots by "
+        "(e.g. PCT_TARGET_50X (%)).",
         default=None,
     )
     parser.add_argument(

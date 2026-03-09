@@ -81,6 +81,8 @@ PCT_CONTAMINATION_EST (%)	Production  0.01    greater_than    0.02	Pass
 PCT_CHIMERIC_READS (%)	Monitoring	25.00	None	None	None
 ```
 
+For detailed documentation of how to prepare the configuration file, see [Summarizing DRAGEN QC metrics with `compile-dragen-metrics` and `plot-dragen-metrics`](compile_and_plot_dragen_metrics.md).
+
 ## Convert Multi-Sample VCF File into Single-Sample VCF files
 
 The `convert-multi-sample-vcf` tool allows to convert multi-sample VCF file into a folder of multiple single-sample VCFs for better analysis of each individual sample.
@@ -223,17 +225,22 @@ Example usage is provided in the [Variant Benchmark](../workflows/variant_benchm
 The `plot-dragen-metrics` tool generates summary plots for backbone QC metrics in the `MetricsOutput.tsv` file(s) output by DRAGEN. Plot settings (i.e. metrics to plot, thresholds, proposed thresholds) are specified in a JSON-formatted configuration file. If `compile-dragen-metrics` was used previously, the same configuration file can be supplied to `plot-dragen-metrics` — refer to the [`compile-dragen-metrics` documentation](#compile-dragen-metrics) for an example.
 
 Of particular importance for `plot-dragen-metrics` is the `ReportedMetrics` section, which specifies the metrics to plot, and the following attributes defined in the `Constants` section, as these are used to annotate plots with threshold lines:
-- `LSL`: lower specification limit
-- `USL`: upper specification limit
-- `PROPOSED_LSL`: proposed lower specification limit
-- `PROPOSED_USL`: proposed upper specification limit
+
+- `LSL`: suggested lower specification limit
+- `USL`: suggested upper specification limit
+
+QC failure thresholds defined in the `Failures` section are also displayed on the plots.
 
 Metrics can be aggregated across runs and plotted together if multiple `MetricsOutput.tsv` files are supplied to `--metrics-files`. Within these plots, samples can be grouped and coloured by a column specified by `--group-by` if a [FASTQ list](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) is passed to `--fastq-list`. This FASTQ list should contain columns mapping each `RGSM` to its corresponding group.
 
+By default, samples appear alphabetically in the plots. Use `--sort-by` to order samples in descending order by a particular metric. The same ordering is applied across all plots. Note that the metric name supplied to `--sort-by` must match the labels used in the plots, including the units (e.g., `--sort-by 'PCT_TARGET_250X (%)'`).
+
 Usage:
 ```bash
-plot-dragen-metrics --metrics-json-config <json_config> --metrics-files <metrics_output_tsv> [<metrics_output_tsv> ...] --output-folder <output_folder> [--fastq-list <dragen_fastq_list>] [--group-by <fastq_list_column_to_group_by>][--sort-by <metric_to_sort_by>]
+plot-dragen-metrics --metrics-json-config <config_json> --metrics-files <metrics_output_tsv> [<metrics_output_tsv> ...] --output-folder <output_folder> [--fastq-list <dragen_fastq_list_csv>] [--group-by <column_name_from_fastq_list>] [--sort-by <metric_from_metrics_files>]
 ```
+
+For detailed documentation of how to prepare the configuration file, see [Summarizing DRAGEN QC metrics with `compile-dragen-metrics` and `plot-dragen-metrics`](compile_and_plot_dragen_metrics.md).
 
 ## Pull Request Fetcher
 
