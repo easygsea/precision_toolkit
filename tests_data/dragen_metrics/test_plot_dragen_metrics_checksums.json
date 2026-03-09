@@ -1,42 +1,42 @@
 {
   "panheme_default": {
-    "PCT_CHIMERIC_READS (%).png": "53e37d7243dbedf9c3fb1fd5b2cf3a81",
-    "PCT_CONTAMINATION_EST (%).png": "0d12c87a706591ff0e85bee6c206d9cc",
+    "PCT_CHIMERIC_READS (%).png": "8d5f56ab81307b103e32e557a7266ebb",
+    "PCT_CONTAMINATION_EST (%).png": "47eb1087206fa97fedcb7907ba2d60ef",
     "PCT_TARGET_250X (%).png": "b291e84476bf16dc320d5260d9a9a19b",
     "plot_data.csv": "d414417124ae1e12d566c05756fee722",
     "TOTAL_PF_READS (Count).png": "85e438fe58257a0e5f86b3ad0231231c"
   },
   "panheme_multiple_default": {
-    "PCT_CHIMERIC_READS (%).png": "3810a2dd136a2a782f637de199167311",
-    "PCT_CONTAMINATION_EST (%).png": "fd97068bd940894af1392dcdd5e05b77",
+    "PCT_CHIMERIC_READS (%).png": "b6970693315a5693566b73314213d551",
+    "PCT_CONTAMINATION_EST (%).png": "26877a0c7add06125f35cce6928c5d1f",
     "PCT_TARGET_250X (%).png": "e73dc7af2eb5bba72cd43fb8631d5f08",
     "plot_data.csv": "4bf21dde3cb66b24229ddbe9366e401d",
     "TOTAL_PF_READS (Count).png": "d3f13d90e55b4a2ed5dc3a516c1bd61c"
   },
   "tso500_default": {
-    "PCT_CHIMERIC_READS (%).png": "53e37d7243dbedf9c3fb1fd5b2cf3a81",
-    "PCT_CONTAMINATION_EST (%).png": "0d12c87a706591ff0e85bee6c206d9cc",
+    "PCT_CHIMERIC_READS (%).png": "8d5f56ab81307b103e32e557a7266ebb",
+    "PCT_CONTAMINATION_EST (%).png": "47eb1087206fa97fedcb7907ba2d60ef",
     "PCT_TARGET_250X (%).png": "b291e84476bf16dc320d5260d9a9a19b",
     "plot_data.csv": "d414417124ae1e12d566c05756fee722",
     "TOTAL_PF_READS (Count).png": "85e438fe58257a0e5f86b3ad0231231c"
   },
   "tso500_grouped": {
-    "PCT_CHIMERIC_READS (%).png": "69d2c284617e476632d2928b4b285f16",
-    "PCT_CONTAMINATION_EST (%).png": "a6e401be6f22e5eebf741b70fd3b67cd",
+    "PCT_CHIMERIC_READS (%).png": "70f5dbd3f3e89c2ae4a2911c267acfa9",
+    "PCT_CONTAMINATION_EST (%).png": "495d594e6db62ef3c88286a398fbb460",
     "PCT_TARGET_250X (%).png": "13f2df9a3d6ff2d0e1eec3ecaf2b3f7a",
     "plot_data.csv": "35cff81cebc44a8052f360fd51eba21f",
     "TOTAL_PF_READS (Count).png": "69ae23f1aed235798f58a9a5fdf88a17"
   },
   "tso500_invalid_group": {
-    "PCT_CHIMERIC_READS (%).png": "53e37d7243dbedf9c3fb1fd5b2cf3a81",
-    "PCT_CONTAMINATION_EST (%).png": "0d12c87a706591ff0e85bee6c206d9cc",
+    "PCT_CHIMERIC_READS (%).png": "8d5f56ab81307b103e32e557a7266ebb",
+    "PCT_CONTAMINATION_EST (%).png": "47eb1087206fa97fedcb7907ba2d60ef",
     "PCT_TARGET_250X (%).png": "b291e84476bf16dc320d5260d9a9a19b",
     "plot_data.csv": "d414417124ae1e12d566c05756fee722",
     "TOTAL_PF_READS (Count).png": "85e438fe58257a0e5f86b3ad0231231c"
   },
   "tso500_sorted": {
-    "PCT_CHIMERIC_READS (%).png": "d7552a0977a02c7754f0f63d58434296",
-    "PCT_CONTAMINATION_EST (%).png": "00539f5f53a4cae24526e7fb0abf9e2b",
+    "PCT_CHIMERIC_READS (%).png": "874efa03de8a8fd92296e36500996815",
+    "PCT_CONTAMINATION_EST (%).png": "e8f9b7b94f968b098d44809e628bd232",
     "PCT_TARGET_250X (%).png": "5001cf359942efbb280cbfa9790fbf00",
     "plot_data.csv": "d414417124ae1e12d566c05756fee722",
     "TOTAL_PF_READS (Count).png": "379a0f07e0d0c6ee41ea90c36c53e7ae"
