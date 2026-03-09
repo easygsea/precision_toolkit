@@ -175,8 +175,10 @@ def plot_metrics(
             continue
 
         # Set up plot area
+        num_samples = len(plot_data)
+        fig_height = max(num_samples * 0.3, 13)  # adjust based on number of samples
         fig, axes = plt.subplots(
-            2, 1, figsize=(7, 13), gridspec_kw={"height_ratios": [4, 1]}
+            2, 1, figsize=(7, fig_height), gridspec_kw={"height_ratios": [4, 1]}
         )
         fig.suptitle(metric_name)
         plt.subplots_adjust(left=0.35, right=0.76, top=0.95, bottom=0.05)
@@ -208,6 +210,7 @@ def plot_metrics(
         axes[1].grid(True, which="both", axis="both", ls="-")
         axes[1].set(xlabel=metric_name)
 
+        # Plot fail thresholds first so it appears first in legend
         if metric_name in fail_thresholds.keys():
             threshold = fail_thresholds[metric_name]
             if threshold is not None:
@@ -217,10 +220,12 @@ def plot_metrics(
                     color="orange",
                     ls=":",
                     label="Failure\nthreshold",
+                    zorder=2,
                 )
                 axes[1].axvline(x=threshold, linewidth=2, color="orange", ls=":")
 
         if metric_name in suggested_limits.keys():
+            label_added = False  # track to avoid duplicate labels in legend
             for threshold in suggested_limits[metric_name]:
                 if threshold is not None:
                     axes[0].axvline(
@@ -228,9 +233,11 @@ def plot_metrics(
                         linewidth=2,
                         color="blue",
                         ls=":",
-                        label="Suggested\nlimit",
+                        label="Suggested\nlimit" if not label_added else None,
+                        zorder=1,  # plot suggested limits below failure thresholds
                     )
-                    axes[1].axvline(x=threshold, linewidth=2, color="black", ls=":")
+                    axes[1].axvline(x=threshold, linewidth=2, color="blue", ls=":")
+                    label_added = True
 
         # Add and adjust position of legend if there are any handles
         # (i.e. thresholds or groupings)
