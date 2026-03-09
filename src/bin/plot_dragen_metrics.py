@@ -159,7 +159,7 @@ def determine_rgsm_order(df: pd.DataFrame, sort_metric: str | None) -> list[str]
 
 def plot_metrics(
     metrics_df: pd.DataFrame,
-    fail_thresholds: dict[str, float | None],
+    fail_thresholds: dict[str, tuple[float | None, str]],
     suggested_limits: dict[str, set[float | None]],
     group_col: str | None,
     sort_metric: str | None,
@@ -171,7 +171,8 @@ def plot_metrics(
     Args:
         metrics_df: Long-format dataframe with columns RGSM, Truncated RGSM,
             Metric (UOM), Value, and group_by column.
-        fail_thresholds: Dictionary mapping metric names to threshold values.
+        fail_thresholds: Dictionary mapping metric names to tuples of threshold values
+            and fail direction.
         suggested_limits: Dictionary mapping metric names to suggested limit
             values (LSL, USL).
         group_col: Column name to group samples by in plots, or None.
@@ -231,7 +232,7 @@ def plot_metrics(
 
         # Plot fail thresholds first so it appears first in legend
         if metric_name in fail_thresholds.keys():
-            threshold = fail_thresholds[metric_name]
+            threshold, direction = fail_thresholds[metric_name]
             if threshold is not None:
                 axes[0].axvline(
                     x=threshold,
@@ -242,6 +243,15 @@ def plot_metrics(
                     zorder=2,
                 )
                 axes[1].axvline(x=threshold, linewidth=2, color="orange", ls=":")
+
+                # Shade pass region
+                pass_boundary = (
+                    axes[0].get_xlim()[0]
+                    if "greater_than" in direction
+                    else axes[0].get_xlim()[1]
+                )
+                axes[0].axvspan(threshold, pass_boundary, color="green", alpha=0.1)
+                axes[1].axvspan(threshold, pass_boundary, color="green", alpha=0.1)
 
         if metric_name in suggested_limits.keys():
             label_added = False  # track to avoid duplicate labels in legend
@@ -380,7 +390,10 @@ def main() -> None:
         metrics_to_plot.append(formatted_metric_name)
 
         # Set thresholds and limits; default to None if not present
-        fail_thresholds[formatted_metric_name] = dragen_metric_obj.fail_threshold
+        fail_thresholds[formatted_metric_name] = (
+            dragen_metric_obj.fail_threshold,
+            dragen_metric_obj.fail_direction,
+        )
         metric_attributes = dragen_metric_obj.other_properties
         suggested_limits[formatted_metric_name] = {
             metric_attributes.get("LSL"),
