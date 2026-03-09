@@ -6,11 +6,14 @@ Usage:
     --metrics-files <metrics_output_tsv> [<metrics_output_tsv> ...]
     --output-folder <output_folder> [--fastq-list <dragen_fastq_list_csv>]
     [--group-by <column_name_from_fastq_list>] [--sort-by <metric_from_metrics_files>]
+    [--truncate-rgsm] [--truncate-rgsm-delim <delimiter_used_to_split_rgsm>]
+    [--truncate-rgsm-index <number_of_fields_to_retain>]
 
 Example usage:
     plot-dragen-metrics --metrics-json-config minimal_config.json
     --metrics-files TSO500_MetricsOutput.tsv --output-folder metrics_plots
     --fastq-list fastq_list.csv --group-by 'Sex' --sort-by 'PCT_TARGET_250X (%)'
+    --truncate-rgsm --truncate-rgsm-delim '_' --truncate-rgsm-index 1
 """
 
 import argparse
@@ -28,7 +31,11 @@ from clinical_tools.dragen.utils import format_metric
 
 
 def parse_metrics_output_tsv(
-    metrics_file: Path, reported_metrics: list[str]
+    metrics_file: Path,
+    reported_metrics: list[str],
+    truncate_rgsm: bool,
+    rgsm_delim: str,
+    num_rgsm_fields: int,
 ) -> tuple[pd.DataFrame, dict[str, set[float]]]:
     """
     Parse specified metrics from MetricsOutput.tsv and returns dataframes.
@@ -37,10 +44,13 @@ def parse_metrics_output_tsv(
         metrics_file: Path to MetricsOutput.tsv.
         reported_metrics: List of metrics to plot, where names should include the units
             (e.g. 'PCT_TARGET_50X (%)').
+        truncate_rgsm: Boolean indicating whether to truncate RGSM names.
+        rgsm_delim: Delimiter used to split RGSM when truncating.
+        num_rgsm_fields: Number of fields to join after splitting RGSM by rgsm_delim.
 
     Returns:
-        - Long-format dataframe of metrics with columns RGSM, Metrics (UOM), Value, and
-            Library type.
+        - Long-format dataframe of metrics with columns RGSM, Truncated RGSM,
+            Metric (UOM), Value, and Library type.
         - Dictionary mapping metric names to sets of LSL/USL values.
     """
     all_metrics = []
@@ -87,6 +97,13 @@ def parse_metrics_output_tsv(
                     for idx, rgsm in index_to_rgsm_col.items():
                         row = {
                             "RGSM": rgsm,
+                            "Truncated RGSM": (
+                                rgsm_delim.join(
+                                    rgsm.split(rgsm_delim)[:num_rgsm_fields]
+                                )
+                                if truncate_rgsm
+                                else rgsm
+                            ),
                             "Metric (UOM)": metric,
                             "Value": (
                                 None if fields[idx] in nan_vals else float(fields[idx])
@@ -121,13 +138,15 @@ def get_rgsm_groupings(
 
 
 def determine_rgsm_order(df: pd.DataFrame, sort_metric: str | None) -> list[str]:
-    """Return RGSMs sorted by RGSM or by sort_metric, if specified."""
+    """Return RGSMs sorted alphabetically or by sort_metric in descending order."""
     if sort_metric:
         if sort_metric in df["Metric (UOM)"].values:
             # Grab rows corresponding to sort_metric, then sort values in descending
             # order
             metric_data = df[df["Metric (UOM)"] == sort_metric]
-            return metric_data.sort_values("Value", ascending=False)["RGSM"].tolist()
+            return metric_data.sort_values("Value", ascending=False)[
+                "Truncated RGSM"
+            ].tolist()
         else:
             logging.warning(
                 f"Sort metric '{sort_metric}' not found in data, sorting alphabetically"
@@ -135,7 +154,7 @@ def determine_rgsm_order(df: pd.DataFrame, sort_metric: str | None) -> list[str]
             )
 
     # Sort RGSM alphabetically if none specified or sort_metric is not found
-    return sorted(df["RGSM"].unique())
+    return sorted(df["Truncated RGSM"].unique())
 
 
 def plot_metrics(
@@ -150,8 +169,8 @@ def plot_metrics(
     Generate and save a strip plot and box plot for each metric.
 
     Args:
-        metrics_df: Long-format dataframe with columns RGSM, Metric (UOM), Value, and
-            group_by column.
+        metrics_df: Long-format dataframe with columns RGSM, Truncated RGSM,
+            Metric (UOM), Value, and group_by column.
         fail_thresholds: Dictionary mapping metric names to threshold values.
         suggested_limits: Dictionary mapping metric names to suggested limit
             values (LSL, USL).
@@ -191,14 +210,14 @@ def plot_metrics(
         axes[0] = sns.stripplot(
             data=plot_data,
             x="Value",
-            y="RGSM",
+            y="Truncated RGSM",
             hue=group_col,
             color=default_colour if not group_col else None,
             ax=axes[0],
             order=rgsm_order,
         )
         axes[0].grid(True, axis="both", ls="-")
-        axes[0].set(xlabel=metric_name)
+        axes[0].set(xlabel=metric_name, ylabel="RGSM")
         axes[1] = sns.boxplot(
             data=plot_data,
             x="Value",
@@ -301,6 +320,32 @@ def main() -> None:
         default=None,
     )
     parser.add_argument(
+        "-t",
+        "--truncate-rgsm",
+        action="store_true",
+        help=(
+            "By default, the full RGSM is used for plot labels. Enabling this flag "
+            "will truncate the RGSM to a shorter sample ID based on "
+            "--truncate-rgsm-delimiter and --truncate-rgsm-index."
+        ),
+    )
+    parser.add_argument(
+        "-d",
+        "--truncate-rgsm-delim",
+        help="Delimiter to split RGSM on when truncating. Defaults to '_'.",
+        default="_",
+    )
+    parser.add_argument(
+        "-i",
+        "--truncate-rgsm-index",
+        type=int,
+        help=(
+            "Fields up to this index (1-based) will be joined after splitting RGSM by "
+            "--truncate-rgsm-delimiter."
+        ),
+        default=1,
+    )
+    parser.add_argument(
         "-o",
         "--output-folder",
         help="Name of folder to output QC plots.",
@@ -343,11 +388,15 @@ def main() -> None:
         }
 
     # Parse each MetricsOutput.tsv and convert into a dataframe with columns RGSM,
-    # Metric (UOM), Value, and Library type
+    # Truncated RGSM, Metric (UOM), Value, and Library type
     metrics_dfs = []
     for metrics_file in args.metrics_files:
         parsed_metrics_df, parsed_suggested_limits = parse_metrics_output_tsv(
-            Path(metrics_file), metrics_to_plot
+            Path(metrics_file),
+            metrics_to_plot,
+            args.truncate_rgsm,
+            args.truncate_rgsm_delim,
+            args.truncate_rgsm_index,
         )
         for metric, limits in parsed_suggested_limits.items():
             suggested_limits[metric] |= limits
@@ -389,7 +438,8 @@ def main() -> None:
         )
 
         metrics_with_metadata_df.pivot(
-            index=["RGSM"] + ([valid_group_col] if valid_group_col else []),
+            index=["RGSM", "Truncated RGSM"]
+            + ([valid_group_col] if valid_group_col else []),
             columns="Metric (UOM)",
             values="Value",
         ).reset_index().to_csv(
