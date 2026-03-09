@@ -37,7 +37,7 @@ workflow prepare_variant_benchmark_inputs {
     // If engine is truvari, ensure truth and query VCFs are bgzipped and indexed
     if (params.variant_benchmark_engine == 'truvari') {
         // Label VCFs to avoid aliasing bgzip_vcf and index_vcf processes
-        def all_vcf_pairs_labelled = vcf_pairs
+        all_vcf_pairs_labelled = vcf_pairs
             .flatMap { sample_name, truth_vcf, query_vcf ->
                 [
                     tuple("${sample_name}.raw_truth", truth_vcf),
@@ -59,13 +59,13 @@ workflow prepare_variant_benchmark_inputs {
             bgzipped: vcf[1].toString().endsWith('.gz')
             uncompressed: true
         }
-        def bgzipped = bgzip_vcf(all_vcf_pairs_branched.uncompressed).gzipped_vcf
+        bgzipped = bgzip_vcf(all_vcf_pairs_branched.uncompressed).gzipped_vcf
 
-        def all_bgzipped_vcfs = bgzipped.mix(
+        all_bgzipped_vcfs = bgzipped.mix(
             all_vcf_pairs_branched.bgzipped_and_indexed,
             all_vcf_pairs_branched.bgzipped,
         )
-        def all_vcf_indices = all_vcf_pairs_branched.bgzipped_and_indexed
+        all_vcf_indices = all_vcf_pairs_branched.bgzipped_and_indexed
             .map { label, vcf -> tuple(label, file("${vcf}.tbi")) }
             .mix(index_vcf(bgzipped.mix(all_vcf_pairs_branched.bgzipped)).indexed_vcf)
 
