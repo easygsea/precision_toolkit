@@ -49,9 +49,10 @@ def parse_metrics_output_tsv(
         num_rgsm_fields: Number of fields to join after splitting RGSM by rgsm_delim.
 
     Returns:
-        - Long-format dataframe of metrics with columns RGSM, Truncated RGSM,
-            Metric (UOM), Value, and Library type.
-        - Dictionary mapping metric names to sets of LSL/USL values.
+        A tuple containing:
+            - Long-format dataframe of metrics with columns RGSM, Truncated RGSM,
+                    Metric (UOM), Value, and Library type.
+            - Dictionary mapping metric names to sets of LSL/USL values.
     """
     all_metrics = []
     parsed_suggested_limits: dict[str, set[float]] = defaultdict(set)

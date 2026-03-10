@@ -1,6 +1,6 @@
 # Summarizing DRAGEN QC metrics with `compile-dragen-metrics` and `plot-dragen-metrics`
 
-DRAGEN outputs several QC reports for each sample, uniquely identified by its `RGSM`, which contains detailed metrics for each stage of the pipeline. The specific reports generated depends on the modules that are enabled, but common reports include `cnv_metrics.csv`, `coverage_metrics.csv`, `mapping_metrics.csv`, and `umi_metrics.csv`.
+DRAGEN outputs several QC reports for each sample, uniquely identified by its `RGSM`, which contains detailed metrics for each activated module of the pipeline. The specific reports generated depends on the modules that are enabled, but common reports include `cnv_metrics.csv`, `coverage_metrics.csv`, `mapping_metrics.csv`, and `umi_metrics.csv`.
 
 While these reports are comprehensive, it can be tedious to locate specific metrics of interest across multiple files. The `compile-dragen-metrics` Python script can be used to extract selected metrics for a given `RGSM` (`--rgsm`) and consolidate them into a single report, `<RGSM>_MetricsOutput.tsv`, based on a user-provided JSON configuration file (`--metric-config-json`).
 
@@ -94,8 +94,8 @@ Templates for both CSV and JSON data sources are included. The two are identical
                 <OUTPUT_METRIC_NAME>.UOM: <str>,        // unit of measurement
                 <OUTPUT_METRIC_NAME>.RAD: <int>,        // number of decimal places to display
                 <OUTPUT_METRIC_NAME>.FACTOR: <float>,   // scale factor
-                <OUTPUT_METRIC_NAME>.LSL: <float>,      // suggested lower specification limit
-                <OUTPUT_METRIC_NAME>.USL: <float>,      // suggested upper specification limit
+                <OUTPUT_METRIC_NAME>.LSL: <float>,      // guideline-suggested lower specification limit
+                <OUTPUT_METRIC_NAME>.USL: <float>,      // guideline-suggested upper specification limit
                 ...
             },
             "FactorOperations": {
@@ -180,7 +180,7 @@ For example, the section for `mapping_metrics.csv` in the configuration file may
                 "PCT_CONTAMINATION_EST.FACTOR": "multiply"
             },
             "Failures": {
-                "PCT_CONTAMINATION_EST.THRESHOLD": 0.02,
+                "PCT_CONTAMINATION_EST.THRESHOLD": 2.0,
                 "PCT_CONTAMINATION_EST.DIRECTION": "greater_than"
             }
         },
@@ -191,7 +191,7 @@ For example, the section for `mapping_metrics.csv` in the configuration file may
 
 #### Note about the configuration file for `plot-dragen-metrics`
 
-Some pipelines already output an aggregated QC summary report, `MetricsOutput.tsv`, such as DRAGEN's TSO500 pipeline. In these cases, mappings of QC metrics to their corresponding source files aren't necessary; thus, a simplified configuration file can be supplied. An example of this is shown below:
+Some pipelines already output an aggregated QC summary report, `MetricsOutput.tsv`, such as DRAGEN's TSO500 pipeline. As this report includes the QC metrics and the associated guideline-suggested LSL/USL values, mappings of QC metrics to their corresponding source files and definition of `LSL`/`USL` attributes aren't necessary; thus, a simplified configuration file can be supplied. An example of this is shown below:
 
 ```json
 {
@@ -238,29 +238,21 @@ Some pipelines already output an aggregated QC summary report, `MetricsOutput.ts
                 "PCT_EXON_50X.UOM": "%",
                 "PCT_CHIMERIC_READS.UOM": "%",
                 "USABLE_MSI_SITES.UOM": "Count",
-                "USABLE_MSI_SITES.LSL": 40,
                 "PCT_TARGET_HRD_50X.UOM": "%",
-                "PCT_TARGET_HRD_50X.LSL": 50,
                 "EXCESSIVE_TF.UOM": "NA",
-                "EXCESSIVE_TF.USL": 0,
                 "GENE_SCALED_MAD.UOM": "Count",
-                "GENE_SCALED_MAD.USL": 0.134,
                 "MEDIAN_BIN_COUNT_CNV_TARGET.UOM": "Count",
-                "MEDIAN_BIN_COUNT_CNV_TARGET.LSL": 1,
                 "TOTAL_PF_READS.UOM": "Count",
                 "MEAN_FAMILY_SIZE.UOM": "Count",
-                "MEAN_FAMILY_SIZE.LSL": 10,
                 "MEDIAN_TARGET_COVERAGE.UOM": "Count",
                 "PCT_EXON_100X.UOM": "%",
                 "PCT_READ_ENRICHMENT.UOM": "%",
-                "PCT_READ_ENRICHMENT.LSL": 40,
                 "PCT_USABLE_UMI_READS.UOM": "%",
                 "MEAN_TARGET_COVERAGE.UOM": "Count",
                 "PCT_ALIGNED_READS.UOM": "%",
                 "PCT_CONTAMINATION_EST.UOM": "%",
                 "PCT_TARGET_0.4X_MEAN.UOM": "%",
                 "PCT_TARGET_50X.UOM": "%",
-                "PCT_TARGET_50X.LSL": 90,
                 "PCT_TARGET_100X.UOM": "%",
                 "PCT_TARGET_250X.UOM": "%",
                 "PCT_SOFT_CLIPPED_BASES.UOM": "%",
@@ -279,7 +271,9 @@ Some pipelines already output an aggregated QC summary report, `MetricsOutput.ts
                 "PCT_EXON_50X.THRESHOLD": 90,
                 "PCT_EXON_50X.DIRECTION": "less_than",
                 "PCT_CHIMERIC_READS.THRESHOLD": 8,
-                "PCT_CHIMERIC_READS.DIRECTION": "greater_than"
+                "PCT_CHIMERIC_READS.DIRECTION": "greater_than",
+                "TOTAL_PF_READS.THRESHOLD": 100000000,
+                "TOTAL_PF_READS.DIRECTION": "less_than",
             }
         }
     }
@@ -298,7 +292,7 @@ compile-dragen-metrics --metrics-json-config <json_config> --analysis-dir <drage
 
 ### 2. Aggregate all samples' metrics into a single report
 
-Before plotting, metrics from each sample need to be combined into a single file. The script below can be used to recursively find all `<RGSM>_MetricsOutput.tsv` files, extract metric values, and create an aggregated `MetricsOutput.tsv`.
+Before plotting, metrics from each sample need to be combined into a single file. The script below can be used to recursively find all `<RGSM>_MetricsOutput.tsv` files, extract metric values, and create an aggregated `MetricsOutput.tsv`. This can be adapted as a Nextflow process or implemented within other workflow orchestration frameworks.
 
 ```bash
 #!/bin/bash
