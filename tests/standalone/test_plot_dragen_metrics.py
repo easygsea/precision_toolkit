@@ -56,6 +56,12 @@ def modified_metrics_file(test_data_dir: Path, tmp_path: Path) -> Path:
             ["--fastq-list", "fastq_list.csv", "--group-by", "Invalid"],
             "tso500_invalid_group",
         ),
+        (
+            "TSO500_MetricsOutput.tsv",
+            "DNA",
+            ["--fastq-list", "fastq_list.csv", "--group-by", "Sex", "--truncate-rgsm"],
+            "tso500_grouped_truncated",
+        ),
     ],
 )
 def test_plot_dragen_metrics_single(
