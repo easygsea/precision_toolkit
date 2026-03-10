@@ -216,6 +216,7 @@ def plot_metrics(
             color=default_colour if not group_col else None,
             ax=axes[0],
             order=rgsm_order,
+            jitter=False,
         )
         axes[0].grid(True, axis="both", ls="-")
         axes[0].set(xlabel=metric_name, ylabel="RGSM")
@@ -242,7 +243,9 @@ def plot_metrics(
                     label="Failure\nthreshold",
                     zorder=2,
                 )
-                axes[1].axvline(x=threshold, linewidth=2, color="orange", ls=":")
+                axes[1].axvline(
+                    x=threshold, linewidth=2, color="orange", ls=":", zorder=2
+                )
 
                 # Shade pass region
                 pass_boundary = (
@@ -265,7 +268,9 @@ def plot_metrics(
                         label="Suggested\nlimit" if not label_added else None,
                         zorder=1,  # plot suggested limits below failure thresholds
                     )
-                    axes[1].axvline(x=threshold, linewidth=2, color="blue", ls=":")
+                    axes[1].axvline(
+                        x=threshold, linewidth=2, color="blue", ls=":", zorder=1
+                    )
                     label_added = True
 
         # Add and adjust position of legend if there are any handles
