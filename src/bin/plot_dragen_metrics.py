@@ -218,6 +218,7 @@ def plot_metrics(
             ax=axes[0],
             order=rgsm_order,
             jitter=False,
+            zorder=2,
         )
         axes[0].grid(True, axis="both", ls="-")
         axes[0].set(xlabel=metric_name, ylabel="RGSM")
@@ -228,6 +229,7 @@ def plot_metrics(
             hue=group_col,
             color=default_colour if not group_col else None,
             ax=axes[1],
+            zorder=2,
         )
         axes[1].grid(True, which="both", axis="both", ls="-")
         axes[1].set(xlabel=metric_name)
@@ -242,19 +244,26 @@ def plot_metrics(
                     color="#2E7D32",
                     ls=":",
                     label="Pass\nthreshold",
-                    zorder=2,
+                    zorder=4,
                 )
                 axes[1].axvline(
-                    x=threshold, linewidth=2, color="#2E7D32", ls=":", zorder=2
+                    x=threshold, linewidth=2, color="#2E7D32", ls=":", zorder=4
                 )
 
                 # Shade pass region
                 xlim = axes[0].get_xlim()
                 pass_boundary = xlim[0] if "greater_than" in direction else xlim[1]
                 axes[0].axvspan(
-                    threshold, pass_boundary, color="#2E7D32", alpha=0.05, label="Pass"
+                    threshold,
+                    pass_boundary,
+                    color="#2E7D32",
+                    alpha=0.05,
+                    label="Pass",
+                    zorder=1,
                 )
-                axes[1].axvspan(threshold, pass_boundary, color="#2E7D32", alpha=0.05)
+                axes[1].axvspan(
+                    threshold, pass_boundary, color="#2E7D32", alpha=0.05, zorder=1
+                )
 
                 # Reset xlim due to addition of axvspan triggering autoscaling of
                 # axis limits
@@ -271,10 +280,10 @@ def plot_metrics(
                         color="#4C78A8",
                         ls=":",
                         label="Guideline\nlimit" if not label_added else None,
-                        zorder=1,  # plot guideline limits below failure thresholds
+                        zorder=3,  # plot guideline limits below failure thresholds
                     )
                     axes[1].axvline(
-                        x=threshold, linewidth=2, color="#4C78A8", ls=":", zorder=1
+                        x=threshold, linewidth=2, color="#4C78A8", ls=":", zorder=3
                     )
                     label_added = True
 
