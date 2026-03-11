@@ -249,13 +249,17 @@ def plot_metrics(
                 )
 
                 # Shade pass region
-                pass_boundary = (
-                    axes[0].get_xlim()[0]
-                    if "greater_than" in direction
-                    else axes[0].get_xlim()[1]
+                xlim = axes[0].get_xlim()
+                pass_boundary = xlim[0] if "greater_than" in direction else xlim[1]
+                axes[0].axvspan(
+                    threshold, pass_boundary, color="green", alpha=0.05, label="PASS"
                 )
-                axes[0].axvspan(threshold, pass_boundary, color="green", alpha=0.1)
-                axes[1].axvspan(threshold, pass_boundary, color="green", alpha=0.1)
+                axes[1].axvspan(threshold, pass_boundary, color="green", alpha=0.05)
+
+                # Reset xlim due to addition of axvspan triggering autoscaling of
+                # axis limits
+                axes[0].set_xlim(xlim)
+                axes[1].set_xlim(xlim)
 
         if metric_name in suggested_limits.keys():
             label_added = False  # track to avoid duplicate labels in legend
@@ -274,11 +278,17 @@ def plot_metrics(
                     )
                     label_added = True
 
+        handles, labels = axes[0].get_legend_handles_labels()
+        # If PASS shading is present, move label to last position in legend
+        if "PASS" in labels:
+            pass_index = labels.index("PASS")
+            handles.append(handles.pop(pass_index))
+            labels.append(labels.pop(pass_index))
+
         # Add and adjust position of legend if there are any handles
         # (i.e. thresholds or groupings)
-        handles, _ = axes[0].get_legend_handles_labels()
         if handles:
-            axes[0].legend()
+            axes[0].legend(handles, labels)
             sns.move_legend(
                 axes[0],
                 "center right",
