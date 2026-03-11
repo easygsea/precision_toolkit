@@ -55,7 +55,7 @@ def parse_metrics_output_tsv(
             - Dictionary mapping metric names to sets of LSL/USL values.
     """
     all_metrics = []
-    parsed_suggested_limits: dict[str, set[float]] = defaultdict(set)
+    parsed_guideline_limits: dict[str, set[float]] = defaultdict(set)
 
     library_type = None
     nan_vals = {"NA", "None", "nan"}
@@ -63,7 +63,7 @@ def parse_metrics_output_tsv(
         # Tracking per table in case rgsm are not ordered the same between tables
         index_to_rgsm_col = {}
         # Refers to LSL/USL Guidelines only present in TSO500's MetricsOutput.tsv;
-        # this, in addition to other suggested limits provided in the JSON config, are
+        # this, in addition to other guideline limits provided in the JSON config, are
         # used for plot annotation later
         specification_limit_col_indices = []
         for line in metrics_tsv:
@@ -87,7 +87,7 @@ def parse_metrics_output_tsv(
                 if metric not in reported_metrics:
                     continue
                 else:
-                    parsed_suggested_limits[metric].update(
+                    parsed_guideline_limits[metric].update(
                         float(fields[idx])
                         for idx in specification_limit_col_indices
                         if fields[idx] not in nan_vals
@@ -114,7 +114,7 @@ def parse_metrics_output_tsv(
 
                         all_metrics.append(row)
 
-    return pd.DataFrame(all_metrics), parsed_suggested_limits
+    return pd.DataFrame(all_metrics), parsed_guideline_limits
 
 
 def get_rgsm_groupings(
@@ -161,7 +161,7 @@ def determine_rgsm_order(df: pd.DataFrame, sort_metric: str | None) -> list[str]
 def plot_metrics(
     metrics_df: pd.DataFrame,
     fail_thresholds: dict[str, tuple[float | None, str]],
-    suggested_limits: dict[str, set[float | None]],
+    guideline_limits: dict[str, set[float | None]],
     group_col: str | None,
     sort_metric: str | None,
     output_folder: Path,
@@ -174,7 +174,7 @@ def plot_metrics(
             Metric (UOM), Value, and group_by column.
         fail_thresholds: Dictionary mapping metric names to tuples of threshold values
             and fail direction.
-        suggested_limits: Dictionary mapping metric names to suggested limit
+        guideline_limits: Dictionary mapping metric names to guideline limit
             values (LSL, USL).
         group_col: Column name to group samples by in plots, or None.
         sort_metric: Metric to sort plots by, in descending order, or None to sort by
@@ -239,49 +239,49 @@ def plot_metrics(
                 axes[0].axvline(
                     x=threshold,
                     linewidth=2,
-                    color="orange",
+                    color="#2E7D32",
                     ls=":",
-                    label="Failure\nthreshold",
+                    label="Pass\nthreshold",
                     zorder=2,
                 )
                 axes[1].axvline(
-                    x=threshold, linewidth=2, color="orange", ls=":", zorder=2
+                    x=threshold, linewidth=2, color="#2E7D32", ls=":", zorder=2
                 )
 
                 # Shade pass region
                 xlim = axes[0].get_xlim()
                 pass_boundary = xlim[0] if "greater_than" in direction else xlim[1]
                 axes[0].axvspan(
-                    threshold, pass_boundary, color="green", alpha=0.05, label="PASS"
+                    threshold, pass_boundary, color="#2E7D32", alpha=0.05, label="Pass"
                 )
-                axes[1].axvspan(threshold, pass_boundary, color="green", alpha=0.05)
+                axes[1].axvspan(threshold, pass_boundary, color="#2E7D32", alpha=0.05)
 
                 # Reset xlim due to addition of axvspan triggering autoscaling of
                 # axis limits
                 axes[0].set_xlim(xlim)
                 axes[1].set_xlim(xlim)
 
-        if metric_name in suggested_limits.keys():
+        if metric_name in guideline_limits.keys():
             label_added = False  # track to avoid duplicate labels in legend
-            for threshold in suggested_limits[metric_name]:
+            for threshold in guideline_limits[metric_name]:
                 if threshold is not None:
                     axes[0].axvline(
                         x=threshold,
                         linewidth=2,
-                        color="blue",
+                        color="#4C78A8",
                         ls=":",
-                        label="Suggested\nlimit" if not label_added else None,
-                        zorder=1,  # plot suggested limits below failure thresholds
+                        label="Guideline\nlimit" if not label_added else None,
+                        zorder=1,  # plot guideline limits below failure thresholds
                     )
                     axes[1].axvline(
-                        x=threshold, linewidth=2, color="blue", ls=":", zorder=1
+                        x=threshold, linewidth=2, color="#4C78A8", ls=":", zorder=1
                     )
                     label_added = True
 
         handles, labels = axes[0].get_legend_handles_labels()
-        # If PASS shading is present, move label to last position in legend
-        if "PASS" in labels:
-            pass_index = labels.index("PASS")
+        # If pass shading is present, move label to last position in legend
+        if "Pass" in labels:
+            pass_index = labels.index("Pass")
             handles.append(handles.pop(pass_index))
             labels.append(labels.pop(pass_index))
 
@@ -397,7 +397,7 @@ def main() -> None:
 
     metrics_to_plot = []
     fail_thresholds = {}
-    suggested_limits = {}
+    guideline_limits = {}
     for metric_name in dragen_metrics_parser.reported_metric_names:
         dragen_metric_obj = dragen_metrics_parser.metric_to_metric_obj[metric_name]
 
@@ -411,7 +411,7 @@ def main() -> None:
             dragen_metric_obj.fail_direction,
         )
         metric_attributes = dragen_metric_obj.other_properties
-        suggested_limits[formatted_metric_name] = {
+        guideline_limits[formatted_metric_name] = {
             metric_attributes.get("LSL"),
             metric_attributes.get("USL"),
         }
@@ -420,15 +420,15 @@ def main() -> None:
     # Truncated RGSM, Metric (UOM), Value, and Library type
     metrics_dfs = []
     for metrics_file in args.metrics_files:
-        parsed_metrics_df, parsed_suggested_limits = parse_metrics_output_tsv(
+        parsed_metrics_df, parsed_guideline_limits = parse_metrics_output_tsv(
             Path(metrics_file),
             metrics_to_plot,
             args.truncate_rgsm,
             args.truncate_rgsm_delim,
             args.truncate_rgsm_index,
         )
-        for metric, limits in parsed_suggested_limits.items():
-            suggested_limits[metric] |= limits
+        for metric, limits in parsed_guideline_limits.items():
+            guideline_limits[metric] |= limits
         metrics_dfs.append(parsed_metrics_df)
     metrics_df = pd.concat(metrics_dfs, ignore_index=True)
 
@@ -460,7 +460,7 @@ def main() -> None:
         plot_metrics(
             metrics_with_metadata_df,
             fail_thresholds,
-            suggested_limits,
+            guideline_limits,
             valid_group_col,
             args.sort_by,
             library_output_folder,
