@@ -22,13 +22,13 @@
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: 299222527b83e60e5dad6a8ca4e97fcb
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.cov_score.bed
-      md5sum: c06d211e849be29daa47d68a988e7f6a
+      md5sum: d9c3fad72007cb16f503dba06adc98d4
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.bq_score.bed
-      md5sum: 71ae2f3e96ab675b10f15a622e7fdc4c
+      md5sum: cdbfc5d54ba5f463d9b86537a9a5c733
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.mq_score.bed
-      md5sum: fb43c1115d65e7d9a1fb00353e18d72d
+      md5sum: b557b0ba1dc8d54a5dce238fe008a036
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.unionized.bed
-      md5sum: b671115b95bc1df7703b18d69c2dab6f
+      md5sum: b4ec36a7676cca461546cdf36fa382be
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/all_libraries_per_base_metrics.scored.txt
       md5sum: 160769495c06b8fa9003ec0cbb269d38
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/plot_TARGET_P25(BASE_COV).png
@@ -57,13 +57,13 @@
     - path: target_evaluation_test_mixed_noref/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       should_exist: false
     - path: target_evaluation_test_mixed_noref/target_evaluation/tracts/tracts.cov_score.bed
-      md5sum: a7edb7eb9669264dacedd74a2ea4fa26
+      md5sum: 9561f4ccb6e650f3a0254d419a6a119b
     - path: target_evaluation_test_mixed_noref/target_evaluation/tracts/tracts.bq_score.bed
-      md5sum: d6797d76f847ca49d59b286f8b89429a
+      md5sum: 26ef01fafd0159135b555d3716ed5b06
     - path: target_evaluation_test_mixed_noref/target_evaluation/tracts/tracts.mq_score.bed
-      md5sum: 7be4a9bff2688937b4ed3f9b0596981c
+      md5sum: cf4dba64995aceb7a3e4440061d0228b
     - path: target_evaluation_test_mixed_noref/target_evaluation/tracts/tracts.unionized.bed
-      md5sum: b671115b95bc1df7703b18d69c2dab6f
+      md5sum: b4ec36a7676cca461546cdf36fa382be
     - path: target_evaluation_test_mixed_noref/target_evaluation/all_libraries_per_base_metrics.scored.txt
       md5sum: f34696a53d00f77d552da4ffb9e8ecbf
     - path: target_evaluation_test_mixed_noref/target_evaluation/plots
@@ -149,13 +149,13 @@
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: e3215a2415ac1968a28e38b7c7ff25c3
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.cov_score.bed
-      md5sum: 7fbcb716211c74c9f9f61ece929a1d48
+      md5sum: caefd9d55abe1cb52cbdd29f121a0b10
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.bq_score.bed
-      md5sum: 1544b16d8b49f04654531d5e6c34da02
+      md5sum: bef33ae0e6ba8eee6753c5c31b5db0e4
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.mq_score.bed
-      md5sum: 1aba511ebc9656168eb7ef0999d9d16f
+      md5sum: 0f3c0bb81e4c44a576f4285d0b15b79a
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.unionized.bed
-      md5sum: 756330758029932d53ff0e07ca5fd8e3
+      md5sum: 8e9550425940387cd56c79de58de6d87
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_COV).png
       md5sum: 14fd110e0ac9961ee27a0205618949d2
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_BQ_P25).png
@@ -185,13 +185,13 @@
     - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: 0d03b93d3b1474fbed380e62d849a2b9
     - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/tracts/tracts.cov_score.bed
-      md5sum: c06d211e849be29daa47d68a988e7f6a
+      md5sum: d9c3fad72007cb16f503dba06adc98d4
     - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/tracts/tracts.bq_score.bed
-      md5sum: 4f70bf4abb32e2bf99be84e558af91ef
+      md5sum: e34f5105ae13ac05aa90f796146fa6c0
     - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/tracts/tracts.mq_score.bed
-      md5sum: fb43c1115d65e7d9a1fb00353e18d72d
+      md5sum: b557b0ba1dc8d54a5dce238fe008a036
     - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/tracts/tracts.unionized.bed
-      md5sum: b671115b95bc1df7703b18d69c2dab6f
+      md5sum: b4ec36a7676cca461546cdf36fa382be
     - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/all_libraries_per_base_metrics.scored.txt
       md5sum: 160769495c06b8fa9003ec0cbb269d38
 

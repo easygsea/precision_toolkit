@@ -87,9 +87,7 @@ def test_dragen_metric_obj_creation(
     - DragenMetric object is created and any missing properties are set to "" or None
     """
     json_config_file = test_data_dir / "minimal_config.json"
-    dragen_metrics_parser = DragenMetricsParser(
-        json_config_file, test_data_dir, "sample"
-    )
+    dragen_metrics_parser = DragenMetricsParser(json_config_file, "sample")
     metric_obj = dragen_metrics_parser.metric_to_metric_obj[metric_name]
 
     # Check that DragenMetric object attributes match expected
@@ -101,7 +99,7 @@ def test_invalid_config_missing_factor_operation(test_data_dir: Path) -> None:
     """Test that metric with FACTOR but no FactorOperation raises ValueError."""
     json_config_file = test_data_dir / "missing_factor_operation_config.json"
     with pytest.raises(ValueError, match="Factor operation not specified"):
-        DragenMetricsParser(json_config_file, test_data_dir, "sample")
+        DragenMetricsParser(json_config_file, "sample")
 
 
 @pytest.mark.parametrize(
@@ -122,7 +120,7 @@ def test_invalid_config_incomplete_failure_spec(
         ValueError,
         match="Only one of fail_threshold and fail_direction is specified.",
     ):
-        DragenMetricsParser(json_config_file, test_data_dir, "sample")
+        DragenMetricsParser(json_config_file, "sample")
 
 
 @pytest.mark.parametrize(
@@ -180,8 +178,10 @@ def test_dragen_metrics_parser(
     """
     # Create parser and parse metrics
     json_config_file = test_data_dir / "minimal_config.json"
-    dragen_metrics_parser = DragenMetricsParser(json_config_file, test_data_dir, sample)
-    parsed_metrics = dragen_metrics_parser.parse_metrics()
+    dragen_metrics_parser = DragenMetricsParser(json_config_file, sample)
+    parsed_metrics = dragen_metrics_parser.parse_metrics(
+        [test_data_dir],
+    )
 
     # Check that expected metrics are parsed
     parsed_metric_labels = parsed_metrics.keys()
@@ -195,3 +195,14 @@ def test_dragen_metrics_parser(
             assert parsed_val is None
         else:
             assert expected_val == pytest.approx(parsed_val)
+
+
+def test_dragen_metrics_parser_multiple_analysis_dirs(test_data_dir: Path) -> None:
+    """Test DragenMetricsParser resolves source file path."""
+    json_config_file = test_data_dir / "minimal_config.json"
+    dragen_metrics_parser = DragenMetricsParser(json_config_file, "sample")
+    parsed_metrics = dragen_metrics_parser.parse_metrics(
+        [Path("nonexistent_dir"), test_data_dir]
+    )
+
+    assert parsed_metrics["TOTAL_PF_READS"] == pytest.approx(100)

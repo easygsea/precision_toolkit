@@ -46,7 +46,7 @@ class SourceFile:
     Class representing a DRAGEN source file and its associated metrics.
 
     Attributes:
-        filename: Path to the source file.
+        filename: Name of source file.
         filetype: Type of the source file (e.g., CSV, JSON).
         allow_missing: If True, source file can be missing and associated metrics will
             use default values.
