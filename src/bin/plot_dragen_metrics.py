@@ -402,7 +402,7 @@ def main() -> None:
 
     # Create parser just to get metrics to plot and metadata (e.g. UOM, LSL, etc.)
     # for each metric
-    dragen_metrics_parser = DragenMetricsParser(metrics_json_config_path, Path(), "")
+    dragen_metrics_parser = DragenMetricsParser(metrics_json_config_path, "")
 
     metrics_to_plot = []
     fail_thresholds = {}
