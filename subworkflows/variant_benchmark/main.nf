@@ -126,7 +126,9 @@ workflow variant_benchmark_workflow {
                     "${params.variant_benchmark_subdir}/raw",
                     "raw"
                 )
-                summary_files = raw_results.truvari_bench_summary.collect()
+                summary_files = raw_results.truvari_bench_summary
+                    .concat(raw_results.truvari_parameters_renamed)
+                    .collect()
 
                 // If enable_refine is true, run truvari refine
                 if (params.enable_refine) {
@@ -137,7 +139,9 @@ workflow variant_benchmark_workflow {
                         params.truvari_refine_options,
                         "${params.variant_benchmark_subdir}/raw",
                         "raw"
-                    ).truvari_refine_summary.collect()
+                    ).truvari_refine_summary
+                        .concat(raw_results.truvari_parameters_renamed)
+                        .collect()
                 }
             }
 
@@ -151,7 +155,9 @@ workflow variant_benchmark_workflow {
                     "${params.variant_benchmark_subdir}/curated",
                     "curated"
                 )
-                summary_files_curated = curated_results.truvari_bench_summary.collect()
+                summary_files_curated = curated_results.truvari_bench_summary
+                    .concat(curated_results.truvari_parameters_renamed)
+                    .collect()
 
                 // If enable_refine is true, run truvari refine
                 if (params.enable_refine) {
@@ -160,7 +166,9 @@ workflow variant_benchmark_workflow {
                         params.truvari_refine_options,
                         "${params.variant_benchmark_subdir}/curated",
                         "curated"
-                    ).truvari_refine_summary.collect()
+                    ).truvari_refine_summary
+                        .concat(curated_results.truvari_parameters_renamed)
+                        .collect()
                 }
             }
         } else if (params.variant_benchmark_engine == "wittyer") {

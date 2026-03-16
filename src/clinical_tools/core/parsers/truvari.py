@@ -29,7 +29,9 @@ class TruvariDataParser:
             Sequence of VariantCallMetrics objects containing processed data.
         """
         # Derive path to params.json which truvari outputs alongside summary.json
-        params_file_path = Path(file_path).parent / "params.json"
+        params_file_path = Path(file_path).parent / Path(file_path).name.replace(
+            "refine.variant_summary.json", "params.json"
+        ).replace("summary.json", "params.json")
         if not params_file_path.exists():
             raise FileNotFoundError(
                 f"{params_file_path} not found. Ensure params.json is present in the "

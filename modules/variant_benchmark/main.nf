@@ -95,7 +95,7 @@ process run_wittyer {
 process run_truvari_bench {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}/${output_dir ?: ''}/truvari", mode: 'copy'
+    publishDir "${params.output_dir}/${output_dir ?: ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
 
     input:
     tuple val(sample_name), path(truth_vcf), path(truth_tbi), path(query_vcf), path(query_tbi)
@@ -107,7 +107,7 @@ process run_truvari_bench {
 
     output:
     path("*/*summary.json"), emit: truvari_bench_summary
-    path("*/params.json"), emit: truvari_bench_parameters
+    path("*params.json"), emit: truvari_parameters_renamed
     tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
 
     script:
@@ -120,13 +120,15 @@ process run_truvari_bench {
         --output "${PREFIX}" \
         ${truvari_options}
     mv "${PREFIX}/summary.json" "${PREFIX}/${PREFIX}.summary.json"
+    # Create a temporary copy of params.json which can be uniquely identified when passed to summarize_diagnostic_metrics
+    cp "${PREFIX}/params.json" "${PREFIX}.params.json"
     """
 }
 
 process run_truvari_refine {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}/${output_dir ?: ''}/truvari", mode: 'copy'
+    publishDir "${params.output_dir}/${output_dir ?: ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
 
     input:
     tuple val(sample_name), path(truvari_bench_results)
@@ -137,7 +139,7 @@ process run_truvari_refine {
     val label
 
     output:
-    path("*/*refine.variant_summary.json"), emit: truvari_refine_summary
+    path("*/*.refine.variant_summary.json"), emit: truvari_refine_summary
     tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
 
     script:
@@ -180,8 +182,8 @@ process summarize_diagnostic_metrics {
     """
     summarize-diagnostic-metrics --metrics ${diagnostic_metrics} \
         --engine "${variant_benchmark_engine}" \
-        ${(raw_variant_benchmark_outputs != []) ? "--raw-files " + raw_variant_benchmark_outputs.collect().join(' ') : ""} \
-        ${(curated_variant_benchmark_outputs != []) ? "--curated-files " + curated_variant_benchmark_outputs.collect().join(' ') : ""} \
+        ${(raw_variant_benchmark_outputs != []) ? "--raw-files " + raw_variant_benchmark_outputs.findAll { file -> !file.name.endsWith('.params.json') }.join(' ') : ""} \
+        ${(curated_variant_benchmark_outputs != []) ? "--curated-files " + curated_variant_benchmark_outputs.findAll { file -> !file.name.endsWith('.params.json') }.join(' ') : ""} \
         --tp-method "${concordance_tp}" \
         --ci-method "${ci_method}" \
         --ci-level ${ci_level} \
