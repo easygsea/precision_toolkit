@@ -344,7 +344,7 @@ def main() -> None:
     parser.add_argument(
         "-g",
         "--group-by",
-        help="Column in DRAGEN's fastq list to group samples by.",
+        help="Column in DRAGEN's fastq list (--fastq-list) to group samples by.",
         default=None,
     )
     parser.add_argument(
