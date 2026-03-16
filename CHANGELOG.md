@@ -4,7 +4,7 @@
 
 ---
 
-### v1.1.4 - 2026-XX-XX
+### v1.1.4 - 2026-03-16
 - New Standalone Utility: Added `plot-dragen-metrics` to plot backbone QC metrics in DRAGEN's `MetricsOutput.tsv`.
 - Feature: Added functionality to compile a systemic fail tract (`common_fail_regions.bed`) using cohort-level base-specific fail data. Threshold can be adjusted with `--fail_percent_threshold` parameter (default: 10).
 - Improvement: Added support for parsing metrics from JSON files in `compile-dragen-metrics`.
