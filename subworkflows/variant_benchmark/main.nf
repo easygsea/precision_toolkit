@@ -116,6 +116,12 @@ workflow variant_benchmark_workflow {
                 genome_fai_path = generate_fai(genome_ref_path).genome_fai
             }
 
+            def enable_refine = params.enable_refine
+            if (params.enable_refine && params.truvari_bench_options.contains("--sizemax -1")) {
+                log.warn " truvari refine is disabled when --sizemax=-1 to avoid performance issues with large SVs."
+                enable_refine = false
+            }
+
             // Only run raw analysis if skip_raw is false
             if (!params.skip_raw) {
                 raw_results = run_truvari_bench_raw(
@@ -131,7 +137,7 @@ workflow variant_benchmark_workflow {
                     .collect()
 
                 // If enable_refine is true, run truvari refine
-                if (params.enable_refine) {
+                if (enable_refine) {
                     summary_files = run_truvari_refine_raw(
                         raw_results.truvari_output_dir,
                         genome_ref_path,
@@ -160,7 +166,7 @@ workflow variant_benchmark_workflow {
                     .collect()
 
                 // If enable_refine is true, run truvari refine
-                if (params.enable_refine) {
+                if (enable_refine) {
                     summary_files_curated = run_truvari_refine_curated(
                         curated_results.truvari_output_dir,
                         params.truvari_refine_options,
