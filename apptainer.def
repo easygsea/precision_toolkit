@@ -21,21 +21,20 @@ From: python:{{ PYTHON_VERSION }}-slim-bookworm
 Stage: clinical_tools_builder
 
 %arguments
-    PYTHON_VERSION=3.11.7
-    POETRY_VERSION=2.0.1
+    PYTHON_VERSION=3.13.12
+    UV_VERSION=0.10.7
 
 %files
     README.md app/
     pyproject.toml app/
-    poetry.lock app/
+    uv.lock app/
     src/ app/
 
 %post
     cd /app
     pip install --upgrade pip --no-cache-dir && \
-    pip install --no-cache-dir "poetry=={{ POETRY_VERSION }}" && \
-    poetry config virtualenvs.create false && \
-    poetry build && \
+    pip install --no-cache-dir "uv=={{ UV_VERSION }}" && \
+    uv build --wheel && \
     chmod a+rx /app -R
 
 Bootstrap: docker
@@ -50,7 +49,7 @@ Stage: runtime1
     HTSLIB_VERSION=1.21
     JOBLIB_VERSION=0.14.1
     PSUTIL_VERSION=6.1.1
-    PYTHON_VERSION=3.11.7
+    PYTHON_VERSION=3.13.12
     NEXTFLOW_VERSION=24.10.3
 
 %files from witty_er_builder

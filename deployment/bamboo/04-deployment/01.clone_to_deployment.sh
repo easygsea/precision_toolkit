@@ -34,9 +34,7 @@ function clone_and_deploy {
   cd "${DEPLOYMENT_ROOT}/clinical_tools"
   [[ -d tmp_dir ]] && rm -rfv tmp_dir
   git clone --branch "${BRANCH_NAME}" "${REPOSITORY_URL}" tmp_dir
-  cd tmp_dir
-  version=$(get_version)
-  cd ..
+  version=$(cd tmp_dir && get_version)
   if [[ -d "${version}" ]]; then
     echo "The version has already been deployed"
     exit 1
@@ -45,11 +43,8 @@ function clone_and_deploy {
     mkdir -pv "${version_folder}"
     mv tmp_dir/* "${version_folder}/"
     cd "${version_folder}"
-    "${PYTHON_EXECUTABLE}" -m venv venv
-    source venv/bin/activate
-    pip install --upgrade pip wheel
-    pip install poetry==2.0.1
-    poetry install
+    uv venv --python "${PYTHON_EXECUTABLE}"
+    uv sync
     cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" ./"${NEW_IMAGE_NAME}"
     sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
     cd "${DEPLOYMENT_ROOT}/clinical_tools"

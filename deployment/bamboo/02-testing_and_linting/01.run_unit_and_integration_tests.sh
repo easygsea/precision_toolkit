@@ -69,17 +69,15 @@ export PATH="$PATH:${NEXTFLOW_EXECUTABLE}"
 export JAVA_HOME="${JAVA_EXECUTABLE}"
 export PATH=$JAVA_HOME/bin:$PATH
 
-cd "${TESTING_DEPLOYMENT_DIRECTORY}"
-source venv/bin/activate
-cd clinical_tools/
+cd "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
 
 # Execute Python unit and standalone tests
-pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standalone.xml
+uv run pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standalone.xml
 
 # Replace the pointer to the remote image to the local one and run workflow tests with Nextflow pointing to the local image
 sed -i 's~container = ".*"~container = "file://'"${IMAGE_NAME}"'"~' nextflow.config
-pytest tests/workflow/ --junit-xml=test_results_workflow.xml
+uv run pytest tests/workflow/ --junit-xml=test_results_workflow.xml
 
 chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}"
-chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
-chmod a+r "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools/test_results_*.xml
+chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
+chmod a+r "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/test_results_*.xml"

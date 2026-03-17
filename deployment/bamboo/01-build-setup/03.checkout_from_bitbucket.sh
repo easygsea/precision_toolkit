@@ -27,20 +27,20 @@ BAMBOO_CONFIG_DOC
 
 set -euxo pipefail
 
-TESTING_DEPLOYMENT_DIRECTORY="$1"
-REPOSITORY_URL="$2"
-BRANCH_NAME="$3"
-BUILDING_DEPLOYMENT_DIRECTORY="$4"
-HOST_NAME="$5"
+TESTING_DEPLOYMENT_DIRECTORY="${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}"
+REPOSITORY_URL="${bamboo.planRepository.repositoryUrl}"
+BRANCH_NAME="${bamboo.planRepository.branchName}"
+BUILDING_DEPLOYMENT_DIRECTORY="${bamboo.inject.BUILDING_DEPLOYMENT_DIRECTORY}"
+HOST_NAME="${bamboo.HOST_CONTAINER}"
 
 rm -rfv "${TESTING_DEPLOYMENT_DIRECTORY}"
 git clone -b "${BRANCH_NAME}" "${REPOSITORY_URL}" \
-  "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
-cd "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
+  "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
+cd "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
 VERSION=$(sed -nr "s|^version\s*=\s*\"([^\"]+)\"|\1|p" pyproject.toml)
 echo "VERSION=${VERSION}" > clinical_tools_version.txt
 chmod -R g+w "${TESTING_DEPLOYMENT_DIRECTORY}"
 
-rsync -av README.md pyproject.toml poetry.lock Dockerfile src \
+rsync -av README.md pyproject.toml uv.lock Dockerfile src \
   deployment/bamboo/01-build-setup/05.build_apptainer_image.sh \
   "${HOST_NAME}":"${BUILDING_DEPLOYMENT_DIRECTORY}/"

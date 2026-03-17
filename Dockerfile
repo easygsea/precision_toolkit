@@ -5,9 +5,9 @@ ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
 ARG JOBLIB_VERSION=0.14.1
-ARG POETRY_VERSION=2.0.1
+ARG UV_VERSION=0.10.7
 ARG PSUTIL_VERSION=6.1.1
-ARG PYTHON_VERSION=3.11.7
+ARG PYTHON_VERSION=3.13.12
 ARG WITTYER_VERSION=0.5.2
 
 # Stage 1: Build witty.er from source
@@ -22,20 +22,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
     cd Wittyer && \
     dotnet publish . -c Release
 
-# Stage 2: Build custom package via Poetry
+# Stage 2: Build custom package via uv
 FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
-ARG POETRY_VERSION
+ARG UV_VERSION
 WORKDIR /app
 
 # Copy application files
-COPY README.md pyproject.toml poetry.lock ./
+COPY README.md pyproject.toml uv.lock ./
 COPY src/ /app/src/
 
-# Install and configure poetry, build project, and set permissions
+# Install uv, sync environment, and build wheel
 RUN pip install --upgrade pip --no-cache-dir && \
-    pip install --no-cache-dir "poetry==${POETRY_VERSION}" && \
-    poetry config virtualenvs.create false && \
-    poetry build && \
+    pip install --no-cache-dir "uv==${UV_VERSION}" && \
+    uv build --wheel && \
     chmod a+rx /app -R
 
 # Stage 3: Runtime
