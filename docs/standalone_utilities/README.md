@@ -6,6 +6,7 @@
 - [Generate Standardized BED](#generate-standardized-bed)
 - [Jira Table Converter](#jira-table-converter)
 - [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
+- [Plot DRAGEN Metrics](#plot-dragen-metrics)
 - [Pull Request Fetcher](#pull-request-fetcher)
 - [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
 
@@ -58,7 +59,7 @@ For example, given the following configuration file:
 }
 ```
 
-`compile-dragen-metrics` will look for the source file `<RGSM>_mapping_metrics.csv` in the directory passed to `--analysis-dir` and extract values for the metrics `TOTAL_PF_READS`, `MAPPED_READS`, `PCT_CHIMERIC_READS_BASE`, and `PCT_CONTAMINATION_EST`. As many metrics expressed as percentages are reported as counts in DRAGEN source files, further calculation is required. These metrics are specified with the `_BASE` suffix (e.g. `PCT_CHIMERIC_READS_BASE`), indicating that the reported count must be divided by `MAPPED_READS` to compute the corresponding percentage.
+`compile-dragen-metrics` will look for the source file `<RGSM>_mapping_metrics.csv` in each directory passed to `--analysis-dirs` and extract values for the metrics `TOTAL_PF_READS`, `MAPPED_READS`, `PCT_CHIMERIC_READS_BASE`, and `PCT_CONTAMINATION_EST`. As many metrics expressed as percentages are reported as counts in DRAGEN source files, further calculation is required. These metrics are specified with the `_BASE` suffix (e.g. `PCT_CHIMERIC_READS_BASE`), indicating that the reported count must be divided by `MAPPED_READS` to compute the corresponding percentage.
 
 Extracted QC metrics are written to `<RGSM>_MetricsOutput.tsv`, with metric names and values formatted according to attributes defined in the `Constants` section of the configuration file. Common attributes include:
 * `FACTOR`: scale **factor**
@@ -69,16 +70,18 @@ Metrics will also be classified as either "Monitoring" or "Production", with "Mo
 
 Usage:
 ```bash
-compile-dragen-metrics --metrics-json-config <json_config> --analysis-dir <dragen_backbone_analysis_dir> --rgsm <rgsm> --output-folder <output_folder>
+compile-dragen-metrics --metrics-json-config <json_config> --analysis-dirs <dragen_backbone_analysis_dir> [<dragen_backbone_analysis_dir> ...] --rgsm <rgsm> --output-folder <output_folder>
 ```
 
 Example output:
 ```bash
-Metric (UOM)	<RGSM>	Category	Threshold	FailureDirection	Status
-TOTAL_PF_READS (Count)	100	Monitoring	None	None	None
-PCT_CONTAMINATION_EST (%)	0.01	Production	0.02	greater_than	Pass
-PCT_CHIMERIC_READS (%)	25.00	Monitoring	None	None	None
+Metric (UOM)	Category	<RGSM>	FailureDirection	Threshold   Status
+TOTAL_PF_READS (Count)	Monitoring  100 None	None	None
+PCT_CONTAMINATION_EST (%)	Production  0.01    greater_than    0.02	Pass
+PCT_CHIMERIC_READS (%)	Monitoring	25.00	None	None	None
 ```
+
+For detailed documentation of how to prepare the configuration file, see [Summarizing DRAGEN QC metrics with `compile-dragen-metrics` and `plot-dragen-metrics`](compile_and_plot_dragen_metrics.md).
 
 ## Convert Multi-Sample VCF File into Single-Sample VCF files
 
@@ -216,6 +219,30 @@ apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-cura
 ```
 
 Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
+
+## Plot DRAGEN Metrics
+
+The `plot-dragen-metrics` tool generates summary plots for backbone QC metrics in the `MetricsOutput.tsv` file(s) output by DRAGEN. Plot settings (i.e. metrics to plot, thresholds, proposed thresholds) are specified in a JSON-formatted configuration file. If `compile-dragen-metrics` was used previously, the same configuration file can be supplied to `plot-dragen-metrics` — refer to the [`compile-dragen-metrics` documentation](#compile-dragen-metrics) for an example.
+
+Of particular importance for `plot-dragen-metrics` is the `ReportedMetrics` section, which specifies the metrics to plot, and the following attributes defined in the `Constants` section, as these are used to annotate plots with threshold lines:
+
+- `LSL`: guideline-suggested lower specification limit
+- `USL`: guideline-suggested upper specification limit
+
+QC failure thresholds defined in the `Failures` section are also displayed on the plots.
+
+Metrics can be aggregated across runs and plotted together if multiple `MetricsOutput.tsv` files are supplied to `--metrics-files`. Within these plots, samples can be grouped and coloured by a column specified by `--group-by` if a [FASTQ list](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) is passed to `--fastq-list`. This FASTQ list should contain columns mapping each `RGSM` to its corresponding group.
+
+Additionally, `RGSM` plot labels can be truncated when `--truncate-rgsm` is set. This is used in conjunction with `--truncate-rgsm-delim` (default: '_') and `--truncate-rgsm-index` (default: 1). These arguments can help simplify long RGSM labels and group samples in the plots.
+
+By default, samples appear alphabetically in the plots. Use `--sort-by` to order samples in descending order by a particular metric. The same ordering is applied across all plots. Note that the metric name supplied to `--sort-by` must match the labels used in the plots, including the units (e.g., `--sort-by 'PCT_TARGET_250X (%)'`).
+
+Usage:
+```bash
+plot-dragen-metrics --metrics-json-config <config_json> --metrics-files <metrics_output_tsv> [<metrics_output_tsv> ...] --output-folder <output_folder> [--fastq-list <dragen_fastq_list_csv>] [--group-by <column_name_from_fastq_list>] [--sort-by <metric_from_metrics_files>] [--truncate-rgsm] [--truncate-rgsm-delim <delimiter_used_to_split_rgsm>] [--truncate-rgsm-index <number_of_fields_to_retain>]
+```
+
+For detailed documentation of how to prepare the configuration file, see [Summarizing DRAGEN QC metrics with `compile-dragen-metrics` and `plot-dragen-metrics`](compile_and_plot_dragen_metrics.md).
 
 ## Pull Request Fetcher
 

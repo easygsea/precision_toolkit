@@ -155,10 +155,12 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
     - `count-variants-by-size`
   - [Generate Standardized BED](./docs/standalone_utilities/README.md#generate-standardized-bed)
     - `generate-standardized-bed`
-  - [Jira Table Converter ](./docs/standalone_utilities/README.md#jira-table-converter)
+  - [Jira Table Converter](./docs/standalone_utilities/README.md#jira-table-converter)
     - `jira-table`
   - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
     - `manual-diagnostic-metric-curation`
+  - [Plot DRAGEN metrics](./docs/standalone_utilities/README.md#plot-dragen-metrics)
+    - `plot-dragen-metrics`
   - [Pull Request Fetcher](./docs/standalone_utilities/README.md#pull-request-fetcher)
     - `fetch-pull-requests`
   - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)

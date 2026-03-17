@@ -2,7 +2,8 @@
     "ReportedMetrics": [
         "TOTAL_PF_READS",
         "PCT_CHIMERIC_READS",
-        "PCT_CONTAMINATION_EST"
+        "PCT_CONTAMINATION_EST",
+        "PCT_TARGET_250X"
     ],
     "DataSources": {
         "MAPPING/ALIGNING SUMMARY": {
@@ -22,6 +23,7 @@
                 "MAPPED_READS.FACTOR": 0.0001,
                 "PCT_CHIMERIC_READS.UOM": "%",
                 "PCT_CHIMERIC_READS.RAD": 2,
+                "PCT_CHIMERIC_READS.USL": 8.0,
                 "PCT_CHIMERIC_READS.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.UOM": "%",
@@ -35,6 +37,19 @@
             "Failures": {
                 "PCT_CONTAMINATION_EST.THRESHOLD": 0.02,
                 "PCT_CONTAMINATION_EST.DIRECTION": "greater_than"
+            }
+        },
+        "ADDITIONAL METRICS": {
+            "SourceName": "additional_metrics.json",
+            "SourceType": "JSON",
+            "AllowSourceFileToBeMissing": true,
+            "DefaultValueOnMissing": null,
+            "Mappings": {
+                "PCT_TARGET_250X": "$.PCT_TARGET_250X"
+            },
+            "Constants": {
+                "PCT_TARGET_250X.UOM": "%",
+                "PCT_TARGET_250X.RAD": 1
             }
         }
     }

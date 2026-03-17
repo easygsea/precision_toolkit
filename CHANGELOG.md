@@ -4,6 +4,17 @@
 
 ---
 
+### v1.1.4 - 2026-03-16
+- New Standalone Utility: Added `plot-dragen-metrics` to plot backbone QC metrics in DRAGEN's `MetricsOutput.tsv`.
+- Feature: Added functionality to compile a systemic fail tract (`common_fail_regions.bed`) using cohort-level base-specific fail data. Threshold can be adjusted with `--fail_percent_threshold` parameter (default: 10).
+- Improvement: Added support for parsing metrics from JSON files in `compile-dragen-metrics`.
+- Improvement: Enabled multiple inputs to `--analysis-dirs` (formerly `--analysis-dir`) in `compile-dragen-metrics`.
+- Improvement: Updated workflow to allow direct CRAM injection into mpileup, bypassing intermediate BAM generation and reducing overhead.
+- Bugfix: Fixed sorting inconsistency during plotting (now deterministic).
+- Bugfix: Fixed tract generation bug causing off-by-one error (indexing concordance now aligned).
+
+---
+
 ### v1.1.3 - 2026-01-26
 - New Standalone Utility: Added `compile-dragen-metrics` to extract and format backbone QC metrics from DRAGEN output files.
 - New Standalone Utility: Added `fetch-pull-requests` to fetch pull requests using a given bitbucket url, project, repo (optional), and authentication token.

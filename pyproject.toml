@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clinical-tools"
-version = "1.1.3"
+version = "1.1.4"
 description = "An integrated toolset to support clinical validation"
 authors = ["Canada's Michael Smith Genome Sciences Centre - Precision Informatics"]
 readme = "README.md"
@@ -41,6 +41,7 @@ fetch-pull-requests = "bin.fetch_pull_requests:main"
 generate-standardized-bed = "bin.generate_standardized_bed:main"
 jira-table = "bin.jira_table:main"
 manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
+plot-dragen-metrics = "bin.plot_dragen_metrics:main"
 plot-signal-correlation = "bin.plot_signal_correlation:main"
 plot-target-tracts = "bin.plot_target_tracts:main"
 summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
