@@ -10,30 +10,21 @@ from typing import TextIO
 
 import pandas as pd
 
+_SNIFF_READ_SIZE = 4096
+
 # Setup logging:
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 def detect_format(file_path: str | TextIO) -> str:
-    """
-    Detect file format based on extension.
+    """Detect file format based on extension.
 
     Args:
         file_path: Path to the file, or TextIO for stdin
 
     Returns:
         Detected format: 'csv', 'tsv', 'excel', or 'json'
-
-    Examples:
-        >>> detect_format("file.csv")
-        'csv'
-        >>> detect_format("file.tsv")
-        'tsv'
-        >>> detect_format("file.xlsx")
-        'excel'
-        >>> detect_format("file.json")
-        'json'
     """
     if hasattr(file_path, "read"):
         return "csv"
@@ -64,13 +55,7 @@ def read_dataframe(
         delimiter: Custom delimiter character, or None for auto-detection
 
     Returns:
-        pandas DataFrame containing the file data, or None if read fails
-
-
-    Examples:
-        >>> df = read_dataframe("data.csv")
-        >>> df = read_dataframe("data.tsv", delimiter="|")
-        >>> df = read_dataframe(None, format_type="csv")  # Read from stdin
+        DataFrame or None if reading fails.
     """
     try:
         # Auto-detect format if not specified
@@ -150,7 +135,7 @@ def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
             keep_buffer = True
         else:
             with open(file_path, "r", encoding="utf-8") as f:
-                buffer = f.read(4096)
+                buffer = f.read(_SNIFF_READ_SIZE)
                 keep_buffer = False
 
         sniffer = csv.Sniffer()
