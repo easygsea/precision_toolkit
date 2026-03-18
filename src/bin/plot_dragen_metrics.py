@@ -37,8 +37,7 @@ def parse_metrics_output_tsv(
     rgsm_delim: str,
     num_rgsm_fields: int,
 ) -> tuple[pd.DataFrame, dict[str, set[float]]]:
-    """
-    Parse specified metrics from MetricsOutput.tsv and returns dataframes.
+    """Extract specified metrics from MetricsOutput.tsv and return data and limits.
 
     Args:
         metrics_file: Path to MetricsOutput.tsv.

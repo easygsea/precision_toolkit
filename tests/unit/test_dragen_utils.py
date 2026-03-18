@@ -111,8 +111,7 @@ def test_format_metric(
     expected_val: float | None,
     request: pytest.FixtureRequest,
 ) -> None:
-    """
-    Test format_metric.
+    """Test format_metric.
 
     Several scenarios are tested and compared to expected outputs via parametrization:
     - Valid float value and num_decimal_places property set in DragenMetric
@@ -138,8 +137,7 @@ def test_scale_metric(
     expected_val: float,
     request: pytest.FixtureRequest,
 ) -> None:
-    """
-    Test scale_metric.
+    """Test scale_metric.
 
     Several scenarios are tested and compared to expected outputs via parametrization:
     - Valid float value and scale_factor property set in DragenMetric
@@ -188,8 +186,7 @@ def test_calc_derived_pct_metric(
     mapped_reads_val: float | None,
     expected_val: float | None,
 ) -> None:
-    """
-    Test calc_derived_pct_metric.
+    """Test calc_derived_pct_metric.
 
     Several scenarios are tested and compared to expected outputs via parametrization:
     - Valid base metric and mapped reads values

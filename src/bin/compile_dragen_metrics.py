@@ -20,12 +20,7 @@ from clinical_tools.dragen.utils import (
 
 
 def main() -> None:
-    """
-    Parse DRAGEN output files and compile backbone metrics.
-
-    Returns:
-        None, writes metrics to a TSV file.
-    """
+    """Compile DRAGEN backbone metrics and write to TSV."""
     parser = argparse.ArgumentParser(
         description=(
             "Parse DRAGEN analysis files for a given sample, then compile and format "

@@ -74,15 +74,7 @@ def generate_all_data_csv(
 
 
 def main() -> None:
-    """
-    Summarize and compute diagnostic metrics from VCF comparisons.
-
-    Args:
-        None. Arguments are parsed from command line.
-
-    Returns:
-        None. Results are saved to CSV, Markdown, and Word files.
-    """
+    """Summarize diagnostic metrics; returns CSV, Markdown, Word outputs."""
     parser = argparse.ArgumentParser(
         description=("Summarize and compute diagnostic metrics from VCF comparisons.")
     )

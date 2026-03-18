@@ -11,13 +11,13 @@ import pytest
 
 @pytest.fixture
 def test_data_dir(pytestconfig: pytest.Config) -> Path:
-    """Fixture for the test data directory."""
+    """Test data directory."""
     return pytestconfig.rootpath / "tests_data/dragen_metrics"
 
 
 @pytest.fixture
 def expected_checksums(test_data_dir: Path) -> dict:
-    """Fixture to load the expected checksums JSON."""
+    """Load expected checksums."""
     with open(test_data_dir / "test_plot_dragen_metrics_checksums.json") as f:
         return json.load(f)
 

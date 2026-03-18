@@ -40,18 +40,7 @@ from clinical_tools.core.statistics.proportion import (
 
 
 def main() -> None:
-    """
-    Manually curate a diagnostic metric.
-
-    This script reads a CSV file containing a diagnostic metric, updates
-    specified statistics based on user input, and then exports the results.
-
-    Args:
-        None (arguments are parsed from command line)
-
-    Returns:
-        None
-    """
+    """Manually curate a diagnostic metric from CSV and export updated results."""
     parser = argparse.ArgumentParser(
         description="Curate diagnostic metrics from an existing table with count "
         "information and recompute statistics. Example: "

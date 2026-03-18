@@ -17,8 +17,7 @@ def pandas_to_word(
     heading: str | None = None,
     summary: str | None = None,
 ) -> Any:
-    """
-    Generate a Word document from a pandas DataFrame.
+    """Generate a Word document from a pandas DataFrame.
 
     Args:
         doc: The Word document object to populate.
@@ -48,8 +47,7 @@ def pandas_to_word(
 
 
 def initiate_word_document() -> Any:
-    """
-    Create and return an empty Word document.
+    """Create and return an empty Word document.
 
     Returns:
         A new Word document object.
@@ -58,8 +56,7 @@ def initiate_word_document() -> Any:
 
 
 def save_word_document(output_file: str | Path, doc: Any = _DEFAULT_DOCUMENT) -> Any:
-    """
-    Save a Word document to a file.
+    """Save a Word document to a file.
 
     Args:
         doc: The Word document object to save.

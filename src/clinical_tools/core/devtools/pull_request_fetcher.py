@@ -15,8 +15,7 @@ logger = logging.getLogger(__name__)
 def fetch_pull_requests(
     bitbucket_url: str, project: str, repo: str, token: str
 ) -> None:
-    """
-    Fetch Pull Requests.
+    """Fetch Pull Requests.
 
     Args:
         bitbucket_url: URL for the BitBucket to fetch PR's from.

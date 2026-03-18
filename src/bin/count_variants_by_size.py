@@ -25,16 +25,7 @@ from clinical_tools.analysis.vcf import count_variants_by_size
 
 
 def main() -> None:
-    """Count variants by size in a VCF file or folder of VCF files.
-
-    Args:
-        input_path: Path to the VCF file or folder containing VCF files
-        size-stratification: Size stratification points (default: [1, 25, 49, 999])
-        count-occurrences: Count variant occurrences in multi-sample VCFs
-
-    Returns:
-        Standard output with size ranges and counts
-    """
+    """Print variant counts by size range from VCF(s)."""
     parser = argparse.ArgumentParser(
         description="Count variants by size in a VCF file or folder of VCF files."
     )

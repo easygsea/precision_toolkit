@@ -47,7 +47,7 @@ class Strand(str, Enum):
 
 @dataclass
 class GenomicRange:
-    """Class for tracking a genomic range and associated number attribute."""
+    """Genomic range with optional number attribute."""
 
     range: tuple
     number_attribute: str = ""
@@ -55,7 +55,7 @@ class GenomicRange:
 
 @dataclass
 class Transcript:
-    """Class for tracking a transcript's feature counts and ranges."""
+    """Transcript features, counts, and ranges."""
 
     refseq_accession: str
     strand: Strand
@@ -70,8 +70,7 @@ class Transcript:
     stop_codon: GenomicRange | None = None
 
     def calc_intron_ranges(self, exon_ranges: list[GenomicRange]) -> None:
-        """
-        Calculate introns based on provided exon ranges.
+        """Calculate introns based on provided exon ranges.
 
         feature_counts attribute is updated to reflect new intron feature and
         exon_to_intron attribute is populated with a 1-to-1 mapping of exon range to
@@ -116,8 +115,7 @@ class Transcript:
                 self.feature_counts["intron"] = len(self.introns)
 
     def exclude_noncoding_exons(self) -> None:
-        """
-        Exclude and/or trim exons to remove non-coding portions (i.e. UTRs).
+        """Exclude and/or trim exons to remove non-coding portions (i.e. UTRs).
 
         exon_to_coding_exon attribute is populated with a 1-to-1 mapping of exon range
         to coding exon GenomicRange object.
@@ -207,14 +205,12 @@ def parse_bed_file(
     refseq_accession_regex_pattern: re.Pattern[str],
     target_genes: set[str],
 ) -> tuple[dict[str, Transcript], set[str]]:
-    """
-    Parse input BED file to track feature counts and genomic ranges per transcript.
+    """Parse BED file; return transcript map and genes found.
 
     Args:
-        bed_file_path: Path to input BED file.
-        refseq_accession_regex_pattern: Compiled regex to extract RefSeq accession.
-        target_genes: Set of target gene symbols to filter for. If empty, all genes
-            are included.
+        bed_file_path: Input BED file path.
+        refseq_accession_regex_pattern: Regex for RefSeq accession.
+        target_genes: Gene symbols to include. If empty, all genes are included.
 
     Returns:
         Tuple containing:

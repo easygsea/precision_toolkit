@@ -27,8 +27,7 @@ from clinical_tools.core.statistics.proportion import (
 def load_data_from_files(
     files: Sequence[str], data_type: VariantConcordanceEngine
 ) -> list[VariantCallMetrics]:
-    """
-    Load data from files based on the specified data type.
+    """Load data from files based on the specified data type.
 
     Args:
         files: Sequence of paths to the files to be loaded
@@ -70,8 +69,7 @@ def compute_concordance_and_ci(
     ci_method: ProportionConfidenceIntervalMethod,
     ci_level: float = DEFAULT_CI_LEVEL,
 ) -> dict[tuple[str, str], tuple[int, int, int, float, float, float]]:
-    """
-    Compute concordance and confidence intervals grouped by variant type and filter.
+    """Compute concordance and confidence intervals grouped by variant type and filter.
 
     Args:
         metrics: Sequence of parsed metrics across samples
@@ -107,8 +105,7 @@ def _compute_concordance_and_ci_for_group(
     ci_method: ProportionConfidenceIntervalMethod,
     ci_level: float = DEFAULT_CI_LEVEL,
 ) -> tuple[int, int, int, float, float, float]:
-    """
-    Calculate concordance and confidence intervals for a group of variants.
+    """Calculate concordance and confidence intervals for a group of variants.
 
     Helper function for compute_concordance_and_ci that processes
     a single group of variants with the same type and filter.
@@ -163,8 +160,7 @@ def compute_sensitivity_and_ci(
     ci_method: ProportionConfidenceIntervalMethod,
     ci_level: float = DEFAULT_CI_LEVEL,
 ) -> dict[tuple[str, str], tuple[int, int, float, float, float]]:
-    """
-    Compute sensitivity and confidence intervals grouped by variant type and filter.
+    """Compute sensitivity and confidence intervals grouped by variant type and filter.
 
     Args:
         metrics: Sequence of parsed metrics across samples
@@ -195,13 +191,13 @@ def _compute_sensitivity_and_ci_for_group(
     ci_method: ProportionConfidenceIntervalMethod,
     ci_level: float = DEFAULT_CI_LEVEL,
 ) -> tuple[int, int, float, float, float]:
-    """
-    Calculate sensitivity and confidence intervals for a group of variants.
+    """Calculate sensitivity and confidence intervals for a group of variants.
 
     Args:
         group: List of variant metrics to aggregate, all with same type and filter
         ci_method: Statistical method for confidence interval calculation
         ci_level: Confidence level for confidence intervals (default: DEFAULT_CI_LEVEL)
+
     Returns:
         Tuple of metrics:
             truth_tp: Number of true positives
@@ -236,8 +232,7 @@ def compute_precision_and_ci(
     ci_method: ProportionConfidenceIntervalMethod,
     ci_level: float = DEFAULT_CI_LEVEL,
 ) -> dict[tuple[str, str], tuple[int, int, float, float, float]]:
-    """
-    Compute precision and confidence intervals grouped by variant type and filter.
+    """Compute precision and confidence intervals grouped by variant type and filter.
 
     Args:
         metrics: Sequence of parsed metrics across samples
@@ -268,8 +263,7 @@ def _compute_precision_and_ci_for_group(
     ci_method: ProportionConfidenceIntervalMethod,
     ci_level: float = DEFAULT_CI_LEVEL,
 ) -> tuple[int, int, float, float, float]:
-    """
-    Calculate precision and confidence intervals for a group of variants.
+    """Calculate precision and confidence intervals for a group of variants.
 
     Args:
         group: List of variant metrics to aggregate, all with same type and filter
@@ -309,8 +303,7 @@ def compute_f1_score(
     metrics: list[VariantCallMetrics],
     ci_method: ProportionConfidenceIntervalMethod,
 ) -> dict[tuple[str, str], tuple[float, float, float]]:
-    """
-    Calculate F1 score from sensitivity and precision for grouped metrics.
+    """Calculate F1 score from sensitivity and precision for grouped metrics.
 
     Args:
         metrics: Sequence of parsed metrics across samples
@@ -343,8 +336,7 @@ def process_diagnostic_metrics(
     ci_method: ProportionConfidenceIntervalMethod,
     ci_level: float = DEFAULT_CI_LEVEL,
 ) -> dict[str, dict[tuple[str, str], tuple]]:
-    """
-    Process VCF comparison results and compute diagnostic metrics.
+    """Process VCF comparison results and compute diagnostic metrics.
 
     Args:
         file_paths: Sequence of file paths to process

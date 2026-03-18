@@ -55,11 +55,7 @@ def read_dataframe(
     format_type: str | None = None,
     delimiter: str | None = None,
 ) -> pd.DataFrame | None:
-    """
-    Read DataFrame from file or stdin with automatic format detection.
-
-    Supports CSV, TSV, EXCEL and JSON formats. Automatically detects file format
-    from extension if not specified, and can sniff delimiters for text files.
+    """Read DataFrame from file or stdin with automatic format detection.
 
     Args:
         input_file: Path to input file, or TextIO to read from stdin
@@ -139,11 +135,7 @@ def read_dataframe(
 
 
 def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
-    """
-    Try to sniff delimiter from file content using CSV sniffer.
-
-    This is useful for files that don't have standard extensions or
-    use non-standard delimiters.
+    """Detect delimiter from file using CSV sniffer.
 
     Args:
         file_path: Path to the file, or TextIO for stdin
@@ -151,10 +143,6 @@ def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
     Returns:
         Tuple containing the detected delimiter character and the read buffer.
         If detection fails, returns None.
-
-    Examples:
-        >>> sniff_delimiter("data.txt")  # Could return ';', '|', etc.
-        ';'
     """
     try:
         if hasattr(file_path, "read"):

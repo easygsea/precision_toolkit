@@ -48,16 +48,7 @@ def identify_raw_signal_columns(signal_df: pd.DataFrame) -> list[str]:
 
 
 def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.DataFrame:
-    """
-    Extract and merge signals from truth and query signal files.
-
-    Args:
-        truth_signal_file: Path to the truth signal file.
-        query_signal_file: Path to the query signal file.
-
-    Returns:
-        DataFrame with merged signals from both files.
-    """
+    """Merge signals from truth and query files into one DataFrame."""
     truth_signal_df = pd.read_csv(truth_signal_file, sep="\t", header=0)
     query_signal_df = pd.read_csv(query_signal_file, sep="\t", header=0)
 
@@ -87,18 +78,7 @@ def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.Data
 
 
 def identify_signal_columns(signal_df: pd.DataFrame) -> tuple[str, str]:
-    """
-    Identify truth and query signal column names from the DataFrame.
-
-    Args:
-        signal_df: DataFrame with merged signals.
-
-    Returns:
-        Tuple of (truth_column_name, query_column_name).
-
-    Raises:
-        ValueError: If truth or query columns cannot be identified.
-    """
+    """Return names of the truth and query signal columns or raise ValueError."""
     truth_cols = [
         col
         for col in signal_df.columns
@@ -126,15 +106,7 @@ def identify_signal_columns(signal_df: pd.DataFrame) -> tuple[str, str]:
 
 
 def calculate_correlation(signal_df: pd.DataFrame) -> tuple[float, float]:
-    """
-    Calculate Pearson correlation and p-value between signals.
-
-    Args:
-        signal_df: DataFrame with merged signals.
-
-    Returns:
-        Tuple of (correlation coefficient, p-value).
-    """
+    """Return Pearson correlation and p-value for merged signals."""
     if signal_df.empty:
         return 0.0, 1.0
 
@@ -154,18 +126,17 @@ def plot_signal_correlation(
     ylim: tuple[float, float] | None = None,
     filter_source: str = "",
 ) -> None:
-    """
-    Generate a scatter plot with optional correlation statistics.
-
+    """Scatter plot of merged signals with optional regression and correlation.
+    
     Args:
-        signal_df: DataFrame with merged signals.
-        output_file: Path to save the output figure.
-        show_regression: Whether to display the regression line.
-        title: Title for the plot.
-        figsize: Figure dimensions.
+        signal_df: Input DataFrame.
+        output_filename: Output figure path.
+        show_regression: If True, show regression line and Pearson stats.
+        title: Plot title.
+        figsize: Figure size (w, h).
         xlim: Optional tuple of (min, max) for x-axis range.
         ylim: Optional tuple of (min, max) for y-axis range.
-        filter_source: FILTER column to use for coloring ('', 'truth', or 'query').
+        filter_source: Color by 'FILTER_TRUTH' or 'FILTER_QUERY' if provided.
     """
     truth_col, query_col = identify_signal_columns(signal_df)
 

@@ -16,8 +16,7 @@ def pandas_to_jira_table(
     float_format: int | None,
     pretty_print: bool,
 ) -> str:
-    """
-    Convert DataFrame to JIRA table format using tabulate.
+    """Convert DataFrame to JIRA table format using tabulate.
 
     Args:
         df: DataFrame to convert
@@ -81,8 +80,7 @@ def populate_jira_table(
     float_format: int | None,
     pretty_print: bool,
 ) -> str:
-    """
-    Generate a complete JIRA table document from DataFrame.
+    """Generate a complete JIRA table document from DataFrame.
 
     Args:
         df: DataFrame to convert
@@ -90,6 +88,7 @@ def populate_jira_table(
         summary: Optional summary before table
         float_format: Optional float format type
         pretty_print: Optional to add spaces between columns
+
     Returns:
         Generated JIRA content
     """

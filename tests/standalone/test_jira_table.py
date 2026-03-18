@@ -13,7 +13,7 @@ from clinical_tools.core.writers.jira_table import (
 
 @pytest.fixture
 def sample_files(tmp_path: Path) -> dict[str, Path | pd.DataFrame]:
-    """Fixture for sample CSV, TSV, EXCEL and JSON files."""
+    """Create sample CSV, TSV, Excel, and JSON files for testing."""
     df = pd.DataFrame(
         {
             "Name": ["Alice", "Bob", "Charlie", "David"],

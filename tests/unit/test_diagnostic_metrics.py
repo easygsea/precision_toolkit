@@ -32,8 +32,7 @@ def test_sensitivity_metrics(
     truth_fn: int,
     expected_sensitivity: float,
 ) -> None:
-    """
-    Test SensitivityMetrics with parametrized inputs.
+    """Test SensitivityMetrics.
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
@@ -75,8 +74,7 @@ def test_precision_metrics(
     query_fp: int,
     expected_precision: float,
 ) -> None:
-    """
-    Test PrecisionMetrics with parametrized inputs.
+    """Test PrecisionMetrics.
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
@@ -168,8 +166,7 @@ def test_concordance_metrics(
     tp_method: ConcordanceTPMethod,
     expected_concordance: float,
 ) -> None:
-    """
-    Test ConcordanceMetrics with parametrized inputs and TP selection methods.
+    """Test ConcordanceMetrics with TP selection methods.
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
@@ -214,8 +211,7 @@ def test_f1_score(
     query_fp: int,
     expected_f1: float,
 ) -> None:
-    """
-    Test F1 score calculation with parametrized inputs.
+    """Test F1 score calculation.
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
@@ -386,8 +382,7 @@ def test_confidence_interval_sensitivity(
     ci_level: float,
     expected_ci: tuple[float, float],
 ) -> None:
-    """
-    Test confidence interval calculation for sensitivity with parametrized inputs.
+    """Test sensitivity confidence interval calculation.
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
@@ -524,8 +519,7 @@ def test_confidence_interval_precision(
     ci_level: float,
     expected_ci: tuple[float, float],
 ) -> None:
-    """
-    Test confidence interval calculation for precision with parametrized inputs.
+    """Test precision confidence interval calculation.
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.
@@ -699,8 +693,7 @@ def test_confidence_interval_concordance(
     ci_level: float,
     expected_ci: tuple[float, float],
 ) -> None:
-    """
-    Test confidence interval calculation for concordance with parametrized inputs.
+    """Test concordance confidence interval calculation.
 
     Execution Order:
     1. Initialize VariantCallMetrics with provided parameters.

@@ -10,7 +10,7 @@ from clinical_tools.dragen.metrics_parser import DragenMetricsParser
 
 @pytest.fixture
 def test_data_dir(pytestconfig: pytest.Config) -> Path:
-    """Fixture for the test data directory."""
+    """Test data directory."""
     return pytestconfig.rootpath / "tests_data/dragen_metrics"
 
 
@@ -74,8 +74,7 @@ def test_data_dir(pytestconfig: pytest.Config) -> Path:
 def test_dragen_metric_obj_creation(
     test_data_dir: Path, metric_name: str, expected_properties: dict
 ) -> None:
-    """
-    Test DragenMetric objects are created correctly.
+    """Test DragenMetric objects are created correctly.
 
     Several scenarios are tested and compared to expected outputs via parametrization:
     - Metric with all properties
@@ -165,8 +164,7 @@ def test_invalid_config_incomplete_failure_spec(
 def test_dragen_metrics_parser(
     test_data_dir: Path, sample: str, expected_metrics: dict[str, Any]
 ) -> None:
-    """
-    Test DragenMetricsParser correctly extracts metrics from source files.
+    """Test DragenMetricsParser correctly extracts metrics from source files.
 
     Several scenarios are tested and compared to expected outputs via parametrization:
     - Source files with all values present

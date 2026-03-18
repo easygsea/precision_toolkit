@@ -29,15 +29,7 @@ import seaborn as sns
 
 
 def main() -> None:
-    """
-    Visualize tract/target scores output from target evaluation workflow, by poolID.
-
-    Args:
-        None. Arguments are parsed from command line.
-
-    Returns:
-        None. Results are saved as PNG files.
-    """
+    """Plot target/tract scores by poolID from command-line args; saves figures."""
     # Get input parameters
     parser = argparse.ArgumentParser(
         description=("Plot visualizations per-target region.")

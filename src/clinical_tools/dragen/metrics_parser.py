@@ -19,11 +19,10 @@ logging.basicConfig(
 
 
 class DragenMetricsParser:
-    """Parser for extracting metrics from DRAGEN analysis output files."""
+    """Extract metrics from DRAGEN output files."""
 
     def __init__(self, config_path: Path, rgsm: str):
-        """
-        Initialize parser for DRAGEN output files.
+        """Initialize parser for DRAGEN output files.
 
         Args:
             config_path: Path to JSON configuration specifying source files and metrics.
@@ -43,8 +42,7 @@ class DragenMetricsParser:
         self._validate_reported_metrics()
 
     def _split_metric_property(self, metric_property: str) -> tuple[str, str]:
-        """
-        Split metric property into metric and attribute.
+        """Split metric property into metric and attribute.
 
         Versioned attributes (e.g. MEDIAN_INSERT_SIZE.V1.LSL) are split such that metric
         does not include version info (e.g. ("MEDIAN_INSERT_SIZE", "V1.LSL")).
@@ -68,8 +66,7 @@ class DragenMetricsParser:
         all_metric_properties: dict[str, float | str],
         all_factor_operations: dict[str, str],
     ) -> tuple[float | None, str, int | None, str, float | None, str, dict[str, Any]]:
-        """
-        Get properties for all metrics in a source file.
+        """Get properties for all metrics in a source file.
 
         Properties includes key-value pairs stored under 'Constants', 'Failures', and
         'FactorOperations' in JSON spec.
@@ -150,8 +147,7 @@ class DragenMetricsParser:
     def _build_metric_group_sources(
         self, source_to_config: dict[str, Any], rgsm: str
     ) -> dict[str, SourceFile]:
-        """
-        Create SourceFile objects for each metric group.
+        """Create SourceFile objects for each metric group.
 
         For each 'DataSource' in JSON spec, create SourceFile object by extracting
         metrics, specification for extracting metrics, and properties for each metric.
@@ -259,8 +255,7 @@ class DragenMetricsParser:
     def _parse_csv(
         self, source_csv_path: Path, name_to_metric_obj: dict[str, DragenMetric]
     ) -> dict[str, float | None]:
-        """
-        Parse CSV source file for metrics.
+        """Parse CSV source file for metrics.
 
         Args:
             source_csv_path: Path to CSV source file.
@@ -348,8 +343,7 @@ class DragenMetricsParser:
         return metric_name_to_value
 
     def _get_value_by_jsonpath_expr(self, json_data: dict, jsonpath_expr: str) -> str:
-        """
-        Extract value from nested JSON data using JSONPath expression.
+        """Extract value from nested JSON data using JSONPath expression.
 
         Args:
             json_data: Dictionary with data loaded from JSON source file.
@@ -372,8 +366,7 @@ class DragenMetricsParser:
     def _parse_json(
         self, source_json_path: Path, name_to_metric_obj: dict[str, DragenMetric]
     ) -> dict[str, float | None]:
-        """
-        Parse JSON source file for metrics.
+        """Parse JSON source file for metrics.
 
         Args:
             source_json_path: Path to JSON source file.
@@ -427,8 +420,7 @@ class DragenMetricsParser:
         return metric_name_to_value
 
     def parse_metrics(self, analysis_dirs: list[Path]) -> dict[str, float | None]:
-        """
-        Resolve paths to all source files, then parse metrics.
+        """Resolve paths to all source files, then parse metrics.
 
         Args:
             analysis_dirs: Path(s) to one or more DRAGEN analysis directories containing

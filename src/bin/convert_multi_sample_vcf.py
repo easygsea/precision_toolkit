@@ -26,35 +26,12 @@ CONSTANT_FIELDS = [
 
 
 def get_empty_format(format_line: str) -> str:
-    """
-    Get an empty version of the format for VCF.
-
-    Args:
-        format_line: reference format
-
-    Returns:
-        empty version of the format
-
-    Example:
-        >>> get_empty_format("GT:AD:DP")
-        '.:.:.'
-    """
+    """Return empty FORMAT field (e.g. 'GT:AD:DP' -> '.:.:.')."""
     return ":".join("." * len(format_line.split(":")))
 
 
 def parse_file(input_file_path: Path) -> tuple[list[str], pd.DataFrame]:
-    """
-    Parse the multi sample vcf file and converts into a pandas dataframe.
-
-    Args:
-        input_file_path: path to the multi sample VCF file
-
-    Returns:
-        info_lines: header lines in the beginning of the VCF file
-        header_line: line containing all the headers including the identifiers
-        df: pandas DataFrame containing the sample information
-
-    """
+    """Parse multi-sample VCF. Returns meta-info lines and DataFrame of variants."""
     info_lines: list[str] = []
     if input_file_path.suffix == ".gz":
         file = gzip.open(input_file_path, "rt")
@@ -77,17 +54,13 @@ def parse_file(input_file_path: Path) -> tuple[list[str], pd.DataFrame]:
 def write_file(
     info_header: list[str], df: pd.DataFrame, output_location: Path, file_suffix: str
 ) -> None:
-    """
-    Write individual samples to respective file in the output location.
+    """Write one single-sample VCF file per sample column.
 
     Args:
-        info_header: info header lines in the original VCF file
-        df: dataframe capturing all the information in the original file
-        output_location: output directory as specified by the user
-        file_suffix: optional suffix to be added to VCF file names
-
-    Returns:
-        None, but writes to files in the output directory
+        info_header: VCF meta headers ('##')
+        df: DataFrame with variant/sample columns
+        output_location: Output directory
+        file_suffix: Extra output filename suffix
     """
     identifiers = [col for col in df.columns if col not in CONSTANT_FIELDS]
     empty_format = get_empty_format(df.iloc[0]["FORMAT"])
@@ -108,12 +81,7 @@ def write_file(
 
 
 def main() -> None:
-    """
-    Parse the original VCF and split into single-sample VCF files with each sample.
-
-    Returns:
-        None, modifies the output directory
-    """
+    """Split a multi-sample VCF into single-sample VCF files."""
     parser = argparse.ArgumentParser(
         description="Convert multi-sample VCF files into a folder of single-sample VCFs"
     )
