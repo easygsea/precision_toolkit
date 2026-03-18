@@ -133,7 +133,7 @@ workflow variant_benchmark_workflow {
                     "raw"
                 )
                 summary_files = raw_results.truvari_bench_summary
-                    .concat(raw_results.truvari_parameters_renamed)
+                    .concat(raw_results.truvari_parameters)
                     .collect()
 
                 // If enable_refine is true, run truvari refine
@@ -146,7 +146,7 @@ workflow variant_benchmark_workflow {
                         "${params.variant_benchmark_subdir}/raw",
                         "raw"
                     ).truvari_refine_summary
-                        .concat(raw_results.truvari_parameters_renamed)
+                        .concat(raw_results.truvari_parameters)
                         .collect()
                 }
             }
@@ -162,7 +162,7 @@ workflow variant_benchmark_workflow {
                     "curated"
                 )
                 summary_files_curated = curated_results.truvari_bench_summary
-                    .concat(curated_results.truvari_parameters_renamed)
+                    .concat(curated_results.truvari_parameters)
                     .collect()
 
                 // If enable_refine is true, run truvari refine
@@ -173,7 +173,7 @@ workflow variant_benchmark_workflow {
                         "${params.variant_benchmark_subdir}/curated",
                         "curated"
                     ).truvari_refine_summary
-                        .concat(curated_results.truvari_parameters_renamed)
+                        .concat(curated_results.truvari_parameters)
                         .collect()
                 }
             }

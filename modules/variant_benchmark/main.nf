@@ -106,8 +106,8 @@ process run_truvari_bench {
     val label
 
     output:
-    path("*/*summary.json"), emit: truvari_bench_summary
-    path("*params.json"), emit: truvari_parameters_renamed
+    path("*summary.json"), emit: truvari_bench_summary
+    path("*params.json"), emit: truvari_parameters
     tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
 
     script:
@@ -119,8 +119,9 @@ process run_truvari_bench {
         --reference "${genome_ref}" \
         --output "${PREFIX}" \
         ${truvari_options}
-    mv "${PREFIX}/summary.json" "${PREFIX}/${PREFIX}.summary.json"
-    # Create a temporary copy of params.json which can be uniquely identified when passed to summarize_diagnostic_metrics
+
+    # Create temporary copies of summary.json and params.json which can be uniquely identified when passed to summarize_diagnostic_metrics
+    cp "${PREFIX}/summary.json" "${PREFIX}.summary.json"
     cp "${PREFIX}/params.json" "${PREFIX}.params.json"
     """
 }
@@ -139,7 +140,7 @@ process run_truvari_refine {
     val label
 
     output:
-    path("*/*.refine.variant_summary.json"), emit: truvari_refine_summary
+    path("*refine.variant_summary.json"), emit: truvari_refine_summary
     tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
 
     script:
@@ -150,11 +151,11 @@ process run_truvari_refine {
         ${truvari_options} \
         "${truvari_bench_results}"
 
-    # Rename file if regions were refined, otherwise copy original truvari bench summmary as refine outputs are not generated when unsuccessful
+    # Create temporary copy if regions were refined, otherwise copy original truvari bench summmary as refine outputs are not generated when unsuccessful
     if [[ -f "${PREFIX}/refine.variant_summary.json" ]]; then
-        mv "${PREFIX}/refine.variant_summary.json" "${PREFIX}/${PREFIX}.refine.variant_summary.json"
+        cp "${PREFIX}/refine.variant_summary.json" "${PREFIX}.refine.variant_summary.json"
     else
-        cp "${PREFIX}/${PREFIX}.summary.json" "${PREFIX}/${PREFIX}.refine.variant_summary.json"
+        cp "${PREFIX}/summary.json" "${PREFIX}.refine.variant_summary.json"
     fi
     """
 }
