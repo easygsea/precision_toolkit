@@ -29,16 +29,24 @@ BAMBOO_CONFIG_DOC
 set -euxo pipefail
 
 IMAGE_NAME="$1"
+DOCKERFILE_HASH=$(md5sum ./Dockerfile | cut -d' ' -f1)
+DOCKER_TAG="clinical_tools:${DOCKERFILE_HASH}"
 
 rm -rfv "${IMAGE_NAME}"
 
-docker build -t clinical_tools:bamboo -f ./Dockerfile .
+# Only rebuild Docker image if Dockerfile changed
+if ! docker image inspect "${DOCKER_TAG}" &>/dev/null; then
+    echo "Building Docker image..."
+    docker build -t "${DOCKER_TAG}" -f ./Dockerfile .
+fi
 
-echo "Building apptainer image...."
+echo "Building Apptainer image..."
 ( while true; do echo "Still building..."; sleep 60; done ) &
 KEEPALIVE_PID=$!
 
-sudo apptainer build "${IMAGE_NAME}" docker-daemon://clinical_tools:bamboo
-chmod --changes g+w "${IMAGE_NAME}"
+sudo apptainer build \
+    "${IMAGE_NAME}" \
+    docker-daemon://"${DOCKER_TAG}"
 
-kill $KEEPALIVE_PID || true
+chmod --changes g+w "${IMAGE_NAME}"
+kill "${KEEPALIVE_PID}" || true
