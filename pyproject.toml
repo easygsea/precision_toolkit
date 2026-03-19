@@ -20,8 +20,8 @@ dependencies = [
     "openpyxl==3.1.5"
 ]
 
-[tool.uv_build]
-packages = ["src/clinical_tools", "src/bin"]
+[tool.uv.build-backend]
+module-name = ["clinical_tools", "bin"]
 
 [project.scripts]
 compile-dragen-metrics = "bin.compile_dragen_metrics:main"
