@@ -1,6 +1,6 @@
 # Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)
 
-The variant benchmark module compares variant calls between truth and query VCF files across multiple samples using either [hap.py](https://github.com/Illumina/hap.py) or [witty.er](https://github.com/EBIvariation/witty.er), and calculates diagnostic metrics including concordance, sensitivity, precision, and F1 score.
+The variant benchmark module compares variant calls between truth and query VCF files across multiple samples using either [hap.py](https://github.com/Illumina/hap.py), [Truvari](https://github.com/ACEnglish/truvari), or [witty.er](https://github.com/EBIvariation/witty.er), and calculates diagnostic metrics including concordance, sensitivity, precision, and F1 score.
 
 By default, all metrics, and their confidence intervals (CIs) wherever applicable, are calculated.
 
@@ -23,7 +23,7 @@ nextflow run main.nf \
 --workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
---variant_benchmark_engine wittyer
+--variant_benchmark_engine <truvari|wittyer>
 ```
 
 Small variant benchmark excluding spurious variants:
@@ -43,7 +43,7 @@ nextflow run main.nf \
 --workflows variant_benchmark \
 --truth_dir <path/to/truth_vcf_dir> \
 --query_dir <path/to/query_vcf_dir> \
---variant_benchmark_engine wittyer \
+--variant_benchmark_engine <truvari|wittyer> \
 --spurious_variants_vcf <path/to/spurious_variants_vcf>
 ```
 
@@ -59,7 +59,19 @@ nextflow run main.nf \
 --happy_options "--write-vcf --write-counts --pass-only"
 ```
 
-Custom large variant benchmark:
+Custom large variant benchmark using Truvari bench + refine:
+```bash
+nextflow run main.nf \
+--workflows variant_benchmark \
+--truth_dir <path/to/truth_vcf_dir> \
+--query_dir <path/to/query_vcf_dir> \
+--variant_benchmark_engine truvari \
+--diagnostic_metrics "sensitivity precision" \
+--truvari_bench_options "--passonly --refdist 1000 --chunksize 2000"
+--enable_refine
+```
+
+Custom large variant benchmark using witty.er:
 ```bash
 nextflow run main.nf \
 --workflows variant_benchmark \
@@ -92,8 +104,8 @@ nextflow run main.nf \
 - `--workflows variant_benchmark`: Required parameter to run variant_benchmark workflow.
 - `--truth_dir`: The directory containing truth VCF files (ground truth). These must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz.
 - `--query_dir`: The directory containing query VCF files (the test or experimental dataset). These must be named as <sample>.query.vcf or <sample>.query.vcf.gz.
-- `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, or `wittyer`, default: `happy`).
-- `--genome_ref`: Required for hap.py: Reference genome FASTA file.
+- `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, `truvari`, or `wittyer`, default: `happy`).
+- `--genome_ref`: Required for hap.py and Truvari: Reference genome FASTA file.
 
 **Optional Parameters:**
 - `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
@@ -102,6 +114,10 @@ nextflow run main.nf \
 - `--happy_engine`: hap.py engine to use (default: `vcfeval`) Options: `vcfeval`, `xcmp`, `scmp-distance`, `scmp-somatic`. Note: `vcfeval` mode only evaluates PASS variants as hap.py does not support `vcfeval --all-records`.
 - `--happy_options`: Additional hap.py options (default: `--write-vcf --write-counts`). Must quote the string and use = to assign the value.
 - `--sompy_options`: Additional som.py options (default: `--include-nonpass`). Must quote the string and use = to assign the value.
+- `--truvari_bench_options`: Additional Truvari bench options (default: `--refdist 5000 --chunksize 10000 --sizemax=-1`). Must quote the string and use = to assign the value.
+  - Note that Truvari performs [size filtering](https://github.com/ACEnglish/truvari/wiki/bench#size-filtering) before benchmarking. Variants that do not meet the thresholds will be filtered out and excluded from final counts, which can be misleading. To avoid this, `--sizemax=-1` is set by default in the variant benchmark workflow, disabling max size filtering. [Performance issues](https://github.com/ACEnglish/truvari/issues/287#issuecomment-3085666675) have been noted previously, thus `--setmax=-1` cannot be used together with `--enable_refine` (i.e. `--enable_refine` is explictly set to `false` when `--setmax=-1`).
+- `--truvari_refine_options`: Additional Truvari refine options (default: `--use-original-vcfs`). Must quote the string and use = to assign the value.
+- `--enable_refine`: Option to run Truvari refine after Truvari bench (default: `false`).
 - `--wittyer_options`: Additional witty.er options (default: auto-generated from parameters below). Must quote the string and use = to assign the value.
 - `--evaluationMode`: witty.er parameter: Evaluation mode (default: `CrossTypeAndSimpleCounting`) Options: `CrossTypeAndSimpleCounting`, `SimpleCounting`, `GenotypeMatching`. Note that GenotypeMatching corresponds to the Default option in witty.er documentation https://github.com/Illumina/witty.er/issues/25.
 - `--includedFilters`: witty.er parameter: Comma separated list. Only variants contain these filters will be considered. Empty string ('') will include all filters (default: '').
@@ -119,8 +135,8 @@ nextflow run main.nf \
 **Official Parameter References:**
 - [hap.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/happy.md#command-line-options)
 - [som.py parameters](https://github.com/Illumina/hap.py/blob/master/doc/sompy.md)
+- [Truvari parameters](https://github.com/acenglish/truvari/wiki)
 - [witty.er parameters](https://github.com/EBIvariation/witty.er/wiki/Configuration-Parameters)
-
 
 ### VCF Comparison Engine Selection Guidelines
 
@@ -133,26 +149,45 @@ nextflow run main.nf \
    - You are analyzing somatic variants (e.g. tumor-normal pairs)
    - You need to normalize variant representations before comparison
 
-3. **Use witty.er when:**
+3. **Use Truvari when**
    - You are analyzing structural variants or large indels (>50bp)
-   - You need faster processing times for complex variant analysis
-   - Your variants may have positional uncertainty or require fuzzy matching
-   - You need advanced filtering capabilities based on variant size and type
-   - Your analysis benefits from cross-type variant comparison
-   - You are working with complex genomic regions or repetitive sequences
+   - You are benchmarking variants across different pipelines or callers where representation-aware matching is beneficial
+   - You need sequence similarity metrics between matched variants
+   - You want fine-tunable matching thresholds for breakpoint distance, size similarity, and sequence similarity
+
+   **Note**: Truvari has specific VCF requirements:
+   -  The length attribute in VCF contig header lines must be present, for example:
+      ```
+      ##fileformat=VCFv4.2
+      ##contig=<ID=chr1,length=248956422>
+      ##contig=<ID=chr2,length=242193529>
+      ```
+   - A valid `SVLEN` or `END` INFO field must be present for variants to be processed and included in summary counts
+
+4. **Use witty.er when:**
+   - You are analyzing structural variants or large indels (>50bp)
+   - You prefer a straightforward, breakpoint-based comparison approach
+   - You want explicit per-SVTYPE evaluation metrics
+   - You need size-stratified benchmarking metrics
+
+   **Note**: witty.er has specific VCF requirements:
+   - Currently lacks support for VCF v4.4+
+   - The `SVTYPE` INFO field is required for all variants
+   - CNVs must include a `CN` sample tag to be processed
 
 **Key Differences:**
 
-| Feature            | hap.py                     | som.py                     | witty.er                   |
-|--------------------|----------------------------|----------------------------|----------------------------|
-| Variant Size       | Small variants (SNPs, indels) | Small variants (SNPs, indels) | Large variants (SVs, CNVs) |
-| Matching Precision | Exact position/allele      | Normalized representation  | Fuzzy matching             |
-| Speed              | Slower for small variants  | Faster than hap.py          | Faster for large variants  |
-| Scalability        | Medium                     | Medium                     | High                       |
-| Filtering          | Basic                      | Basic                      | Advanced by size/type      |
-| Reference Genome   | Required                   | Optional                   | Optional                   |
-| Best Use Case      | Small variants, germline | Small variants, somatic | Large variants, throughput |
+| Feature            | hap.py                        | som.py                        | Truvari                                             | witty.er                   |
+|--------------------|-------------------------------|-------------------------------|-----------------------------------------------------|----------------------------|
+| Variant Size       | Small variants (SNPs, indels) | Small variants (SNPs, indels) | Large variants (SVs, CNVs)                          | Large variants (SVs, CNVs) |
+| Matching Precision | Exact position/allele         | Normalized representation     | Representation tolerant                             | Breakpoint tolerant        |
+| Speed              | Slower for small variants     | Faster than hap.py            | Moderate for large variants depending on thresholds | Faster than Truvari        |
+| Scalability        | Medium                        | Medium                        | Medium                                              | High                       |
+| Filtering          | Basic                         | Basic                         | Advanced by sequence/size/type                      | Advanced by size/type      |
+| Reference Genome   | Required                      | Optional                      | Optional for `bench`, required for `refine`         | Optional                   |
+| Best Use Case      | Small variants, germline      | Small variants, somatic       | Large variants, different representations           | Large variants, throughput |
 
+**Note**: Although a reference genome is technically optional for Truvari bench, this workflow requires one to enable symbolic allele resolution and variant matching based on sequence similarity, leading to more accurate benchmarking results.
 
 ### Spurious Variant Filtering
 
@@ -215,6 +250,17 @@ For example, when spurious_variants_vcf is supplied:
         │   ├── sompy/          # som.py reports if using sompy engine
         │   │   ├── stats.csv   # som.py statistics per sample
         │   │   ├── scratch_sompy/ # scratch reports detailing TP/FN/FP calls
+        │   └── truvari/        # Truvari reports if using truvari engine
+        │   │   ├── sample1/    # Sample-specific reports
+        │   │   │   ├── summary.json  # Summary statistics in JSON format
+        │   │   │   ├── params.json   # Truvari parameters in JSON format
+        │   │   │   ├── vcf.gz        # Detailed variant-level reports e.g. TP FN FP
+        │   │   │   ├── ...           # Additional Truvari reports
+        │   │   └── sample2/
+        │   │       ├── summary.json
+        │   │       ├── params.json
+        │   │       ├── vcf.gz
+        │   │       ├── ...
         │   └── wittyer/        # witty.er reports if using wittyer engine
         │       ├── sample1/    # Sample-specific reports
         │       │   ├── Wittyer.Stats.json  # Summary statistics in JSON format
@@ -232,6 +278,17 @@ For example, when spurious_variants_vcf is supplied:
         │   ├── sompy/
         │   │   ├── stats.csv
         │   │   ├── scratch_sompy/
+        │   └── truvari/
+        │   │   ├── sample1/
+        │   │   │   ├── summary.json
+        │   │   │   ├── params.json
+        │   │   │   ├── vcf.gz
+        │   │   │   ├── ...
+        │   │   └── sample2/
+        │   │       ├── summary.json
+        │   │       ├── params.json
+        │   │       ├── vcf.gz
+        │   │       ├── ...
         │   └── wittyer/
         │       ├── sample1/
         │       │   ├── Wittyer.Stats.json
@@ -278,11 +335,12 @@ This table summarizes the curated sensitivity of variant calls.
 | SNP            | PASS             |            1337 |                0 | 100.0%        | 99.7%      | 100.0%     |
 ```
 
-Note that som.py does not report a filter column, so the `Variant Filter` column is always set to `NA`.
+Note that som.py does not report a filter column, so the `Variant Filter` column is always set to `NA`. Additionally, Truvari does not report per-SVTYPE metrics, thus the `Variant Type` column is always set to `SV`.
 
-For more details on hap.py, som.py, and witty.er outputs:
+For more details on hap.py, som.py, Truvari, and witty.er outputs:
 - [hap.py output documentation](https://github.com/Illumina/hap.py?tab=readme-ov-file#happy)
 - [som.py output documentation](https://github.com/Illumina/hap.py?tab=readme-ov-file#sompy)
+- [Truvari output documentation](https://github.com/ACEnglish/truvari/wiki/bench#outputs)
 - [witty.er output documentation](https://github.com/Illumina/witty.er?tab=readme-ov-file#outputs)
 
 
