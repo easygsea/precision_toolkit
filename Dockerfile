@@ -34,7 +34,9 @@ COPY src/ /app/src/
 # Install uv, sync environment, and build wheel
 RUN pip install --upgrade pip --no-cache-dir && \
     pip install --no-cache-dir "uv==${UV_VERSION}" && \
-    uv build --wheel && \
+    pip wheel pysam==0.23.0 --no-binary pysam -w /app/dist/
+
+RUN uv build --wheel && \
     chmod a+rx /app -R
 
 # Stage 3: Runtime
@@ -121,9 +123,8 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     apt-get remove --purge -y wget apt-transport-https software-properties-common build-essential && \
     apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy binaries and wheel
+# Copy witty.er binary
 COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
-COPY --from=clinical_tools_builder /app/dist/*.whl .
 
 # Set environment variables
 ENV PATH="$PATH:/opt/hap.py/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
@@ -136,10 +137,12 @@ RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~
     update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1 && \
     update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1 && \
     python -m pip install --no-cache-dir --upgrade pip setuptools && \
-    pip install --no-cache-dir ./*.whl && \
-    python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python && \
-    rm ./*.whl && \
-    rm -rf /tmp/*
+    python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python
 
 # CDI-158 fix som.py inconsistency issue
 RUN sed -i 's~True,  # pass_only~not args.inc_nonpass, # account for nonpass in truth vcf~' /opt/hap.py/bin/som.py
+
+COPY --from=clinical_tools_builder /app/dist/*.whl .
+RUN pip install --no-cache-dir ./*.whl && \
+    rm ./*.whl && \
+    rm -rf /tmp/*

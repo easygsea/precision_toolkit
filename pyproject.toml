@@ -20,8 +20,18 @@ dependencies = [
     "openpyxl==3.1.5"
 ]
 
-[tool.uv.build-backend]
-module-name = "clinical_tools"
+[tool.mypy]
+mypy_path = "src"
+
+[dependency-groups]
+dev = [
+    "pre-commit==4.3.0",
+    "pytest==9.0.2",
+    "pytest-cov==7.0.0",
+    "pytest-workflow==2.0.1",
+    "pytest-xdist==3.6.1",
+    "types-requests==2.32.4.20260107",
+]
 
 [project.scripts]
 compile-dragen-metrics = "clinical_tools.cli.compile_dragen_metrics:main"
@@ -36,22 +46,12 @@ plot-signal-correlation = "clinical_tools.cli.plot_signal_correlation:main"
 plot-target-tracts = "clinical_tools.cli.plot_target_tracts:main"
 summarize-diagnostic-metrics = "clinical_tools.cli.summarize_diagnostic_metrics:main"
 
-[dependency-groups]
-dev = [
-    "pre-commit==4.3.0",
-    "pytest==9.0.2",
-    "pytest-cov==7.0.0",
-    "pytest-workflow==2.0.1",
-    "pytest-xdist==3.6.1",
-    "types-requests==2.32.4.20260107",
-]
-
-[tool.mypy]
-mypy_path = "src"
-
 [build-system]
 requires = ["uv_build>=0.10.7,<0.11.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "clinical_tools"
 
 [tool.pytest.ini_options]
 testpaths = [
