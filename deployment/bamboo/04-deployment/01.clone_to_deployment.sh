@@ -42,12 +42,13 @@ function clone_and_deploy {
     version_folder="${DEPLOYMENT_ROOT}/clinical_tools/${version}"
     mkdir -pv "${version_folder}"
     mv tmp_dir/* "${version_folder}/"
-    cd "${version_folder}"
-    uv venv --python "${PYTHON_EXECUTABLE}"
-    uv sync
-    cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" ./"${NEW_IMAGE_NAME}"
-    sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
-    cd "${DEPLOYMENT_ROOT}/clinical_tools"
+    (
+      cd "${version_folder}"
+      uv venv --python "${PYTHON_EXECUTABLE}"
+      uv sync
+      cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" ./"${NEW_IMAGE_NAME}"
+      sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
+    )
     chmod --recursive a-w "${version}"
     [[ -d main ]] && chmod --changes --recursive u+w main && rm -rfv main
     mkdir --mode 2750 main

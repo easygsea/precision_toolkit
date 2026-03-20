@@ -127,7 +127,7 @@ def plot_signal_correlation(
     filter_source: str = "",
 ) -> None:
     """Scatter plot of merged signals with optional regression and correlation.
-    
+
     Args:
         signal_df: Input DataFrame.
         output_filename: Output figure path.

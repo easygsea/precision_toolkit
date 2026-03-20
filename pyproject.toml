@@ -24,17 +24,17 @@ dependencies = [
 module-name = "clinical_tools"
 
 [project.scripts]
-compile-dragen-metrics = "clinical_tools.bin.compile_dragen_metrics:main"
-convert-multi-sample-vcf = "clinical_tools.bin.convert_multi_sample_vcf:main"
-count-variants-by-size = "clinical_tools.bin.count_variants_by_size:main"
-fetch-pull-requests = "clinical_tools.bin.fetch_pull_requests:main"
-generate-standardized-bed = "clinical_tools.bin.generate_standardized_bed:main"
-jira-table = "clinical_tools.bin.jira_table:main"
-manual-diagnostic-metric-curation = "clinical_tools.bin.manual_diagnostic_metric_curation:main"
-plot-dragen-metrics = "clinical_tools.bin.plot_dragen_metrics:main"
-plot-signal-correlation = "clinical_tools.bin.plot_signal_correlation:main"
-plot-target-tracts = "clinical_tools.bin.plot_target_tracts:main"
-summarize-diagnostic-metrics = "clinical_tools.bin.summarize_diagnostic_metrics:main"
+compile-dragen-metrics = "clinical_tools.cli.compile_dragen_metrics:main"
+convert-multi-sample-vcf = "clinical_tools.cli.convert_multi_sample_vcf:main"
+count-variants-by-size = "clinical_tools.cli.count_variants_by_size:main"
+fetch-pull-requests = "clinical_tools.cli.fetch_pull_requests:main"
+generate-standardized-bed = "clinical_tools.cli.generate_standardized_bed:main"
+jira-table = "clinical_tools.cli.jira_table:main"
+manual-diagnostic-metric-curation = "clinical_tools.cli.manual_diagnostic_metric_curation:main"
+plot-dragen-metrics = "clinical_tools.cli.plot_dragen_metrics:main"
+plot-signal-correlation = "clinical_tools.cli.plot_signal_correlation:main"
+plot-target-tracts = "clinical_tools.cli.plot_target_tracts:main"
+summarize-diagnostic-metrics = "clinical_tools.cli.summarize_diagnostic_metrics:main"
 
 [dependency-groups]
 dev = [

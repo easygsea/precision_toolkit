@@ -6,7 +6,7 @@ Task type:
   SSH Task
 
 Task description:
-  Build Python virtual environment for testing
+  Create Virtual Environment
 
 Hosts:
   ${bamboo.HOST}
@@ -40,5 +40,6 @@ shift $#
 
 # Install the package from the lock file
 uv venv --python "${PYTHON_EXECUTABLE}"
+chmod -R g+w .venv/
 uv sync --group dev
 uv run pre-commit install

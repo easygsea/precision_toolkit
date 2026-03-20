@@ -21,8 +21,7 @@ Password:
   ${bamboo.PASSWORD}
 
 SSH command:
-cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
-cd clinical_tools/deployment/bamboo/02-testing_and_linting/
+cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/deployment/bamboo/02-testing_and_linting/
 bash 02.run_formatters_and_linters.sh \
 ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
 ${bamboo.inject.IMAGE_NAME} \

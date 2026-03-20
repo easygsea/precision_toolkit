@@ -21,8 +21,7 @@ Password:
   ${bamboo.PASSWORD}
 
 SSH command:
-cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
-cd clinical_tools/deployment/bamboo/02-testing_and_linting/
+cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/deployment/bamboo/02-testing_and_linting/
 bash 01.run_unit_and_integration_tests.sh \
 ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
 ${bamboo.inject.IMAGE_NAME} \
@@ -80,4 +79,4 @@ uv run pytest tests/workflow/ --junit-xml=test_results_workflow.xml
 
 chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}"
 chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
-chmod a+r "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/test_results_*.xml"
+chmod a+r "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools/test_results_*.xml

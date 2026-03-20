@@ -33,7 +33,7 @@ IMAGE_NAME="$1"
 rm -rfv "${IMAGE_NAME}"
 
 echo "Building Docker image..."
-docker build -t "clinical_tools:bamboo" -f ./Dockerfile .
+docker build -t clinical_tools:bamboo -f ./Dockerfile .
 
 echo "Building Apptainer image..."
 ( while true; do echo "Still building..."; sleep 60; done ) &
@@ -41,7 +41,7 @@ KEEPALIVE_PID=$!
 
 sudo apptainer build \
     "${IMAGE_NAME}" \
-    docker-daemon://"clinical_tools:bamboo"
+    docker-daemon://clinical_tools:bamboo
 
 chmod --changes g+w "${IMAGE_NAME}"
 kill "${KEEPALIVE_PID}" || true

@@ -1,7 +1,7 @@
 <<'BAMBOO_CONFIG_DOC'
 
 Task type:
-  Inject Bamboo variables configuration
+  Inject Bamboo Variables
 
 Path to properties file:
   02.inject_bamboo_variables.txt
