@@ -34,9 +34,7 @@ COPY src/ /app/src/
 # Install uv, sync environment, and build wheel
 RUN pip install --upgrade pip --no-cache-dir && \
     pip install --no-cache-dir "uv==${UV_VERSION}" && \
-    pip wheel pysam==0.23.0 --no-binary pysam -w /app/dist/
-
-RUN uv build --wheel && \
+    uv build --wheel && \
     chmod a+rx /app -R
 
 # Stage 3: Runtime
@@ -120,6 +118,7 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     ./configure --enable-optimizations && \
     make -j "$(nproc)" && \
     make install && cd .. && rm -rf "Python-${PYTHON_VERSION}" "Python-${PYTHON_VERSION}.tgz" && \
+    python3 -m pip wheel pysam==0.23.0 --no-binary pysam -w /wheels/ && \
     apt-get remove --purge -y wget apt-transport-https software-properties-common build-essential && \
     apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -143,6 +142,6 @@ RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~
 RUN sed -i 's~True,  # pass_only~not args.inc_nonpass, # account for nonpass in truth vcf~' /opt/hap.py/bin/som.py
 
 COPY --from=clinical_tools_builder /app/dist/*.whl .
-RUN pip install --no-cache-dir ./*.whl && \
+RUN pip install --no-cache-dir ./*.whl /wheels/pysam*.whl && \
     rm ./*.whl && \
-    rm -rf /tmp/*
+    rm -rf /wheels /tmp/*
