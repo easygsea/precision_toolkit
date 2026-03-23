@@ -79,7 +79,7 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 && \
     wget --quiet "https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb" && \
     dpkg -i packages-microsoft-prod.deb && \
-    apt-get update && apt-get install -y --no-install-recommends "dotnet-runtime-${DOTNET_VERSION}" && \
+    apt-get update && apt-get install -y --no-install-recommends "dotnet-sdk-${DOTNET_VERSION}" && \
     # Build htslib (dependency for bcftools and samtools)
     wget --quiet "https://github.com/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "htslib-${HTSLIB_VERSION}.tar.bz2" && \
