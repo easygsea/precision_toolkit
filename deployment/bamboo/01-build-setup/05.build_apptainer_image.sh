@@ -39,7 +39,7 @@ echo "Building Apptainer image..."
 ( while true; do echo "Still building..."; sleep 60; done ) &
 KEEPALIVE_PID=$!
 
-sudo apptainer build --compression lz4 \
+sudo apptainer build \
     "${IMAGE_NAME}" \
     docker-daemon://clinical_tools:bamboo
 
