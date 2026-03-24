@@ -22,22 +22,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
     cd Wittyer && \
     dotnet publish . -c Release
 
-# Stage 2: Build custom package via uv
-FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
-ARG UV_VERSION
-WORKDIR /app
 
-# Copy application files
-COPY README.md pyproject.toml uv.lock ./
-COPY src/ /app/src/
-
-# Install uv, sync environment, and build wheel
-RUN pip install --upgrade pip --no-cache-dir && \
-    pip install --no-cache-dir "uv==${UV_VERSION}" && \
-    uv build --wheel && \
-    chmod a+rx /app -R
-
-# Stage 3: Runtime
+# Stage 2: Runtime
 FROM mgibio/hap.py:v${HAPPY_VERSION}
 ARG BEDOPS_VERSION
 ARG BEDTOOLS_VERSION
@@ -141,7 +127,5 @@ RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~
 # CDI-158 fix som.py inconsistency issue
 RUN sed -i 's~True,  # pass_only~not args.inc_nonpass, # account for nonpass in truth vcf~' /opt/hap.py/bin/som.py
 
-COPY --from=clinical_tools_builder /app/dist/*.whl .
-RUN pip install --no-cache-dir ./*.whl /wheels/pysam*.whl && \
-    rm ./*.whl && \
+RUN pip install --no-cache-dir /wheels/pysam*.whl && \
     rm -rf /wheels /tmp/*
