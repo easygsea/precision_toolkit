@@ -31,7 +31,16 @@ def get_empty_format(format_line: str) -> str:
 
 
 def parse_file(input_file_path: Path) -> tuple[list[str], pd.DataFrame]:
-    """Parse multi-sample VCF. Returns meta-info lines and DataFrame of variants."""
+    """Parse a multi-sample VCF file into a pandas DataFrame.
+
+    Args:
+        input_file_path: Path to the multi-sample VCF file.
+
+    Returns:
+        info_lines: Header metadata lines at the top of the VCF.
+        header_line: Column header line.
+        df: DataFrame containing the parsed sample data.
+    """
     info_lines: list[str] = []
     if input_file_path.suffix == ".gz":
         file = gzip.open(input_file_path, "rt")

@@ -276,26 +276,23 @@ def construct_feature_name(
     refseq_accession_to_transcript_obj: dict[str, Transcript],
     zero_pad_names: bool,
 ) -> str:
-    """
-    Construct updated feature name.
+    """Construct a standardized feature name.
 
-    Feature names follow the format
-    <gene_symbol>_<refseq_accession>_<genomic_feature><exon_number> where exon_number,
-    if present, is dynamically zero-padded based on total number of genomic features
-    present for the transcript.
+    Feature names follow the format:
+        <gene_symbol>_<refseq_accession>_<genomic_feature><exon_number>
 
     Args:
         gene_symbol: HGNC gene symbol.
         genomic_feature: Feature type.
-        refseq_acc: RefSeq accession.
+        refseq_acc: RefSeq accession, or None if unavailable.
         exon_num: Exon number extracted from BED attributes.
-        refseq_accession_to_transcript_obj: Dictionary mapping RefSeq accessions to
-            corresponding Transcript objects.
-        zero_pad_names: If True, zero-pad numbers in feature names (e.g., exon_001
+        refseq_accession_to_transcript_obj: Mapping of RefSeq accessions to
+           Transcript objects.
+        zero_pad_names: Whether to zero-pad exon numbers (e.g., exon_001
             instead of exon_1).
 
     Returns:
-        Updated feature name.
+        The formatted feature name.
     """
     # Extract exon number, if applicable, and construct feature name
     # If no exon number, don't append to feature name
@@ -370,8 +367,7 @@ def generate_modified_target_bed(
     output_introns: bool,
     zero_pad_names: bool,
 ) -> None:
-    """
-    Standardize BED features with optional boundary adjustments.
+    """Standardize BED features with optional boundary adjustments.
 
     Optional boundary adjustment apply to exon and CDS features. Introns may also be
     derived from exon features and output.
@@ -517,12 +513,7 @@ def generate_modified_target_bed(
 
 
 def main() -> None:
-    """
-    Reformat BED file and rename features.
-
-    Returns:
-        Modified BED file.
-    """
+    """Reformat BED file and rename features."""
     parser = argparse.ArgumentParser(
         "Reformat input into a 4-column BED file and rename 4th column such that "
         "it follows the format "

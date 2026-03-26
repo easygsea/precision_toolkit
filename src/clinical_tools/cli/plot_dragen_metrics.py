@@ -165,8 +165,7 @@ def plot_metrics(
     sort_metric: str | None,
     output_folder: Path,
 ) -> None:
-    """
-    Generate and save a strip plot and box plot for each metric.
+    """Generate and save a strip plot and box plot for each metric.
 
     Args:
         metrics_df: Long-format dataframe with columns RGSM, Truncated RGSM,
@@ -313,12 +312,7 @@ def plot_metrics(
 
 
 def main() -> None:
-    """
-    Parse DRAGEN output files and plot QC metrics.
-
-    Returns:
-        None, saves plots to PNG files.
-    """
+    """Parse DRAGEN output files and generate QC metric plots."""
     parser = argparse.ArgumentParser(
         "Parse DRAGEN's MetricsOutput.tsv and generate summary plots per metric."
     )

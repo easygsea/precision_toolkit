@@ -74,7 +74,7 @@ def generate_all_data_csv(
 
 
 def main() -> None:
-    """Summarize diagnostic metrics; returns CSV, Markdown, Word outputs."""
+    """Summarize diagnostic metrics; returns CSV, Markdown, and Word outputs."""
     parser = argparse.ArgumentParser(
         description=("Summarize and compute diagnostic metrics from VCF comparisons.")
     )

@@ -104,8 +104,7 @@ class SensitivityMetrics(BaseVariantCallMetrics):
 
     @property
     def sensitivity(self) -> float:
-        """
-        Calculate the proportion of true positives among all positive calls.
+        """Calculate the proportion of true positives among all positive calls.
 
         Returns:
             Sensitivity value between 0 and 1
@@ -154,8 +153,7 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
         metrics: VariantCallMetrics,
         tp_method: ConcordanceTPMethod,
     ) -> None:
-        """
-        Initialize with metrics data and TP selection method.
+        """Initialize with metrics data and TP selection method.
 
         Args:
             metrics: Container with variant metrics data

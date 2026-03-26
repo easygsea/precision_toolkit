@@ -29,7 +29,7 @@ import seaborn as sns
 
 
 def main() -> None:
-    """Plot target/tract scores by poolID from command-line args; saves figures."""
+    """Plot target/tract scores by poolID from target evaluation workflow."""
     # Get input parameters
     parser = argparse.ArgumentParser(
         description=("Plot visualizations per-target region.")

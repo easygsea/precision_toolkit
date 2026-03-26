@@ -9,7 +9,7 @@ from clinical_tools.analysis.vcf import count_variants_by_size
 
 @pytest.fixture
 def test_vcf(tmp_path: Path) -> str:
-    """Create a VCF file with variants of different sizes."""
+    """VCF file with variants of different sizes."""
     vcf_path = tmp_path / "test.vcf"
     with open(vcf_path, "w") as f:
         f.write("##fileformat=VCFv4.2\n")
@@ -27,7 +27,7 @@ def test_vcf(tmp_path: Path) -> str:
 
 @pytest.fixture
 def test_multi_sample_vcf(tmp_path: Path) -> str:
-    """Create a multi-sample VCF file with variants of different sizes."""
+    """Multi-sample VCF file with variants of different sizes."""
     vcf_path = tmp_path / "test.vcf"
     with open(vcf_path, "w") as f:
         f.write("##fileformat=VCFv4.2\n")
@@ -45,7 +45,7 @@ def test_multi_sample_vcf(tmp_path: Path) -> str:
 
 @pytest.fixture
 def test_multi_sample_vcf_with_end(tmp_path: Path) -> str:
-    """Create a multi-sample VCF file with variants of different sizes and INFO END."""
+    """Multi-sample VCF file with variants of different sizes and INFO END."""
     vcf_path = tmp_path / "test.vcf"
     with open(vcf_path, "w") as f:
         f.write("##fileformat=VCFv4.2\n")

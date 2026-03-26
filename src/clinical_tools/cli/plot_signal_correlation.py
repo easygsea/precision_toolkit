@@ -78,7 +78,18 @@ def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.Data
 
 
 def identify_signal_columns(signal_df: pd.DataFrame) -> tuple[str, str]:
-    """Return names of the truth and query signal columns or raise ValueError."""
+    """
+    Identify truth and query signal column names from the DataFrame.
+
+    Args:
+        signal_df: DataFrame with merged signals.
+
+    Returns:
+        Tuple of (truth_column_name, query_column_name).
+
+    Raises:
+        ValueError: If truth or query columns cannot be identified.
+    """
     truth_cols = [
         col
         for col in signal_df.columns

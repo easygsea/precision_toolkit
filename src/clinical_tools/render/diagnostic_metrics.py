@@ -177,12 +177,7 @@ def format_diagnostic_metrics_table(
 
 
 def export_diagnostic_metrics_to_csv(df: pd.DataFrame, output_file: str | Path) -> None:
-    """Export diagnostic metrics DataFrame to CSV file.
-
-    Args:
-        df: The metrics DataFrame
-        output_file: Path to save the CSV file
-    """
+    """Export a diagnostic metrics DataFrame to a CSV file."""
     pandas_to_csv(df, output_file)
 
 
