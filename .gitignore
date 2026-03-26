@@ -1,3 +1,8 @@
 __pycache__/
 */__pycache__/
 .coverage
+
+# Nextflow
+.nextflow/
+.nextflow.log*
+work/
