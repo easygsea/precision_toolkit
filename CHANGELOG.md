@@ -4,6 +4,15 @@
 
 ---
 
+### v1.2.0 - 2026-03-27
+- Improvement: Move `src/bin` to `src/clinical_tool/cli`.
+- Improvement: Replace Poetry with uv for managing the environment and upgrade Python to 3.13.12.
+- Improvement: Retire `apptainer.def` file since Apptainer image is built from Docker image.
+- Improvement: Standardize docstrings across dataclasses and functions to follow Google-style conventions.
+- Improvement: Update Dockerfile to use a multi-stage build, caching the pysam compilation step.
+
+---
+
 ### v1.1.4 - 2026-03-16
 - New Standalone Utility: Added `plot-dragen-metrics` to plot backbone QC metrics in DRAGEN's `MetricsOutput.tsv`.
 - Feature: Added functionality to compile a systemic fail tract (`common_fail_regions.bed`) using cohort-level base-specific fail data. Threshold can be adjusted with `--fail_percent_threshold` parameter (default: 10).

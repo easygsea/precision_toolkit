@@ -9,7 +9,7 @@ import pytest
 
 @pytest.fixture
 def test_data_dir() -> Path:
-    """Fixture for the test data directory."""
+    """Test data directory."""
     return Path(__file__).parent / "data"
 
 

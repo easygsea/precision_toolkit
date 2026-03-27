@@ -6,8 +6,7 @@ import pandas as pd
 
 
 def convert_to_list_if_single_instance(value: Any, expected_type: type) -> list:
-    """
-    Convert single instances to lists while preserving existing lists.
+    """Convert single instances to lists while preserving existing lists.
 
     Ensures consistent handling of inputs that can be either single values or lists
     by converting single instances of the expected type to single-item lists.
@@ -31,8 +30,7 @@ def assemble_exports(
     list[str] | str | None,
     list[str] | str | None,
 ]:
-    """
-    Assemble and validate inputs for export functions across different modules.
+    """Assemble and validate inputs for export functions across different modules.
 
     Args:
         dfs: Single DataFrame or list of DataFrames to export

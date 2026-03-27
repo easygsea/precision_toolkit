@@ -47,7 +47,7 @@ class Strand(str, Enum):
 
 @dataclass
 class GenomicRange:
-    """Class for tracking a genomic range and associated number attribute."""
+    """Genomic range with optional number attribute."""
 
     range: tuple
     number_attribute: str = ""
@@ -55,7 +55,7 @@ class GenomicRange:
 
 @dataclass
 class Transcript:
-    """Class for tracking a transcript's feature counts and ranges."""
+    """Transcript features, counts, and ranges."""
 
     refseq_accession: str
     strand: Strand
@@ -70,8 +70,7 @@ class Transcript:
     stop_codon: GenomicRange | None = None
 
     def calc_intron_ranges(self, exon_ranges: list[GenomicRange]) -> None:
-        """
-        Calculate introns based on provided exon ranges.
+        """Calculate introns based on provided exon ranges.
 
         feature_counts attribute is updated to reflect new intron feature and
         exon_to_intron attribute is populated with a 1-to-1 mapping of exon range to
@@ -116,8 +115,7 @@ class Transcript:
                 self.feature_counts["intron"] = len(self.introns)
 
     def exclude_noncoding_exons(self) -> None:
-        """
-        Exclude and/or trim exons to remove non-coding portions (i.e. UTRs).
+        """Exclude and/or trim exons to remove non-coding portions (i.e. UTRs).
 
         exon_to_coding_exon attribute is populated with a 1-to-1 mapping of exon range
         to coding exon GenomicRange object.
@@ -207,14 +205,12 @@ def parse_bed_file(
     refseq_accession_regex_pattern: re.Pattern[str],
     target_genes: set[str],
 ) -> tuple[dict[str, Transcript], set[str]]:
-    """
-    Parse input BED file to track feature counts and genomic ranges per transcript.
+    """Parse BED file; return transcript map and genes found.
 
     Args:
-        bed_file_path: Path to input BED file.
-        refseq_accession_regex_pattern: Compiled regex to extract RefSeq accession.
-        target_genes: Set of target gene symbols to filter for. If empty, all genes
-            are included.
+        bed_file_path: Input BED file path.
+        refseq_accession_regex_pattern: Regex for RefSeq accession.
+        target_genes: Gene symbols to include. If empty, all genes are included.
 
     Returns:
         Tuple containing:
@@ -280,26 +276,23 @@ def construct_feature_name(
     refseq_accession_to_transcript_obj: dict[str, Transcript],
     zero_pad_names: bool,
 ) -> str:
-    """
-    Construct updated feature name.
+    """Construct a standardized feature name.
 
-    Feature names follow the format
-    <gene_symbol>_<refseq_accession>_<genomic_feature><exon_number> where exon_number,
-    if present, is dynamically zero-padded based on total number of genomic features
-    present for the transcript.
+    Feature names follow the format:
+        <gene_symbol>_<refseq_accession>_<genomic_feature><exon_number>
 
     Args:
         gene_symbol: HGNC gene symbol.
         genomic_feature: Feature type.
-        refseq_acc: RefSeq accession.
+        refseq_acc: RefSeq accession, or None if unavailable.
         exon_num: Exon number extracted from BED attributes.
-        refseq_accession_to_transcript_obj: Dictionary mapping RefSeq accessions to
-            corresponding Transcript objects.
-        zero_pad_names: If True, zero-pad numbers in feature names (e.g., exon_001
+        refseq_accession_to_transcript_obj: Mapping of RefSeq accessions to
+           Transcript objects.
+        zero_pad_names: Whether to zero-pad exon numbers (e.g., exon_001
             instead of exon_1).
 
     Returns:
-        Updated feature name.
+        The formatted feature name.
     """
     # Extract exon number, if applicable, and construct feature name
     # If no exon number, don't append to feature name
@@ -374,8 +367,7 @@ def generate_modified_target_bed(
     output_introns: bool,
     zero_pad_names: bool,
 ) -> None:
-    """
-    Standardize BED features with optional boundary adjustments.
+    """Standardize BED features with optional boundary adjustments.
 
     Optional boundary adjustment apply to exon and CDS features. Introns may also be
     derived from exon features and output.
@@ -521,12 +513,7 @@ def generate_modified_target_bed(
 
 
 def main() -> None:
-    """
-    Reformat BED file and rename features.
-
-    Returns:
-        Modified BED file.
-    """
+    """Reformat BED file and rename features."""
     parser = argparse.ArgumentParser(
         "Reformat input into a 4-column BED file and rename 4th column such that "
         "it follows the format "

@@ -21,8 +21,7 @@ OPERATIONS = {
 def format_metric(
     dragen_metric_obj: DragenMetric, metric_val: float | None
 ) -> tuple[str, str]:
-    """
-    Format metric value based on properties stored in DragenMetric object.
+    """Format metric value based on properties stored in DragenMetric object.
 
     Args:
         dragen_metric_obj: DragenMetric object, corresponding to metric value.
@@ -51,8 +50,7 @@ def format_metric(
 
 
 def scale_metric(dragen_metric_obj: DragenMetric, metric_val: float) -> float:
-    """
-    Scale metric value based on properties stored in DragenMetric object.
+    """Scale metric value based on properties stored in DragenMetric object.
 
     Args:
         dragen_metric_obj: DragenMetric object, corresponding to metric value.
@@ -77,8 +75,7 @@ def calc_derived_pct_metric(
     derived_metric_name: str,
     base_metric_name: str,
 ) -> float | None:
-    """
-    Calculate derived percentage metric.
+    """Calculate derived percentage metric.
 
     Takes a base metric value and divides it by the number of mapped reads
     ("MAPPED_READS") to get the percentage.
@@ -109,8 +106,7 @@ def classify_metric(
     dragen_metric_obj: DragenMetric,
     metric_val: float | None,
 ) -> tuple[str, str | None]:
-    """
-    Classify metric depending on whether value satisfies threshold condition.
+    """Classify metric depending on whether value satisfies threshold condition.
 
     A metric is classified as 'Production' if a fail threshold is defined, otherwise
     it's classified as 'Monitoring'. Production metrics are further evaluated as 'Pass'

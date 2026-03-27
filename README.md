@@ -13,7 +13,7 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 - Apptainer (>=1.3.1) or Singularity (>=3.8.7)
 
 Containerized dependencies (no installation required):
-- Python 3.11.7
+- Python 3.13.12
 - RTG Tools 3.12.1
 - bcftools 1.21
 - bedops 2.4.41

@@ -34,8 +34,8 @@ Generates additional variables from the Bamboo configuration and saves them into
 Contains Bamboo configuration instructions for injecting variables from the file generated above into the Bamboo agent.
 - 03.checkout_from_bitbucket.sh\
 Checks out the testing branch from a remote repository (e.g., Bitbucket, GitHub) to the temporary testing path.
-- 04.poetry_environment.sh\
-Sets up the Poetry environment for testing.
+- 04.create_virtual_environment.sh\
+Sets up the Python virtual environment for testing.
 - 05.build_apptainer_image.sh\
 Builds the Apptainer image on `HOST_CONTAINER`.
 - 06.transfer_image.sh\

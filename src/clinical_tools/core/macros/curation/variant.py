@@ -29,8 +29,7 @@ from clinical_tools.render.diagnostic_metrics import (
 
 
 def validate_curation_format(curation: str, valid_metrics: list[str]) -> bool:
-    """
-    Validate manual curation input format.
+    """Validate manual curation input format.
 
     Args:
         curation: Manual curation input in format type:filter:metric:count
@@ -64,8 +63,7 @@ def update_metrics(
     ),
     ci_level: float = DEFAULT_CI_LEVEL,
 ) -> pd.DataFrame:
-    """
-    Update metrics in the DataFrame based on manual curation.
+    """Update metrics in the DataFrame based on manual curation.
 
     Args:
         df: DataFrame containing metrics
@@ -188,8 +186,7 @@ def export_curation_results(
     metric_type: DiagnosticMetricType,
     decimals: int = DEFAULT_DECIMALS,
 ) -> None:
-    """
-    Export results to CSV, Markdown, and Word formats.
+    """Export results to CSV, Markdown, and Word formats.
 
     Args:
         df: DataFrame containing results

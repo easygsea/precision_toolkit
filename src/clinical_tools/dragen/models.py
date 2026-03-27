@@ -7,8 +7,7 @@ from typing import Any
 
 @dataclass
 class DragenMetric:
-    """
-    Class representing a DRAGEN metric and its properties.
+    """DRAGEN metric and its properties.
 
     Attributes:
         metric_group: Top-level metric group (e.g. "MAPPING/ALIGNING SUMMARY").
@@ -42,8 +41,7 @@ class DragenMetric:
 
 @dataclass
 class SourceFile:
-    """
-    Class representing a DRAGEN source file and its associated metrics.
+    """DRAGEN source file and its associated metrics.
 
     Attributes:
         filename: Name of source file.

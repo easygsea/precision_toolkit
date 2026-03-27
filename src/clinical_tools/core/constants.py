@@ -25,7 +25,7 @@ class VariantConcordanceEngine(StrEnum):
 
 
 class NameMapper:
-    """Class to hold abbreviations and full names."""
+    """Metric abbreviations and full names."""
 
     NAME_MAP = {
         "TP": "True Positive",

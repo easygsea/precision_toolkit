@@ -10,7 +10,7 @@ import pytest
 
 @pytest.fixture
 def test_data_dir(pytestconfig: pytest.Config) -> Path:
-    """Fixture for the test data directory."""
+    """Test data directory."""
     return pytestconfig.rootpath / "tests_data/dragen_metrics"
 
 

@@ -23,7 +23,7 @@ class ProportionConfidenceIntervalMethod(StrEnum):
 
 
 class ProportionConfidenceInterval:
-    """A class for calculating confidence intervals for proportions."""
+    """Calculate confidence intervals for proportions."""
 
     SUPPORTED_METHODS = [method.value for method in ProportionConfidenceIntervalMethod]
 

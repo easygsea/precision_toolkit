@@ -6,7 +6,7 @@ Task type:
   Script
 
 Task description:
-  Inject Bamboo variables
+  Create Variables File
 
 Interpreter:
   Shell

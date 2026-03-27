@@ -7,8 +7,7 @@ import pandas as pd
 
 
 def pandas_to_csv(df: pd.DataFrame, output_file: str | Path) -> None:
-    """
-    Save DataFrame to CSV file.
+    """Save DataFrame to CSV file.
 
     Args:
         df: DataFrame to save

@@ -10,8 +10,7 @@ from tabulate import tabulate
 def populate_markdown(
     df: pd.DataFrame, heading: str | None = None, summary: str | None = None
 ) -> str:
-    """
-    Generate a Markdown string from DataFrame.
+    """Generate a Markdown string from DataFrame.
 
     Args:
         df: DataFrame to convert
@@ -40,8 +39,7 @@ def populate_markdown(
 
 
 def save_markdown(content: str, output_file: str | Path) -> None:
-    """
-    Save Markdown content to file.
+    """Save Markdown content to file.
 
     Args:
         content: Markdown content to save

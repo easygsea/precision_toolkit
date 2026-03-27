@@ -1,54 +1,57 @@
-[tool.poetry]
+[project]
 name = "clinical-tools"
-version = "1.1.4"
+version = "1.2.0"
 description = "An integrated toolset to support clinical validation"
-authors = ["Canada's Michael Smith Genome Sciences Centre - Precision Informatics"]
 readme = "README.md"
-packages = [
-    { include = "clinical_tools", from = "src" },
-    { include = "bin", from = "src" },
+requires-python = ">=3.11,<4"
+authors = [
+    { name = "Canada's Michael Smith Genome Sciences Centre - Precision Informatics" }
 ]
-
-[tool.poetry.dependencies]
-matplotlib = "3.10.1"
-pysam = "0.23.1"
-python = "3.11.7"
-python-docx = "1.1.2"
-pandas = "2.2.3"
-requests = "2.32.3"
-scipy = "1.15.2"
-seaborn = "0.13.2"
-statsmodels = "0.14.4"
-tabulate = "0.9.0"
-openpyxl = "3.1.5"
+dependencies = [
+    "matplotlib==3.10.1",
+    "pysam==0.23.0",
+    "python-docx==1.1.2",
+    "pandas==2.2.3",
+    "requests==2.32.3",
+    "scipy==1.15.2",
+    "seaborn==0.13.2",
+    "statsmodels==0.14.4",
+    "tabulate==0.9.0",
+    "openpyxl==3.1.5"
+]
 
 [tool.mypy]
 mypy_path = "src"
 
-[tool.poetry.group.dev.dependencies]
-pyproject-pre-commit = "0.4.1"
-pytest = "8.3.4"
-pytest-cov = "4.0.0"
-pytest-workflow = "2.0.1"
-pytest-xdist = "3.6.1"
-types-requests = "^2.32.4.20260107"
+[dependency-groups]
+dev = [
+    "pre-commit==4.3.0",
+    "pytest==9.0.2",
+    "pytest-cov==7.0.0",
+    "pytest-workflow==2.0.1",
+    "pytest-xdist==3.6.1",
+    "types-requests==2.32.4.20260107",
+]
 
-[tool.poetry.scripts]
-compile-dragen-metrics = "bin.compile_dragen_metrics:main"
-convert-multi-sample-vcf = "bin.convert_multi_sample_vcf:main"
-count-variants-by-size = "bin.count_variants_by_size:main"
-fetch-pull-requests = "bin.fetch_pull_requests:main"
-generate-standardized-bed = "bin.generate_standardized_bed:main"
-jira-table = "bin.jira_table:main"
-manual-diagnostic-metric-curation = "bin.manual_diagnostic_metric_curation:main"
-plot-dragen-metrics = "bin.plot_dragen_metrics:main"
-plot-signal-correlation = "bin.plot_signal_correlation:main"
-plot-target-tracts = "bin.plot_target_tracts:main"
-summarize-diagnostic-metrics = "bin.summarize_diagnostic_metrics:main"
+[project.scripts]
+compile-dragen-metrics = "clinical_tools.cli.compile_dragen_metrics:main"
+convert-multi-sample-vcf = "clinical_tools.cli.convert_multi_sample_vcf:main"
+count-variants-by-size = "clinical_tools.cli.count_variants_by_size:main"
+fetch-pull-requests = "clinical_tools.cli.fetch_pull_requests:main"
+generate-standardized-bed = "clinical_tools.cli.generate_standardized_bed:main"
+jira-table = "clinical_tools.cli.jira_table:main"
+manual-diagnostic-metric-curation = "clinical_tools.cli.manual_diagnostic_metric_curation:main"
+plot-dragen-metrics = "clinical_tools.cli.plot_dragen_metrics:main"
+plot-signal-correlation = "clinical_tools.cli.plot_signal_correlation:main"
+plot-target-tracts = "clinical_tools.cli.plot_target_tracts:main"
+summarize-diagnostic-metrics = "clinical_tools.cli.summarize_diagnostic_metrics:main"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.10.7,<0.11.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "clinical_tools"
 
 [tool.pytest.ini_options]
 testpaths = [

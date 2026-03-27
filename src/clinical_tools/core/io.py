@@ -10,30 +10,21 @@ from typing import TextIO
 
 import pandas as pd
 
+_SNIFF_READ_SIZE = 4096
+
 # Setup logging:
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 def detect_format(file_path: str | TextIO) -> str:
-    """
-    Detect file format based on extension.
+    """Detect file format based on extension.
 
     Args:
         file_path: Path to the file, or TextIO for stdin
 
     Returns:
         Detected format: 'csv', 'tsv', 'excel', or 'json'
-
-    Examples:
-        >>> detect_format("file.csv")
-        'csv'
-        >>> detect_format("file.tsv")
-        'tsv'
-        >>> detect_format("file.xlsx")
-        'excel'
-        >>> detect_format("file.json")
-        'json'
     """
     if hasattr(file_path, "read"):
         return "csv"
@@ -55,11 +46,7 @@ def read_dataframe(
     format_type: str | None = None,
     delimiter: str | None = None,
 ) -> pd.DataFrame | None:
-    """
-    Read DataFrame from file or stdin with automatic format detection.
-
-    Supports CSV, TSV, EXCEL and JSON formats. Automatically detects file format
-    from extension if not specified, and can sniff delimiters for text files.
+    """Read DataFrame from file or stdin with automatic format detection.
 
     Args:
         input_file: Path to input file, or TextIO to read from stdin
@@ -68,13 +55,7 @@ def read_dataframe(
         delimiter: Custom delimiter character, or None for auto-detection
 
     Returns:
-        pandas DataFrame containing the file data, or None if read fails
-
-
-    Examples:
-        >>> df = read_dataframe("data.csv")
-        >>> df = read_dataframe("data.tsv", delimiter="|")
-        >>> df = read_dataframe(None, format_type="csv")  # Read from stdin
+        DataFrame or None if reading fails.
     """
     try:
         # Auto-detect format if not specified
@@ -139,11 +120,7 @@ def read_dataframe(
 
 
 def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
-    """
-    Try to sniff delimiter from file content using CSV sniffer.
-
-    This is useful for files that don't have standard extensions or
-    use non-standard delimiters.
+    """Detect delimiter from file using CSV sniffer.
 
     Args:
         file_path: Path to the file, or TextIO for stdin
@@ -151,10 +128,6 @@ def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
     Returns:
         Tuple containing the detected delimiter character and the read buffer.
         If detection fails, returns None.
-
-    Examples:
-        >>> sniff_delimiter("data.txt")  # Could return ';', '|', etc.
-        ';'
     """
     try:
         if hasattr(file_path, "read"):
@@ -162,7 +135,7 @@ def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
             keep_buffer = True
         else:
             with open(file_path, "r", encoding="utf-8") as f:
-                buffer = f.read(4096)
+                buffer = f.read(_SNIFF_READ_SIZE)
                 keep_buffer = False
 
         sniffer = csv.Sniffer()

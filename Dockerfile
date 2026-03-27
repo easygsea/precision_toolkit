@@ -5,9 +5,9 @@ ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
 ARG JOBLIB_VERSION=0.14.1
-ARG POETRY_VERSION=2.0.1
+ARG UV_VERSION=0.10.7
 ARG PSUTIL_VERSION=6.1.1
-ARG PYTHON_VERSION=3.11.7
+ARG PYTHON_VERSION=3.13.12
 ARG WITTYER_VERSION=0.5.2
 
 # Stage 1: Build witty.er from source
@@ -22,20 +22,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
     cd Wittyer && \
     dotnet publish . -c Release
 
-# Stage 2: Build custom package via Poetry
+# Stage 2: Build custom package via uv
+ARG UV_VERSION
+FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_binary
 FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
-ARG POETRY_VERSION
 WORKDIR /app
 
+# Copy uv binary directly
+COPY --from=uv_binary /uv /bin/uv
+
 # Copy application files
-COPY README.md pyproject.toml poetry.lock ./
+COPY README.md pyproject.toml uv.lock ./
 COPY src/ /app/src/
 
-# Install and configure poetry, build project, and set permissions
-RUN pip install --upgrade pip --no-cache-dir && \
-    pip install --no-cache-dir "poetry==${POETRY_VERSION}" && \
-    poetry config virtualenvs.create false && \
-    poetry build && \
+# Build wheel
+RUN uv build --wheel && \
     chmod a+rx /app -R
 
 # Stage 3: Runtime
@@ -119,12 +120,12 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     ./configure --enable-optimizations && \
     make -j "$(nproc)" && \
     make install && cd .. && rm -rf "Python-${PYTHON_VERSION}" "Python-${PYTHON_VERSION}.tgz" && \
+    python3 -m pip wheel pysam==0.23.0 --no-binary pysam -w /wheels/ && \
     apt-get remove --purge -y wget apt-transport-https software-properties-common build-essential && \
     apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy binaries and wheel
+# Copy witty.er binary
 COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
-COPY --from=clinical_tools_builder /app/dist/*.whl .
 
 # Set environment variables
 ENV PATH="$PATH:/opt/hap.py/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
@@ -137,10 +138,12 @@ RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~
     update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1 && \
     update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1 && \
     python -m pip install --no-cache-dir --upgrade pip setuptools && \
-    pip install --no-cache-dir ./*.whl && \
-    python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python && \
-    rm ./*.whl && \
-    rm -rf /tmp/*
+    python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python
 
 # CDI-158 fix som.py inconsistency issue
 RUN sed -i 's~True,  # pass_only~not args.inc_nonpass, # account for nonpass in truth vcf~' /opt/hap.py/bin/som.py
+
+COPY --from=clinical_tools_builder /app/dist/*.whl .
+RUN pip install --no-cache-dir ./*.whl /wheels/pysam*.whl && \
+    rm ./*.whl && \
+    rm -rf /wheels /tmp/*

@@ -6,7 +6,7 @@ Task type:
   SSH Task
 
 Task description:
-  Build Poetry environment for testing
+  Create Virtual Environment
 
 Hosts:
   ${bamboo.HOST}
@@ -21,9 +21,8 @@ Password:
   ${bamboo.PASSWORD}
 
 SSH command:
-cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
-cd clinical_tools/deployment/bamboo/01-build-setup/
-bash 04.poetry_environment.sh \
+cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/deployment/bamboo/01-build-setup/
+bash 04.create_virtual_environment.sh \
 ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
 ${bamboo.PYTHON_EXECUTABLE}
 
@@ -34,16 +33,11 @@ set -euxo pipefail
 TESTING_DEPLOYMENT_DIRECTORY="$1"
 PYTHON_EXECUTABLE="$2"
 
-cd "${TESTING_DEPLOYMENT_DIRECTORY}"
+cd "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
 # Ensures $@ is empty when calling source to avoid passing in unwanted parameters
 shift $#
 
-# Activates the virtual environment and installs the packages from the lock file
-"${PYTHON_EXECUTABLE}" -m venv venv
-chmod -R g+w venv/
-source venv/bin/activate
-pip install --upgrade pip wheel
-pip install poetry==2.0.1
-
-cd clinical_tools/
-poetry install --with dev
+# Install the package from the lock file
+uv venv --python "${PYTHON_EXECUTABLE}"
+uv sync --group dev
+uv run pre-commit install

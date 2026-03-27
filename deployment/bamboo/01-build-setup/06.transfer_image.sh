@@ -6,7 +6,7 @@ Task type:
   SSH Task
 
 Task description:
-  Transfer Apptainer image
+  Transfer Apptainer Image
 
 Hosts:
   ${bamboo.HOST}
@@ -21,8 +21,7 @@ Password:
   ${bamboo.PASSWORD}
 
 SSH command:
-cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}
-cd clinical_tools/deployment/bamboo/01-build-setup/
+cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/deployment/bamboo/01-build-setup/
 bash 06.transfer_image.sh ${bamboo.HOST_CONTAINER} \
 ${bamboo.inject.BUILDING_DEPLOYMENT_DIRECTORY} \
 ${bamboo.inject.IMAGE_NAME} \

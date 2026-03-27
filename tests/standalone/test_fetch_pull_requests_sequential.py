@@ -14,7 +14,7 @@ from clinical_tools.core.devtools.pull_request_fetcher import (
 def test_fetch_prs_sequential_auth_flow(
     monkeypatch: pytest.MonkeyPatch, caplog: Any
 ) -> None:
-    """Test the PR fetch function for sequential requests."""
+    """Test pull request fetcher sequential authentication flow."""
     caplog.set_level(logging.INFO)
 
     # Setup: First response is 401 (Fail), Second is 200 (Success)

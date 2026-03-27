@@ -12,7 +12,7 @@ from clinical_tools.core.statistics.proportion import (
 
 
 class ConcordanceTPMethod(StrEnum):
-    """Enum for TP selection methods for variant concordance."""
+    """TP selection methods for variant concordance."""
 
     TruthTP = "truth"  # Use truth TP for variant concordance
     QueryTP = "query"  # Use query TP for variant concordance
@@ -21,8 +21,7 @@ class ConcordanceTPMethod(StrEnum):
 
 @dataclass(frozen=True)
 class VariantCallMetrics:
-    """
-    Container for variant call metrics data.
+    """Variant call metrics values.
 
     Attributes:
         VariantType: Type of variant (e.g., SNV, INDEL)
@@ -46,7 +45,7 @@ class VariantCallMetrics:
 
 
 class BaseVariantCallMetrics(ABC):
-    """Base class for variant call metrics calculations."""
+    """Abstract base for variant call metrics."""
 
     def __init__(self, metrics: VariantCallMetrics) -> None:
         """Initialize with metrics data.
@@ -81,8 +80,7 @@ class BaseVariantCallMetrics(ABC):
         ci_level: float = DEFAULT_CI_LEVEL,
         **kwargs: dict[str, str],
     ) -> tuple[float, float]:
-        """
-        Calculate confidence interval for the metric.
+        """Calculate confidence interval for the metric.
 
         Args:
             method: Statistical method for CI calculation.
@@ -102,12 +100,11 @@ class BaseVariantCallMetrics(ABC):
 
 
 class SensitivityMetrics(BaseVariantCallMetrics):
-    """Handles sensitivity (recall) calculations."""
+    """Sensitivity (recall) calculator."""
 
     @property
     def sensitivity(self) -> float:
-        """
-        Calculate the proportion of true positives among all positive calls.
+        """Calculate the proportion of true positives among all positive calls.
 
         Returns:
             Sensitivity value between 0 and 1
@@ -126,7 +123,7 @@ class SensitivityMetrics(BaseVariantCallMetrics):
 
 
 class PrecisionMetrics(BaseVariantCallMetrics):
-    """Handles precision calculations."""
+    """Precision calculator."""
 
     @property
     def precision(self) -> float:
@@ -149,15 +146,14 @@ class PrecisionMetrics(BaseVariantCallMetrics):
 
 
 class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
-    """Handles concordance and combined metrics calculations."""
+    """Concordance metrics calculator."""
 
     def __init__(
         self,
         metrics: VariantCallMetrics,
         tp_method: ConcordanceTPMethod,
     ) -> None:
-        """
-        Initialize with metrics data and TP selection method.
+        """Initialize with metrics data and TP selection method.
 
         Args:
             metrics: Container with variant metrics data
@@ -181,8 +177,7 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
 
     @property
     def concordance(self) -> float:
-        """
-        Calculate concordance rate.
+        """Calculate concordance rate.
 
         Returns:
             Concordance value between 0 and 1
@@ -192,7 +187,7 @@ class ConcordanceMetrics(SensitivityMetrics, PrecisionMetrics):
 
 
 class F1ScoreMetrics:
-    """Class for calculating F1 score metrics."""
+    """F1 score metric calculator."""
 
     def __init__(self, precision: float, sensitivity: float) -> None:
         """Initialize with precision and sensitivity values.
@@ -206,8 +201,7 @@ class F1ScoreMetrics:
 
     @property
     def f1_score(self) -> float:
-        """
-        Calculate F1 score (harmonic mean of precision and sensitivity).
+        """Calculate F1 score (harmonic mean of precision and sensitivity).
 
         Returns:
             F1 score value between 0 and 1

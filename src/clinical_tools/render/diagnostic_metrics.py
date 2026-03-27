@@ -20,8 +20,7 @@ from clinical_tools.core.writers.word import (
 def generate_diagnostic_metrics_table(
     results: dict[tuple[str, str], tuple], metric_type: DiagnosticMetricType
 ) -> pd.DataFrame:
-    """
-    Generate a pandas DataFrame for diagnostic metrics summary.
+    """Generate diagnostic metrics summary.
 
     Args:
         results: Dictionary where keys are tuples of (variant_type, variant_filter)
@@ -152,8 +151,7 @@ def format_diagnostic_metrics_table(
     metric_type: DiagnosticMetricType,
     decimals: int = DEFAULT_DECIMALS,
 ) -> pd.DataFrame:
-    """
-    Format the metric and confidence interval columns as percentages.
+    """Format the metric and confidence interval columns as percentages.
 
     Args:
         df: The metrics DataFrame to format
@@ -179,13 +177,7 @@ def format_diagnostic_metrics_table(
 
 
 def export_diagnostic_metrics_to_csv(df: pd.DataFrame, output_file: str | Path) -> None:
-    """
-    Export diagnostic metrics DataFrame to CSV file.
-
-    Args:
-        df: The metrics DataFrame
-        output_file: Path to save the CSV file
-    """
+    """Export a diagnostic metrics DataFrame to a CSV file."""
     pandas_to_csv(df, output_file)
 
 
@@ -197,8 +189,7 @@ def export_diagnostic_metrics_to_markdown(
     summaries: list[str] | str | None = None,
     decimals: int = DEFAULT_DECIMALS,
 ) -> None:
-    """
-    Export one or more diagnostic metrics DataFrames to Markdown file.
+    """Export one or more diagnostic metrics DataFrames to Markdown file.
 
     Args:
         dfs: Single DataFrame or list of DataFrames to export
@@ -243,8 +234,7 @@ def export_diagnostic_metrics_to_word(
     summaries: list[str] | str | None = None,
     decimals: int = DEFAULT_DECIMALS,
 ) -> None:
-    """
-    Export one or more diagnostic metrics DataFrames to Word file.
+    """Export one or more diagnostic metrics DataFrames to Word file.
 
     Args:
         dfs: Single DataFrame or list of DataFrames to export
