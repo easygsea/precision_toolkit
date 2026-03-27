@@ -23,12 +23,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
     dotnet publish . -c Release
 
 # Stage 2: Build custom package via uv
-FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
 ARG UV_VERSION
+FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_binary
+FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
 WORKDIR /app
 
 # Copy uv binary directly
-COPY --from=ghcr.io/astral-sh/uv:${UV_VERSION} /uv /bin/uv
+COPY --from=uv_binary /uv /bin/uv
 
 # Copy application files
 COPY README.md pyproject.toml uv.lock ./
