@@ -79,4 +79,4 @@ uv run pytest tests/workflow/ --junit-xml=test_results_workflow.xml
 
 chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}"
 chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
-chmod a+r "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools/test_results_*.xml
+chmod a+r "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/"test_results_*.xml

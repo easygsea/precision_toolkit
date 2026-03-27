@@ -27,14 +27,15 @@ FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
 ARG UV_VERSION
 WORKDIR /app
 
+# Copy uv binary directly
+COPY --from=ghcr.io/astral-sh/uv:${UV_VERSION} /uv /bin/uv
+
 # Copy application files
 COPY README.md pyproject.toml uv.lock ./
 COPY src/ /app/src/
 
-# Install uv, sync environment, and build wheel
-RUN pip install --upgrade pip --no-cache-dir && \
-    pip install --no-cache-dir "uv==${UV_VERSION}" && \
-    uv build --wheel && \
+# Build wheel
+RUN uv build --wheel && \
     chmod a+rx /app -R
 
 # Stage 3: Runtime

@@ -12,7 +12,7 @@ def format_percentage(x: int | float, decimals: int = DEFAULT_DECIMALS) -> str:
 
 
 def parse_percentage_and_float(x: str | float) -> float:
-    """Convert a string with '%' or a float to float. Raises ValueError if invalid."""
+    """Convert a '%' string or numeric value to float. Raises ValueError if invalid."""
     if isinstance(x, str) and x.endswith("%"):
         stripped = x.strip("%")
         if stripped == "." or stripped == "":

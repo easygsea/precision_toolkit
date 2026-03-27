@@ -40,7 +40,7 @@ from clinical_tools.core.statistics.proportion import (
 
 
 def main() -> None:
-    """Manually curate a diagnostic metric from CSV and export updated results."""
+    """Manually curate a diagnostic metric from a CSV and export updated results."""
     parser = argparse.ArgumentParser(
         description="Curate diagnostic metrics from an existing table with count "
         "information and recompute statistics. Example: "

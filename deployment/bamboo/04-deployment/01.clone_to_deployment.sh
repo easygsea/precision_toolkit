@@ -46,7 +46,7 @@ function clone_and_deploy {
       cd "${version_folder}"
       uv venv --python "${PYTHON_EXECUTABLE}"
       uv sync
-      cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" ./"${NEW_IMAGE_NAME}"
+      cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" "./${NEW_IMAGE_NAME}"
       sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
     )
     chmod --recursive a-w "${version}"
