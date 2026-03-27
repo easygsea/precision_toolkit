@@ -4,11 +4,12 @@
 
 ---
 
-### v1.2.0 - 2026-XX-XX
+### v1.2.0 - 2026-03-27
+- Improvement: Move `src/bin` to `src/clinical_tool/cli`.
 - Improvement: Replace Poetry with uv for managing the environment and upgrade Python to 3.13.12.
+- Improvement: Retire `apptainer.def` file since Apptainer image is built from Docker image.
 - Improvement: Standardize docstrings across dataclasses and functions to follow Google-style conventions.
 - Improvement: Update Dockerfile to use a multi-stage build, caching the pysam compilation step.
-- Improvement: Move `src/bin` to `src/clinical_tool/cli`
 
 ---
 
