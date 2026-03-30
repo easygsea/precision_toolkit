@@ -4,6 +4,10 @@
 
 ---
 
+### v1.2.1 - 2026-04-XX
+
+---
+
 ### v1.2.0 - 2026-03-27
 - Improvement: Move `src/bin` to `src/clinical_tool/cli`.
 - Improvement: Replace Poetry with uv for managing the environment and upgrade Python to 3.13.12.
