@@ -1,6 +1,6 @@
 # Variant Benchmark (Diagnostic Metrics - Concordance, Sensitivity, Precision, F1 Score)
 
-The variant benchmark module compares variant calls between truth and query VCF files across multiple samples using either [hap.py](https://github.com/Illumina/hap.py), [Truvari](https://github.com/ACEnglish/truvari), or [witty.er](https://github.com/EBIvariation/witty.er), and calculates diagnostic metrics including concordance, sensitivity, precision, and F1 score.
+The variant benchmark module compares variant calls between truth and query VCF files across multiple samples using either [hap.py](https://github.com/Illumina/hap.py), [som.py](https://github.com/Illumina/hap.py/blob/master/doc/sompy.md), [Truvari](https://github.com/ACEnglish/truvari), or [witty.er](https://github.com/Illumina/witty.er), and calculates diagnostic metrics including concordance, sensitivity, precision, and F1 score.
 
 By default, all metrics, and their confidence intervals (CIs) wherever applicable, are calculated.
 
@@ -67,7 +67,7 @@ nextflow run main.nf \
 --query_dir <path/to/query_vcf_dir> \
 --variant_benchmark_engine truvari \
 --diagnostic_metrics "sensitivity precision" \
---truvari_bench_options "--passonly --refdist 1000 --chunksize 2000"
+--truvari_bench_options "--passonly --refdist=5000 --chunksize=10000 --sizemax=-1"
 --enable_refine
 ```
 
@@ -114,7 +114,7 @@ nextflow run main.nf \
 - `--happy_engine`: hap.py engine to use (default: `vcfeval`) Options: `vcfeval`, `xcmp`, `scmp-distance`, `scmp-somatic`. Note: `vcfeval` mode only evaluates PASS variants as hap.py does not support `vcfeval --all-records`.
 - `--happy_options`: Additional hap.py options (default: `--write-vcf --write-counts`). Must quote the string and use = to assign the value.
 - `--sompy_options`: Additional som.py options (default: `--include-nonpass`). Must quote the string and use = to assign the value.
-- `--truvari_bench_options`: Additional Truvari bench options (default: `--refdist 5000 --chunksize 10000 --sizemax=-1`). Must quote the string and use = to assign the value.
+- `--truvari_bench_options`: Additional Truvari bench options (default: `--passonly --refdist=5000 --chunksize=10000 --sizemax=-1`). Must quote the string and use = to assign the value.
   - Note that Truvari performs [size filtering](https://github.com/ACEnglish/truvari/wiki/bench#size-filtering) before benchmarking. Variants that do not meet the thresholds will be filtered out and excluded from final counts, which can be misleading. To avoid this, `--sizemax=-1` is set by default in the variant benchmark workflow, disabling max size filtering. [Performance issues](https://github.com/ACEnglish/truvari/issues/287#issuecomment-3085666675) have been noted previously, thus `--setmax=-1` cannot be used together with `--enable_refine` (i.e. `--enable_refine` is explictly set to `false` when `--setmax=-1`).
 - `--truvari_refine_options`: Additional Truvari refine options (default: `--use-original-vcfs`). Must quote the string and use = to assign the value.
 - `--enable_refine`: Option to run Truvari refine after Truvari bench (default: `false`).
@@ -149,7 +149,7 @@ nextflow run main.nf \
    - You are analyzing somatic variants (e.g. tumor-normal pairs)
    - You need to normalize variant representations before comparison
 
-3. **Use Truvari when**
+3. **Use Truvari when:**
    - You are analyzing structural variants or large indels (>50bp)
    - You are benchmarking variants across different pipelines or callers where representation-aware matching is beneficial
    - You need sequence similarity metrics between matched variants
