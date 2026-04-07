@@ -95,7 +95,7 @@ process run_wittyer {
 process run_truvari_bench {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}/${output_dir ?: ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
+    publishDir "${params.output_dir}${output_dir ? '/' + output_dir : ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
 
     input:
     tuple val(sample_name), path(truth_vcf), path(truth_tbi), path(query_vcf), path(query_tbi)
@@ -129,7 +129,7 @@ process run_truvari_bench {
 process run_truvari_refine {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}/${output_dir ?: ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
+    publishDir "${params.output_dir}${output_dir ? '/' + output_dir : ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
 
     input:
     tuple val(sample_name), path(truvari_bench_results)
