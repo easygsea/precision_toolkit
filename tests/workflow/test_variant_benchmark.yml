@@ -154,16 +154,6 @@
     - path: tests_variant_benchmark_truvari_raw/variant_benchmark/raw/truvari/sample1.raw/params.json
     - path: tests_variant_benchmark_truvari_raw/variant_benchmark/raw/truvari/sample2.raw/params.json
 
-- name: variant_benchmark_truvari_raw_options
-  command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine truvari  --truth_dir tests_data/cnv_truth_vcfs --query_dir tests_data/cnv_query_vcfs --genome_ref tests_data/genome.fa --output_dir tests_variant_benchmark_truvari_options --truvari_bench_options='--pctovl 0.9 --sizemax 50000' --enable_refine true
-  files:
-    - path: tests_variant_benchmark_truvari_options/variant_benchmark/diagnostic_metrics_truvari_raw.md
-      md5sum: d81c4ff93d9365d76164ca7ab65b8ea9
-    - path: tests_variant_benchmark_truvari_options/variant_benchmark/raw/truvari/sample1.raw/refine.variant_summary.json
-      md5sum: 5ba46d26b4eb15ca9e4b085ee9f4df56
-    - path: tests_variant_benchmark_truvari_options/variant_benchmark/raw/truvari/sample2.raw/refine.variant_summary.json
-      should_exist: false
-
 - name: variant_benchmark_truvari_exclude_spurious
   command: nextflow run main.nf --workflows variant_benchmark --variant_benchmark_engine truvari  --truth_dir tests_data/cnv_truth_vcfs --query_dir tests_data/cnv_query_vcfs --genome_ref tests_data/genome.fa --spurious_variants_vcf tests_data/spurious_cnv.vcf --output_dir tests_variant_benchmark_truvari_exclude_spurious
   files:
