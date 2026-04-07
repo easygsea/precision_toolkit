@@ -315,7 +315,7 @@ def main() -> None:
     ylim = tuple(args.ylim) if args.ylim else None
     run_pattern = args.run_pattern if args.run_pattern else None
     # TODO
-    # run_pattern = "IX\\d{5}"
+    run_pattern = "IX\\d{5}"
 
     # Dynamically handle file(s) and folder inputs
     if (
