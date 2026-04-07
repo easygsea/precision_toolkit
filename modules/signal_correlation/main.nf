@@ -46,6 +46,7 @@ process plot_signal_correlation {
     val ylim
     val show_regression
     val filter_source
+    val run_pattern
 
     output:
     path("correlation_*.png"), emit: signal_correlation_png
@@ -58,6 +59,7 @@ process plot_signal_correlation {
     def ylim_arg = ylim == "" ? "" : "--ylim ${ylim}"
     def regression_arg = show_regression ? "--show-regression" : ""
     def filter_source_arg = filter_source == "" ? "" : "--filter-source ${filter_source}"
+    def run_pattern_arg = run_pattern == "" ? "" : "--run-pattern ${run_pattern}"
     """
     export MPLCONFIGDIR=\$(mktemp -d)
     plot-signal-correlation \
@@ -67,6 +69,7 @@ process plot_signal_correlation {
     ${xlim_arg} \
     ${ylim_arg} \
     ${regression_arg} \
-    ${filter_source_arg}
+    ${filter_source_arg} \
+    ${run_pattern_arg}
     """
 }

@@ -5,6 +5,7 @@
 ---
 
 ### v1.2.1 - 2026-04-XX
+- Improvement: Added option to color signal correlation plots by pool using `--filter-source run` and `--run-pattern`.
 
 ---
 

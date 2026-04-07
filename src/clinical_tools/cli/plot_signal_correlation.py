@@ -298,6 +298,11 @@ def main() -> None:
         default="",
         help="FILTER column to use for coloring ('', 'truth', or 'query').",
     )
+    parser.add_argument(
+        "--run-pattern",
+        default="",
+        help="Pattern used to match pool ID from file names for coloring (Optional)",
+    )
     args = parser.parse_args()
 
     # Convert arguments to appropriate types
@@ -308,8 +313,9 @@ def main() -> None:
     figsize = tuple(args.figsize)
     xlim = tuple(args.xlim) if args.xlim else None
     ylim = tuple(args.ylim) if args.ylim else None
+    run_pattern = args.run_pattern if args.run_pattern else None
     # TODO
-    run_pattern = "IX\\d{5}"
+    # run_pattern = "IX\\d{5}"
 
     # Dynamically handle file(s) and folder inputs
     if (
