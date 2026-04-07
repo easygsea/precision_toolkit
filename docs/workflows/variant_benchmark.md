@@ -107,6 +107,8 @@ nextflow run main.nf \
 - `--variant_benchmark_engine`: Analysis engine for variant benchmark (`happy`, `sompy`, `truvari`, or `wittyer`, default: `happy`).
 - `--genome_ref`: Required for hap.py and Truvari: Reference genome FASTA file.
 
+**Note**: Each truth VCF is expected to be paired with a single query VCF per sample. If multiple query VCFs are present for a given sample, only the first matching query VCF will be used.
+
 **Optional Parameters:**
 - `--diagnostic_metrics`: Diagnostic metrics to calculate (default: all metrics: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
 - `--output_dir`: Base output directory (default: `output_clinical_tools`).
