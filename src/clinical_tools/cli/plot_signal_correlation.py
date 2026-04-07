@@ -16,14 +16,14 @@ line. Example usage:
 plot-signal-correlation
 --truth-signal truth_vaf.tsv
 --query-signal query_vaf.tsv
---output-figure vaf_correlation.png
---output-table vaf_correlation.tsv
+--output-filename vaf_correlation
 --xlim 0 1
 --ylim 0 1
 ```
 """
 
 import argparse
+import re
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -151,9 +151,11 @@ def plot_signal_correlation(
     """
     truth_col, query_col = identify_signal_columns(signal_df)
 
+    print(signal_df)
     # Create figure with enhanced styling
     plt.figure(figsize=figsize)
     sns.set_style("whitegrid")
+    sns.set_palette("colorblind")
 
     # Create base scatter plot with optional coloring by filter
     if filter_source.lower() == "truth" and "FILTER_TRUTH" in signal_df.columns:
@@ -171,6 +173,15 @@ def plot_signal_correlation(
             x=truth_col,
             y=query_col,
             hue="FILTER_QUERY",
+            alpha=0.5,
+            s=50,
+        )
+    elif filter_source.lower() == "run":
+        sns.scatterplot(
+            data=signal_df,
+            x=truth_col,
+            y=query_col,
+            hue="RUN_ID",
             alpha=0.5,
             s=50,
         )
@@ -283,7 +294,7 @@ def main() -> None:
     parser.add_argument(
         "-fs",
         "--filter-source",
-        choices=["", "truth", "query"],
+        choices=["", "truth", "query", "run"],
         default="",
         help="FILTER column to use for coloring ('', 'truth', or 'query').",
     )
@@ -297,6 +308,8 @@ def main() -> None:
     figsize = tuple(args.figsize)
     xlim = tuple(args.xlim) if args.xlim else None
     ylim = tuple(args.ylim) if args.ylim else None
+    # TODO
+    run_pattern = "IX\\d{5}"
 
     # Dynamically handle file(s) and folder inputs
     if (
@@ -317,8 +330,13 @@ def main() -> None:
         for truth_signal_file, query_signal_file in zip(
             truth_signal_files, query_signal_files
         ):
-            # Get sample name from file path
+            # Get sample name & run_id from file path
             sample_name = truth_signal_file.with_suffix("").stem.split("_")[0]
+            if run_pattern:
+                m = re.search(run_pattern, truth_signal_file.name)
+                run_id = m.group() if m else None
+            else:
+                run_id = None
 
             # Extract signals for this sample
             sample_df = extract_signals(truth_signal_file, query_signal_file)
@@ -328,8 +346,9 @@ def main() -> None:
                     f"{query_signal_file}."
                 )
 
-            # Add sample name column
+            # Add sample name & run_id column
             sample_df["SAMPLE"] = sample_name
+            sample_df["RUN_ID"] = run_id
 
             # Append to combined dataframe
             signal_df = pd.concat([signal_df, sample_df], ignore_index=True)
@@ -341,8 +360,13 @@ def main() -> None:
             truth_signal = sorted(truth_signal)
             query_signal = sorted(query_signal)
             for truth_signal_file, query_signal_file in zip(truth_signal, query_signal):
-                # Get sample name from file path
+                # Get sample name & run_id from file path
                 sample_name = truth_signal_file.with_suffix("").stem.split("_")[0]
+                if run_pattern:
+                    m = re.search(run_pattern, truth_signal_file.name)
+                    run_id = m.group() if m else None
+                else:
+                    run_id = None
 
                 # Extract signals for this sample
                 sample_df = extract_signals(truth_signal_file, query_signal_file)
@@ -352,8 +376,9 @@ def main() -> None:
                         f"{query_signal_file}."
                     )
 
-                # Add sample name column
+                # Add sample name & run_id column
                 sample_df["SAMPLE"] = sample_name
+                sample_df["RUN_ID"] = run_id
 
                 # Append to combined dataframe
                 signal_df = pd.concat([signal_df, sample_df], ignore_index=True)
