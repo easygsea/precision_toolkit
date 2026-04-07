@@ -224,7 +224,7 @@ process GENERATE_PER_BASE_SUMMARY {
     tuple val("All_Samples"), path(OUT), val("All_Pools"), emit: all_libraries_per_base
 
     script:
-    OUT="all_libraries_per_base_metrics.txt"
+    OUT="cohort_base_analysis.tsv"
     """
     grep -v '^#' ${combined_labelled_pileups} |
     sort -k1,1 -k2,2 -k3,3 |
@@ -375,6 +375,45 @@ process UNIONIZE_TRACTS {
     OUT="tracts.unionized.bed"
     """
     sort-bed ${all_tracts_bed} | bedtools merge -c 4 -o distinct > ${OUT}
+    """
+}
+
+process GENERATE_PER_LIBRARY_QC_REPORT {
+    tag "All_Samples"
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}", mode: 'copy'
+
+    input:
+    // flatten the list of pairs into one directory
+    path "files/*"
+
+    output:
+    path("cohort_qc_report.tsv"), emit: final_table
+
+    script:
+    OUT="cohort_qc_report.tsv"
+    """
+    echo -e "SAMPLE_ID\t%_Bases_Failed\t%_Targets_Failed\tAvg_%_Bases_Failed_Per_Target" > ${OUT}
+
+    for BASE_FILE in files/*.mpileup.per_base.parsed.labelled.scored.txt; do
+        [ -e "\${BASE_FILE}" ] || continue
+
+        FILENAME=\$(basename "\${BASE_FILE}")
+        ID=\${FILENAME%%.mpileup*}
+
+        AGGR_FILE="files/\${ID}.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt"
+
+        if [[ -f "\${AGGR_FILE}" ]]; then
+            # Metric calculation
+            # %_Bases_Failed --> from library-level <LIB>.mpileup.per_base.parsed.labelled.scored.txt based on SCORE column (8)
+            # %_Targets_Failed --> from library-level <LIB>.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt based on SCORE column (11)
+            # Avg_%_Bases_Failed_Per_Target --> from library-level <LIB>.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt based on PCT_BASES_FAIL column (10) averaged for each file(library)
+
+            BASE_STATS=\$(awk -F'\t' 'NR>1 {all++; if(\$8=="FAIL") fail++} END {if(all>0) printf "%.2f%%", (fail/all)*100; else print "0.00%"}' "\${BASE_FILE}")
+            AGGR_STATS=\$(awk -F'\t' 'NR>1 {all++; if(\$11=="FAIL") fail++; sum+=\$10} END {if(all>0) printf "%.2f%%\t%.2f%%", (fail/all)*100, sum/all; else print "0.00%\t0.00%"}' "\${AGGR_FILE}")
+
+            echo -e "\${ID}\t\${BASE_STATS}\t\${AGGR_STATS}" >> ${OUT}
+        fi
+    done
     """
 }
 
