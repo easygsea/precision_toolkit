@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 Generate a scatter plot from paired truth and query signal files.
 
 Each signal file should have the following columns:
@@ -19,11 +19,15 @@ plot-signal-correlation
 --output-filename vaf_correlation
 --xlim 0 1
 --ylim 0 1
+--filter-source run
+--run-pattern "AB\\d{5}"
+--show-regression
 ```
 """
 
 import argparse
 import re
+import warnings
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -189,26 +193,44 @@ def plot_signal_correlation(
         plt.scatter(signal_df[truth_col], signal_df[query_col], alpha=0.5, s=50)
 
     if show_regression:
-        # Calculate correlation and p-value
-        corr, p_value = calculate_correlation(signal_df)
+        # Get unique run IDs, handling NaN values gracefully
+        unique_runs = signal_df["RUN_ID"].dropna().astype(str).unique().tolist()
+        if len(unique_runs) < 1:
+            warnings.warn("No valid RUN_ID found for regression lines.", UserWarning)
+            unique_runs = [" "]
+            signal_df["RUN_ID"] = " "
 
-        # Add regression line on top of scatter
-        sns.regplot(
-            x=truth_col,
-            y=query_col,
-            data=signal_df,
-            scatter=False,
-            line_kws={"color": "red", "alpha": 0.7},
-        )
+        # Set a different color palette for regression lines
+        palette = sns.color_palette("colorblind", n_colors=len(unique_runs))
+        color_map = dict(zip(unique_runs, palette))
 
-        # Add correlation statistics to plot
-        plt.text(
-            0.05,
-            0.95,
-            f"Pearson r = {corr:.3f}\np-value = {p_value:.2e}",
-            transform=plt.gca().transAxes,
-            bbox=dict(facecolor="white", alpha=0.8),
-        )
+        # Add regression lines for each run if coloring by run
+        for idx, run_id in enumerate(unique_runs):
+            # Isolate data unique to run
+            run_df = signal_df[signal_df["RUN_ID"] == run_id]
+
+            # Add regression line on top of scatter
+            sns.regplot(
+                x=truth_col,
+                y=query_col,
+                data=run_df,
+                scatter=False,
+                line_kws={"alpha": 0.7, "color": color_map[run_id]},
+                label=f"Run {run_id}",
+            )
+
+            # Calculate correlation and p-value
+            corr, p_value = calculate_correlation(run_df)
+
+            # Add correlation statistics to plot
+            y_offset = 0.95 - (idx * 0.07)  # Offset to avoid overlap
+            plt.text(
+                0.05,
+                y_offset,
+                f"{run_id}: Pearson r = {corr:.3f}\n{run_id}: p-value = {p_value:.2e}",
+                transform=plt.gca().transAxes,
+                bbox=dict(facecolor="white", alpha=0.8),
+            )
 
     # Customize plot
     plt.xlabel(f"Truth ({truth_col.replace('_TRUTH', '')})")
@@ -314,8 +336,6 @@ def main() -> None:
     xlim = tuple(args.xlim) if args.xlim else None
     ylim = tuple(args.ylim) if args.ylim else None
     run_pattern = args.run_pattern if args.run_pattern else None
-    # TODO
-    run_pattern = "IX\\d{5}"
 
     # Dynamically handle file(s) and folder inputs
     if (
@@ -396,7 +416,17 @@ def main() -> None:
                     f"No matching signals found between {truth_signal} and "
                     f"{query_signal}."
                 )
+
+            # find run pattern
+            if run_pattern:
+                m = re.search(run_pattern, truth_signal.name)
+                run_id = m.group() if m else None
+            else:
+                run_id = None
+
+            # Add sample name & run_id column
             signal_df["SAMPLE"] = truth_signal.with_suffix("").stem.split("_")[0]
+            signal_df["RUN_ID"] = run_id
 
     # Save signal table
     signal_df.to_csv(output_table, sep="\t", index=False)
