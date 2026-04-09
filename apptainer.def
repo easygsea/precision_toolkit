@@ -2,7 +2,7 @@ Bootstrap: localimage
 From: <BASE_IMAGE_PLACEHOLDER>
 
 %files
-    src/ /app/
+    src/ /app/src/
     README.md /app/
 
 %post
@@ -10,6 +10,3 @@ From: <BASE_IMAGE_PLACEHOLDER>
     uv build --wheel --out-dir dist/
     pip install --no-cache-dir --no-deps dist/*.whl
     rm -rf dist/ /root/.cache
-
-%environment
-    export PYTHONPATH=/app/src
