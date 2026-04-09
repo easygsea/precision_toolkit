@@ -1,0 +1,12 @@
+Bootstrap: localimage
+From: <BASE_IMAGE_PLACEHOLDER>
+
+%files
+    src/ /app/
+    README.md /app/
+
+%post
+    cd /app
+    uv build --wheel --out-dir dist/
+    pip install --no-cache-dir --no-deps dist/*.whl
+    rm -rf dist/ /root/.cache

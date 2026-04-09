@@ -5,7 +5,7 @@
 ---
 
 ### v1.2.1 - 2026-04-XX
-
+- Improvement: Refactor container creation to use a cached base image.
 ---
 
 ### v1.2.0 - 2026-03-27

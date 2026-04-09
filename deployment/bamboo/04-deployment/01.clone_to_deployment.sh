@@ -80,7 +80,7 @@ function main {
     IMAGE_NAME="${4:-${bamboo.inject.IMAGE_NAME}}" \
     PYTHON_EXECUTABLE="${5:-${bamboo.PYTHON_EXECUTABLE}}" \
     IMAGE_STORE_ROOT="${6:-${bamboo.TEMPORARY_IMAGE_ROOT}}" \
-    NEW_IMAGE_NAME="${7:-${bamboo.APPTAINER_IMAGE_NAME}}"
+    NEW_IMAGE_NAME="${7:-${bamboo.APPTAINER_IMAGE_NAME}}.sif"
 
   if [[ "${BRANCH_NAME}" != "main" ]]; then
     echo "Deployment is restricted to the 'main' branch only."
