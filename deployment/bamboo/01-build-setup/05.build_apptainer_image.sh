@@ -31,6 +31,7 @@ set -euxo pipefail
 IMAGE_NAME="$1"
 BASE_IMAGE_ROOT="$2"
 
+chmod -R a+rx "$PWD"
 rm -rfv "${IMAGE_NAME}"
 
 CONFIG_HASH=$(cat Dockerfile pyproject.toml uv.lock | sha256sum | cut -c1-16)
