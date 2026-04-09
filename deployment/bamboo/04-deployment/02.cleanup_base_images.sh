@@ -18,7 +18,7 @@ Username:
   ${bamboo.USER}
 
 Password:
-  ${bamboo.PASSWORD}
+  ${bamboo.PASSWORD_CONTAINER}
 
 SSH command:
   Copy and paste the full code from this script into the Bamboo interface.

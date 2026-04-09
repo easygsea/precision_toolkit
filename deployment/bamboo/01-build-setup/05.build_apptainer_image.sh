@@ -22,7 +22,7 @@ Password:
 
 SSH command:
 cd ${bamboo.inject.BUILDING_DEPLOYMENT_DIRECTORY}
-bash 05.build_apptainer_image.sh ${bamboo.inject.IMAGE_NAME}
+bash 05.build_apptainer_image.sh ${bamboo.inject.IMAGE_NAME} ${bamboo.BASE_IMAGE_ROOT}
 
 BAMBOO_CONFIG_DOC
 
