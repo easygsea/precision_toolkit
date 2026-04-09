@@ -2,7 +2,7 @@ Bootstrap: localimage
 From: <BASE_IMAGE_PLACEHOLDER>
 
 %files
-    src/ /app/src/
+    src/ /app/
     README.md /app/
 
 %post
