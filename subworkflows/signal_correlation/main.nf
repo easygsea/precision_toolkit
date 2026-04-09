@@ -36,6 +36,7 @@ workflow signal_correlation_workflow {
         params.ylim,
         params.show_regression,
         params.filter_source,
-        params.run_pattern
+        params.run_pattern,
+        params.plot_color_palette
     )
 }

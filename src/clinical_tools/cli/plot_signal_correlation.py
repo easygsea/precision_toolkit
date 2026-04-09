@@ -22,6 +22,7 @@ plot-signal-correlation
 --filter-source run
 --run-pattern "AB\\d{5}"
 --show-regression
+--plot-color-palette viridis
 ```
 """
 
@@ -140,6 +141,7 @@ def plot_signal_correlation(
     xlim: tuple[float, float] | None = None,
     ylim: tuple[float, float] | None = None,
     filter_source: str = "",
+    plot_color_palette: str = "colorblind",
 ) -> None:
     """Scatter plot of merged signals with optional regression and correlation.
 
@@ -152,6 +154,7 @@ def plot_signal_correlation(
         xlim: Optional tuple of (min, max) for x-axis range.
         ylim: Optional tuple of (min, max) for y-axis range.
         filter_source: Color by 'FILTER_TRUTH' or 'FILTER_QUERY' if provided.
+        plot_color_palette: Color scheme for plotting if provided.
     """
     truth_col, query_col = identify_signal_columns(signal_df)
 
@@ -159,7 +162,7 @@ def plot_signal_correlation(
     # Create figure with enhanced styling
     plt.figure(figsize=figsize)
     sns.set_style("whitegrid")
-    sns.set_palette("colorblind")
+    sns.set_palette(plot_color_palette)
 
     # Create base scatter plot with optional coloring by filter
     if filter_source.lower() == "truth" and "FILTER_TRUTH" in signal_df.columns:
@@ -201,7 +204,7 @@ def plot_signal_correlation(
             signal_df["RUN_ID"] = " "
 
         # Set a different color palette for regression lines
-        palette = sns.color_palette("colorblind", n_colors=len(unique_runs))
+        palette = sns.color_palette(plot_color_palette, n_colors=len(unique_runs))
         color_map = dict(zip(unique_runs, palette))
 
         # Add regression lines for each run if coloring by run
@@ -323,7 +326,12 @@ def main() -> None:
     parser.add_argument(
         "--run-pattern",
         default="",
-        help="Pattern used to match pool ID from file names for coloring (Optional)",
+        help="Pattern used to match pool ID from file names for coloring (Optional).",
+    )
+    parser.add_argument(
+        "--plot-color-palette",
+        default="colorblind",
+        help="Color palette to use for plotting (e.g., 'colorblind', 'viridis').",
     )
     args = parser.parse_args()
 
@@ -336,6 +344,7 @@ def main() -> None:
     xlim = tuple(args.xlim) if args.xlim else None
     ylim = tuple(args.ylim) if args.ylim else None
     run_pattern = args.run_pattern if args.run_pattern else None
+    plot_color_palette = args.plot_color_palette
 
     # Dynamically handle file(s) and folder inputs
     if (
@@ -441,6 +450,7 @@ def main() -> None:
         xlim=xlim,
         ylim=ylim,
         filter_source=args.filter_source,
+        plot_color_palette=plot_color_palette,
     )
 
 

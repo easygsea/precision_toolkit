@@ -47,6 +47,7 @@ process plot_signal_correlation {
     val show_regression
     val filter_source
     val run_pattern
+    val plot_color_palette
 
     output:
     path("correlation_*.png"), emit: signal_correlation_png
@@ -70,6 +71,7 @@ process plot_signal_correlation {
     ${ylim_arg} \
     ${regression_arg} \
     ${filter_source_arg} \
-    ${run_pattern_arg}
+    ${run_pattern_arg} \
+    --plot-color-palette ${plot_color_palette}
     """
 }
