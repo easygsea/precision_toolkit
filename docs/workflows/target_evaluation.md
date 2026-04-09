@@ -70,13 +70,13 @@ nextflow run main.nf \
 - `--visualize`: Flag to generate per-target level plots for each stat.
 
 **Fine-Tuning Parameters**
-- `--fail_percent_threshold`: Filtering threshold used for generating the 'common_regions_fail.bed' file (default = 10).
+- `--cohort_percent_library_fail_threshold`: Maximum tolerable percentage of libraries failing at a base (default = 0.25, non-inclusive).
 - `--coverage_threshold`: Minimum coverage threshold for pass (default = 25).
 - `--baseq_threshold`: Minimum BASEQ threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--mapq_threshold`: Minimum MAPQ score threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--read_fail_tolerance`: Maximum acceptable percentage of reads per base failing baseq and mapq thresholds (default = 0.25, non-inclusive).
+- `--separate_plots`: Flag to separate plots for metrics when generating visualizations for regions failing to meet threshold.
 - `--target_fail_tolerance`: Maximum tolerable percentage of bases failed for target-level PASS per sample (default = 0.25, non-inclusive).
-- `--base_fail_tolerance`: Maximum tolerable percentage of libraries failing at a base (default = 0.25, non-inclusive).
 - `--tract_gap_tolerance`: Maximum gap tolerance between fail regions when building tracts (default = 2).
 
 **Custom Metric Parameters** (optional parameters to fine-tune filtering of raw mpileup output for each metric):
@@ -103,6 +103,7 @@ For example, when `--output_raw_mpileup` and `--visualize` is flagged:
     │   ├── WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.scored.txt
     │   └── WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
     ├── plots           # Per-target plots (if '--visualize' enabled)
+    │   ├── failure_threshold_{params.threshold}_boxplot.png
     │   ├── plot_TARGET_P25(BASE_COV).png
     │   ├── plot_TARGET_P25(BASE_BQ_P25).png
     │   └── plot_TARGET_P25(BASE_MQ_P25).png
@@ -166,7 +167,7 @@ _Overall, a `FAIL` here suggests that there is a problem with this target in thi
 
 #### C) Cohort-level, per-base
 
-On a Cohort-level, we evaluate systemic issues based on the percentage of libraries failed on each metric. The threshold for percentage of libraries failed can be fine-tuned with `--base_fail_tolerance`.
+On a Cohort-level, we evaluate systemic issues based on the percentage of libraries failed on each metric. The threshold for percentage of libraries failed can be fine-tuned with `--cohort_percent_library_fail_threshold`.
    - PCT_LIB_FAIL(COV): Calculated as the percent of libraries that failed on coverage on this base (as defined in section A). Scoring for this metric is recorded under the COV_SCORE heading.
    - PCT_LIB_FAIL(BQ): Calculated as the percent of libraries that failed on base quality on this base (as defined in section A). Scoring for this metric is recorded under the BQ_SCORE heading.
    - PCT_LIB_FAIL(MQ): Calculated as the percent of libraries that failed on mapping quality on this base (as defined in section A). Scoring for this metric is recorded under the MQ_SCORE heading.

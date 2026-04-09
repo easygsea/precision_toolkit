@@ -4,7 +4,8 @@
 
 ---
 
-### v1.2.1 - 2026-04-XX
+### v1.2.1 - 2026-0X-0X
+- Feature: Add visualization plot to visualize library metrics failing to meet a user specified threshold. This threshold also uses the `--cohort_percent_library_fail_threshold` parameter (default: 0.25).
 
 ---
 
@@ -19,7 +20,7 @@
 
 ### v1.1.4 - 2026-03-16
 - New Standalone Utility: Added `plot-dragen-metrics` to plot backbone QC metrics in DRAGEN's `MetricsOutput.tsv`.
-- Feature: Added functionality to compile a systemic fail tract (`common_fail_regions.bed`) using cohort-level base-specific fail data. Threshold can be adjusted with `--fail_percent_threshold` parameter (default: 10).
+- Feature: Added functionality to compile a systemic fail tract (`common_fail_regions.bed`) using cohort-level base-specific fail data. Threshold can be adjusted with `--cohort_percent_library_fail_threshold` parameter (default: 0.25).
 - Improvement: Added support for parsing metrics from JSON files in `compile-dragen-metrics`.
 - Improvement: Enabled multiple inputs to `--analysis-dirs` (formerly `--analysis-dir`) in `compile-dragen-metrics`.
 - Improvement: Updated workflow to allow direct CRAM injection into mpileup, bypassing intermediate BAM generation and reducing overhead.
