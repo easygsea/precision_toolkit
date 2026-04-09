@@ -1,9 +1,9 @@
 - name: signal_correlation_vaf
   command: nextflow run main.nf --workflows signal_correlation --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --truth_signal VAF --query_signal AF --output_dir tests_signal_correlation_vaf
   files:
-    - path: tests_signal_correlation_vaf/signal_correlation/truth/VAF/sample1_truth_VAF.tsv
+    - path: tests_signal_correlation_vaf/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
       md5sum: 1a905513b6d0b27a7405d4ec6b3899f8
-    - path: tests_signal_correlation_vaf/signal_correlation/query/AF/sample1_query_AF.tsv
+    - path: tests_signal_correlation_vaf/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
       md5sum: 8294901cc6770c32968e2e0ae544e5dd
     - path: tests_signal_correlation_vaf/signal_correlation/correlation_VAF_AF.png
       md5sum: 9ad28f6884c7ba1dd4a0e1148e552804
@@ -11,9 +11,9 @@
 - name: signal_correlation_vaf_spurious
   command: nextflow run main.nf --workflows signal_correlation --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --truth_signal VAF --query_signal AF --spurious_variants_vcf tests_data/spurious_snv.vcf --output_dir tests_signal_correlation_vaf_spurious
   files:
-    - path: tests_signal_correlation_vaf_spurious/signal_correlation/truth/VAF/sample1_truth_VAF.tsv
+    - path: tests_signal_correlation_vaf_spurious/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
       md5sum: c09a0c71f738eeeb9e935f9504d8de8c
-    - path: tests_signal_correlation_vaf_spurious/signal_correlation/query/AF/sample1_query_AF.tsv
+    - path: tests_signal_correlation_vaf_spurious/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
       md5sum: ee6aaba3da702c2ecdbaa241255aee45
     - path: tests_signal_correlation_vaf_spurious/signal_correlation/correlation_VAF_AF.png
       md5sum: 8417eacae1613e8c6b67db183adc4417
@@ -21,9 +21,9 @@
 - name: signal_correlation_vaf_xlim_ylim
   command: nextflow run main.nf --workflows signal_correlation --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --truth_signal VAF --query_signal AF --xlim "0 1" --ylim "0 1" --output_dir tests_signal_correlation_vaf_xlim_ylim
   files:
-    - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/truth/VAF/sample1_truth_VAF.tsv
+    - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
       md5sum: 1a905513b6d0b27a7405d4ec6b3899f8
-    - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/query/AF/sample1_query_AF.tsv
+    - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
       md5sum: 8294901cc6770c32968e2e0ae544e5dd
     - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/correlation_VAF_AF.png
       md5sum: 70df403ef0dd8d0ba826500ed2c5af79
@@ -31,9 +31,20 @@
 - name: signal_correlation_vaf_show_regression
   command: nextflow run main.nf --workflows signal_correlation --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --truth_signal VAF --query_signal AF --show_regression true --output_dir tests_signal_correlation_vaf_show_regression
   files:
-    - path: tests_signal_correlation_vaf_show_regression/signal_correlation/truth/VAF/sample1_truth_VAF.tsv
+    - path: tests_signal_correlation_vaf_show_regression/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
       md5sum: 1a905513b6d0b27a7405d4ec6b3899f8
-    - path: tests_signal_correlation_vaf_show_regression/signal_correlation/query/AF/sample1_query_AF.tsv
+    - path: tests_signal_correlation_vaf_show_regression/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
       md5sum: 8294901cc6770c32968e2e0ae544e5dd
     - path: tests_signal_correlation_vaf_show_regression/signal_correlation/correlation_VAF_AF.png
       md5sum: 67400cc476ac2c1a4921ed902030d29c
+
+
+- name: signal_correlation_multirun_support
+  command: nextflow run main.nf --workflows signal_correlation --truth_dir tests_data/snv_truth_vcfs --query_dir tests_data/snv_query_vcfs --truth_signal VAF --query_signal AF --show_regression true --output_dir tests_signal_correlation_multirun_support --filter_source run --run_pattern 'AB\\d{5}' --plot_color_palette "tab10"
+  files:
+    - path: tests_signal_correlation_multirun_support/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
+      md5sum: 1a905513b6d0b27a7405d4ec6b3899f8
+    - path: tests_signal_correlation_multirun_support/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
+      md5sum: 8294901cc6770c32968e2e0ae544e5dd
+    - path: tests_signal_correlation_multirun_support/signal_correlation/correlation_VAF_AF.png
+      md5sum: 544fa88aa771d3cd9ed990e75ee8ad42
