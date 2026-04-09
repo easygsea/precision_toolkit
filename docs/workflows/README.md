@@ -14,4 +14,4 @@ Below are a suite of parameters common to all workflows.
 - `--output_dir`: Directory or path in which to output results (default = "output_clinical_tools"). If specified directory does not exist, it will be created locally or at the path specified.
 - `--genome_ref`: Provide reference genome when indicated by workflow docs (eg. for CRAM file expansion; default = null).
 - `--decimals`: Number of decimal places (default = 2).
-- `--plot_color_palete`: Color palette to use for plotting (e.g., 'colorblind', 'viridis', 'plasma').
+- `--color-palette`: Color palette to use for plotting (e.g., 'colorblind', 'tab10', 'bright').

@@ -37,6 +37,6 @@ workflow signal_correlation_workflow {
         params.show_regression,
         params.filter_source,
         params.run_pattern,
-        params.plot_color_palette
+        params.color_palette
     )
 }
