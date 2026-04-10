@@ -3,7 +3,7 @@
   files:
     - path: tests_signal_correlation_vaf/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
       md5sum: 1a905513b6d0b27a7405d4ec6b3899f8
-    - path: tests_signal_correlation_vaf/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
+    - path: tests_signal_correlation_vaf/signal_correlation/query/AF/sample1_AB00001_query_AF.tsv
       md5sum: 8294901cc6770c32968e2e0ae544e5dd
     - path: tests_signal_correlation_vaf/signal_correlation/correlation_VAF_AF.png
       md5sum: 9ad28f6884c7ba1dd4a0e1148e552804
@@ -13,7 +13,7 @@
   files:
     - path: tests_signal_correlation_vaf_spurious/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
       md5sum: c09a0c71f738eeeb9e935f9504d8de8c
-    - path: tests_signal_correlation_vaf_spurious/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
+    - path: tests_signal_correlation_vaf_spurious/signal_correlation/query/AF/sample1_AB00001_query_AF.tsv
       md5sum: ee6aaba3da702c2ecdbaa241255aee45
     - path: tests_signal_correlation_vaf_spurious/signal_correlation/correlation_VAF_AF.png
       md5sum: 8417eacae1613e8c6b67db183adc4417
@@ -23,7 +23,7 @@
   files:
     - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
       md5sum: 1a905513b6d0b27a7405d4ec6b3899f8
-    - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
+    - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/query/AF/sample1_AB00001_query_AF.tsv
       md5sum: 8294901cc6770c32968e2e0ae544e5dd
     - path: tests_signal_correlation_vaf_xlim_ylim/signal_correlation/correlation_VAF_AF.png
       md5sum: 70df403ef0dd8d0ba826500ed2c5af79
@@ -33,7 +33,7 @@
   files:
     - path: tests_signal_correlation_vaf_show_regression/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
       md5sum: 1a905513b6d0b27a7405d4ec6b3899f8
-    - path: tests_signal_correlation_vaf_show_regression/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
+    - path: tests_signal_correlation_vaf_show_regression/signal_correlation/query/AF/sample1_AB00001_query_AF.tsv
       md5sum: 8294901cc6770c32968e2e0ae544e5dd
     - path: tests_signal_correlation_vaf_show_regression/signal_correlation/correlation_VAF_AF.png
       md5sum: 67400cc476ac2c1a4921ed902030d29c
@@ -44,7 +44,7 @@
   files:
     - path: tests_signal_correlation_multirun_support/signal_correlation/truth/VAF/sample1_AB00001_truth_VAF.tsv
       md5sum: 1a905513b6d0b27a7405d4ec6b3899f8
-    - path: tests_signal_correlation_multirun_support/signal_correlation/query/AF/sample1_AB00002_query_AF.tsv
+    - path: tests_signal_correlation_multirun_support/signal_correlation/query/AF/sample1_AB00001_query_AF.tsv
       md5sum: 8294901cc6770c32968e2e0ae544e5dd
     - path: tests_signal_correlation_multirun_support/signal_correlation/correlation_VAF_AF.png
       md5sum: 544fa88aa771d3cd9ed990e75ee8ad42
