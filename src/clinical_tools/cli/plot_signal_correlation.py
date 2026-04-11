@@ -156,6 +156,9 @@ def plot_signal_correlation(
         filter_source: Color by 'FILTER_TRUTH' or 'FILTER_QUERY' if provided.
         color_palette: Color scheme for plotting if provided.
     """
+    # sort dataframe to ensure deterministic behaviour
+    signal_df = signal_df.sort_values(by=list(signal_df.columns)).reset_index(drop=True)
+
     truth_col, query_col = identify_signal_columns(signal_df)
 
     print(signal_df)
