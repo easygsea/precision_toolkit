@@ -4,8 +4,9 @@
 
 ---
 
-### v1.2.1 - 2026-0X-0X
+### v1.2.1 - 2026-04-0X
 - Feature: Add visualization plot to visualize library metrics failing to meet a user specified threshold. This threshold also uses the `--cohort_percent_library_fail_threshold` parameter (default: 0.25).
+- Improvement: Refactor container creation to use a cached base image.
 
 ---
 
