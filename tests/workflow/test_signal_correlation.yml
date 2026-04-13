@@ -36,7 +36,7 @@
     - path: tests_signal_correlation_vaf_show_regression/signal_correlation/query/AF/sample1_AB00001_query_AF.tsv
       md5sum: 8294901cc6770c32968e2e0ae544e5dd
     - path: tests_signal_correlation_vaf_show_regression/signal_correlation/correlation_VAF_AF.png
-      md5sum: 804791b4ad55bc7299200fac4c14e7fe
+      md5sum: c0ef5d490c64187b86c9cfac491eb412
 
 
 - name: signal_correlation_multirun_support
@@ -47,4 +47,4 @@
     - path: tests_signal_correlation_multirun_support/signal_correlation/query/AF/sample1_AB00001_query_AF.tsv
       md5sum: 8294901cc6770c32968e2e0ae544e5dd
     - path: tests_signal_correlation_multirun_support/signal_correlation/correlation_VAF_AF.png
-      md5sum: a2888caabb04aec326864fc34ca21baa
+      md5sum: 61a451f2d4c4998a419ddbed8e392eb6
