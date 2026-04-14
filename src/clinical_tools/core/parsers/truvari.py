@@ -15,18 +15,17 @@ class TruvariDataParser:
     def process_truvari_output(
         file_path: Path | str,
     ) -> Sequence[VariantCallMetrics]:
-        """
-        Process the Truvari output files to extract metrics information.
+        """Process the Truvari output files to extract metrics information.
 
         Args:
             file_path: Path to the summary.json output file.
 
+        Returns:
+            Sequence of VariantCallMetrics objects containing processed data.
+
         Raises:
             FileNotFoundError: When params.json is not found in the same directory as
                 file_path.
-
-        Returns:
-            Sequence of VariantCallMetrics objects containing processed data.
         """
         # Derive path to params.json which truvari outputs alongside summary.json
         params_file_path = Path(file_path).parent / Path(file_path).name.replace(
