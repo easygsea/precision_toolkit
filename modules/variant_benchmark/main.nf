@@ -66,32 +66,6 @@ process run_sompy {
     """
 }
 
-process run_wittyer {
-    label "dynamic_resource"
-    tag "${sample_name}"
-    containerOptions = "-B /home"
-    publishDir "${params.output_dir}/${output_dir ?: ''}/wittyer", mode: 'copy'
-
-    input:
-    tuple val(sample_name), path(truth_vcf), path(query_vcf)
-    val wittyer_options
-    val output_dir
-    val label
-
-    output:
-    path("*/*Wittyer.Stats.json"), emit: wittyer_summary
-    path("${sample_name}*"), emit: wittyer_outputs
-
-    script:
-    PREFIX = "${sample_name}.${label}"
-    // CDI-90 workaround: clean witty.er invalid options
-    def clean_options = wittyer_options.replaceAll('--evaluationMode=Default|--evaluationMode=d|--em=Default|--em=d', '')
-    """
-    witty.er -i "${query_vcf}" -t "${truth_vcf}" -o "${PREFIX}" ${clean_options}
-    mv "${PREFIX}/Wittyer.Stats.json" "${PREFIX}/${PREFIX}.Wittyer.Stats.json"
-    """
-}
-
 process run_truvari_bench {
     label "dynamic_resource"
     tag "${sample_name}"
@@ -157,6 +131,32 @@ process run_truvari_refine {
     else
         cp "${PREFIX}/summary.json" "${PREFIX}.refine.variant_summary.json"
     fi
+    """
+}
+
+process run_wittyer {
+    label "dynamic_resource"
+    tag "${sample_name}"
+    containerOptions = "-B /home"
+    publishDir "${params.output_dir}/${output_dir ?: ''}/wittyer", mode: 'copy'
+
+    input:
+    tuple val(sample_name), path(truth_vcf), path(query_vcf)
+    val wittyer_options
+    val output_dir
+    val label
+
+    output:
+    path("*/*Wittyer.Stats.json"), emit: wittyer_summary
+    path("${sample_name}*"), emit: wittyer_outputs
+
+    script:
+    PREFIX = "${sample_name}.${label}"
+    // CDI-90 workaround: clean witty.er invalid options
+    def clean_options = wittyer_options.replaceAll('--evaluationMode=Default|--evaluationMode=d|--em=Default|--em=d', '')
+    """
+    witty.er -i "${query_vcf}" -t "${truth_vcf}" -o "${PREFIX}" ${clean_options}
+    mv "${PREFIX}/Wittyer.Stats.json" "${PREFIX}/${PREFIX}.Wittyer.Stats.json"
     """
 }
 
