@@ -100,7 +100,6 @@ def validate_ci_method(method) {
     }
 }
 
-// Include the prepare_variant_benchmark_inputs and variant benchmark subworkflows
 include { prepare_variant_benchmark_inputs } from '../subworkflows/prepare_variant_benchmark_inputs/main'
 include { variant_benchmark_workflow } from '../subworkflows/variant_benchmark/main'
 
