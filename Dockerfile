@@ -24,24 +24,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
     cd Wittyer && \
     dotnet publish . -c Release
 
-# Stage 2: Build custom package via uv
+# Stage 2: Runtime
 ARG UV_VERSION
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_binary
-FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
-WORKDIR /app
-
-# Copy uv binary directly
-COPY --from=uv_binary /uv /bin/uv
-
-# Copy application files
-COPY README.md pyproject.toml uv.lock ./
-COPY src/ /app/src/
-
-# Build wheel
-RUN uv build --wheel && \
-    chmod a+rx /app -R
-
-# Stage 3: Runtime
 FROM mgibio/hap.py:v${HAPPY_VERSION}
 ARG BEDOPS_VERSION
 ARG BEDTOOLS_VERSION
@@ -154,7 +139,19 @@ RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~
 # CDI-158 fix som.py inconsistency issue
 RUN sed -i 's~True,  # pass_only~not args.inc_nonpass, # account for nonpass in truth vcf~' /opt/hap.py/bin/som.py
 
-COPY --from=clinical_tools_builder /app/dist/*.whl .
-RUN pip install --no-cache-dir ./*.whl /wheels/pysam*.whl && \
-    rm ./*.whl && \
-    rm -rf /wheels /tmp/*
+# Install project dependencies
+COPY --from=uv_binary /uv /bin/uv
+ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
+COPY pyproject.toml uv.lock /app/
+
+RUN pip install --no-cache-dir /wheels/pysam*.whl && \
+    uv sync --no-install-project && \
+    rm -rf /wheels /tmp/* /root/.cache
+
+# Install project source (This is removed in the CI pipeline)
+COPY src/ /app/src/
+COPY README.md /app/
+
+RUN uv build --wheel --out-dir dist/ && \
+    pip install --no-cache-dir --no-deps dist/*.whl && \
+    rm -rf dist/ /root/.cache

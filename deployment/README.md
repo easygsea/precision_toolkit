@@ -8,7 +8,8 @@ any PUSH to your Clinical Tool Branch on BitBucket.
 Deployment is a manual stage that promotes a tested build into the operational environment.
 
 To run the default plan configuration, the following Variables must be defined in the Bamboo Default plan configuration:
-- `APPTAINER_IMAGE_NAME` - default name of the Apptainer image to be built (e.g. clinical_tools_latest.sif)
+- `APPTAINER_IMAGE_NAME` - default name of the Apptainer image to be built (e.g. clinical_tools)
+- `BASE_IMAGE_ROOT` - path where the base Apptainer images are stored
 - `CONTAINER_BUILD_ROOT` - path where Docker and Apptainer images are built
 - `DEPLOYMENT_ROOT` - path where the clinical_tools package is deployed to
 - `HOST` -  standard server providing access to testing and deployment directories
@@ -56,3 +57,5 @@ Cleans up the image-building directory on `HOST_CONTAINER`.
 ### 04-deployment
 - 01.clone_to_deployment.sh\
 Cleans up temporary images and clones the final build into the deployment directory.
+- 02.cleanup_base_images.sh\
+Cleans up all the base Docker and Apptainer images on `HOST_CONTAINER`.
