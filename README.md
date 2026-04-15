@@ -10,7 +10,7 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 
 - Java (>=17.0.2)
 - Nextflow (>=25.04.6)
-- Apptainer (>=1.3.1) or Singularity (>=3.8.7)
+- Apptainer (>=1.3.1)
 
 Containerized dependencies (no installation required):
 - Python 3.13.12
@@ -185,7 +185,7 @@ Its workflows implement several resource optimization strategies:
    - For local execution, a maximum time limit of 24 hours is set per task with no retry options
 
 2. **Containerization**:
-   - All dependencies are containerized using Docker/Singularity
+   - All dependencies are containerized using Docker
    - Reduces installation overhead and dependency conflicts
 
 3. **Parallel Execution**:
