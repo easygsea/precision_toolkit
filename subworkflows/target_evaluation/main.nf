@@ -12,6 +12,7 @@ include {
     SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_MQ
     GENERATE_TRACTS
     UNIONIZE_TRACTS
+    GENERATE_PER_LIBRARY_QC_REPORT
     GENERATE_VISUALIZATION
     GENERATE_COMMON_REGIONS_FAIL
 } from '../../modules/target_evaluation/main'
@@ -190,6 +191,8 @@ workflow gene_target_evaluation_workflow {
         params.base_fail_tolerance
     )
 
+    // STAGE 4: Generate tracks
+
     // generate tracts per metric
     GENERATE_TRACTS (
         SCORE_PER_BASE_SUMMARY_ON_MQ.out.scored_output,
@@ -202,7 +205,17 @@ workflow gene_target_evaluation_workflow {
     // generate unionized tract
     UNIONIZE_TRACTS (GENERATE_TRACTS.out.tract_bed.collectFile(name: 'combined.bed', skip: 1))
 
-    // Stage 5: Generate visualization per target
+    // STAGE 5: Summarize Bases and Targets Failed for Analysis
+    ch_files_for_report = SCORE_BASES_PER_LIBRARY.out.scored_output
+        .join(SCORE_TARGETS_PER_LIBRARY.out.scored_output)
+        .map { sample_name, base_file, pool_id, aggr_file, pool_id2 ->
+            [base_file, aggr_file]
+        }
+        .collect()
+
+    GENERATE_PER_LIBRARY_QC_REPORT(ch_files_for_report)
+
+    // STAGE 6: Generate visualization per target
     if (params.visualize) {
 
         // sort plot data prior to plotting

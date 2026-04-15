@@ -1,7 +1,7 @@
 ##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description="All filters passed">
-##contig=<ID=chr1>
-##contig=<ID=chr2>
+##contig=<ID=chr1,length=1000>
+##contig=<ID=chr2,length=1000>
 ##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant">
 ##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
 ##INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Length of the variant">
