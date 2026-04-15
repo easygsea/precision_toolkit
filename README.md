@@ -20,7 +20,9 @@ Containerized dependencies (no installation required):
 - bedtools 2.31.0
 - hap.py 0.3.15
 - htslib 1.21 (bgzip tabix)
+- MAFFT 7.505-1
 - samtools 1.21
+- Truvari 5.4.0
 - witty.er 0.5.2.0
 
 ## Quick Start
