@@ -6,6 +6,7 @@
 
 ### v1.2.1 - 2026-04-XX
 - Feature: Add per library QC report generation process to summarize base and target failures in `cohort_qc_report.tsv`.
+- Feature: Add support for Truvari in variant benchmark workflow.
 - Improvement: Refactor container creation to use a cached base image.
 
 ---

@@ -1,9 +1,9 @@
 process bgzip_vcf {
     input:
-    path original_vcf
+    tuple val(label), path(original_vcf)
 
     output:
-    path("${original_vcf}.gz"), emit: gzipped_vcf
+    tuple val(label), path("${original_vcf}.gz"), emit: gzipped_vcf
 
     script:
     """
@@ -13,10 +13,10 @@ process bgzip_vcf {
 
 process index_vcf {
     input:
-    path gzipped_vcf
+    tuple val(label), path(gzipped_vcf)
 
     output:
-    path("${gzipped_vcf}.tbi"), emit: indexed_vcf
+    tuple val(label), path("${gzipped_vcf}.tbi"), emit: indexed_vcf
 
     script:
     """

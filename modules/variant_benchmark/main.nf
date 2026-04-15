@@ -66,6 +66,74 @@ process run_sompy {
     """
 }
 
+process run_truvari_bench {
+    label "dynamic_resource"
+    tag "${sample_name}"
+    publishDir "${params.output_dir}${output_dir ? '/' + output_dir : ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
+
+    input:
+    tuple val(sample_name), path(truth_vcf), path(truth_tbi), path(query_vcf), path(query_tbi)
+    path genome_ref
+    path genome_fai
+    val truvari_options
+    val output_dir
+    val label
+
+    output:
+    path("*summary.json"), emit: truvari_bench_summary
+    path("*params.json"), emit: truvari_parameters
+    tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
+
+    script:
+    PREFIX = "${sample_name}.${label}"
+    """
+    truvari bench \
+        --base "${truth_vcf}" \
+        --comp "${query_vcf}" \
+        --reference "${genome_ref}" \
+        --output "${PREFIX}" \
+        ${truvari_options}
+
+    # Create temporary copies of summary.json and params.json which can be uniquely identified when passed to summarize_diagnostic_metrics
+    cp "${PREFIX}/summary.json" "${PREFIX}.summary.json"
+    cp "${PREFIX}/params.json" "${PREFIX}.params.json"
+    """
+}
+
+process run_truvari_refine {
+    label "dynamic_resource"
+    tag "${sample_name}"
+    publishDir "${params.output_dir}${output_dir ? '/' + output_dir : ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
+
+    input:
+    tuple val(sample_name), path(truvari_bench_results)
+    path genome_ref
+    path genome_fai
+    val truvari_options
+    val output_dir
+    val label
+
+    output:
+    path("*refine.variant_summary.json"), emit: truvari_refine_summary
+    tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
+
+    script:
+    PREFIX = "${sample_name}.${label}"
+    """
+    truvari refine \
+        --reference "${genome_ref}" \
+        ${truvari_options} \
+        "${truvari_bench_results}"
+
+    # Create temporary copy if regions were refined, otherwise copy original truvari bench summmary as refine outputs are not generated when unsuccessful
+    if [[ -f "${PREFIX}/refine.variant_summary.json" ]]; then
+        cp "${PREFIX}/refine.variant_summary.json" "${PREFIX}.refine.variant_summary.json"
+    else
+        cp "${PREFIX}/summary.json" "${PREFIX}.refine.variant_summary.json"
+    fi
+    """
+}
+
 process run_wittyer {
     label "dynamic_resource"
     tag "${sample_name}"
@@ -115,8 +183,8 @@ process summarize_diagnostic_metrics {
     """
     summarize-diagnostic-metrics --metrics ${diagnostic_metrics} \
         --engine "${variant_benchmark_engine}" \
-        ${(raw_variant_benchmark_outputs != []) ? "--raw-files " + raw_variant_benchmark_outputs.collect().join(' ') : ""} \
-        ${(curated_variant_benchmark_outputs != []) ? "--curated-files " + curated_variant_benchmark_outputs.collect().join(' ') : ""} \
+        ${(raw_variant_benchmark_outputs != []) ? "--raw-files " + raw_variant_benchmark_outputs.findAll { file -> !file.name.endsWith('.params.json') }.join(' ') : ""} \
+        ${(curated_variant_benchmark_outputs != []) ? "--curated-files " + curated_variant_benchmark_outputs.findAll { file -> !file.name.endsWith('.params.json') }.join(' ') : ""} \
         --tp-method "${concordance_tp}" \
         --ci-method "${ci_method}" \
         --ci-level ${ci_level} \

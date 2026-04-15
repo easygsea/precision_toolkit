@@ -21,6 +21,7 @@ class VariantConcordanceEngine(StrEnum):
 
     HAPPY = "happy"
     SOMPY = "sompy"
+    TRUVARI = "truvari"
     WITTYER = "wittyer"
 
 
