@@ -5,7 +5,7 @@
 ---
 
 ### v1.2.1 - 2026-04-XX
-- Improvement: Added option to group and color signal correlation plots by run tag using `--filter-source run` and `--run-pattern`. Also added `--color_palette` metric to set color preferences.
+- Improvement: Add option to group and color signal correlation plots by run tag using `--filter-source run` and `--run-pattern`, as well as `--color_palette` metric to set colour preferences.
 - Improvement: Refactor container creation to use a cached base image.
 
 ---

@@ -161,7 +161,6 @@ def plot_signal_correlation(
 
     truth_col, query_col = identify_signal_columns(signal_df)
 
-    print(signal_df)
     # Create figure with enhanced styling
     plt.figure(figsize=figsize)
     sns.set_style("whitegrid")
@@ -329,7 +328,10 @@ def main() -> None:
     parser.add_argument(
         "--run-pattern",
         default="",
-        help="Pattern used to match pool ID from file names for coloring (Optional).",
+        help=(
+            "Pattern used to match run ID from file names for gouping and coloring "
+            '(Optional; e.g., "AB\\d{5}").'
+        ),
     )
     parser.add_argument(
         "--color-palette",
