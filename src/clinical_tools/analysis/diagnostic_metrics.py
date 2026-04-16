@@ -18,10 +18,9 @@ from clinical_tools.core.metrics.variant import (
 )
 from clinical_tools.core.parsers.happy import HappyDataParser
 from clinical_tools.core.parsers.sompy import SompyDataParser
+from clinical_tools.core.parsers.truvari import TruvariDataParser
 from clinical_tools.core.parsers.wittyer import WittyerDataParser
-from clinical_tools.core.statistics.proportion import (
-    ProportionConfidenceIntervalMethod,
-)
+from clinical_tools.core.statistics.proportion import ProportionConfidenceIntervalMethod
 
 
 def load_data_from_files(
@@ -46,11 +45,14 @@ def load_data_from_files(
         parser = HappyDataParser.process_hap_py_output
     elif data_type == VariantConcordanceEngine.SOMPY:
         parser = SompyDataParser.process_sompy_output
+    elif data_type == VariantConcordanceEngine.TRUVARI:
+        parser = TruvariDataParser.process_truvari_output
     elif data_type == VariantConcordanceEngine.WITTYER:
         parser = WittyerDataParser.process_witty_er_output
     else:
         raise ValueError(
-            f"Unsupported data_type: {data_type}. Must be one of: happy, sompy, wittyer"
+            f"Unsupported data_type: {data_type}. Must be one of: happy, sompy, "
+            f"truvari, wittyer"
         )
 
     all_metrics: list[VariantCallMetrics] = []

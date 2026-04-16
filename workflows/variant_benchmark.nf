@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 // Variant concordance analysis engine enum
 enum VariantConcordanceEngine {
-    happy, sompy, wittyer
+    happy, sompy, truvari, wittyer
 }
 
 // Diagnostic metrics enum
@@ -100,7 +100,7 @@ def validate_ci_method(method) {
     }
 }
 
-// Include the variant benchmark subworkflow
+include { prepare_variant_benchmark_inputs } from '../subworkflows/prepare_variant_benchmark_inputs/main'
 include { variant_benchmark_workflow } from '../subworkflows/variant_benchmark/main'
 
 workflow variant_benchmark {
@@ -109,8 +109,14 @@ workflow variant_benchmark {
     validate_happy_engine(params.happy_engine)
     validate_tp_method(params.concordance_tp)
     validate_ci_method(params.ci_method)
-    if (params.variant_benchmark_engine in ['happy', 'sompy']) {
+    if (params.variant_benchmark_engine in ['happy', 'sompy', 'truvari']) {
         validate_genome_ref(params.genome_ref)
     }
-    variant_benchmark_workflow()
+    def variant_benchmark_inputs = prepare_variant_benchmark_inputs()
+    variant_benchmark_workflow(
+        variant_benchmark_inputs.vcf_pairs,
+        variant_benchmark_inputs.vcf_tbi_pairs,
+        variant_benchmark_inputs.curated_vcf_pairs,
+        variant_benchmark_inputs.curated_vcf_tbi_pairs,
+    )
 }

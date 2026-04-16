@@ -29,7 +29,7 @@
       md5sum: b557b0ba1dc8d54a5dce238fe008a036
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/tracts/tracts.unionized.bed
       md5sum: b4ec36a7676cca461546cdf36fa382be
-    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/all_libraries_per_base_metrics.scored.txt
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: 160769495c06b8fa9003ec0cbb269d38
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/plot_TARGET_P25(BASE_COV).png
       md5sum: b50e55f9f99af9e186536d1e7666f111
@@ -47,6 +47,8 @@
       should_exist: false
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/common_fail_regions.bed
       md5sum: b671115b95bc1df7703b18d69c2dab6f
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/cohort_qc_report.tsv
+      md5sum: 4c0266e7fc69ce68e39029162198703e
 
 - name: target_evaluation_test_mixed_noref
   command: >
@@ -75,7 +77,7 @@
       md5sum: cf4dba64995aceb7a3e4440061d0228b
     - path: target_evaluation_test_mixed_noref/target_evaluation/tracts/tracts.unionized.bed
       md5sum: b4ec36a7676cca461546cdf36fa382be
-    - path: target_evaluation_test_mixed_noref/target_evaluation/all_libraries_per_base_metrics.scored.txt
+    - path: target_evaluation_test_mixed_noref/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: f34696a53d00f77d552da4ffb9e8ecbf
     - path: target_evaluation_test_mixed_noref/target_evaluation/plots/plot_TARGET_P50(BASE_COV).png
       should_exist: false
@@ -93,6 +95,8 @@
       should_exist: false
     - path: target_evaluation_test_mixed_noref/target_evaluation/common_fail_regions.bed
       md5sum: b671115b95bc1df7703b18d69c2dab6f
+    - path: target_evaluation_test_mixed_noref/target_evaluation/cohort_qc_report.tsv
+      md5sum: 8e4ff27bfbd6f146289691ffcac85bad
 
 - name: target_evaluation_test_bam_only
   command: >
@@ -110,7 +114,7 @@
       should_exist: false
     - path: target_evaluation_test_bam_only/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       should_exist: false
-    - path: target_evaluation_test_bam_only/target_evaluation/all_libraries_per_base_metrics.scored.txt
+    - path: target_evaluation_test_bam_only/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: f34696a53d00f77d552da4ffb9e8ecbf
     - path: target_evaluation_test_bam_only/target_evaluation/plots/failure_threshold_25.0_boxplot.png
       should_exist: true
@@ -132,7 +136,7 @@
       md5sum: ee557bfff814156963393c3a1ce2efa1
     - path: target_evaluation_test_cram_only_ref/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: 299222527b83e60e5dad6a8ca4e97fcb
-    - path: target_evaluation_test_cram_only_ref/target_evaluation/all_libraries_per_base_metrics.scored.txt
+    - path: target_evaluation_test_cram_only_ref/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: d1f4fba0b9053c8b5713711696766245
     - path: target_evaluation_test_cram_only_ref/target_evaluation/common_fail_regions.bed
       md5sum: b671115b95bc1df7703b18d69c2dab6f
@@ -191,8 +195,8 @@
       md5sum: a834607c2f8cd5af24369238ba1005c7
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_MQ_P25).png
       md5sum: bf5b1e7bd9d332908c95399ddebd5b32
-    - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/all_libraries_per_base_metrics.scored.txt
-      md5sum: 8f0066495647438fc78569f477ded0cd
+    - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/cohort_base_analysis.scored.txt
+      md5sum: 28ed4da4db215bab2d7496991819463d
 
 - name: target_evaluation_test_target_and_gap_tolerance
   command: >
@@ -221,7 +225,7 @@
       md5sum: b557b0ba1dc8d54a5dce238fe008a036
     - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/tracts/tracts.unionized.bed
       md5sum: b4ec36a7676cca461546cdf36fa382be
-    - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/all_libraries_per_base_metrics.scored.txt
+    - path: target_evaluation_test_target_and_gap_tolerance/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: 160769495c06b8fa9003ec0cbb269d38
 
 - name: target_evaluation_test_normalization
@@ -242,7 +246,7 @@
       md5sum: 0f91a53f852ab28b9653cd43e27fb0cd
     - path: target_evaluation_test_normalization/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.normalized.target_aggregated.scored.txt
       md5sum: 3d8bdecd41387d63c997dbba19a9b14d
-    - path: target_evaluation_test_normalization/target_evaluation/all_libraries_per_base_metrics.scored.txt
+    - path: target_evaluation_test_normalization/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: 8dfec298fc921b3a7ad6ba0264a5fef1
 
 - name: target_evaluation_test_read_fail_tolerance
@@ -263,5 +267,5 @@
       md5sum: c8a5960895afa12564b98420c6a0d769
     - path: target_evaluation_test_read_fail_tolerance/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: 3570908796b7869923ca552dca746bd7
-    - path: target_evaluation_test_read_fail_tolerance/target_evaluation/all_libraries_per_base_metrics.scored.txt
+    - path: target_evaluation_test_read_fail_tolerance/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: c1a66008b73b2c7a264900d9290f8e29
