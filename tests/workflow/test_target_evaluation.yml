@@ -196,7 +196,7 @@
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_MQ_P25).png
       md5sum: bf5b1e7bd9d332908c95399ddebd5b32
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/cohort_base_analysis.scored.txt
-      md5sum: 28ed4da4db215bab2d7496991819463d
+      md5sum: 8f0066495647438fc78569f477ded0cd
 
 - name: target_evaluation_test_target_and_gap_tolerance
   command: >
