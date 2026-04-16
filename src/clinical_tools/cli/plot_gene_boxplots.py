@@ -167,7 +167,7 @@ def parse_args() -> argparse.Namespace:
         "-i",
         "--input-file",
         required=True,
-        help="Path to cohort_base_analysis.tsv file",
+        help="Path to cohort_base_analysis.tsv file.",
     )
     parser.add_argument(
         "-t",
@@ -176,14 +176,14 @@ def parse_args() -> argparse.Namespace:
         default=25.0,
         help=(
             "Maximum percentage of libraries allowed to fail at a given base "
-            "(default: 25, not inclusive)"
+            "(default: 25, not inclusive)."
         ),
     )
     parser.add_argument(
         "-s",
         "--separate-plots",
         action="store_true",
-        help="Flag to separate metric plots into distinct figures (default: false)",
+        help="Flag to separate metric plots into distinct figures (default: false).",
     )
     return parser.parse_args()
 

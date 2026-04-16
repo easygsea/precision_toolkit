@@ -224,11 +224,11 @@ workflow gene_target_evaluation_workflow {
     GENERATE_COMMON_REGIONS_FAIL(GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base)
 
     // STAGE 7: General fail analysis box plots using threshold from stage 6.
-    ch_for_plots = GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base
+    boxplot_data_ch = GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base
         .map { sample, file, pool ->
 	    return [sample, file, (params.cohort_percent_library_fail_threshold * 100), params.separate_plots]
         }
 
-    GENERATE_BOX_PLOTS(ch_for_plots)
+    GENERATE_BOX_PLOTS(boxplot_data_ch)
 
 }

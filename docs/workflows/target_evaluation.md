@@ -68,6 +68,7 @@ nextflow run main.nf \
 - `--output_raw_mpileup`: Flag to output raw mpileup file.
 - `--normalize_coverage`: If set, coverage across the targets bed for every sample is normalized and scaled to center on this value. This function is provided to improve comparability and adjust for variations in sequencing depth cross samples if needed.
 - `--visualize`: Flag to generate per-target level plots for each stat.
+- `--separate_plots`: Flag to separate plots for metrics when generating visualizations for regions failing to meet threshold.
 
 **Fine-Tuning Parameters**
 - `--cohort_percent_library_fail_threshold`: Maximum tolerable percentage of libraries failing at a base (default = 0.25, non-inclusive).
@@ -75,7 +76,6 @@ nextflow run main.nf \
 - `--baseq_threshold`: Minimum BASEQ threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--mapq_threshold`: Minimum MAPQ score threshold for pass, scored on first quartile of all reads per base (default = 30).
 - `--read_fail_tolerance`: Maximum acceptable percentage of reads per base failing baseq and mapq thresholds (default = 0.25, non-inclusive).
-- `--separate_plots`: Flag to separate plots for metrics when generating visualizations for regions failing to meet threshold.
 - `--target_fail_tolerance`: Maximum tolerable percentage of bases failed for target-level PASS per sample (default = 0.25, non-inclusive).
 - `--tract_gap_tolerance`: Maximum gap tolerance between fail regions when building tracts (default = 2).
 
