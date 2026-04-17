@@ -75,7 +75,7 @@ uv run pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standa
 
 # Replace the pointer to the remote image to the local one and run workflow tests with Nextflow pointing to the local image
 sed -i 's~container = ".*"~container = "file://'"${IMAGE_NAME}"'"~' nextflow.config
-uv run pytest tests/workflow/ --workflow-threads 4 --junit-xml=test_results_workflow.xml
+uv run pytest tests/workflow/ --workflow-threads 8 --junit-xml=test_results_workflow.xml
 
 chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}"
 chmod a+x "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
