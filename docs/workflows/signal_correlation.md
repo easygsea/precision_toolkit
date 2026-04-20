@@ -32,5 +32,5 @@ nextflow run main.nf \
 - `--xlim`: The x-axis limits. Example usage: --xlim="0 1".
 - `--ylim`: The y-axis limits. Example usage: --ylim="0 1".
 - `--show_regression`: Show the regression line.
-- `--filter_source`: The FILTER column or pool to use for coloring ('', 'truth', 'query', or 'run').
-- `--run_pattern`: If run selected for `--filter_source`, provide run pattern used to match the runs together for visualization (eg. 'AB\\d{5}' or "AB\\\d{5}").
+- `--color_source`: The column or pool to use for coloring ('', 'truth', 'query', or 'run').
+- `--run_pattern`: If run selected for `--color_source`, provide run pattern used to match the runs together for visualization (eg. 'AB\\d{5}' or "AB\\\d{5}").

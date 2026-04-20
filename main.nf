@@ -76,7 +76,7 @@ def helpMessage() {
             --xlim            x-axis limits for the figure (default: "", auto-fit). Example usage: --xlim="0 1"
             --ylim            y-axis limits for the figure (default: "", auto-fit). Example usage: --ylim="0 1"
             --show_regression Whether to show the regression line and equation (default: false)
-            --filter_source   FILTER column to use for coloring ('', 'truth', or 'query') (default: '')
+            --color_source    Column to use for coloring ('', 'truth', or 'query') (default: '')
 
     Target Evaluation Workflow:
         Mandatory Parameters:

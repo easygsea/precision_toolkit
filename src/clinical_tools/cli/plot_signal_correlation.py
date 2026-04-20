@@ -19,7 +19,7 @@ plot-signal-correlation
 --output-filename vaf_correlation
 --xlim 0 1
 --ylim 0 1
---filter-source run
+--color-source run
 --run-pattern "AB\\d{5}"
 --show-regression
 --color-palette tab10
@@ -140,7 +140,7 @@ def plot_signal_correlation(
     figsize: tuple[int, int] = (10, 10),
     xlim: tuple[float, float] | None = None,
     ylim: tuple[float, float] | None = None,
-    filter_source: str = "",
+    color_source: str = "",
     color_palette: str = "colorblind",
 ) -> None:
     """Scatter plot of merged signals with optional regression and correlation.
@@ -153,7 +153,7 @@ def plot_signal_correlation(
         figsize: Figure size (w, h).
         xlim: Optional tuple of (min, max) for x-axis range.
         ylim: Optional tuple of (min, max) for y-axis range.
-        filter_source: Color by 'FILTER_TRUTH', 'FILTER_QUERY', or 'RUN_ID' if provided.
+        color_source: Color by 'FILTER_TRUTH', 'FILTER_QUERY', or 'RUN_ID' if provided.
         color_palette: Color scheme for plotting if provided.
     """
     # sort dataframe to ensure deterministic behaviour
@@ -167,7 +167,7 @@ def plot_signal_correlation(
     sns.set_palette(color_palette)
 
     # Create base scatter plot with optional coloring by filter
-    if filter_source.lower() == "truth" and "FILTER_TRUTH" in signal_df.columns:
+    if color_source.lower() == "truth" and "FILTER_TRUTH" in signal_df.columns:
         sns.scatterplot(
             data=signal_df,
             x=truth_col,
@@ -176,7 +176,7 @@ def plot_signal_correlation(
             alpha=0.5,
             s=50,
         )
-    elif filter_source.lower() == "query" and "FILTER_QUERY" in signal_df.columns:
+    elif color_source.lower() == "query" and "FILTER_QUERY" in signal_df.columns:
         sns.scatterplot(
             data=signal_df,
             x=truth_col,
@@ -185,7 +185,7 @@ def plot_signal_correlation(
             alpha=0.5,
             s=50,
         )
-    elif filter_source.lower() == "run":
+    elif color_source.lower() == "run":
         sns.scatterplot(
             data=signal_df,
             x=truth_col,
@@ -320,10 +320,10 @@ def main() -> None:
     )
     parser.add_argument(
         "-fs",
-        "--filter-source",
+        "--color-source",
         choices=["", "truth", "query", "run"],
         default="",
-        help="FILTER column to use for coloring ('', 'truth', or 'query').",
+        help="Column to use for coloring ('', 'truth', or 'query').",
     )
     parser.add_argument(
         "--run-pattern",
@@ -454,7 +454,7 @@ def main() -> None:
         figsize=figsize,
         xlim=xlim,
         ylim=ylim,
-        filter_source=args.filter_source,
+        color_source=args.color_source,
         color_palette=color_palette,
     )
 
