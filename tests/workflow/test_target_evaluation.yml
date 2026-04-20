@@ -37,6 +37,16 @@
       md5sum: e613f75ece6af2315bd80e9107e00d36
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/plot_TARGET_P25(BASE_MQ_P25).png
       md5sum: d9c5931e8c4c6fc9e99ca471dae4497a
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/failure_threshold_25.0_boxplot.png
+      should_exist: true
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/failure_threshold_25.0_boxplot_base_quality.png
+      should_exist: false
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/failure_threshold_25.0_boxplot_mapping_quality.png
+      should_exist: false
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/plots/failure_threshold_25.0_boxplot_coverage.png
+      should_exist: false
+    - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/common_fail_regions.bed
+      md5sum: b671115b95bc1df7703b18d69c2dab6f
     - path: target_evaluation_test_mixed_ref_visualize_with_raw/target_evaluation/cohort_qc_report.tsv
       md5sum: 4c0266e7fc69ce68e39029162198703e
 
@@ -47,6 +57,7 @@
     --aligned_files 'tests_data/target_evaluation/*.{bam,cram,bed}'
     --targets_bed tests_data/target_evaluation/test_targets.bed
     --output_dir target_evaluation_test_mixed_noref
+    --separate_plots
   files:
     - path: target_evaluation_test_mixed_noref/target_evaluation/raw_mpileups
       should_exist: false
@@ -68,8 +79,22 @@
       md5sum: b4ec36a7676cca461546cdf36fa382be
     - path: target_evaluation_test_mixed_noref/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: f34696a53d00f77d552da4ffb9e8ecbf
-    - path: target_evaluation_test_mixed_noref/target_evaluation/plots
+    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/plot_TARGET_P50(BASE_COV).png
       should_exist: false
+    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/plot_TARGET_P50(BASE_BQ_P25).png
+      should_exist: false
+    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/plot_TARGET_P50(BASE_MQ_P25).png
+      should_exist: false
+    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/failure_threshold_25.0_boxplot_base_quality.png
+      should_exist: true
+    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/failure_threshold_25.0_boxplot_mapping_quality.png
+      should_exist: true
+    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/failure_threshold_25.0_boxplot_coverage.png
+      should_exist: true
+    - path: target_evaluation_test_mixed_noref/target_evaluation/plots/failure_threshold_25.0.png
+      should_exist: false
+    - path: target_evaluation_test_mixed_noref/target_evaluation/common_fail_regions.bed
+      md5sum: b671115b95bc1df7703b18d69c2dab6f
     - path: target_evaluation_test_mixed_noref/target_evaluation/cohort_qc_report.tsv
       md5sum: 8e4ff27bfbd6f146289691ffcac85bad
 
@@ -91,6 +116,8 @@
       should_exist: false
     - path: target_evaluation_test_bam_only/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: f34696a53d00f77d552da4ffb9e8ecbf
+    - path: target_evaluation_test_bam_only/target_evaluation/plots/failure_threshold_25.0_boxplot.png
+      should_exist: true
 
 - name: target_evaluation_test_cram_only_ref
   command: >
@@ -111,6 +138,8 @@
       md5sum: 299222527b83e60e5dad6a8ca4e97fcb
     - path: target_evaluation_test_cram_only_ref/target_evaluation/cohort_base_analysis.scored.txt
       md5sum: d1f4fba0b9053c8b5713711696766245
+    - path: target_evaluation_test_cram_only_ref/target_evaluation/common_fail_regions.bed
+      md5sum: b671115b95bc1df7703b18d69c2dab6f
 
 - name: target_evaluation_test_cram_only_noref
   command: >
@@ -153,13 +182,13 @@
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt
       md5sum: e3215a2415ac1968a28e38b7c7ff25c3
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.cov_score.bed
-      md5sum: caefd9d55abe1cb52cbdd29f121a0b10
+      md5sum: a394859a05cb1cb058f00bec20240edb
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.bq_score.bed
-      md5sum: bef33ae0e6ba8eee6753c5c31b5db0e4
+      md5sum: 4400a4dc7f20837fb469131d4d88a14d
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.mq_score.bed
-      md5sum: 0f3c0bb81e4c44a576f4285d0b15b79a
+      md5sum: 930e441e2d347794a1f2548b378af12c
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/tracts/tracts.unionized.bed
-      md5sum: 8e9550425940387cd56c79de58de6d87
+      md5sum: c14cababb1b832e58df2b4c4f13ed458
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_COV).png
       md5sum: 14fd110e0ac9961ee27a0205618949d2
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_BQ_P25).png
@@ -167,7 +196,7 @@
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/plots/plot_TARGET_P50(BASE_MQ_P25).png
       md5sum: bf5b1e7bd9d332908c95399ddebd5b32
     - path: target_evaluation_test_metric_parameters_and_thresholds/target_evaluation/cohort_base_analysis.scored.txt
-      md5sum: 28ed4da4db215bab2d7496991819463d
+      md5sum: 8f0066495647438fc78569f477ded0cd
 
 - name: target_evaluation_test_target_and_gap_tolerance
   command: >

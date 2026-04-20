@@ -454,14 +454,33 @@ process GENERATE_COMMON_REGIONS_FAIL {
     OUT="common_fail_regions.bed"
     """
     awk -v OFS="\\t" '
-        \$11 > ${params.fail_percent_threshold} ||
-        \$12 > ${params.fail_percent_threshold} ||
-        \$13 > ${params.fail_percent_threshold} {
+        \$11 > ${params.cohort_percent_library_fail_threshold * 100} ||
+        \$12 > ${params.cohort_percent_library_fail_threshold * 100} ||
+        \$13 > ${params.cohort_percent_library_fail_threshold * 100} {
             print \$1,\$2,\$2+1,\$3
         }
         ' ${all_libraries_per_base} |
         sort-bed - |
         bedtools merge -c 4 -o distinct \
         > ${OUT}
+    """
+}
+
+process GENERATE_BOX_PLOTS {
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/plots", mode: 'copy'
+
+    input:
+    tuple val(sample_name), path(input_file), val(threshold), val(separate_plots)
+
+    output:
+    path(OUT), emit: percent_failed_box_plot
+
+    script:
+    OUT = "failure_threshold_*.png"
+    """
+    plot-gene-boxplots \
+    --input-file ${input_file} \
+    --threshold ${threshold} \
+    ${separate_plots.toBoolean() ? '--separate-plots' : ''}
     """
 }
