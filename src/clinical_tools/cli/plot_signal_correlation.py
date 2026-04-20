@@ -153,7 +153,7 @@ def plot_signal_correlation(
         figsize: Figure size (w, h).
         xlim: Optional tuple of (min, max) for x-axis range.
         ylim: Optional tuple of (min, max) for y-axis range.
-        filter_source: Color by 'FILTER_TRUTH' or 'FILTER_QUERY' if provided.
+        filter_source: Color by 'FILTER_TRUTH', 'FILTER_QUERY', or 'RUN_ID' if provided.
         color_palette: Color scheme for plotting if provided.
     """
     # sort dataframe to ensure deterministic behaviour
@@ -329,7 +329,7 @@ def main() -> None:
         "--run-pattern",
         default="",
         help=(
-            "Pattern used to match run ID from file names for gouping and coloring "
+            "Pattern used to match run ID from file names for grouping and coloring "
             '(Optional; e.g., "AB\\d{5}").'
         ),
     )
