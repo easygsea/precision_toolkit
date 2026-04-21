@@ -231,7 +231,7 @@ Of particular importance for `plot-dragen-metrics` is the `ReportedMetrics` sect
 
 QC failure thresholds defined in the `Failures` section are also displayed on the plots.
 
-Metrics can be aggregated across runs and plotted together if multiple `MetricsOutput.tsv` files are supplied to `--metrics-files`. Within these plots, samples can be grouped and coloured by a column specified by `--group-by` if a [FASTQ list](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) is passed to `--fastq-list`. This FASTQ list should contain columns mapping each `RGSM` to its corresponding group.
+Metrics can be aggregated across runs and plotted together if multiple `MetricsOutput.tsv` files are supplied to `--metrics-files`. Within these plots, samples can be grouped and colored by a column specified by `--group-by` if a [FASTQ list](https://help.dragen.illumina.com/product-guide/dragen-v4.4/dragen-host-software#multiple-fastq-input-files) is passed to `--fastq-list`. This FASTQ list should contain columns mapping each `RGSM` to its corresponding group.
 
 Additionally, `RGSM` plot labels can be truncated when `--truncate-rgsm` is set. This is used in conjunction with `--truncate-rgsm-delim` (default: '_') and `--truncate-rgsm-index` (default: 1). These arguments can help simplify long RGSM labels and group samples in the plots.
 

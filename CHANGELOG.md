@@ -4,11 +4,12 @@
 
 ---
 
-### v1.2.1 - 2026-04-0X
+### v1.2.1 - 2026-04-21
 - Feature: Add per library QC report generation process to summarize base and target failures in `cohort_qc_report.tsv`.
 - Feature: Add support for Truvari in variant benchmark workflow.
 - Feature: Add plot to visualize per-base library fail rates, highlighting bases where the fraction of failing libraries exceeds a threshold specified by `--cohort_percent_library_fail_threshold` (default: 0.25).
 - Improvement: Add `length` tag to contig header lines in lifted VCF output by `liftover_sv_vcf.sh`.
+- Improvement: Add option to group and color signal correlation plots by run tag using `--color_source run` (renamed from old `--filter_source` parameter) and `--run_pattern`, as well as `--color_palette` metric to set color preferences.
 - Improvement: Optimize Nextflow test execution by parallelizing workflows and symlinking input files.
 - Improvement: Refactor container creation to use a cached base image.
 

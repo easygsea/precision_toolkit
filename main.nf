@@ -31,12 +31,18 @@ def helpMessage() {
     ====================
     Detailed Usage
     ====================
+    General Parameters
+        --output_dir        Directory or path in which to output results (default: "output_clinical_tools"). If specified directory does not exist, it will be created locally or at the path specified
+        --genome_ref        Provide reference genome when indicated by workflow docs (eg. for CRAM file expansion; default: null)
+        --decimals          Number of decimal places (default: 2)
+        --color_palette     Color palette to use for plotting (e.g., 'colorblind', 'tab10', 'bright')
+
     Variant Benchmark (Diagnostic Metrics) Workflow:
         Mandatory Parameters:
             --truth_dir   Directory containing truth VCF files (must be named as <sample>.truth.vcf or <sample>.truth.vcf.gz)
             --query_dir   Directory containing query VCF files (must be named as <sample>.query.vcf or <sample>.query.vcf.gz)
-            --variant_benchmark_engine  Analysis engine: 'happy', 'sompy', or 'wittyer' (default: happy)
-            --genome_ref  Required for happy: Reference genome FASTA
+            --variant_benchmark_engine  Analysis engine: 'happy', 'sompy', 'truvari', or 'wittyer' (default: happy)
+            --genome_ref  Required for happy and truvari: Reference genome FASTA
 
         Optional Parameters:
             --diagnostic_metrics     Diagnostic metrics to calculate (default: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
@@ -76,7 +82,8 @@ def helpMessage() {
             --xlim            x-axis limits for the figure (default: "", auto-fit). Example usage: --xlim="0 1"
             --ylim            y-axis limits for the figure (default: "", auto-fit). Example usage: --ylim="0 1"
             --show_regression Whether to show the regression line and equation (default: false)
-            --filter_source   FILTER column to use for coloring ('', 'truth', or 'query') (default: '')
+            --color_source    Column to use for coloring ('', 'truth', 'query', or 'run') (default: '')
+            --run_pattern     If color_source is 'run', regex pattern to extract run name for coloring (default: '')
 
     Target Evaluation Workflow:
         Mandatory Parameters:
@@ -89,16 +96,17 @@ def helpMessage() {
             --target_evaluation_subdir      Subdirectory for target evaluation results (default: target_evaluation)
             --output_raw_mpileup            Flag to output raw/un-parsed mpileup file (note that this file is large)
             --normalize_coverage            If set, coverage across the targets bed for every sample is normalized and scaled to center on this value
-            --genome_ref                    Reference genome for CRAM files. CRAM files skipped if not provided.
+            --genome_ref                    Reference genome for CRAM files. CRAM files skipped if not provided
             --visualize                     Flag to generate per-target plots for all input files per stat
+            --separate_plots                Flag to separate plots for metrics when generating visualizations for regions failing to meet threshold
 
         Fine-Tuning Parameters:
+            --cohort_percent_library_fail_threshold Maximum tolerable percentage of libraries failing at a base for cohort-level PASS per base (default: 0.25)
             --coverage_threshold                    Minimum acceptable coverage per base (default: 25)
             --baseq_threshold                       Minimum acceptable first-quartile(Q1) of BASEQ scores per base (default: 30)
             --mapq_threshold                        Minimum acceptable first-quartile(Q1) of MAPQ scores per base (default: 30)
             --read_fail_tolerance                   Maximum tolerable percentage of reads per base failing baseq and mapq thresholds (default: 0.25)
             --target_fail_tolerance                 Maximum tolerable percentage of bases failed for target-level PASS per sample (default: 0.25)
-            --base_fail_tolerance                   Maximum tolerable percentage of libraries failing at a base for base-level PASS across all libraries (default: 0.25)
             --tract_gap_tolerance                   Maximum gap tolerance between fail regions when building tracts (default: 2)
             --min_bq_per_read.coverage_analysis     Minimum BASEQ for read to be included in coverage count at each position (default: 10)
             --min_bq_per_read.mapq_analysis         Minimum BASEQ for read to be included in MAPQ Q1 analysis at each position (default: 10)

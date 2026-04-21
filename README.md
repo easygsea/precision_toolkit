@@ -23,6 +23,7 @@ Containerized dependencies (no installation required):
 - MAFFT 7.505-1
 - samtools 1.21
 - Truvari 5.4.0
+- uv 0.10.7
 - witty.er 0.5.2.0
 
 ## Quick Start

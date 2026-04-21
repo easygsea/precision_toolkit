@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 Generate a scatter plot from paired truth and query signal files.
 
 Each signal file should have the following columns:
@@ -16,14 +16,19 @@ line. Example usage:
 plot-signal-correlation
 --truth-signal truth_vaf.tsv
 --query-signal query_vaf.tsv
---output-figure vaf_correlation.png
---output-table vaf_correlation.tsv
+--output-filename vaf_correlation
 --xlim 0 1
 --ylim 0 1
+--color-source run
+--run-pattern "AB\\d{5}"
+--show-regression
+--color-palette tab10
 ```
 """
 
 import argparse
+import re
+import warnings
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -135,7 +140,8 @@ def plot_signal_correlation(
     figsize: tuple[int, int] = (10, 10),
     xlim: tuple[float, float] | None = None,
     ylim: tuple[float, float] | None = None,
-    filter_source: str = "",
+    color_source: str = "",
+    color_palette: str = "colorblind",
 ) -> None:
     """Scatter plot of merged signals with optional regression and correlation.
 
@@ -147,16 +153,21 @@ def plot_signal_correlation(
         figsize: Figure size (w, h).
         xlim: Optional tuple of (min, max) for x-axis range.
         ylim: Optional tuple of (min, max) for y-axis range.
-        filter_source: Color by 'FILTER_TRUTH' or 'FILTER_QUERY' if provided.
+        color_source: Color by 'FILTER_TRUTH', 'FILTER_QUERY', or 'RUN_ID' if provided.
+        color_palette: Color scheme for plotting if provided.
     """
+    # sort dataframe to ensure deterministic behaviour
+    signal_df = signal_df.sort_values(by=list(signal_df.columns)).reset_index(drop=True)
+
     truth_col, query_col = identify_signal_columns(signal_df)
 
     # Create figure with enhanced styling
     plt.figure(figsize=figsize)
     sns.set_style("whitegrid")
+    sns.set_palette(color_palette)
 
     # Create base scatter plot with optional coloring by filter
-    if filter_source.lower() == "truth" and "FILTER_TRUTH" in signal_df.columns:
+    if color_source.lower() == "truth" and "FILTER_TRUTH" in signal_df.columns:
         sns.scatterplot(
             data=signal_df,
             x=truth_col,
@@ -165,7 +176,7 @@ def plot_signal_correlation(
             alpha=0.5,
             s=50,
         )
-    elif filter_source.lower() == "query" and "FILTER_QUERY" in signal_df.columns:
+    elif color_source.lower() == "query" and "FILTER_QUERY" in signal_df.columns:
         sns.scatterplot(
             data=signal_df,
             x=truth_col,
@@ -174,30 +185,57 @@ def plot_signal_correlation(
             alpha=0.5,
             s=50,
         )
+    elif color_source.lower() == "run":
+        sns.scatterplot(
+            data=signal_df,
+            x=truth_col,
+            y=query_col,
+            hue="RUN_ID",
+            alpha=0.5,
+            s=50,
+        )
     else:
         plt.scatter(signal_df[truth_col], signal_df[query_col], alpha=0.5, s=50)
 
     if show_regression:
-        # Calculate correlation and p-value
-        corr, p_value = calculate_correlation(signal_df)
+        # Get unique run IDs, handling NaN values gracefully
+        unique_runs = signal_df["RUN_ID"].dropna().astype(str).unique().tolist()
+        if len(unique_runs) < 1:
+            warnings.warn("No valid RUN_ID found for regression lines.", UserWarning)
+            unique_runs = [" "]
+            signal_df["RUN_ID"] = " "
 
-        # Add regression line on top of scatter
-        sns.regplot(
-            x=truth_col,
-            y=query_col,
-            data=signal_df,
-            scatter=False,
-            line_kws={"color": "red", "alpha": 0.7},
-        )
+        # Set a different color palette for regression lines
+        palette = sns.color_palette(color_palette, n_colors=len(unique_runs))
+        color_map = dict(zip(unique_runs, palette))
 
-        # Add correlation statistics to plot
-        plt.text(
-            0.05,
-            0.95,
-            f"Pearson r = {corr:.3f}\np-value = {p_value:.2e}",
-            transform=plt.gca().transAxes,
-            bbox=dict(facecolor="white", alpha=0.8),
-        )
+        # Add regression lines for each run if coloring by run
+        for idx, run_id in enumerate(unique_runs):
+            # Isolate data unique to run
+            run_df = signal_df[signal_df["RUN_ID"] == run_id]
+
+            # Add regression line on top of scatter
+            sns.regplot(
+                x=truth_col,
+                y=query_col,
+                data=run_df,
+                scatter=False,
+                line_kws={"alpha": 0.7, "color": color_map[run_id]},
+                label=f"Run {run_id}",
+            )
+
+            # Calculate correlation and p-value
+            corr, p_value = calculate_correlation(run_df)
+
+            # Add correlation statistics to plot
+            y_offset = 0.95 - (idx * 0.07)  # Offset to avoid overlap
+            plt.text(
+                0.05,
+                y_offset,
+                f"{run_id}: Pearson r = {corr:.3f}\n{run_id}: p-value = {p_value:.2e}",
+                transform=plt.gca().transAxes,
+                bbox=dict(facecolor="white", alpha=0.8),
+            )
 
     # Customize plot
     plt.xlabel(f"Truth ({truth_col.replace('_TRUTH', '')})")
@@ -282,10 +320,23 @@ def main() -> None:
     )
     parser.add_argument(
         "-fs",
-        "--filter-source",
-        choices=["", "truth", "query"],
+        "--color-source",
+        choices=["", "truth", "query", "run"],
         default="",
-        help="FILTER column to use for coloring ('', 'truth', or 'query').",
+        help="Column to use for coloring ('', 'truth', or 'query').",
+    )
+    parser.add_argument(
+        "--run-pattern",
+        default="",
+        help=(
+            "Pattern used to match run ID from file names for grouping and coloring "
+            '(Optional; e.g., "AB\\d{5}").'
+        ),
+    )
+    parser.add_argument(
+        "--color-palette",
+        default="colorblind",
+        help="Color palette to use for plotting (e.g., 'colorblind', 'viridis').",
     )
     args = parser.parse_args()
 
@@ -297,6 +348,8 @@ def main() -> None:
     figsize = tuple(args.figsize)
     xlim = tuple(args.xlim) if args.xlim else None
     ylim = tuple(args.ylim) if args.ylim else None
+    run_pattern = args.run_pattern if args.run_pattern else None
+    color_palette = args.color_palette
 
     # Dynamically handle file(s) and folder inputs
     if (
@@ -317,8 +370,13 @@ def main() -> None:
         for truth_signal_file, query_signal_file in zip(
             truth_signal_files, query_signal_files
         ):
-            # Get sample name from file path
+            # Get sample name & run_id from file path
             sample_name = truth_signal_file.with_suffix("").stem.split("_")[0]
+            if run_pattern:
+                m = re.search(run_pattern, truth_signal_file.name)
+                run_id = m.group() if m else None
+            else:
+                run_id = None
 
             # Extract signals for this sample
             sample_df = extract_signals(truth_signal_file, query_signal_file)
@@ -328,8 +386,9 @@ def main() -> None:
                     f"{query_signal_file}."
                 )
 
-            # Add sample name column
+            # Add sample name & run_id column
             sample_df["SAMPLE"] = sample_name
+            sample_df["RUN_ID"] = run_id
 
             # Append to combined dataframe
             signal_df = pd.concat([signal_df, sample_df], ignore_index=True)
@@ -341,8 +400,13 @@ def main() -> None:
             truth_signal = sorted(truth_signal)
             query_signal = sorted(query_signal)
             for truth_signal_file, query_signal_file in zip(truth_signal, query_signal):
-                # Get sample name from file path
+                # Get sample name & run_id from file path
                 sample_name = truth_signal_file.with_suffix("").stem.split("_")[0]
+                if run_pattern:
+                    m = re.search(run_pattern, truth_signal_file.name)
+                    run_id = m.group() if m else None
+                else:
+                    run_id = None
 
                 # Extract signals for this sample
                 sample_df = extract_signals(truth_signal_file, query_signal_file)
@@ -352,8 +416,9 @@ def main() -> None:
                         f"{query_signal_file}."
                     )
 
-                # Add sample name column
+                # Add sample name & run_id column
                 sample_df["SAMPLE"] = sample_name
+                sample_df["RUN_ID"] = run_id
 
                 # Append to combined dataframe
                 signal_df = pd.concat([signal_df, sample_df], ignore_index=True)
@@ -365,7 +430,17 @@ def main() -> None:
                     f"No matching signals found between {truth_signal} and "
                     f"{query_signal}."
                 )
+
+            # find run pattern
+            if run_pattern:
+                m = re.search(run_pattern, truth_signal.name)
+                run_id = m.group() if m else None
+            else:
+                run_id = None
+
+            # Add sample name & run_id column
             signal_df["SAMPLE"] = truth_signal.with_suffix("").stem.split("_")[0]
+            signal_df["RUN_ID"] = run_id
 
     # Save signal table
     signal_df.to_csv(output_table, sep="\t", index=False)
@@ -379,7 +454,8 @@ def main() -> None:
         figsize=figsize,
         xlim=xlim,
         ylim=ylim,
-        filter_source=args.filter_source,
+        color_source=args.color_source,
+        color_palette=color_palette,
     )
 
 
