@@ -32,5 +32,8 @@ nextflow run main.nf \
 - `--xlim`: The x-axis limits. Example usage: --xlim="0 1".
 - `--ylim`: The y-axis limits. Example usage: --ylim="0 1".
 - `--show_regression`: Show the regression line.
-- `--color_source`: The column or pool to use for coloring ('', 'truth', 'query', or 'run').
-- `--run_pattern`: If run selected for `--color_source`, provide run pattern used to match the runs together for visualization (eg. 'AB\\d{5}' or "AB\\\d{5}").
+- `--color_source`: The column to use for grouping and coloring in the signal correlation plots ('', 'truth', 'query', or 'run').
+    - If 'truth' is selected, the pipeline will group and color variant calls by the FILTER column in the truth VCFs.
+    - If 'query' is selected, the pipeline will group and color variant calls by the FILTER column in the query VCFs.
+    - If 'run' is selected, the workflow will extract tags from VCF filenames using the pattern provided in `--run_pattern`, grouping and coloring variants on the extracted tags.
+- `--run_pattern`: If 'run' is selected for `--color_source`, provide a run pattern used to match the runs together for visualization (e.g., 'AB\\d{5}' or "AB\\\d{5}").
