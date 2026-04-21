@@ -28,8 +28,6 @@ def helpMessage() {
         target_evaluation    Run target evaluation to generate per-base coverage, MAPQ, and BASEQ metrics for target space
         (more workflows to come...)
 
-    General Parameters
-
     ====================
     Detailed Usage
     ====================
