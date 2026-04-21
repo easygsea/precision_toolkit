@@ -98,7 +98,7 @@ def helpMessage() {
             --normalize_coverage            If set, coverage across the targets bed for every sample is normalized and scaled to center on this value
             --genome_ref                    Reference genome for CRAM files. CRAM files skipped if not provided
             --visualize                     Flag to generate per-target plots for all input files per stat
-            --separate_plots                Flag to separate plots for metrics when generating visualizations for regions failing to meet threshold.
+            --separate_plots                Flag to separate plots for metrics when generating visualizations for regions failing to meet threshold
 
         Fine-Tuning Parameters:
             --cohort_percent_library_fail_threshold Maximum tolerable percentage of libraries failing at a base for cohort-level PASS per base (default: 0.25)
