@@ -9,6 +9,7 @@
 - Feature: Add support for Truvari in variant benchmark workflow.
 - Feature: Add plot to visualize per-base library fail rates, highlighting bases where the fraction of failing libraries exceeds a threshold specified by `--cohort_percent_library_fail_threshold` (default: 0.25).
 - Improvement: Add `length` tag to contig header lines in lifted VCF output by `liftover_sv_vcf.sh`.
+- Improvement: Optimize Nextflow test execution by parallelizing workflows and symlinking input files.
 - Improvement: Refactor container creation to use a cached base image.
 
 ---
