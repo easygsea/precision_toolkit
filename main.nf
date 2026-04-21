@@ -31,7 +31,7 @@ def helpMessage() {
     ====================
     Detailed Usage
     ====================
-    General Parameteres
+    General Parameters
         --output_dir        Directory or path in which to output results (default: "output_clinical_tools"). If specified directory does not exist, it will be created locally or at the path specified
         --genome_ref        Provide reference genome when indicated by workflow docs (eg. for CRAM file expansion; default: null)
         --decimals          Number of decimal places (default: 2)
