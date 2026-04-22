@@ -203,8 +203,8 @@ def plot_metrics(
         plt.subplots_adjust(left=0.35, right=0.76, top=0.95, bottom=0.05)
         sns.set_style("white")
         sns.set_palette("hls", 8)
-        # Set default to ensure consistent colours across plots if grouping is disabled
-        default_colour = sns.color_palette("hls", 8)[0]
+        # Set default to ensure consistent colors across plots if grouping is disabled
+        default_color = sns.color_palette("hls", 8)[0]
 
         # Plot data
         axes[0] = sns.stripplot(
@@ -212,7 +212,7 @@ def plot_metrics(
             x="Value",
             y="Truncated RGSM",
             hue=group_col,
-            color=default_colour if not group_col else None,
+            color=default_color if not group_col else None,
             ax=axes[0],
             order=rgsm_order,
             jitter=False,
@@ -225,7 +225,7 @@ def plot_metrics(
             x="Value",
             y=group_col,
             hue=group_col,
-            color=default_colour if not group_col else None,
+            color=default_color if not group_col else None,
             ax=axes[1],
             zorder=2,
         )

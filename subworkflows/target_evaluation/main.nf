@@ -12,8 +12,10 @@ include {
     SCORE_OUTPUT_ON_FIELD as SCORE_PER_BASE_SUMMARY_ON_MQ
     GENERATE_TRACTS
     UNIONIZE_TRACTS
+    GENERATE_PER_LIBRARY_QC_REPORT
     GENERATE_VISUALIZATION
     GENERATE_COMMON_REGIONS_FAIL
+    GENERATE_BOX_PLOTS
 } from '../../modules/target_evaluation/main'
 
 include { INDEX_BAM_FILE    } from '../../modules/bam/main'
@@ -35,7 +37,7 @@ workflow gene_target_evaluation_workflow {
         cov: [
             library_header: "COVERAGE_P${params.read_fail_tolerance*100 as int}",
             target_header: "TARGET_P${params.target_fail_tolerance*100 as int}(BASE_COV)",
-            base_header: "SAMPLES_P${params.base_fail_tolerance*100 as int}(BASE_COV)",
+            base_header: "SAMPLES_P${params.cohort_percent_library_fail_threshold*100 as int}(BASE_COV)",
             base_score_header: "PCT_LIB_FAIL(COV)",
             base_score_output_header: "COV_SCORE",
             threshold: params.coverage_threshold
@@ -43,7 +45,7 @@ workflow gene_target_evaluation_workflow {
         bq: [
             library_header: "BASEQ_P${params.read_fail_tolerance*100 as int}",
             target_header: "TARGET_P${params.target_fail_tolerance*100 as int}(BASE_BQ_P${params.read_fail_tolerance*100 as int})",
-            base_header: "SAMPLES_P${params.base_fail_tolerance*100 as int}(BASE_BQ_Q${params.read_fail_tolerance*100 as int})",
+            base_header: "SAMPLES_P${params.cohort_percent_library_fail_threshold*100 as int}(BASE_BQ_Q${params.read_fail_tolerance*100 as int})",
             base_score_header: "PCT_LIB_FAIL(BQ)",
             base_score_output_header: "BQ_SCORE",
             threshold: params.baseq_threshold
@@ -51,7 +53,7 @@ workflow gene_target_evaluation_workflow {
         mq: [
             library_header: "MAPQ_P${params.read_fail_tolerance*100 as int}",
             target_header: "TARGET_P${params.target_fail_tolerance*100 as int}(BASE_MQ_P${params.read_fail_tolerance*100 as int})",
-            base_header: "SAMPLES_P${params.base_fail_tolerance*100 as int}(BASE_MQ_P${params.read_fail_tolerance*100 as int})",
+            base_header: "SAMPLES_P${params.cohort_percent_library_fail_threshold*100 as int}(BASE_MQ_P${params.read_fail_tolerance*100 as int})",
             base_score_header: "PCT_LIB_FAIL(MQ)",
             base_score_output_header: "MQ_SCORE",
             threshold: params.mapq_threshold
@@ -165,7 +167,7 @@ workflow gene_target_evaluation_workflow {
     // STAGE 3: Aggregate per base across libraries (percentile of per-base stats)
     GENERATE_PER_BASE_SUMMARY (
         SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: 'combined_labelled_pileups.txt'){it[1]},
-        params.base_fail_tolerance,
+        params.cohort_percent_library_fail_threshold,
         metrics_thresholds_and_headings //for detailed output: num libraries failed/metric
         //TODO: should display percentile be separate from threshold/tolerance percentile?
     )
@@ -175,20 +177,22 @@ workflow gene_target_evaluation_workflow {
         GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base,
         metrics_thresholds_and_headings.cov.base_score_header,
         metrics_thresholds_and_headings.cov.base_score_output_header,
-        params.base_fail_tolerance
+        params.cohort_percent_library_fail_threshold
      )
     SCORE_PER_BASE_SUMMARY_ON_BQ (
         SCORE_PER_BASE_SUMMARY_ON_COV.out.scored_output,
         metrics_thresholds_and_headings.bq.base_score_header,
         metrics_thresholds_and_headings.bq.base_score_output_header,
-        params.base_fail_tolerance
+        params.cohort_percent_library_fail_threshold
     )
     SCORE_PER_BASE_SUMMARY_ON_MQ (
         SCORE_PER_BASE_SUMMARY_ON_BQ.out.scored_output,
         metrics_thresholds_and_headings.mq.base_score_header,
         metrics_thresholds_and_headings.mq.base_score_output_header,
-        params.base_fail_tolerance
+        params.cohort_percent_library_fail_threshold
     )
+
+    // STAGE 4: Generate tracks
 
     // generate tracts per metric
     GENERATE_TRACTS (
@@ -202,7 +206,17 @@ workflow gene_target_evaluation_workflow {
     // generate unionized tract
     UNIONIZE_TRACTS (GENERATE_TRACTS.out.tract_bed.collectFile(name: 'combined.bed', skip: 1))
 
-    // Stage 5: Generate visualization per target
+    // STAGE 5: Summarize Bases and Targets Failed for Analysis
+    ch_files_for_report = SCORE_BASES_PER_LIBRARY.out.scored_output
+        .join(SCORE_TARGETS_PER_LIBRARY.out.scored_output)
+        .map { sample_name, base_file, pool_id, aggr_file, pool_id2 ->
+            [base_file, aggr_file]
+        }
+        .collect()
+
+    GENERATE_PER_LIBRARY_QC_REPORT(ch_files_for_report)
+
+    // STAGE 6: Generate visualization per target
     if (params.visualize) {
 
         // sort plot data prior to plotting
@@ -221,4 +235,13 @@ workflow gene_target_evaluation_workflow {
 
     // STAGE 6: Generate common regions failing at a certain percent threshold
     GENERATE_COMMON_REGIONS_FAIL(GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base)
+
+    // STAGE 7: General fail analysis box plots using threshold from stage 6.
+    boxplot_data_ch = GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base
+        .map { sample, file, pool ->
+	    return [sample, file, (params.cohort_percent_library_fail_threshold * 100), params.separate_plots]
+        }
+
+    GENERATE_BOX_PLOTS(boxplot_data_ch)
+
 }

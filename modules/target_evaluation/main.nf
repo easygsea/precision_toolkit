@@ -224,7 +224,7 @@ process GENERATE_PER_BASE_SUMMARY {
     tuple val("All_Samples"), path(OUT), val("All_Pools"), emit: all_libraries_per_base
 
     script:
-    OUT="all_libraries_per_base_metrics.txt"
+    OUT="cohort_base_analysis.tsv"
     """
     grep -v '^#' ${combined_labelled_pileups} |
     sort -k1,1 -k2,2 -k3,3 |
@@ -378,6 +378,45 @@ process UNIONIZE_TRACTS {
     """
 }
 
+process GENERATE_PER_LIBRARY_QC_REPORT {
+    tag "All_Samples"
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}", mode: 'copy'
+
+    input:
+    // flatten the list of pairs into one directory
+    path "files/*"
+
+    output:
+    path("cohort_qc_report.tsv"), emit: final_table
+
+    script:
+    OUT="cohort_qc_report.tsv"
+    """
+    echo -e "SAMPLE_ID\t%_Bases_Failed\t%_Targets_Failed\tAvg_%_Bases_Failed_Per_Target" > ${OUT}
+
+    for BASE_FILE in files/*.mpileup.per_base.parsed.labelled.scored.txt; do
+        [ -e "\${BASE_FILE}" ] || continue
+
+        FILENAME=\$(basename "\${BASE_FILE}")
+        ID=\${FILENAME%%.mpileup*}
+
+        AGGR_FILE="files/\${ID}.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt"
+
+        if [[ -f "\${AGGR_FILE}" ]]; then
+            # Metric calculation
+            # %_Bases_Failed --> from library-level <LIB>.mpileup.per_base.parsed.labelled.scored.txt based on SCORE column (8)
+            # %_Targets_Failed --> from library-level <LIB>.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt based on SCORE column (11)
+            # Avg_%_Bases_Failed_Per_Target --> from library-level <LIB>.mpileup.per_base.parsed.labelled.target_aggregated.scored.txt based on PCT_BASES_FAIL column (10) averaged for each file(library)
+
+            BASE_STATS=\$(awk -F'\t' 'NR>1 {all++; if(\$8=="FAIL") fail++} END {if(all>0) printf "%.2f%%", (fail/all)*100; else print "0.00%"}' "\${BASE_FILE}")
+            AGGR_STATS=\$(awk -F'\t' 'NR>1 {all++; if(\$11=="FAIL") fail++; sum+=\$10} END {if(all>0) printf "%.2f%%\t%.2f%%", (fail/all)*100, sum/all; else print "0.00%\t0.00%"}' "\${AGGR_FILE}")
+
+            echo -e "\${ID}\t\${BASE_STATS}\t\${AGGR_STATS}" >> ${OUT}
+        fi
+    done
+    """
+}
+
 process GENERATE_VISUALIZATION {
     publishDir "${params.output_dir}/${params.target_evaluation_subdir}/plots", mode: 'copy'
 
@@ -415,14 +454,33 @@ process GENERATE_COMMON_REGIONS_FAIL {
     OUT="common_fail_regions.bed"
     """
     awk -v OFS="\\t" '
-        \$11 > ${params.fail_percent_threshold} ||
-        \$12 > ${params.fail_percent_threshold} ||
-        \$13 > ${params.fail_percent_threshold} {
+        \$11 > ${params.cohort_percent_library_fail_threshold * 100} ||
+        \$12 > ${params.cohort_percent_library_fail_threshold * 100} ||
+        \$13 > ${params.cohort_percent_library_fail_threshold * 100} {
             print \$1,\$2,\$2+1,\$3
         }
         ' ${all_libraries_per_base} |
         sort-bed - |
         bedtools merge -c 4 -o distinct \
         > ${OUT}
+    """
+}
+
+process GENERATE_BOX_PLOTS {
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/plots", mode: 'copy'
+
+    input:
+    tuple val(sample_name), path(input_file), val(threshold), val(separate_plots)
+
+    output:
+    path(OUT), emit: percent_failed_box_plot
+
+    script:
+    OUT = "failure_threshold_*.png"
+    """
+    plot-gene-boxplots \
+    --input-file ${input_file} \
+    --threshold ${threshold} \
+    ${separate_plots.toBoolean() ? '--separate-plots' : ''}
     """
 }

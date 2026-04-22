@@ -134,13 +134,23 @@ bed_to_vcf() {
 	local original_vcf="$1"
 	local bed_file="$2"
 	local output_vcf="$3"
+	local chain_file="$4"
 	log_msg "INFO" "Converting BED back to VCF format..."
 	# Create temporary files
 	local temp_header="${TEMP_DIR}/header.tmp"
 	local temp_variants="${TEMP_DIR}/variants.tmp"
 	local temp_mapping="${TEMP_DIR}/mapping.tmp"
-	# Extract VCF header
-	grep '^#' "${original_vcf}" > "${temp_header}"
+	# Extract VCF header and append lengths extracted from chain file to contig fields
+	awk 'FNR==NR { if (/^chain/) target_contig_lengths[$8]=$9; next }
+	/^#/ {
+		if (/^##contig/) {
+			match($0, /ID=([^,>]+)/, contig_match)
+			contig = contig_match[1]
+			print "##contig=<ID=" contig (contig in target_contig_lengths ? ",length=" target_contig_lengths[contig] : "") ">"
+			next
+		}
+		print
+	}' "${chain_file}" "${original_vcf}" > "${temp_header}"
 	# Create coordinate mapping from BED file (BED4+INFO)
 	# Output: name \t new_chrom \t new_start \t new_end \t info
 	awk -F'\t' 'BEGIN{OFS="\t"}{
@@ -320,7 +330,7 @@ main() {
 	# Step 2: Run liftover with -bedPlus=4
 	run_liftover "${input_bed}" "${chain_file}" "${output_bed}" "${unmapped_bed}"
 	# Step 3: Convert back to VCF
-	bed_to_vcf "${uncompressed_vcf}" "${output_bed}" "${output_vcf}"
+	bed_to_vcf "${uncompressed_vcf}" "${output_bed}" "${output_vcf}" "${chain_file}"
 	# Step 4: Report statistics
 	report_statistics "${output_bed}" "${unmapped_bed}"
 	log_msg "INFO" "Liftover completed successfully. Output: ${output_vcf}"

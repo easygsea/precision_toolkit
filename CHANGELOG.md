@@ -4,6 +4,17 @@
 
 ---
 
+### v1.2.1 - 2026-04-21
+- Feature: Add per library QC report generation process to summarize base and target failures in `cohort_qc_report.tsv`.
+- Feature: Add support for Truvari in variant benchmark workflow.
+- Feature: Add plot to visualize per-base library fail rates, highlighting bases where the fraction of failing libraries exceeds a threshold specified by `--cohort_percent_library_fail_threshold` (default: 0.25).
+- Improvement: Add `length` tag to contig header lines in lifted VCF output by `liftover_sv_vcf.sh`.
+- Improvement: Add option to group and color signal correlation plots by run tag using `--color_source run` (renamed from old `--filter_source` parameter) and `--run_pattern`, as well as `--color_palette` metric to set color preferences.
+- Improvement: Optimize Nextflow test execution by parallelizing workflows and symlinking input files.
+- Improvement: Refactor container creation to use a cached base image.
+
+---
+
 ### v1.2.0 - 2026-03-27
 - Improvement: Move `src/bin` to `src/clinical_tool/cli`.
 - Improvement: Replace Poetry with uv for managing the environment and upgrade Python to 3.13.12.
@@ -15,7 +26,7 @@
 
 ### v1.1.4 - 2026-03-16
 - New Standalone Utility: Added `plot-dragen-metrics` to plot backbone QC metrics in DRAGEN's `MetricsOutput.tsv`.
-- Feature: Added functionality to compile a systemic fail tract (`common_fail_regions.bed`) using cohort-level base-specific fail data. Threshold can be adjusted with `--fail_percent_threshold` parameter (default: 10).
+- Feature: Added functionality to compile a systemic fail tract (`common_fail_regions.bed`) using cohort-level base-specific fail data. Threshold can be adjusted with `--cohort_percent_library_fail_threshold` parameter (default: 0.25).
 - Improvement: Added support for parsing metrics from JSON files in `compile-dragen-metrics`.
 - Improvement: Enabled multiple inputs to `--analysis-dirs` (formerly `--analysis-dir`) in `compile-dragen-metrics`.
 - Improvement: Updated workflow to allow direct CRAM injection into mpileup, bypassing intermediate BAM generation and reducing overhead.

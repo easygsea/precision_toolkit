@@ -5,9 +5,11 @@ ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
 ARG JOBLIB_VERSION=0.14.1
-ARG UV_VERSION=0.10.7
+ARG MAFFT_VERSION=7.505-1
 ARG PSUTIL_VERSION=6.1.1
 ARG PYTHON_VERSION=3.13.12
+ARG TRUVARI_VERSION=5.4.0
+ARG UV_VERSION=0.10.7
 ARG WITTYER_VERSION=0.5.2
 
 # Stage 1: Build witty.er from source
@@ -22,32 +24,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
     cd Wittyer && \
     dotnet publish . -c Release
 
-# Stage 2: Build custom package via uv
+# Stage 2: Runtime
 ARG UV_VERSION
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_binary
-FROM python:${PYTHON_VERSION}-slim-bookworm AS clinical_tools_builder
-WORKDIR /app
-
-# Copy uv binary directly
-COPY --from=uv_binary /uv /bin/uv
-
-# Copy application files
-COPY README.md pyproject.toml uv.lock ./
-COPY src/ /app/src/
-
-# Build wheel
-RUN uv build --wheel && \
-    chmod a+rx /app -R
-
-# Stage 3: Runtime
 FROM mgibio/hap.py:v${HAPPY_VERSION}
 ARG BEDOPS_VERSION
 ARG BEDTOOLS_VERSION
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
 ARG JOBLIB_VERSION
+ARG MAFFT_VERSION
 ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
+ARG TRUVARI_VERSION
 WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and install .NET SDK
@@ -82,6 +71,10 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     wget --quiet "https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb" && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && apt-get install -y --no-install-recommends "dotnet-sdk-${DOTNET_VERSION}" && \
+    # Install mafft (dependency for truvari)
+    wget --quiet "https://mafft.cbrc.jp/alignment/software/mafft_${MAFFT_VERSION}_amd64.deb" && \
+    dpkg -i "mafft_${MAFFT_VERSION}_amd64.deb" && \
+    rm "mafft_${MAFFT_VERSION}_amd64.deb" && \
     # Build htslib (dependency for bcftools and samtools)
     wget --quiet "https://github.com/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2" && \
     tar -xjf "htslib-${HTSLIB_VERSION}.tar.bz2" && \
@@ -128,22 +121,37 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
 COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
 
 # Set environment variables
-ENV PATH="$PATH:/opt/hap.py/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
+ENV PATH="$PATH:/opt/hap.py/bin:/opt/truvari/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
 ENV PATH="$PATH:/usr/bin"
 
-# Update shebangs, create wrapper script, set python defaults, and install package
+# Update shebangs, create wrapper script, set python defaults, and install truvari
 RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~#!/usr/bin/env python2.7~' {} \; && \
     printf '#!/bin/bash\ndotnet /witty.er/bin/Release/net6.0/Wittyer.dll "$@"\n' > /witty.er/bin/witty.er && \
     chmod +x /witty.er/bin/witty.er && \
     update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1 && \
     update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1 && \
     python -m pip install --no-cache-dir --upgrade pip setuptools && \
+    python -m venv /opt/truvari && \
+    /opt/truvari/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/truvari/bin/pip install --no-cache-dir "truvari==${TRUVARI_VERSION}" && \
     python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python
 
 # CDI-158 fix som.py inconsistency issue
 RUN sed -i 's~True,  # pass_only~not args.inc_nonpass, # account for nonpass in truth vcf~' /opt/hap.py/bin/som.py
 
-COPY --from=clinical_tools_builder /app/dist/*.whl .
-RUN pip install --no-cache-dir ./*.whl /wheels/pysam*.whl && \
-    rm ./*.whl && \
-    rm -rf /wheels /tmp/*
+# Install project dependencies
+COPY --from=uv_binary /uv /bin/uv
+ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
+COPY pyproject.toml uv.lock /app/
+
+RUN pip install --no-cache-dir /wheels/pysam*.whl && \
+    uv sync --no-install-project && \
+    rm -rf /wheels /tmp/* /root/.cache
+
+# Install project source (This is removed in the CI pipeline)
+COPY src/ /app/src/
+COPY README.md /app/
+
+RUN uv build --wheel --out-dir dist/ && \
+    pip install --no-cache-dir --no-deps dist/*.whl && \
+    rm -rf dist/ /root/.cache
