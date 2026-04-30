@@ -17,9 +17,25 @@ process NORMALIZE_COVERAGE_TO_TARGET {
     BEGIN {
         OFS="\\t"
     } NR > 1 {
-        total += \$5
+        vals[NR-1] = \$5
     } END {
-        print tc / total * (NR-1)
+        n = NR - 1
+
+        if (n == 0) {
+            print 1
+            exit
+        }
+
+        asort(vals)
+
+        if (n % 2 == 1) {
+            median = vals[int((n+1)/2)]
+        } else {
+            median = (vals[n/2] + vals[n/2 + 1]) / 2
+        }
+
+        print tc / median
+
     }' ${parsed_pileup} )
     echo "TARGET COVERAGE = ${target_coverage}" #info
     echo "NORM_FACTOR = \${norm_factor}" #info

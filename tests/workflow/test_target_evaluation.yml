@@ -239,15 +239,15 @@
      --normalize_coverage 10
   files:
     - path: target_evaluation_test_normalization/target_evaluation/library_level/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.normalized.scored.txt
-      md5sum: 1ef0c446264b8061167b44f73e2d4b9e
+      md5sum: a9bb179321d4cd7adcabf5cf5a212a8c
     - path: target_evaluation_test_normalization/target_evaluation/library_level/PacBio_MSH3_1_reads_GM24385_IX00001.mpileup.per_base.parsed.labelled.normalized.target_aggregated.scored.txt
       md5sum: cc08e4634cb4a8a1787a9c3c36a1f6f0
     - path: target_evaluation_test_normalization/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.normalized.scored.txt
-      md5sum: 0f91a53f852ab28b9653cd43e27fb0cd
+      md5sum: 3be57efe3bb996dcd35c3e4982a4a68f
     - path: target_evaluation_test_normalization/target_evaluation/library_level/WGS_HCP_MSH3_2_reads_GM24385_IX00000.mpileup.per_base.parsed.labelled.normalized.target_aggregated.scored.txt
-      md5sum: 3d8bdecd41387d63c997dbba19a9b14d
+      md5sum: e2aea929e5c1dc0fe057c920ac7b1548
     - path: target_evaluation_test_normalization/target_evaluation/cohort_base_analysis.scored.txt
-      md5sum: 8dfec298fc921b3a7ad6ba0264a5fef1
+      md5sum: fd3c19b2a44b60e7c71a22d0af7d0a99
 
 - name: target_evaluation_test_read_fail_tolerance
   command: >
