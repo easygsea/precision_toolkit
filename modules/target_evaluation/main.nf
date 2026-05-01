@@ -5,6 +5,7 @@ process NORMALIZE_COVERAGE_TO_TARGET {
     tuple val(sample_name), path(parsed_pileup), val(pool_id)
     path(targets_bed)
     val(target_coverage)
+    val(normalize_by_median)
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: normalized_pileup
@@ -13,30 +14,41 @@ process NORMALIZE_COVERAGE_TO_TARGET {
     OUT="${parsed_pileup.baseName}.normalized.txt"
     """
     echo "Starting calculation for ${parsed_pileup}" #info
-    norm_factor=\$(awk -v tc=${target_coverage} '
+    norm_factor=\$(awk -v tc=${target_coverage} -v use_median=${normalize_by_median} '
     BEGIN {
         OFS="\\t"
-    } NR > 1 {
-        vals[NR-1] = \$5
-    } END {
-        n = NR - 1
+    }
 
+    NR > 1 {
+        if (use_median == "true") {
+            vals[NR-1] = \$5
+        } else {
+            total += \$5
+        }
+    }
+
+    END {
+        n = NR - 1
         if (n == 0) {
             print 1
             exit
         }
 
-        asort(vals)
+        if (use_median == "true") {
+            asort(vals)
 
-        if (n % 2 == 1) {
-            median = vals[int((n+1)/2)]
+            if (n % 2 == 1) {
+                median = vals[int((n+1)/2)]
+            } else {
+                median = (vals[n/2] + vals[n/2 + 1]) / 2
+            }
+
+            print tc / median
         } else {
-            median = (vals[n/2] + vals[n/2 + 1]) / 2
+            mean = total / n
+            print tc / mean
         }
-
-        print tc / median
-
-    }' ${parsed_pileup} )
+    }' ${parsed_pileup})
     echo "TARGET COVERAGE = ${target_coverage}" #info
     echo "NORM_FACTOR = \${norm_factor}" #info
     awk -v norm_factor=\${norm_factor} '

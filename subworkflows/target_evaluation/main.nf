@@ -127,7 +127,8 @@ workflow gene_target_evaluation_workflow {
         NORMALIZE_COVERAGE_TO_TARGET (
             ADD_TARGET_LABELS.out.labelled_pileup,
             targets_bed,
-            params.normalize_coverage
+            params.normalize_coverage,
+            params.normalize_by_median
         )
         sample_stage_output = NORMALIZE_COVERAGE_TO_TARGET.out.normalized_pileup
     }
