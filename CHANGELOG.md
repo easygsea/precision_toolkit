@@ -5,7 +5,7 @@
 ---
 
 ### v1.2.2 - 2026-06-XX
-- Improvement: Change mean normalization to median normalization in the `NORMALIZE_COVERAGE_TO_TARGET` process.
+- Improvement: Add `normalize_by_median` option for normalizing by median in the `NORMALIZE_COVERAGE_TO_TARGET` process.
 
 ---
 
