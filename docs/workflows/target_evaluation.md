@@ -67,7 +67,7 @@ nextflow run main.nf \
 - `--target_evaluation_subdir`: Subdirectory for target evaluation results (default: target_evaluation).
 - `--output_raw_mpileup`: Flag to output raw mpileup file.
 - `--normalize_coverage`: If set, coverage across the targets bed for every sample is normalized and scaled to center on this value. This function is provided to improve comparability and adjust for variations in sequencing depth cross samples if needed.
-- `--normalization_method`: Enum option to normalize by median or mean in normalization step.
+- `--normalization_method`: Method used to normalize raw coverage values. Supported options: "mean" (default) and "median".
 - `--visualize`: Flag to generate per-target level plots for each stat.
 - `--separate_plots`: Flag to separate plots for metrics when generating visualizations for regions failing to meet threshold.
 
