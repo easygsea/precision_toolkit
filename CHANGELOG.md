@@ -4,7 +4,7 @@
 
 ---
 
-### v1.2.2 - 2026-XX-XX
+### v1.2.2 - 2026-06-XX
 - Bugfix: Include `.venv` in the copy step into main when cloning to deployment.
 
 ---
