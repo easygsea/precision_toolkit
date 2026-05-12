@@ -52,7 +52,7 @@ function clone_and_deploy {
     chmod --recursive a-w "${version}"
     [[ -d main ]] && chmod --changes --recursive u+w main && rm -rfv main
     mkdir --mode 2750 main
-    cp -r "${version}"/* main/
+    cp -r "${version}"/{*,.venv} main/
     sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/main/${NEW_IMAGE_NAME}\"~" main/nextflow.config
     chmod --changes --recursive a-w main
   fi

@@ -29,7 +29,10 @@ process NORMALIZE_COVERAGE_TO_TARGET {
 
     END {
         n = NR - 1
-        if (n == 0) {
+
+        # Handle empty/header-only files to avoid
+        # division by zero and indexing into empty arrays
+        if (n <= 0) {
             print 1
             exit
         }
