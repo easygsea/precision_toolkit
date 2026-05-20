@@ -5,6 +5,7 @@
 ---
 
 ### v1.2.2 - 2026-06-XX
+- Improvement: Add `normalization_method` enum option for normalizing by median or mean in the `NORMALIZE_COVERAGE_TO_TARGET` process.
 - Bugfix: Include `.venv` in the copy step into main when cloning to deployment.
 
 ---
