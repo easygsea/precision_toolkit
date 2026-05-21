@@ -13,7 +13,7 @@ def validate_normalization_method(method) {
 }
 
 // Include the gene_target_evaluation_workflow
-include { gene_target_evaluation_workflow } from '../subworkflows/target_evaluation/main'
+include { gene_target_evaluation_workflow } from '../subworkflows/target_evaluation'
 
 workflow target_evaluation {
     validate_normalization_method(params.normalization_method)

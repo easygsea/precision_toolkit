@@ -1,12 +1,12 @@
 include {
     build_vcf_pair_channels
     process_spurious_variants
-} from '../../modules/utils/main'
+} from '../../modules/utils'
 
 include {
     extract_signal
     plot_signal_correlation
-} from '../../modules/signal_correlation/main'
+} from '../../modules/signal_correlation'
 
 workflow signal_correlation_workflow {
     // Build VCF pair channels

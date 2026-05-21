@@ -6,7 +6,7 @@ include {
     exclude_spurious_variants as exclude_spurious_variants_truth
     exclude_spurious_variants as exclude_spurious_variants_query
     normalize_vcf
-} from '../../modules/vcf/main'
+} from '../../modules/vcf'
 
 /**
  * Builds channels for paired VCF files from truth and query directories.

@@ -16,10 +16,10 @@ include {
     GENERATE_VISUALIZATION
     GENERATE_COMMON_REGIONS_FAIL
     GENERATE_BOX_PLOTS
-} from '../../modules/target_evaluation/main'
+} from '../../modules/target_evaluation'
 
-include { INDEX_BAM_FILE    } from '../../modules/bam/main'
-include { SORT_BED          } from '../../modules/bed/main'
+include { INDEX_BAM_FILE    } from '../../modules/bam'
+include { SORT_BED          } from '../../modules/bed'
 
 
 // Main variant gene target evaluation workflow

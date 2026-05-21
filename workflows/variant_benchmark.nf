@@ -74,8 +74,8 @@ def validate_ci_method(method) {
     validate_enum_value([method], ConfidenceIntervalMethod)
 }
 
-include { prepare_variant_benchmark_inputs } from '../subworkflows/prepare_variant_benchmark_inputs/main'
-include { variant_benchmark_workflow } from '../subworkflows/variant_benchmark/main'
+include { prepare_variant_benchmark_inputs } from '../subworkflows/prepare_variant_benchmark_inputs'
+include { variant_benchmark_workflow } from '../subworkflows/variant_benchmark'
 
 workflow variant_benchmark {
     validate_engine_selection(params.variant_benchmark_engine)
