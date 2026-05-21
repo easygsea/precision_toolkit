@@ -2,6 +2,11 @@
 
 nextflow.enable.dsl=2
 
+include {
+    validate_enum_value
+    get_enum_valid_values
+} from '../modules/utils'
+
 // Variant concordance analysis engine enum
 enum VariantConcordanceEngine {
     happy, sompy, truvari, wittyer
@@ -38,66 +43,35 @@ def validate_genome_ref(genome_ref) {
 
 // Function to validate engine selection
 def validate_engine_selection(engine) {
-    def valid_engines = VariantConcordanceEngine.values()*.toString()
-    if (!(engine in valid_engines)) {
-        throw new IllegalArgumentException(
-            "Invalid 'variant_benchmark_engine': ${engine}. " +
-            "Valid options are: ${valid_engines.join(', ')}"
-        )
-    }
+    validate_enum_value([engine], VariantConcordanceEngine)
 }
 
 // Function to validate diagnostic metrics selection
 def validate_metrics_selection(metrics) {
-    def valid_metrics = DiagnosticMetrics.values()*.toString()
-    def metricsList = metrics.split(' ')
-    if (!metricsList.every { it in valid_metrics }) {
-        throw new IllegalArgumentException(
-            "Invalid 'diagnostic_metrics': ${metrics}. " +
-            "Valid options are: ${valid_metrics.join(', ')}"
-        )
-    }
+    validate_enum_value(metrics.split(' '), DiagnosticMetrics)
 }
 
 // Function to validate hap.py engine selection
 def validate_happy_engine(engine) {
-    def valid_engines = HappyEngine.values()*.toString()
-    def normalized_engine = engine.replace('-', '_')
     if (engine.contains('_')) {
         throw new IllegalArgumentException(
             "Invalid 'happy_engine': ${engine}. " +
             "Engine name cannot contain underscores. " +
-            "Valid options are: ${valid_engines.join(', ')}"
+            "Valid options are: ${get_enum_valid_values(HappyEngine).join(', ')}"
         )
     }
-    if (!(normalized_engine in valid_engines)) {
-        throw new IllegalArgumentException(
-            "Invalid 'happy_engine': ${engine}. " +
-            "Valid options are: ${valid_engines.join(', ')}"
-        )
-    }
+    def normalized_engine = engine.replace('-', '_')
+    validate_enum_value([normalized_engine], HappyEngine)
 }
 
 // Function to validate TP method selection
 def validate_tp_method(tp) {
-    def valid_tp_methods = ConcordanceTPMethod.values()*.toString()
-    if (!(tp in valid_tp_methods)) {
-        throw new IllegalArgumentException(
-            "Invalid 'concordance_tp': ${tp}. " +
-            "Valid options are: ${valid_tp_methods.join(', ')}"
-        )
-    }
+    validate_enum_value([tp], ConcordanceTPMethod)
 }
 
 // Function to validate confidence interval method
 def validate_ci_method(method) {
-    def valid_methods = ConfidenceIntervalMethod.values()*.toString()
-    if (!(method in valid_methods)) {
-        throw new IllegalArgumentException(
-            "Invalid 'confidence_interval_method': ${method}. " +
-            "Valid options are: ${valid_methods.join(', ')}"
-        )
-    }
+    validate_enum_value([method], ConfidenceIntervalMethod)
 }
 
 include { prepare_variant_benchmark_inputs } from '../subworkflows/prepare_variant_benchmark_inputs/main'

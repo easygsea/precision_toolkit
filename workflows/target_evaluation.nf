@@ -2,18 +2,14 @@
 
 nextflow.enable.dsl=2
 
+include { validate_enum_value } from '../modules/utils'
+
 enum NormalizationMethod {
     mean, median
 }
 
 def validate_normalization_method(method) {
-    def valid = NormalizationMethod.values()*.toString()
-    if (!(method in valid)) {
-        throw new IllegalArgumentException(
-            "Invalid normalization_method: ${method}. " +
-            "Valid options: ${valid.join(', ')}"
-        )
-    }
+    validate_enum_value([method], NormalizationMethod)
 }
 
 // Include the gene_target_evaluation_workflow
