@@ -5,6 +5,7 @@
 ---
 
 ### v1.2.2 - 2026-06-XX
+- New Standalone Utility: Add `plot-contamination-vafs` to visualize germline variant VAFs for contamination assessment.
 - Improvement: Add `normalization_method` enum option for normalizing by median or mean in the `NORMALIZE_COVERAGE_TO_TARGET` process.
 - Improvement: Extract enum validation duplicated logic from `target_evaluation.nf` and `variant_benchmark.nf` to `modules/utils/main.nf`.
 - Improvement: Remove main.nf filename in include paths to use module include to import modules
