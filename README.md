@@ -162,6 +162,8 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
     - `jira-table`
   - [Manual Diagnostic Metric Curation](./docs/standalone_utilities/README.md#manual-diagnostic-metric-curation)
     - `manual-diagnostic-metric-curation`
+  - [Plot Contamination VAFs](./docs/standalone_utilities/README.md#plot-contamination-vafs)
+    - `plot-contamination-vafs`
   - [Plot DRAGEN metrics](./docs/standalone_utilities/README.md#plot-dragen-metrics)
     - `plot-dragen-metrics`
   - [Pull Request Fetcher](./docs/standalone_utilities/README.md#pull-request-fetcher)
