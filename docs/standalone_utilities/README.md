@@ -229,6 +229,8 @@ Valid inputs include DRAGEN's `*.tmb.trace.tsv` and `*.hard.filtered.vcf.gz`, wh
 
 To ensure VAFs from confident calls are plotted, variant calls in VCF format will first be filtered based on the FILTER column. Specifically, records with FILTER values matching those in the comma-separated list passed to `--variant-vcf-apply-filters` (default: `PASS`) are retained. By default, VAFs are extracted from the `FORMAT/AF` tag; however, a different tag can be specified using `--variant-vcf-af-tag`.
 
+**Note:** This tool is primarily intended for targeted, exome, and (virtual) panel-based datasets. Runtime and memory requirements may increase for larger-scale assays, such as WGS, due to the increased number of variants that must be processed.
+
 Usage:
 ```bash
 plot-contamination-vafs --variant-calls <dragen_tmb_trace_tsv|variant_calls_vcf> --output-folder <output_folder> [--variant-vcf-apply-filters <filter_value1,filter_value2,...>] [--variant-vcf-af-tag <FORMAT|INFO>/<tag>] [--population-variants-vcf <population_variants_vcf> | --population-markers-vcf <population_markers_vcf>] [--population-vcf-af-tag <FORMAT|INFO>/<tag>] [--population-snp-af-threshold <min_af>]
@@ -259,6 +261,8 @@ plot-contamination-vafs \
     --population-markers-vcf population_markers.vcf \
     --output-folder contamination_vaf_plot
 ```
+
+The example datasets referenced above are available in `tests_data/contamination`.
 
 ## Plot DRAGEN Metrics
 

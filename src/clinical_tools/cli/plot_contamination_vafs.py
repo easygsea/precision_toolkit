@@ -11,6 +11,7 @@ Usage:
     [--population-snp-af-threshold <min_af>]
 
 Example usage:
+    # Example input datasets available in tests_data/contamination
     # DRAGEN's *.tmb.trace.tsv output
     plot-contamination-vafs \
         --variant-calls NA12878_Coriell_IX13680_F161339.tmb.trace.tsv \
