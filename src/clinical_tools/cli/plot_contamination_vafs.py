@@ -38,16 +38,22 @@ Example usage:
 import argparse
 import logging
 import re
-import shutil
 import sys
 import tempfile
-from enum import StrEnum
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import pysam.bcftools
 
+from clinical_tools.analysis.vcf import (
+    BcftoolsIsecOutput,
+    bgzip_and_index_vcf,
+    collapse_multi_allelics,
+    drop_genotypes,
+    extract_biallelic_snps,
+    filter_vcf,
+    intersect_vcfs,
+)
 from clinical_tools.core.io import FileMode, open_file
 
 # Configure logging
@@ -62,22 +68,6 @@ logging.basicConfig(
 VALID_CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X", "Y"]
 
 
-class BcftoolsIsecOutput(StrEnum):
-    """Suffixes of output files produced by bcftools isec when comparing two VCF files.
-
-    When intersecting two VCFs, bcftools isec yields four output files:
-    - 0000.vcf: variants found only in vcf1
-    - 0001.vcf: variants found only in vcf2
-    - 0002.vcf: shared variants, as reported in vcf1
-    - 0003.vcf: shared variants, as reported in vcf2
-    """
-
-    PRIVATE_TO_VCF1 = "0000"
-    PRIVATE_TO_VCF2 = "0001"
-    SHARED_FROM_VCF1 = "0002"
-    SHARED_FROM_VCF2 = "0003"
-
-
 def validate_vcf_af_tag(af_tag: str) -> str:
     """Validate that AF tag is properly formatted as <FORMAT|INFO>/<TAG>."""
     if not (af_tag.startswith("FORMAT/") or af_tag.startswith("INFO/")):
@@ -85,83 +75,6 @@ def validate_vcf_af_tag(af_tag: str) -> str:
             f"Invalid tag '{af_tag}': must start with 'FORMAT/' or 'INFO/'"
         )
     return af_tag
-
-
-def bgzip_and_index_vcf(vcf_path: Path) -> Path:
-    """Return path to bgzipped and indexed VCF."""
-    if not str(vcf_path).endswith(".vcf.gz"):
-        bgzipped_vcf_path = Path(str(vcf_path).replace(".vcf", ".vcf.gz"))
-        if not bgzipped_vcf_path.exists():
-            pysam.tabix_compress(str(vcf_path), str(bgzipped_vcf_path))
-    else:
-        bgzipped_vcf_path = vcf_path
-
-    vcf_tbi_path = Path(str(bgzipped_vcf_path) + ".tbi")
-    if not vcf_tbi_path.exists():
-        pysam.tabix_index(str(bgzipped_vcf_path), preset="vcf")
-
-    return bgzipped_vcf_path
-
-
-def drop_genotypes(vcf_path: Path, sites_only_vcf_path: Path) -> None:
-    """Drop sample columns yielding a sites-only VCF."""
-    pysam.bcftools.view(
-        "--drop-genotypes",
-        "--output",
-        str(sites_only_vcf_path),
-        "--output-type",
-        "z",
-        str(vcf_path),
-        catch_stdout=False,
-    )
-
-
-def collapse_multi_allelics(vcf_path: Path, collapsed_vcf_path: Path) -> None:
-    """Collapse multi-allelic sites into a single record."""
-    pysam.bcftools.norm(
-        "--multiallelics",
-        "+any",
-        "--output",
-        str(collapsed_vcf_path),
-        "--output-type",
-        "z",
-        str(vcf_path),
-        catch_stdout=False,
-    )
-
-
-def extract_biallelic_snps(vcf_path: Path, biallelic_snps_vcf_path: Path) -> None:
-    """Filter for bi-allelic SNPs only."""
-    pysam.bcftools.view(
-        "--types",
-        "snps",
-        "--min-alleles",
-        "2",
-        "--max-alleles",
-        "2",
-        "--output",
-        str(biallelic_snps_vcf_path),
-        "--output-type",
-        "z",
-        str(vcf_path),
-        catch_stdout=False,
-    )
-
-
-def filter_vcf(
-    vcf_path: Path, include_expression: str, filtered_vcf_path: Path
-) -> None:
-    """Filter for variants that satisfy the specified expression."""
-    pysam.bcftools.filter(
-        "--include",
-        include_expression,
-        "--output",
-        str(filtered_vcf_path),
-        "--output-type",
-        "z",
-        str(vcf_path),
-        catch_stdout=False,
-    )
 
 
 def generate_population_markers_vcf(
@@ -208,41 +121,6 @@ def generate_population_markers_vcf(
         )
 
     return population_markers_vcf_path
-
-
-def intersect_vcfs(
-    vcf1_path: Path,
-    vcf2_path: Path,
-    keep: BcftoolsIsecOutput,
-    intersected_vcf_path: Path,
-) -> Path:
-    """Intersect two VCFs, keeping either shared or private records as specified.
-
-    Args:
-        vcf1_path: Path to first VCF.
-        vcf2_path: Path to second VCF.
-        keep: BcftoolsIsecOutput value specifying which isec output file to keep.
-        intersected_vcf_path: Path to output intersected VCF.
-
-    Returns:
-        Path to intersected VCF.
-    """
-    with tempfile.TemporaryDirectory() as tmpdir:
-        pysam.bcftools.isec(
-            "--prefix",
-            str(tmpdir),
-            str(bgzip_and_index_vcf(vcf1_path)),
-            str(bgzip_and_index_vcf(vcf2_path)),
-            catch_stdout=False,
-        )
-
-        vcf_to_keep = Path(tmpdir) / f"{keep}.vcf"  # isec doesn't output bgzipped VCFs
-        if str(intersected_vcf_path).endswith(".vcf.gz"):
-            shutil.copy2(bgzip_and_index_vcf(vcf_to_keep), intersected_vcf_path)
-        else:
-            shutil.copy2(vcf_to_keep, intersected_vcf_path)
-
-    return intersected_vcf_path
 
 
 def extract_af(af_tag: str, vcf_record_fields: list[str]) -> float:
