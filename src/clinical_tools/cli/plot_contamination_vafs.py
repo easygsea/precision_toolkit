@@ -194,7 +194,7 @@ def prepare_plot_data(
                 vaf = extract_af(variant_calls_af_tag, fields)
 
             all_germline_variant_calls.append(
-                {"chrom": chrom, "pos": pos, "ref": ref, "alt": alt, "vaf": vaf}
+                {"chrom": chrom, "pos": int(pos), "ref": ref, "alt": alt, "vaf": vaf}
             )
 
     return pd.DataFrame(all_germline_variant_calls)
@@ -259,9 +259,9 @@ def plot_contamination_vafs(
     ax.set_ylim(0, 1.05)
     ax.tick_params(axis="y", labelsize=8)
     ax.set_ylabel("Variant allele frequency (VAF)", fontsize=10)
-    ax.axhline(0.5, color="#FDB339", linestyle="--", linewidth=1.5)
-    ax.axhline(0.25, color="grey", linestyle="--", linewidth=1.0)
-    ax.axhline(0.75, color="grey", linestyle="--", linewidth=1.0)
+    ax.axhline(0.5, color="#FDB339", linestyle="--", linewidth=1.5, zorder=1)
+    ax.axhline(0.25, color="grey", linestyle="--", linewidth=1.0, zorder=1)
+    ax.axhline(0.75, color="grey", linestyle="--", linewidth=1.0, zorder=1)
     fig.tight_layout()
 
     # Save plot and write data to output folder
