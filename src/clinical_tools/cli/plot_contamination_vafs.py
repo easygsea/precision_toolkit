@@ -268,7 +268,7 @@ def plot_contamination_vafs(
     fig.savefig(output_folder / "contamination_vafs.png", dpi=300)
     plt.close(fig)
     plot_data_df[["chrom", "pos", "ref", "alt", "vaf"]].to_csv(
-        output_folder / "contamination_vafs_plot_data.tsv", index=False
+        output_folder / "contamination_vafs_plot_data.csv", index=False
     )
     logging.info(f"Total germline variants plotted: {num_germline_variants}")
 
