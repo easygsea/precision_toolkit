@@ -19,13 +19,13 @@ Usage:
 """
 
 import argparse
-import gzip
 import logging
 import re
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import IO, cast
+
+from clinical_tools.core.io import FileMode, open_file
 
 # Configure logging
 logging.basicConfig(
@@ -169,21 +169,6 @@ class Transcript:
                 self.exon_to_coding_exon[exon.range] = GenomicRange(
                     (coding_exon_start, coding_exon_end), exon.number_attribute
                 )
-
-
-class FileMode(str, Enum):
-    """Valid file modes."""
-
-    READ = "r"
-    WRITE = "w"
-
-
-def open_file(filename: Path, mode: FileMode) -> IO[str]:
-    """Open file with the appropriate method depending on the extension."""
-    if filename.suffix == ".gz":
-        return cast(IO[str], gzip.open(filename, mode + "t"))
-    else:
-        return open(filename, mode)
 
 
 def extract_refseq_accession(

@@ -6,6 +6,7 @@
 - [Generate Standardized BED](#generate-standardized-bed)
 - [Jira Table Converter](#jira-table-converter)
 - [Manual Diagnostic Metric Curation](#manual-diagnostic-metric-curation)
+- [Plot Contamination VAFs](#plot-contamination-vafs)
 - [Plot DRAGEN Metrics](#plot-dragen-metrics)
 - [Pull Request Fetcher](#pull-request-fetcher)
 - [Structural Variant VCF Liftover](#structural-variant-vcf-liftover)
@@ -219,6 +220,53 @@ apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-cura
 ```
 
 Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
+
+## Plot Contamination VAFs
+
+The `plot-contamination-vafs` tool plots variant allele frequencies (VAFs) of germline variants, facilitating differentiation of samples with true vs. false-positive contamination estimates. As germline variants are expected to have VAFs clustered at 0, 0.5, and 1, deviations from this pattern suggest potential contamination. More specifically, presence of *scattered* VAFs outside of 0.5 is indicative of true contamination. Refer to [DRAGEN's documentation](https://help.tso500software.illumina.com/dragen-tso-500-guides/dragen-tso-500-v2.6/overview-1/quality-control/contamination#contamination-score-interpretation) for example plots and interpretation.
+
+Valid inputs include DRAGEN's `*.tmb.trace.tsv` and `*.hard.filtered.vcf.gz`, where germline variants are flagged with `Germline_DB` or `Germline_Proxi` status. Small variant VCFs from other callers are also supported, provided that one of the following is supplied:
+- `--population-variants-vcf`: A VCF with reference population variants, such as those from [1000 Genomes](https://hgdownload.soe.ucsc.edu/gbdb/hg38/1000Genomes/). When this argument is used, population markers are derived from this VCF internally by filtering for bi-allelic SNPs with AF ≥ a configurable threshold (`--population-snp-af-threshold`, default: `0.01`). AF values are extracted from the VCF column and tag indicated by `--population-vcf-af-tag` (default: `'INFO/AF'`).
+- `--population-markers-vcf`: A sites-only VCF with precomputed population markers, already filtered to contain bi-allelic SNPs that are common in the general population.
+
+This enables inference of germline SNVs via intersection of variant calls with population markers.
+
+To ensure VAFs from confident calls are plotted, variant calls in VCF format will first be filtered based on the FILTER column. Specifically, records with FILTER values matching those in the comma-separated list passed to `--variant-vcf-apply-filters` (default: `PASS`) are retained. By default, VAFs are extracted from the `FORMAT/AF` tag; however, a different tag can be specified using `--variant-vcf-af-tag`.
+
+**Note:** This tool is primarily intended for targeted, exome, and (virtual) panel-based datasets. Runtime and memory requirements may increase for larger-scale assays, such as WGS, due to the increased number of variants that must be processed.
+
+Usage:
+```bash
+plot-contamination-vafs --variant-calls <dragen_tmb_trace_tsv|variant_calls_vcf> --output-folder <output_folder> [--variant-vcf-apply-filters <filter_value1,filter_value2,...>] [--variant-vcf-af-tag <FORMAT|INFO>/<tag>] [--population-variants-vcf <population_variants_vcf> | --population-markers-vcf <population_markers_vcf>] [--population-vcf-af-tag <FORMAT|INFO>/<tag>] [--population-snp-af-threshold <min_af>]
+```
+
+Example usage:
+```bash
+# DRAGEN's *.tmb.trace.tsv
+plot-contamination-vafs \
+    --variant-calls NA12878_Coriell_IX13680_F161339.tmb.trace.tsv \
+    --output-folder contamination_vaf_plot
+
+# VCF of variant calls and a VCF of population variants from which population markers can be derived
+plot-contamination-vafs \
+    --variant-calls NA12878_Coriell_IX13680_F161339.hard-filtered.vcf \
+    --variant-vcf-apply-filters 'PASS' \
+    --variant-vcf-af-tag 'FORMAT/AF' \
+    --population-variants-vcf population_variants.vcf \
+    --population-vcf-af-tag 'INFO/AF' \
+    --population-snp-af-threshold 0.01 \
+    --output-folder contamination_vaf_plot
+
+# VCF of variant calls and a VCF of population markers
+plot-contamination-vafs \
+    --variant-calls NA12878_Coriell_IX13680_F161339.hard-filtered.vcf \
+    --variant-vcf-apply-filters 'PASS' \
+    --variant-vcf-af-tag 'FORMAT/AF' \
+    --population-markers-vcf population_markers.vcf \
+    --output-folder contamination_vaf_plot
+```
+
+The example datasets referenced above are available in `tests_data/contamination`.
 
 ## Plot DRAGEN Metrics
 

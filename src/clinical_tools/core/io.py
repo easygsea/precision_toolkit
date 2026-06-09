@@ -1,16 +1,26 @@
 """Input/Output utilities for reading data from various file formats."""
 
 import csv
+import gzip
 import json
 import logging
 import sys
+from enum import Enum
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import TextIO
+from typing import IO, TextIO, cast
 
 import pandas as pd
 
 _SNIFF_READ_SIZE = 4096
+
+
+class FileMode(str, Enum):
+    """Valid file modes."""
+
+    READ = "r"
+    WRITE = "w"
+
 
 # Setup logging:
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
@@ -38,6 +48,14 @@ def detect_format(file_path: str | TextIO) -> str:
         return "json"
     else:
         return "csv"
+
+
+def open_file(filename: Path, mode: FileMode) -> IO[str]:
+    """Open file with the appropriate method depending on the extension."""
+    if filename.suffix == ".gz":
+        return cast(IO[str], gzip.open(filename, mode + "t"))
+    else:
+        return open(filename, mode)
 
 
 def read_dataframe(

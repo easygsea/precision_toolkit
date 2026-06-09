@@ -1,0 +1,18 @@
+{
+  "dragen_tmb_trace": {
+    "contamination_vafs_plot_data.csv": "7bf4744309ca8536390296cb23790867",
+    "contamination_vafs.png": "d153d1e56c54bba132d52f8386cce8a3"
+  },
+  "dragen_vc": {
+    "contamination_vafs_plot_data.csv": "517aa02b0015746587b639d1fa50be02",
+    "contamination_vafs.png": "94dc77fb801265778ae19f25beb7b6ac",
+    "NA12878_Coriell_IX13680_F161339.hard-filtered.filtered.vcf.gz": "8f84ea49e5407720a0a8be61d4ca71a7"
+  },
+  "vc_with_population_variants": {
+    "contamination_vafs_plot_data.csv": "c68acb8435ea8f3cb9db0549c41085ec",
+    "contamination_vafs.png": "2b2e201637b0b7c34af7c5095050a509",
+    "NA12878_Coriell_IX13680_F161339.hard-filtered.filtered.vcf.gz": "8f84ea49e5407720a0a8be61d4ca71a7",
+    "NA12878_Coriell_IX13680_F161339.hard-filtered.germline_snvs.vcf.gz": "1ec42f442c110b8ffd6f8821d001d7c5",
+    "population_variants.biallelic_snps.minAF0.01.vcf.gz": "1448b16ce1cff514d18ec704dc3fe9c2"
+  }
+}
