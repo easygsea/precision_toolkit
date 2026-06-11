@@ -1,6 +1,6 @@
 # Clinical Genomics Assay Development & Validation Tools
 
-**Precision Toolkit** is a software suite that provides robust CI/CD workflows and tools for developing and validating clinical genomics assays. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
+**Precision Toolkit** is a containerized toolkit that integrates end-to-end pipelines for assay benchmarking, sequencing quality assessment, DRAGEN output analysis, and routine laboratory operations. Analytical tasks are parallelized and orchestrated within a continuous integration/continuous deployment (CI/CD) framework that promotes best practices, reduces platform dependencies, and ensures reproducible execution across computational environments. The toolkit also includes demonstration datasets to support adoption, validation, training, and method development. By combining standardized workflows with automated infrastructure, Precision Toolkit provides a flexible and scalable foundation for genomics assay development and validation in clinical laboratory settings.
 
 ## Supported Architectures
 
@@ -129,17 +129,8 @@ apptainer exec \
 
 # Contents
 
-- [Motivation](#motivation)
 - [Manual](#manual)
 - [Resource Optimization and High-Performance Computing](#resource-optimization-and-high-performance-computing)
-
-## Motivation
-
-Clinical validation of genomic assays is critical in ensuring the accuracy and reliability of diagnostic tests. However, manual workflows are often time-consuming, error-prone, and difficult to standardize across laboratories, leading to challenges in consistency and reproducibility.
-
-The Precision Toolkit software package addresses these challenges with an automated, containerized solution. Built on [Nextflow](https://www.nextflow.io/) with containerized dependencies, it offers a standardized framework that ensures reproducibility and comparability across institutions.
-
-The pipeline's architecture supports execution across various computing environments, from local machines to high-performance computing clusters, making it accessible to laboratories with different computational resources. By automating complex analysis workflows and providing standardized outputs ([CSV](https://en.wikipedia.org/wiki/Comma-separated_values), [Markdown](https://www.markdownguide.org/), and [Word](https://www.microsoft.com/en-us/microsoft-365/word)), this tool aims to improve the efficiency and reliability of clinical validation studies while meeting regulatory requirements for diagnostic test validation.
 
 ## Manual
 
