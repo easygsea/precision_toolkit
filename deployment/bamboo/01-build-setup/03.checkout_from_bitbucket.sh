@@ -35,10 +35,10 @@ HOST_NAME="${bamboo.HOST_CONTAINER}"
 
 rm -rfv "${TESTING_DEPLOYMENT_DIRECTORY}"
 git clone -b "${BRANCH_NAME}" "${REPOSITORY_URL}" \
-  "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
-cd "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
+  "${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit"
+cd "${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit"
 VERSION=$(sed -nr "s|^version\s*=\s*\"([^\"]+)\"|\1|p" pyproject.toml)
-echo "VERSION=${VERSION}" > clinical_tools_version.txt
+echo "VERSION=${VERSION}" > precision_toolkit_version.txt
 chmod -R g+w "${TESTING_DEPLOYMENT_DIRECTORY}"
 
 rsync -av README.md pyproject.toml uv.lock Dockerfile apptainer.def src \

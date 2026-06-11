@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from clinical_tools.core.io import FileMode, open_file
+from precision_toolkit.core.io import FileMode, open_file
 
 
 @pytest.fixture

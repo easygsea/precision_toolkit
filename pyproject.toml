@@ -1,6 +1,6 @@
 [project]
-name = "clinical-tools"
-version = "1.2.2"
+name = "precision-toolkit"
+version = "1.3.0"
 description = "An integrated toolset to support clinical validation"
 readme = "README.md"
 requires-python = ">=3.11,<4"
@@ -34,26 +34,26 @@ dev = [
 ]
 
 [project.scripts]
-compile-dragen-metrics = "clinical_tools.cli.compile_dragen_metrics:main"
-convert-multi-sample-vcf = "clinical_tools.cli.convert_multi_sample_vcf:main"
-count-variants-by-size = "clinical_tools.cli.count_variants_by_size:main"
-fetch-pull-requests = "clinical_tools.cli.fetch_pull_requests:main"
-generate-standardized-bed = "clinical_tools.cli.generate_standardized_bed:main"
-jira-table = "clinical_tools.cli.jira_table:main"
-manual-diagnostic-metric-curation = "clinical_tools.cli.manual_diagnostic_metric_curation:main"
-plot-contamination-vafs = "clinical_tools.cli.plot_contamination_vafs:main"
-plot-dragen-metrics = "clinical_tools.cli.plot_dragen_metrics:main"
-plot-gene-boxplots = "clinical_tools.cli.plot_gene_boxplots:main"
-plot-signal-correlation = "clinical_tools.cli.plot_signal_correlation:main"
-plot-target-tracts = "clinical_tools.cli.plot_target_tracts:main"
-summarize-diagnostic-metrics = "clinical_tools.cli.summarize_diagnostic_metrics:main"
+compile-dragen-metrics = "precision_toolkit.cli.compile_dragen_metrics:main"
+convert-multi-sample-vcf = "precision_toolkit.cli.convert_multi_sample_vcf:main"
+count-variants-by-size = "precision_toolkit.cli.count_variants_by_size:main"
+fetch-pull-requests = "precision_toolkit.cli.fetch_pull_requests:main"
+generate-standardized-bed = "precision_toolkit.cli.generate_standardized_bed:main"
+jira-table = "precision_toolkit.cli.jira_table:main"
+manual-diagnostic-metric-curation = "precision_toolkit.cli.manual_diagnostic_metric_curation:main"
+plot-contamination-vafs = "precision_toolkit.cli.plot_contamination_vafs:main"
+plot-dragen-metrics = "precision_toolkit.cli.plot_dragen_metrics:main"
+plot-gene-boxplots = "precision_toolkit.cli.plot_gene_boxplots:main"
+plot-signal-correlation = "precision_toolkit.cli.plot_signal_correlation:main"
+plot-target-tracts = "precision_toolkit.cli.plot_target_tracts:main"
+summarize-diagnostic-metrics = "precision_toolkit.cli.summarize_diagnostic_metrics:main"
 
 [build-system]
 requires = ["uv_build>=0.10.7,<0.11.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-module-name = "clinical_tools"
+module-name = "precision_toolkit"
 
 [tool.pytest.ini_options]
 testpaths = [

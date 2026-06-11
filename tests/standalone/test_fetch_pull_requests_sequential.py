@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from clinical_tools.core.devtools.pull_request_fetcher import (
+from precision_toolkit.core.devtools.pull_request_fetcher import (
     fetch_pull_requests as fetch_pull_requests,
 )
 
@@ -28,7 +28,7 @@ def test_fetch_prs_sequential_auth_flow(
 
     # Apply the monkeypatch
     monkeypatch.setattr(
-        "clinical_tools.core.devtools.pull_request_fetcher.requests.get", mock_get
+        "precision_toolkit.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
 
     # First Call: Should print Unauthorized

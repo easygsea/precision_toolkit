@@ -35,7 +35,7 @@ chmod -R a+rx "$PWD"
 rm -rfv "${IMAGE_NAME}"
 
 CONFIG_HASH=$(cat Dockerfile pyproject.toml uv.lock | sha256sum | cut -c1-16)
-DOCKER_TAG="clinical_tools:${CONFIG_HASH}"
+DOCKER_TAG="precision_toolkit:${CONFIG_HASH}"
 BASE_IMAGE="${BASE_IMAGE_ROOT}/${CONFIG_HASH}_base.sif"
 
 # Only rebuild base images if config hash is new

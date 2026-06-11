@@ -8,7 +8,7 @@ Task type:
   SSH Task
 
 Task description:
-  Deploy clinical_tools
+  Deploy precision_toolkit
 
 Hosts:
   ${bamboo.HOST}
@@ -31,7 +31,7 @@ set -euxo pipefail
 
 # Clone the repository, move it into the deployment folder and build the apptainer image
 function clone_and_deploy {
-  cd "${DEPLOYMENT_ROOT}/clinical_tools"
+  cd "${DEPLOYMENT_ROOT}/precision_toolkit"
   [[ -d tmp_dir ]] && rm -rfv tmp_dir
   git clone --branch "${BRANCH_NAME}" "${REPOSITORY_URL}" tmp_dir
   version=$(cd tmp_dir && get_version)
@@ -39,7 +39,7 @@ function clone_and_deploy {
     echo "The version has already been deployed"
     exit 1
   else
-    version_folder="${DEPLOYMENT_ROOT}/clinical_tools/${version}"
+    version_folder="${DEPLOYMENT_ROOT}/precision_toolkit/${version}"
     mkdir -pv "${version_folder}"
     mv tmp_dir/* "${version_folder}/"
     (
@@ -47,13 +47,13 @@ function clone_and_deploy {
       uv venv --python "${PYTHON_EXECUTABLE}"
       uv sync
       cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" "./${NEW_IMAGE_NAME}"
-      sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
+      sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/precision_toolkit/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
     )
     chmod --recursive a-w "${version}"
     [[ -d main ]] && chmod --changes --recursive u+w main && rm -rfv main
     mkdir --mode 2750 main
     cp -r "${version}"/{*,.venv} main/
-    sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/clinical_tools/main/${NEW_IMAGE_NAME}\"~" main/nextflow.config
+    sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/precision_toolkit/main/${NEW_IMAGE_NAME}\"~" main/nextflow.config
     chmod --changes --recursive a-w main
   fi
   rm -rfv tmp_dir/

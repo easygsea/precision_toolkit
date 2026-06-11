@@ -31,12 +31,12 @@ You'll need appropriate chain files for the coordinate conversion you want to pe
 
 ### Basic Usage
 ```bash
-<path/to/clinical_tools/src/bin/>liftover_sv_vcf.sh input.vcf output.vcf chain_file.chain
+<path/to/precision_toolkit/src/bin/>liftover_sv_vcf.sh input.vcf output.vcf chain_file.chain
 ```
 
 ### Keep Temporary Files for Debugging
 ```bash
-<path/to/clinical_tools/src/bin/>liftover_sv_vcf.sh input.vcf output.vcf chain_file.chain \
+<path/to/precision_toolkit/src/bin/>liftover_sv_vcf.sh input.vcf output.vcf chain_file.chain \
     --temp-dir /path/to/temp \
     --keep-temp \
     --verbose

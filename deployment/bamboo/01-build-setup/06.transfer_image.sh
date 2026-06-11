@@ -21,7 +21,7 @@ Password:
   ${bamboo.PASSWORD}
 
 SSH command:
-cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/deployment/bamboo/01-build-setup/
+cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit/deployment/bamboo/01-build-setup/
 bash 06.transfer_image.sh ${bamboo.HOST_CONTAINER} \
 ${bamboo.inject.BUILDING_DEPLOYMENT_DIRECTORY} \
 ${bamboo.inject.IMAGE_NAME} \
@@ -37,4 +37,4 @@ IMAGE_NAME="$3"
 TESTING_DEPLOYMENT_DIRECTORY="$4"
 
 scp "${HOST_NAME}":"${BUILDING_DEPLOYMENT_DIRECTORY}"/"${IMAGE_NAME}" \
-  "${TESTING_DEPLOYMENT_DIRECTORY}"/clinical_tools
+  "${TESTING_DEPLOYMENT_DIRECTORY}"/precision_toolkit

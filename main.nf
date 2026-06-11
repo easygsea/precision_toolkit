@@ -32,7 +32,7 @@ def helpMessage() {
     Detailed Usage
     ====================
     General Parameters
-        --output_dir        Directory or path in which to output results (default: "output_clinical_tools"). If specified directory does not exist, it will be created locally or at the path specified
+        --output_dir        Directory or path in which to output results (default: "output_precision_toolkit"). If specified directory does not exist, it will be created locally or at the path specified
         --genome_ref        Provide reference genome when indicated by workflow docs (eg. for CRAM file expansion; default: null)
         --decimals          Number of decimal places (default: 2)
         --color_palette     Color palette to use for plotting (e.g., 'colorblind', 'tab10', 'bright')
@@ -46,7 +46,7 @@ def helpMessage() {
 
         Optional Parameters:
             --diagnostic_metrics     Diagnostic metrics to calculate (default: 'concordance sensitivity precision f1_score'). Multiple values must be passed as a quoted space-separated list. F1 score does not have a confidence interval.
-            --output_dir             Base output directory (default: output_clinical_tools)
+            --output_dir             Base output directory (default: output_precision_toolkit)
             --variant_benchmark_subdir  Subdirectory for variant benchmark results (default: variant_benchmark)
             --happy_engine           hap.py engine to use (default: vcfeval) Options: vcfeval, xcmp, scmp-distance, scmp-somatic. Note: vcfeval mode only evaluates PASS variants.
             --happy_options          Additional hap.py options (default: '--write-vcf --write-counts'). Must quote the string and use = to assign the value.
@@ -139,7 +139,7 @@ def helpMessage() {
             --query_signal AF \\
             --xlim "0 1" \\
             --ylim "0 1" \\
-            --output_dir output_clinical_tools
+            --output_dir output_precision_toolkit
 
     Variant Benchmark with Spurious Variant Exclusion and hap.py options:
         nextflow run main.nf --workflows variant_benchmark \\
@@ -149,7 +149,7 @@ def helpMessage() {
             --spurious_variants_vcf spurious_variants.vcf.gz \\
             --collapse both \\
             --happy_options="--write-vcf --write-counts" \\
-            --output_dir output_clinical_tools
+            --output_dir output_precision_toolkit
 
     Local Execution with Custom Resources:
         nextflow run main.nf \\
@@ -203,7 +203,7 @@ def helpMessage() {
 workflow.onComplete {
     log.info"""
     ========================================
-    Clinical Tools Analysis Complete!
+    Precision Toolkit Analysis Complete!
     ========================================
     Command line    : ${workflow.commandLine}
     Completed at    : ${workflow.complete}

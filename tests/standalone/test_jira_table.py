@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from clinical_tools.core.writers.jira_table import (
+from precision_toolkit.core.writers.jira_table import (
     populate_jira_table,
 )
 

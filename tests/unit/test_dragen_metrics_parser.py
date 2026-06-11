@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from clinical_tools.dragen.metrics_parser import DragenMetricsParser
+from precision_toolkit.dragen.metrics_parser import DragenMetricsParser
 
 
 @pytest.fixture

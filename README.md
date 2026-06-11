@@ -1,6 +1,6 @@
 # Clinical Genomics Assay Development & Validation Tools
 
-**Clinical Tools** is a software suite that provides robust CI/CD workflows and tools for developing and validating clinical genomics assays. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
+**Precision Toolkit** is a software suite that provides robust CI/CD workflows and tools for developing and validating clinical genomics assays. Leveraging containerized environments, it ensures computational reproducibility and cross-platform compatibility across various hardware architectures and high-performance computing systems. By enhancing analytical throughput and maintaining data integrity, it empowers clinical laboratories to enhance efficiency, reliability, and regulatory compliance.
 
 ## Supported Architectures
 
@@ -31,17 +31,17 @@ Containerized dependencies (no installation required):
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/easygsea/clinical_tools.git
+   git clone https://github.com/easygsea/precision_toolkit.git
    ```
 
 2. Run specific workflow(s). Example:
    ```bash
-   nextflow run <path/to/clinical_tools>/main.nf \
+   nextflow run <path/to/precision_toolkit>/main.nf \
        --workflows variant_benchmark \
        --truth_dir <path/to/truth_vcfs/> \
        --query_dir <path/to/query_vcfs/> \
        --variant_benchmark_engine happy \
-       --output_dir output_clinical_tools
+       --output_dir output_precision_toolkit
    ```
 
 > **Note:**
@@ -57,29 +57,29 @@ Containerized dependencies (no installation required):
 > Or set `apptainer.cacheDir` in `nextflow.config`.
 >
 > **Advanced users:**
-> If you have deployed clinical_tools using the recommended [deployment and Bamboo plans](deployment/README.md), you do **not** need to manually set up the Apptainer cache.
+> If you have deployed precision_toolkit using the recommended [deployment and Bamboo plans](deployment/README.md), you do **not** need to manually set up the Apptainer cache.
 
 ### Using Containerized Tools
 
 1. Download the container image:
 
-   > **Tip:** If you have already run a workflow with Clinical Tools, you likely have a cached Apptainer image (see notes above), so you may not need to download it again.
+   > **Tip:** If you have already run a workflow with Precision Toolkit, you likely have a cached Apptainer image (see notes above), so you may not need to download it again.
 
    For the latest version, run:
 
    ```bash
-   apptainer pull docker://quay.io/easygsea/clinical_tools
+   apptainer pull docker://quay.io/easygsea/precision_toolkit
    ```
 
    To get a specific version, use:
 
    ```bash
-   apptainer pull docker://quay.io/easygsea/clinical_tools:v1.0.1
+   apptainer pull docker://quay.io/easygsea/precision_toolkit:v1.0.1
    ```
 
 2. Run specific tools inside the container. Example:
    ```bash
-   apptainer exec -B <data_path> </path/to/clinical_tools_latest.sif> manual-diagnostic-metric-curation -h
+   apptainer exec -B <data_path> </path/to/precision_toolkit_latest.sif> manual-diagnostic-metric-curation -h
    ```
    See the official [apptainer exec](https://apptainer.org/docs/user/main/cli/apptainer_exec.html) manual for more details on running commands within a container.
 
@@ -90,7 +90,7 @@ For a full list and documentation of available standalone utilities, see the [St
 
 ## Demo Data
 
-Clinical Tools are rigorously tested at both unit and integration levels. Integration tests, covering workflows and standalone utilities, concurrently provide demos:
+Precision Toolkit are rigorously tested at both unit and integration levels. Integration tests, covering workflows and standalone utilities, concurrently provide demos:
 
 [Workflows Tests as Demos](./tests/workflow)
 
@@ -99,12 +99,12 @@ Example:
 Demo of customized benchmarking small variant calls across multiple samples and calculating variant concordance, sensitivity, precision, confidence intervals (Jeffreys method, 99% CI; default: Wilson method, 95% CI), and F1 score reported to 1 (default: 2) decimal place:
 
 ```bash
-nextflow run <path/to/clinical_tools>/main.nf \
+nextflow run <path/to/precision_toolkit>/main.nf \
     --workflows variant_benchmark \
     --variant_benchmark_engine happy \
-    --truth_dir <path/to/clinical_tools>/tests_data/snv_truth_vcfs \
-    --query_dir <path/to/clinical_tools>/tests_data/snv_query_vcfs \
-    --genome_ref <path/to/clinical_tools>/tests_data/genome.fa \
+    --truth_dir <path/to/precision_toolkit>/tests_data/snv_truth_vcfs \
+    --query_dir <path/to/precision_toolkit>/tests_data/snv_query_vcfs \
+    --genome_ref <path/to/precision_toolkit>/tests_data/genome.fa \
     --ci_method "jeffreys" \
     --ci_level 0.99 \
     --decimals 1 \
@@ -119,10 +119,10 @@ Demo of manual sensitivity curation:
 
 ```bash
 apptainer exec \
-    -B <path/to/clinical_tools> \
-    </path/to/clinical_tools_latest.sif> \
+    -B <path/to/precision_toolkit> \
+    </path/to/precision_toolkit_latest.sif> \
     manual-diagnostic-metric-curation sensitivity \
-    --input <path/to/clinical_tools>/tests/standalone/data/sensitivity.csv \
+    --input <path/to/precision_toolkit>/tests/standalone/data/sensitivity.csv \
     --curation "SNP:PASS:TP:100" "SNP:PASS:FN:50" \
     --output-prefix manually_curated_sensitivity
 ```
@@ -137,7 +137,7 @@ apptainer exec \
 
 Clinical validation of genomic assays is critical in ensuring the accuracy and reliability of diagnostic tests. However, manual workflows are often time-consuming, error-prone, and difficult to standardize across laboratories, leading to challenges in consistency and reproducibility.
 
-The Clinical Tools software package addresses these challenges with an automated, containerized solution. Built on [Nextflow](https://www.nextflow.io/) with containerized dependencies, it offers a standardized framework that ensures reproducibility and comparability across institutions.
+The Precision Toolkit software package addresses these challenges with an automated, containerized solution. Built on [Nextflow](https://www.nextflow.io/) with containerized dependencies, it offers a standardized framework that ensures reproducibility and comparability across institutions.
 
 The pipeline's architecture supports execution across various computing environments, from local machines to high-performance computing clusters, making it accessible to laboratories with different computational resources. By automating complex analysis workflows and providing standardized outputs ([CSV](https://en.wikipedia.org/wiki/Comma-separated_values), [Markdown](https://www.markdownguide.org/), and [Word](https://www.microsoft.com/en-us/microsoft-365/word)), this tool aims to improve the efficiency and reliability of clinical validation studies while meeting regulatory requirements for diagnostic test validation.
 
