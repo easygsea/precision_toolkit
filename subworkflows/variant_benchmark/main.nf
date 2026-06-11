@@ -1,6 +1,6 @@
 include {
     generate_fai
-} from '../../modules/fasta/main'
+} from '../../modules/fasta'
 
 include {
     run_happy as run_happy_raw
@@ -14,7 +14,7 @@ include {
     run_wittyer as run_wittyer_raw
     run_wittyer as run_wittyer_curated
     summarize_diagnostic_metrics
-} from '../../modules/variant_benchmark/main'
+} from '../../modules/variant_benchmark'
 
 // Main variant benchmark workflow
 workflow variant_benchmark_workflow {

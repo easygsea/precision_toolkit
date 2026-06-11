@@ -39,5 +39,5 @@ shift $#
 
 # Install the package from the lock file
 uv venv --python "${PYTHON_EXECUTABLE}"
-uv sync --group dev
+uv sync --locked --group dev
 uv run pre-commit install

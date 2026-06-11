@@ -1,12 +1,12 @@
 include {
     build_vcf_pair_channels
     process_spurious_variants
-} from '../../modules/utils/main'
+} from '../../modules/utils'
 
 include {
     bgzip_vcf
     index_vcf
-} from '../../modules/vcf/main'
+} from '../../modules/vcf'
 
 workflow prepare_variant_benchmark_inputs {
 
