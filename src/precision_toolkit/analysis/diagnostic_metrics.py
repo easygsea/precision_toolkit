@@ -20,7 +20,9 @@ from precision_toolkit.core.parsers.happy import HappyDataParser
 from precision_toolkit.core.parsers.sompy import SompyDataParser
 from precision_toolkit.core.parsers.truvari import TruvariDataParser
 from precision_toolkit.core.parsers.wittyer import WittyerDataParser
-from precision_toolkit.core.statistics.proportion import ProportionConfidenceIntervalMethod
+from precision_toolkit.core.statistics.proportion import (
+    ProportionConfidenceIntervalMethod,
+)
 
 
 def load_data_from_files(
