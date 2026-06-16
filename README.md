@@ -1,6 +1,10 @@
-# Clinical Genomics Assay Development & Validation Tools
+# Precision Toolkit: Clinical Genomics Assay Development & Validation
 
-**Precision Toolkit** is a containerized toolkit that integrates end-to-end pipelines for assay benchmarking, sequencing quality assessment, DRAGEN output analysis, and routine laboratory operations. Analytical tasks are parallelized and orchestrated within a continuous integration/continuous deployment (CI/CD) framework that promotes best practices, reduces platform dependencies, and ensures reproducible execution across computational environments. The toolkit also includes demonstration datasets to support adoption, validation, training, and method development. By combining standardized workflows with automated infrastructure, Precision Toolkit provides a flexible and scalable foundation for genomics assay development and validation in clinical laboratory settings.
+**Precision Toolkit** is a containerized toolkit that integrates end-to-end pipelines for assay benchmarking, sequencing quality assessment, DRAGEN output analysis, and routine laboratory operations.
+
+Analytical tasks are parallelized and orchestrated within a continuous integration/continuous deployment (CI/CD) framework that promotes best practices, reduces platform dependencies, and ensures reproducible execution across computational environments.
+
+The toolkit also includes demonstration datasets to support adoption, validation, training, and method development.
 
 ## Supported Architectures
 
