@@ -1,6 +1,11 @@
-# Clinical Tools Update Log
+# Precision Toolkit Update Log
 
 ## Version History
+
+---
+
+### v1.3.0 - 2026-06-16
+- Rename the project from Clinical Tools to Precision Toolkit (`clinical_tools` -> `precision_toolkit`).
 
 ---
 

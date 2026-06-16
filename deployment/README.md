@@ -1,17 +1,15 @@
 # Deployment scripts
 
-Provided with the repository, there are recommended scripts for testing and linting the code for continuous integration
-and continuous development.
+This folder contains scripts for testing and linting code as part of the continuous integration and continuous delivery (CI/CD) workflow.
 
-The first three stages - build-setup, testing-and-linting, and build-cleanup - are automated on Bamboo and triggered by
-any PUSH to your Clinical Tool Branch on BitBucket.
-Deployment is a manual stage that promotes a tested build into the operational environment.
+The first three stages - build-setup, testing-and-linting, and build-cleanup - are automated in Bamboo and are triggered by any push to Bitbucket.
+The final stage, Deployment, is a manual step that deploys a successful build into the operational environment.
 
-To run the default plan configuration, the following Variables must be defined in the Bamboo Default plan configuration:
-- `APPTAINER_IMAGE_NAME` - default name of the Apptainer image to be built (e.g. clinical_tools)
+The following variables must be defined in the Bamboo plan's Default Variables configuration:
+- `APPTAINER_IMAGE_NAME` - default name of the Apptainer image to be built (e.g. precision_toolkit)
 - `BASE_IMAGE_ROOT` - path where the base Apptainer images are stored
 - `CONTAINER_BUILD_ROOT` - path where Docker and Apptainer images are built
-- `DEPLOYMENT_ROOT` - path where the clinical_tools package is deployed to
+- `DEPLOYMENT_ROOT` - path where the precision_toolkit package is deployed to
 - `HOST` -  standard server providing access to testing and deployment directories
 - `HOST_CONTAINER` - server used for building Docker/Apptainer images, which is typically separated from regular filesystems because it requires sudo access and offers better protection for sensitive environments
 - `JAVA_EXECUTABLE` - path to the Java executable required by Nextflow (e.g. `/usr/local/bin/jdk-21.0.6`)

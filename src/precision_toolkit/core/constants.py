@@ -1,0 +1,52 @@
+"""Constants for the precision toolkit package."""
+
+from enum import StrEnum
+
+DEFAULT_CI_LEVEL: float = 0.95
+DEFAULT_CI_METHOD: str = "wilson"
+DEFAULT_DECIMALS: int = 2
+
+
+class DiagnosticMetricType(StrEnum):
+    """Supported diagnostic metric types."""
+
+    CONCORDANCE = "concordance"
+    SENSITIVITY = "sensitivity"
+    PRECISION = "precision"
+    F1_SCORE = "f1_score"
+
+
+class VariantConcordanceEngine(StrEnum):
+    """Supported variant concordance analysis engines."""
+
+    HAPPY = "happy"
+    SOMPY = "sompy"
+    TRUVARI = "truvari"
+    WITTYER = "wittyer"
+
+
+class NameMapper:
+    """Metric abbreviations and full names."""
+
+    NAME_MAP = {
+        "TP": "True Positive",
+        "FP": "False Positive",
+        "TN": "True Negative",
+        "FN": "False Negative",
+    }
+
+    @staticmethod
+    def get_full_name(abbreviation: str) -> str:
+        """Get the full name of a metric based on its abbreviation."""
+        full_name = NameMapper.NAME_MAP.get(abbreviation)
+        if full_name is None:
+            raise ValueError(f"Unknown abbreviation: {abbreviation}")
+        return full_name
+
+    @staticmethod
+    def get_abbreviation(full_name: str) -> str:
+        """Get the abbreviation of a metric based on its full name."""
+        for abbr, name in NameMapper.NAME_MAP.items():
+            if name == full_name:
+                return abbr
+        raise ValueError(f"Unknown full name: {full_name}")

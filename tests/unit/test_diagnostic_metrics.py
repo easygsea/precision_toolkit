@@ -5,7 +5,7 @@ Concordance, Sensitivity, Precision, F1 Score, Confidence Intervals
 
 import pytest
 
-from clinical_tools.core.metrics.variant import (
+from precision_toolkit.core.metrics.variant import (
     ConcordanceMetrics,
     ConcordanceTPMethod,
     F1ScoreMetrics,

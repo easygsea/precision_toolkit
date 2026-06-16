@@ -2,8 +2,8 @@
 
 import pytest
 
-from clinical_tools.dragen.models import DragenMetric
-from clinical_tools.dragen.utils import (
+from precision_toolkit.dragen.models import DragenMetric
+from precision_toolkit.dragen.utils import (
     calc_derived_pct_metric,
     classify_metric,
     format_metric,

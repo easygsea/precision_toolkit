@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from clinical_tools.analysis.vcf import count_variants_by_size
+from precision_toolkit.analysis.vcf import count_variants_by_size
 
 
 @pytest.fixture

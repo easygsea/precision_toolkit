@@ -25,5 +25,5 @@ SSH command:
 
 BAMBOO_CONFIG_DOC
 
-docker images --format '{{.Repository}}:{{.Tag}}' | grep 'clinical_tools' | xargs docker rmi
+docker images --format '{{.Repository}}:{{.Tag}}' | grep 'precision_toolkit' | xargs docker rmi
 rm -f "${bamboo.BASE_IMAGE_ROOT}"/*.sif

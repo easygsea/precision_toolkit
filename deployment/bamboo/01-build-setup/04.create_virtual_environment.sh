@@ -21,7 +21,7 @@ Password:
   ${bamboo.PASSWORD}
 
 SSH command:
-cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools/deployment/bamboo/01-build-setup/
+cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit/deployment/bamboo/01-build-setup/
 bash 04.create_virtual_environment.sh \
 ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
 ${bamboo.PYTHON_EXECUTABLE}
@@ -33,7 +33,7 @@ set -euxo pipefail
 TESTING_DEPLOYMENT_DIRECTORY="$1"
 PYTHON_EXECUTABLE="$2"
 
-cd "${TESTING_DEPLOYMENT_DIRECTORY}/clinical_tools"
+cd "${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit"
 # Ensures $@ is empty when calling source to avoid passing in unwanted parameters
 shift $#
 

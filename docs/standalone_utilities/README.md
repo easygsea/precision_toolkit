@@ -216,7 +216,7 @@ We provide a handy tool to manually curate a diagnostic metric (concordance, sen
 To view the help message, run:
 
 ```bash
-apptainer exec <path/to/clinical_tools_latest.sif> manual-diagnostic-metric-curation -h
+apptainer exec <path/to/precision_toolkit_latest.sif> manual-diagnostic-metric-curation -h
 ```
 
 Example usage is provided in the [Variant Benchmark](../workflows/variant_benchmark.md#diagnostic-metrics-manual-curation) manual.
@@ -308,7 +308,7 @@ The `liftover_sv_vcf.sh` tool enables conversion of structural variant VCF files
 Usage:
 
 ```bash
-<path/to/clinical_tools/src/bin/>liftover_sv_vcf.sh input.vcf output.vcf chain_file.chain
+<path/to/precision_toolkit/src/bin/>liftover_sv_vcf.sh input.vcf output.vcf chain_file.chain
 ```
 
 For detailed documentation and examples, see [Structural Variant VCF Liftover Tool](liftover_sv_vcf.md).
