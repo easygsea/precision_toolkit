@@ -5,6 +5,8 @@
 ---
 
 ### v1.3.1 - 2026-XX-XX
+- Feature: Add `d2` into Dockerfile.
+- Improvement: Add containerized tools documentation and clarify amd64-only precompiled dependency installation in Dockerfile (`mafft`, `bedtools`, `bedops`, `d2`).
 - Bugfix: Fix mypy incompatible type issue in `plot_target_tracts.py`.
 
 ---
