@@ -46,6 +46,14 @@ apptainer exec \
     -B $(pwd):/output \
     /path/to/precision_toolkit_latest.sif \
     d2 /data/<d2_diagram_file> /output/<output_svg>
+
+# This will produce an SVG file in the current working directory named <output_svg> based on the D2 diagram file <d2_diagram_file> located in /data. To verify this:
+
+$ ls /data
+<d2_diagram_file>
+
+$ ls .
+<output_svg>
 ```
 
 Run `bcftools` on a VCF file in the current working directory:
