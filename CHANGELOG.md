@@ -4,6 +4,10 @@
 
 ---
 
+### v1.3.1 - 2026-XX-XX
+
+---
+
 ### v1.3.0 - 2026-06-16
 - Rename the project from Clinical Tools to Precision Toolkit (`clinical_tools` -> `precision_toolkit`).
 
