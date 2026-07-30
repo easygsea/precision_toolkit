@@ -1,6 +1,7 @@
 # Environment variables
 ARG BEDOPS_VERSION=2.4.41
 ARG BEDTOOLS_VERSION=2.31.0
+ARG D2_VERSION=0.7.0
 ARG DOTNET_VERSION=6.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
@@ -30,6 +31,7 @@ FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_binary
 FROM mgibio/hap.py:v${HAPPY_VERSION}
 ARG BEDOPS_VERSION
 ARG BEDTOOLS_VERSION
+ARG D2_VERSION
 ARG DOTNET_VERSION
 ARG HTSLIB_VERSION
 ARG JOBLIB_VERSION
@@ -106,6 +108,11 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     tar -jxf "bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2" -C "bedops_linux_x86_64-v${BEDOPS_VERSION}" && \
     cp bedops_linux_x86_64-v"${BEDOPS_VERSION}"/bin/* /opt/hap.py/bin/ && \
     rm -rf bedops_linux_x86_64-v"${BEDOPS_VERSION}"* && \
+    # Install d2
+    wget --quiet "https://github.com/terrastruct/d2/releases/download/v${D2_VERSION}/d2-v${D2_VERSION}-linux-amd64.tar.gz" && \
+    tar -xzf "d2-v${D2_VERSION}-linux-amd64.tar.gz" && \
+    mv "d2-v${D2_VERSION}/bin/d2" /opt/hap.py/bin/d2 && \
+    rm -rf "d2-v${D2_VERSION}"* && \
     # Build Python
     wget --quiet "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz" && \
     tar -xzf "Python-${PYTHON_VERSION}.tgz" && \
