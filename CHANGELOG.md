@@ -5,6 +5,7 @@
 ---
 
 ### v1.3.1 - 2026-XX-XX
+- Bugfix: Fix mypy incompatible type issue in `plot_target_tracts.py`.
 
 ---
 
