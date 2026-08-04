@@ -169,7 +169,7 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
   - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
     - `liftover_sv_vcf.sh`
 - [Containerized Tools](./docs/containerized_tools/README.md)
-- [third-party tools](../docs/third_party/README.md)
+- [Third-Party Tools](./docs/third_party/README.md)
   - [Convert Inversions](./docs/third_party/README.md#convert-inversions)
     - `convert-inversions`
 
