@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Standalone PR fetching utility script for command line usage.
 

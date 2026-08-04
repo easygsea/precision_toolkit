@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Parse DRAGEN output files to compile backbone-level metrics specified in JSON config.
 

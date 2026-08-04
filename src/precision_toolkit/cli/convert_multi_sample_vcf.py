@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Convert multi-sample VCF file to a folder of single sample VCF files.
 

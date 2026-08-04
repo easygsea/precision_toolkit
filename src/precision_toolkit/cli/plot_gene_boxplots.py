@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 Visualize gene fail scores output from target evaluation workflow.
 

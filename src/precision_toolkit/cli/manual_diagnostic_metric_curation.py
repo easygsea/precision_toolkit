@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Manually curate a diagnostic metric.
 
