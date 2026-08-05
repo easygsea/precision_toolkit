@@ -21,7 +21,7 @@
 # - Changed shebang to use python3 instead of python2. - 06/05/2024
 # - Adapted to handle DRAGEN SV output. - 06/05/2024
 # - Adapted to output only inversion calls. - 06/05/2024
-# - Fixed mate breakend parsing to handle chromosome names containing ':' since DRAGEN 4.4. - 07/28/2026
+# - Fixed mate breakend parsing to handle chromosome names containing ':'. - 07/28/2026
 
 import sys
 import gzip
