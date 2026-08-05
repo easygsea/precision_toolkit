@@ -9,7 +9,7 @@
 - Feature: Add `d2` into Dockerfile.
 - Improvement: Add containerized tools documentation and clarify amd64-only precompiled dependency installation in Dockerfile (`mafft`, `bedtools`, `bedops`, `d2`).
 - Improvement: Add documentation describing third-party tools.
-- Improvement: Keep Python files consistently non-executable.
+- Improvement: Keep Python files consistently non-executable and remove shebangs from CLI Python scripts.
 - Bugfix: Fix mypy incompatible type issue in `plot_target_tracts.py`.
 
 ---
