@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Reformat BED6+4 to 4-column BED file with standardized feature names.
 

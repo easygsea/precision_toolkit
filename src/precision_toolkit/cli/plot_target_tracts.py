@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 Visualize tract/target scores output from target evaluation workflow, grouped by poolID.
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Standalone JIRA table converter for command line usage.
 

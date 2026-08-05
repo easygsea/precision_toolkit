@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Count variants by size in a VCF file or folder of VCF files.
 

@@ -1,4 +1,5 @@
 default_stages: [pre-commit]
+exclude: ^src/third_party/convertInversions.py$
 
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit

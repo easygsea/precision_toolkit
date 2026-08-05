@@ -35,6 +35,7 @@ dev = [
 
 [project.scripts]
 compile-dragen-metrics = "precision_toolkit.cli.compile_dragen_metrics:main"
+convert-inversions = "third_party.convertInversions:main"
 convert-multi-sample-vcf = "precision_toolkit.cli.convert_multi_sample_vcf:main"
 count-variants-by-size = "precision_toolkit.cli.count_variants_by_size:main"
 fetch-pull-requests = "precision_toolkit.cli.fetch_pull_requests:main"

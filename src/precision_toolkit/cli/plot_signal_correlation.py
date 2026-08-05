@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 r"""
 Generate a scatter plot from paired truth and query signal files.
 
