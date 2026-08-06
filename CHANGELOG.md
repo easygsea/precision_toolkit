@@ -11,6 +11,7 @@
 - Improvement: Add documentation describing third-party tools.
 - Improvement: Keep Python files consistently non-executable and remove shebangs from CLI Python scripts.
 - Bugfix: Fix mypy incompatible type issue in `plot_target_tracts.py`.
+- Bugfix: Upgrade GitHub workflow to actions/checkout@v7 that runs on the Node.js 24 runtime.
 
 ---
 
