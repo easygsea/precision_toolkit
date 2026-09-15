@@ -33,6 +33,26 @@ dev = [
     "types-requests==2.32.4.20260107",
 ]
 
+[tool.ruff]
+line-length = 88
+extend-exclude = [
+    ".git",
+    "**/__init__.py",
+]
+
+[tool.ruff.lint]
+extend-select = [
+    "D",
+    "E",
+    "I",
+]
+ignore = [
+    "D104",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
 [project.scripts]
 compile-dragen-metrics = "precision_toolkit.cli.compile_dragen_metrics:main"
 convert-inversions = "third_party.convertInversions:main"
