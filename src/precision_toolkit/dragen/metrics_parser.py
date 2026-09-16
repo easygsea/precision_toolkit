@@ -21,7 +21,7 @@ logging.basicConfig(
 class DragenMetricsParser:
     """Extract metrics from DRAGEN output files."""
 
-    def __init__(self, config_path: Path, rgsm: str):
+    def __init__(self, config_path: Path, rgsm: str) -> None:
         """Initialize parser for DRAGEN output files.
 
         Args:

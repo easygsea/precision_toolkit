@@ -42,16 +42,21 @@ extend-exclude = [
 
 [tool.ruff.lint]
 extend-select = [
+    "ANN",
     "D",
     "E",
     "I",
 ]
 ignore = [
     "D104",
+    "ANN401"
 ]
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
+
+[tool.ty.analysis]
+respect-type-ignore-comments = false
 
 [project.scripts]
 compile-dragen-metrics = "precision_toolkit.cli.compile_dragen_metrics:main"
