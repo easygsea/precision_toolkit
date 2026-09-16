@@ -142,7 +142,7 @@ def generate_diagnostic_metrics_table(
     else:
         raise ValueError(f"Unsupported metric type: {metric_type}")
 
-    df = pd.DataFrame(data, columns=columns)
+    df = pd.DataFrame(data, columns=pd.Index(columns))
     return df.sort_values(by=["Variant Type", "Variant Filter"])
 
 

@@ -435,7 +435,7 @@ def main() -> None:
     metrics_df = pd.concat(metrics_dfs, ignore_index=True)
 
     # If grouping is desired, parse FASTQ list to reliably get groupings for each RGSM
-    rgsm_to_metadata_df = pd.DataFrame(columns=["RGSM"])
+    rgsm_to_metadata_df = pd.DataFrame(columns=pd.Index(["RGSM"]))
     valid_group_col = None
     if group_by and fastq_list_file_path:
         rgsm_to_metadata_df, valid_group_col = get_rgsm_groupings(

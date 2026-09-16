@@ -8,7 +8,7 @@ import sys
 from enum import Enum
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import IO, TextIO, cast
+from typing import IO, Any, TextIO, cast
 
 import pandas as pd
 
@@ -90,31 +90,31 @@ def read_dataframe(
                 input_file = StringIO(buffer)
 
         # Read file based on format
-        read_arg: dict[str, type[str]] = {"dtype": str} if convert_to_string else {}
+        dtype = str if convert_to_string else None
         if format_type == "tsv":
             return pd.read_csv(
-                input_file,
+                cast(Any, input_file),
                 sep=delimiter,
-                **read_arg,  # type: ignore[call-overload]
+                dtype=dtype,
             )
         elif format_type == "excel":
             if hasattr(input_file, "buffer"):
-                data = input_file.buffer.read()
+                data = cast(Any, input_file).buffer.read()
                 return pd.read_excel(
                     BytesIO(data),
                     engine="openpyxl",
-                    **read_arg,  # type: ignore[call-overload]
+                    dtype=dtype,
                 )
             else:
                 return pd.read_excel(
-                    input_file,
+                    cast(Any, input_file),
                     engine="openpyxl",
-                    **read_arg,  # type: ignore[call-overload]
+                    dtype=dtype,
                 )
         elif format_type == "json":
             if convert_to_string:
                 if hasattr(input_file, "read"):
-                    text = input_file.read()
+                    text = cast(TextIO, input_file).read()
                 else:
                     with open(input_file, "r", encoding="utf-8") as f:
                         text = f.read()
@@ -126,9 +126,9 @@ def read_dataframe(
             return df
         else:
             return pd.read_csv(
-                input_file,
+                cast(Any, input_file),
                 sep=delimiter,
-                **read_arg,  # type: ignore[call-overload]
+                dtype=dtype,
             )
 
     except Exception as e:
