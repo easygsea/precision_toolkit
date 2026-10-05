@@ -235,6 +235,8 @@ To ensure VAFs from confident calls are plotted, variant calls in VCF format wil
 
 **Note:** This tool is primarily intended for targeted, exome, and (virtual) panel-based datasets. Runtime and memory requirements may increase for larger-scale assays, such as WGS, due to the increased number of variants that must be processed.
 
+By default, y-axis gridlines are not displayed. Use `--y-gridlines` to enable minor y-axis gridlines at 0.01 intervals, including the major y-axis tick positions
+
 Usage:
 ```bash
 plot-contamination-vafs --variant-calls <dragen_tmb_trace_tsv|variant_calls_vcf> --output-folder <output_folder> [--variant-vcf-apply-filters <filter_value1,filter_value2,...>] [--variant-vcf-af-tag <FORMAT|INFO>/<tag>] [--population-variants-vcf <population_variants_vcf> | --population-markers-vcf <population_markers_vcf>] [--population-vcf-af-tag <FORMAT|INFO>/<tag>] [--population-snp-af-threshold <min_af>]
@@ -246,6 +248,12 @@ Example usage:
 plot-contamination-vafs \
     --variant-calls NA12878_Coriell_IX13680_F161339.tmb.trace.tsv \
     --output-folder contamination_vaf_plot
+
+# DRAGEN's *.tmb.trace.tsv with y-axis gridlines at 0.01 intervals
+plot-contamination-vafs \
+    --variant-calls NA12878_Coriell_IX13680_F161339.tmb.trace.tsv \
+    --output-folder contamination_vaf_plot \
+    --y-gridlines
 
 # VCF of variant calls and a VCF of population variants from which population markers can be derived
 plot-contamination-vafs \
