@@ -45,6 +45,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.ticker import MultipleLocator
 
 from precision_toolkit.analysis.vcf import (
     BcftoolsIsecOutput,
@@ -201,7 +202,9 @@ def prepare_plot_data(
 
 
 def plot_contamination_vafs(
-    germline_variant_calls_df: pd.DataFrame, output_folder: Path
+    germline_variant_calls_df: pd.DataFrame,
+    output_folder: Path,
+    show_y_gridlines: bool = False,
 ) -> None:
     """Plot VAFs of germline SNVs/variants.
 
@@ -259,6 +262,17 @@ def plot_contamination_vafs(
     ax.set_ylim(0, 1.05)
     ax.tick_params(axis="y", labelsize=8)
     ax.set_ylabel("Variant allele frequency (VAF)", fontsize=10)
+
+    if show_y_gridlines:
+        ax.yaxis.set_minor_locator(MultipleLocator(0.01))
+        ax.grid(
+            which="both",
+            axis="y",
+            color="lightgrey",
+            linewidth=0.5,
+            zorder=0,
+        )
+
     ax.axhline(0.5, color="#FDB339", linestyle="--", linewidth=1.5, zorder=1)
     ax.axhline(0.25, color="grey", linestyle="--", linewidth=1.0, zorder=1)
     ax.axhline(0.75, color="grey", linestyle="--", linewidth=1.0, zorder=1)
@@ -357,6 +371,12 @@ def main() -> None:
         help="Name of folder to output intermediate VCFs, VAF plot and plot data to.",
         required=True,
     )
+    parser.add_argument(
+        "--y-gridlines",
+        help="Enable minor y-axis gridlines at 0.01 intervals.",
+        action="store_true",
+        default=False,
+    )
 
     # Parse args
     args = parser.parse_args()
@@ -373,6 +393,7 @@ def main() -> None:
     population_snp_af_threshold = args.population_snp_af_threshold
     output_folder = Path(args.output_folder)
     output_folder.mkdir(parents=True, exist_ok=True)
+    show_y_gridlines = args.y_gridlines
 
     # Validate args
     is_dragen_output = (
@@ -457,7 +478,7 @@ def main() -> None:
         )
 
     # Plot
-    plot_contamination_vafs(germline_variant_calls_df, output_folder)
+    plot_contamination_vafs(germline_variant_calls_df, output_folder, show_y_gridlines)
 
 
 if __name__ == "__main__":
