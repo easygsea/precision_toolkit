@@ -20,8 +20,8 @@ dependencies = [
     "openpyxl==3.1.5"
 ]
 
-[tool.mypy]
-mypy_path = "src"
+[tool.ty.src]
+exclude = ["src/third_party/"]
 
 [dependency-groups]
 dev = [

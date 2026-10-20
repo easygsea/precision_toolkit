@@ -1,0 +1,7 @@
+rules:
+  - id: no-noqa
+    languages:
+      - python
+    message: "Do not use '# noqa'. Fix the underlying lint error instead."
+    pattern-regex: "#\\s*noqa\\b"
+    severity: ERROR

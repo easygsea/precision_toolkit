@@ -1,5 +1,5 @@
 default_stages: [pre-commit]
-exclude: ^src/third_party/convertInversions.py$
+exclude: ^src/third_party/
 
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
@@ -30,6 +30,13 @@ repos:
     rev: v0.0.81
     hooks:
       - id: ty
+
+  - repo: https://github.com/semgrep/pre-commit
+    rev: v1.157.0
+    hooks:
+      - id: semgrep
+        args: ["--config", ".semgrep", "--error", "--quiet"]
+        files: "^src/|^tests/"
 
   - repo: https://github.com/PyCQA/bandit
     rev: 1.8.3

@@ -1,0 +1,7 @@
+rules:
+  - id: no-ty-ignore
+    languages:
+      - python
+    message: "Do not use blanket '# ty: ignore'. Add a specific error code or fix the underlying type error."
+    pattern-regex: '#\s*ty:\s*ignore\b(?!\s*\[(?!\s*\])[^\]]+\])'
+    severity: ERROR
