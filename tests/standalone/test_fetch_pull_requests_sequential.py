@@ -2,7 +2,6 @@
 
 import logging
 from types import SimpleNamespace
-from typing import Any
 
 import pytest
 
@@ -12,7 +11,7 @@ from precision_toolkit.core.devtools.pull_request_fetcher import (
 
 
 def test_fetch_prs_sequential_auth_flow(
-    monkeypatch: pytest.MonkeyPatch, caplog: Any
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test pull request fetcher sequential authentication flow."""
     caplog.set_level(logging.INFO)
@@ -23,7 +22,7 @@ def test_fetch_prs_sequential_auth_flow(
 
     responses = iter([mock_fail, mock_success])
 
-    def mock_get(*args: Any, **kwargs: Any) -> Any:
+    def mock_get(*args: object, **kwargs: object) -> SimpleNamespace:
         return next(responses)
 
     # Apply the monkeypatch

@@ -8,7 +8,7 @@ import sys
 from enum import Enum
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import IO, Any, TextIO, cast
+from typing import IO, TextIO, cast
 
 import pandas as pd
 
@@ -93,13 +93,13 @@ def read_dataframe(
         dtype = str if convert_to_string else None
         if format_type == "tsv":
             return pd.read_csv(
-                cast(Any, input_file),
+                input_file,
                 sep=delimiter,
                 dtype=dtype,
             )
         elif format_type == "excel":
             if hasattr(input_file, "buffer"):
-                data = cast(Any, input_file).buffer.read()
+                data = cast(TextIO, input_file).buffer.read()
                 return pd.read_excel(
                     BytesIO(data),
                     engine="openpyxl",
@@ -107,14 +107,14 @@ def read_dataframe(
                 )
             else:
                 return pd.read_excel(
-                    cast(Any, input_file),
+                    input_file,
                     engine="openpyxl",
                     dtype=dtype,
                 )
         elif format_type == "json":
             if convert_to_string:
-                if hasattr(input_file, "read"):
-                    text = cast(TextIO, input_file).read()
+                if not isinstance(input_file, str):
+                    text = input_file.read()
                 else:
                     with open(input_file, "r", encoding="utf-8") as f:
                         text = f.read()
@@ -126,7 +126,7 @@ def read_dataframe(
             return df
         else:
             return pd.read_csv(
-                cast(Any, input_file),
+                input_file,
                 sep=delimiter,
                 dtype=dtype,
             )

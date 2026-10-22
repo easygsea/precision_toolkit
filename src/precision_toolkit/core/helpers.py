@@ -1,11 +1,15 @@
 """Helper functions."""
 
-from typing import Any
+from typing import TypeVar
 
 import pandas as pd
 
+ValueType = TypeVar("ValueType")
 
-def convert_to_list_if_single_instance(value: Any, expected_type: type) -> list:
+
+def convert_to_list_if_single_instance(
+    value: ValueType | list[ValueType],
+) -> list[ValueType]:
     """Convert single instances to lists while preserving existing lists.
 
     Ensures consistent handling of inputs that can be either single values or lists
@@ -13,12 +17,13 @@ def convert_to_list_if_single_instance(value: Any, expected_type: type) -> list:
 
     Args:
         value: The input value to process (must be single value or list)
-        expected_type: The type to check against (e.g. pd.DataFrame, str)
 
     Returns:
-        Single-item list if input matches expected type, or original value otherwise.
+        Single-item list if input is not a list, or the original list.
     """
-    return [value] if isinstance(value, expected_type) else value
+    if isinstance(value, list):
+        return value
+    return [value]
 
 
 def assemble_exports(
@@ -45,9 +50,11 @@ def assemble_exports(
         DataFrames
     """
     # Convert single instances to lists for consistent processing
-    dfs = convert_to_list_if_single_instance(dfs, pd.DataFrame)
-    headings = convert_to_list_if_single_instance(headings, str)
-    summaries = convert_to_list_if_single_instance(summaries, str)
+    dfs = convert_to_list_if_single_instance(dfs)
+    if headings is not None:
+        headings = convert_to_list_if_single_instance(headings)
+    if summaries is not None:
+        summaries = convert_to_list_if_single_instance(summaries)
 
     # Validate that headings and summaries match the number of DataFrames
     if headings is not None and len(headings) != len(dfs):

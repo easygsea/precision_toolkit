@@ -2,10 +2,10 @@
 
 import logging
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 from docx import Document
+from docx.document import Document as DocumentType
 
 logger = logging.getLogger(__name__)
 
@@ -15,10 +15,10 @@ _DEFAULT_DOCUMENT = Document()
 
 def pandas_to_word(
     df: pd.DataFrame,
-    doc: Any = _DEFAULT_DOCUMENT,
+    doc: DocumentType = _DEFAULT_DOCUMENT,
     heading: str | None = None,
     summary: str | None = None,
-) -> Any:
+) -> DocumentType:
     """Generate a Word document from a pandas DataFrame.
 
     Args:
@@ -48,7 +48,7 @@ def pandas_to_word(
     return doc
 
 
-def initiate_word_document() -> Any:
+def initiate_word_document() -> DocumentType:
     """Create and return an empty Word document.
 
     Returns:
@@ -57,21 +57,20 @@ def initiate_word_document() -> Any:
     return Document()
 
 
-def save_word_document(output_file: str | Path, doc: Any = _DEFAULT_DOCUMENT) -> Any:
+def save_word_document(
+    output_file: str | Path, doc: DocumentType = _DEFAULT_DOCUMENT
+) -> None:
     """Save a Word document to a file.
 
     Args:
         doc: The Word document object to save.
         output_file: The path to save the Word file.
 
-    Returns:
-        The saved Word document object.
-
     Raises:
         IOError: If file cannot be written
     """
     try:
-        doc.save(output_file)
+        doc.save(str(output_file))
         logger.info(f"Word document saved to {output_file}")
     except OSError as e:
         logger.error(f"Failed to save Word document to {output_file}: {e}")
