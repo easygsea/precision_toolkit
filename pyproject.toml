@@ -49,9 +49,6 @@ extend-select = [
     "E",
     "I",
 ]
-ignore = [
-    "D104",
-]
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
