@@ -1,5 +1,4 @@
-"""
-Manually curate a diagnostic metric.
+"""Manually curate a diagnostic metric.
 
 Usage:
     manual-diagnostic-metric-curation metric --input <input_file>

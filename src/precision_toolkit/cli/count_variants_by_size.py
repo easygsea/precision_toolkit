@@ -1,5 +1,4 @@
-"""
-Count variants by size in a VCF file or folder of VCF files.
+"""Count variants by size in a VCF file or folder of VCF files.
 
 Usage:
     count_variants_by_size.py <input_path> [--size-stratification <size>...]

@@ -1,5 +1,4 @@
-"""
-Visualize tract/target scores output from target evaluation workflow, grouped by poolID.
+"""Visualize target evaluation workflow tract/target scores grouped by poolID.
 
 Usage:
     plot-target-tracts --input-files <input_files> --pool-ids <pool_ids>

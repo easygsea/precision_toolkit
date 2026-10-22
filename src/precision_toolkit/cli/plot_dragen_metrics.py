@@ -1,5 +1,4 @@
-"""
-Plot backbone-level metrics in DRAGEN's MetricsOutput.tsv file(s).
+"""Plot backbone-level metrics in DRAGEN's MetricsOutput.tsv file(s).
 
 Usage:
     plot-dragen-metrics --metrics-json-config <config_json>

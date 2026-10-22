@@ -1,5 +1,4 @@
-"""
-Convert multi-sample VCF file to a folder of single sample VCF files.
+"""Convert multi-sample VCF file to a folder of single sample VCF files.
 
 Usage:
     convert_multi_sample_vcf --input-vcf=<PATH_TO_VCF> --output-folder=<NEW_FOLDER_NAME>

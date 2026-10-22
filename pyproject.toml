@@ -52,7 +52,7 @@ extend-select = [
 ]
 
 [tool.ruff.lint.pydocstyle]
-convention = "pep257"
+convention = "google"
 
 [tool.ty.analysis]
 respect-type-ignore-comments = false

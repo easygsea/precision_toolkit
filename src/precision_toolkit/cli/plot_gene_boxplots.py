@@ -1,5 +1,4 @@
-"""
-Visualize gene fail scores output from target evaluation workflow.
+"""Visualize gene fail scores output from target evaluation workflow.
 
 Usage:
     plot-gene-boxplots --input-file <input_file>

@@ -1,5 +1,4 @@
-"""
-Parse DRAGEN output files to compile backbone-level metrics specified in JSON config.
+"""Parse DRAGEN output files to compile backbone-level metrics specified in JSON config.
 
 Usage:
     compile-dragen-metrics --metrics-json-config <json_config>

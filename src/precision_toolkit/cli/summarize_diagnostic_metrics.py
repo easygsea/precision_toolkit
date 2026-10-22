@@ -1,5 +1,4 @@
-"""
-Summarize and compute diagnostic metrics from VCF comparisons.
+"""Summarize and compute diagnostic metrics from VCF comparisons.
 
 Usage:
     summarize-diagnostic-metrics --engine <engine> --raw-files <raw_files>

@@ -1,5 +1,4 @@
-"""
-Reformat BED6+4 to 4-column BED file with standardized feature names.
+"""Reformat BED6+4 to 4-column BED file with standardized feature names.
 
 Updated names should follow the format
 <gene_symbol>_<refseq_accession>_<feature><exon_number>, where exon_number
@@ -370,6 +369,7 @@ def generate_modified_target_bed(
         extend_cds_to_stop: If True, extend CDS features to include stop codons.
         exclude_utrs: If True, exclude/trim UTRs from exons.
         output_introns: If True, calculate introns and output to target BED file.
+        zero_pad_names: If True, zero-pad exon numbers in feature names.
 
     Returns:
         None, standardized BED file is written to out_bed_file_path.

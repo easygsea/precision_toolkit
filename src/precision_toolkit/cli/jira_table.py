@@ -1,5 +1,4 @@
-"""
-Standalone JIRA table converter for command line usage.
+"""Standalone JIRA table converter for command line usage.
 
 Usage:
     jira-table file.csv

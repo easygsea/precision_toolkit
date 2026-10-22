@@ -194,7 +194,7 @@ def export_curation_results(
         df: DataFrame containing results
         output_prefix: Prefix for output files
         metric_type: Type of metric (e.g. "sensitivity")
-        summary_text: Summary text for the report
+        decimals: Number of decimal places in Markdown and Word output
     """
     metric_name = "F1 Score" if metric_type == "f1_score" else metric_type
     summary_text = f"Manually curated {metric_name.capitalize()} summary"

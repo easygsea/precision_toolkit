@@ -1,5 +1,4 @@
-"""
-Plot allele frequencies of germline variants to assess sample contamination.
+"""Plot allele frequencies of germline variants to assess sample contamination.
 
 Usage:
     plot-contamination-vafs --variant-calls <dragen_tmb_trace_tsv|variant_calls_vcf>
@@ -213,6 +212,7 @@ def plot_contamination_vafs(
         germline_variant_calls_df: Dataframe of germline variants with columns chrom,
             pos, ref, alt, vaf.
         output_folder: Directory to write the VAF plot and corresponding data to.
+        show_y_gridlines: If True, display major and minor y-axis gridlines.
     """
     # Filter for valid chromosomes (autosomal + sex chromosomes), then sort by chrom
     # and pos

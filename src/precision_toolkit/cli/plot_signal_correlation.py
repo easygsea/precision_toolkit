@@ -1,5 +1,4 @@
-r"""
-Generate a scatter plot from paired truth and query signal files.
+r"""Generate a scatter plot from paired truth and query signal files.
 
 Each signal file should have the following columns:
 - CHROM
@@ -82,8 +81,7 @@ def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.Data
 
 
 def identify_signal_columns(signal_df: pd.DataFrame) -> tuple[str, str]:
-    """
-    Identify truth and query signal column names from the DataFrame.
+    """Identify truth and query signal column names from the DataFrame.
 
     Args:
         signal_df: DataFrame with merged signals.
