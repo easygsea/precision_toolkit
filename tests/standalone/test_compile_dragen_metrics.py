@@ -18,7 +18,7 @@ def _parse_script_output(
     metrics_output: Path,
 ) -> tuple[list[str], dict[str, dict[str, Any]]]:
     """Parse header and metrics from compile-dragen-metrics output."""
-    with open(metrics_output, "r") as metrics_tsv:
+    with open(metrics_output) as metrics_tsv:
         colnames = metrics_tsv.readline().strip().split("\t")
 
         parsed_metrics = {}

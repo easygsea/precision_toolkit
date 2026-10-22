@@ -30,7 +30,7 @@ class DragenMetricsParser:
             rgsm: RGSM prefixed to DRAGEN source file names
                 (e.g. <rgsm>.mapping_metrics.csv).
         """
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             content = json.load(f)
 
         # Initialize parser with JSON content
@@ -289,7 +289,7 @@ class DragenMetricsParser:
 
         # Iterate through CSV and check if metric is present in lookup, if so, extract
         metric_name_to_value: dict[str, float | None] = {}
-        with open(source_csv_path, "r") as source_file:
+        with open(source_csv_path) as source_file:
             csv_reader = csv.reader(source_file)
             for row in csv_reader:
                 for (metric_name, metric_val_index), (
@@ -382,7 +382,7 @@ class DragenMetricsParser:
             factor.
         """
         # Load JSON file
-        with open(source_json_path, "r") as source_file:
+        with open(source_json_path) as source_file:
             json_data = json.load(source_file)
 
         # Extract metrics using JSONPath expressions

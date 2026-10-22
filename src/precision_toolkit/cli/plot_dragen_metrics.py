@@ -60,7 +60,7 @@ def parse_metrics_output_tsv(
 
     library_type = None
     nan_vals = {"NA", "None", "nan"}
-    with open(metrics_file, "r") as metrics_tsv:
+    with open(metrics_file) as metrics_tsv:
         # Tracking per table in case rgsm are not ordered the same between tables
         index_to_rgsm_col = {}
         # Refers to LSL/USL Guidelines only present in TSO500's MetricsOutput.tsv;

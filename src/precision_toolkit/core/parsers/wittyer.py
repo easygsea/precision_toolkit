@@ -26,7 +26,7 @@ class WittyerDataParser:
         logger.info(f"Processing Wittyer output file: {file_path}")
 
         try:
-            with open(file_path, "r") as file:
+            with open(file_path) as file:
                 data = json.load(file)
 
             results = []

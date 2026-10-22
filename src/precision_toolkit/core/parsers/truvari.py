@@ -40,12 +40,12 @@ class TruvariDataParser:
             )
 
         # Get VariantCallFilter from params.json
-        with open(params_file_path, "r") as params_file:
+        with open(params_file_path) as params_file:
             params_data = json.load(params_file)
             variant_filter = "PASS" if params_data["passonly"] else "ALL"
 
         # Parse summary.json to get remaining metrics
-        with open(file_path, "r") as summary_file:
+        with open(file_path) as summary_file:
             summary_data = json.load(summary_file)
 
         metrics = VariantCallMetrics(

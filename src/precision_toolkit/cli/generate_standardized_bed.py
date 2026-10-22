@@ -22,7 +22,7 @@ import logging
 import re
 import sys
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from precision_toolkit.core.io import FileMode, open_file
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 VALID_FEATURES = {"CDS", "exon", "gene", "start_codon", "stop_codon", "transcript"}
 
 
-class Strand(str, Enum):
+class Strand(StrEnum):
     """Valid strand orientations."""
 
     PLUS = "+"

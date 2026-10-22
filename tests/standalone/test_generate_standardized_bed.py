@@ -76,7 +76,7 @@ def test_zeropad_name(
         input_bed_file = Path(tmpdir) / exons_only_bed_filename
 
         with (
-            open(test_data_dir / bed_filename, "r") as all_features_bed,
+            open(test_data_dir / bed_filename) as all_features_bed,
             open(input_bed_file, "w") as exons_bed,
         ):
             for line in all_features_bed:
@@ -260,7 +260,7 @@ def test_filter_genes(test_data_dir: Path) -> None:
         input_bed_file = Path(tmpdir) / "features_concatenated.bed"
         with open(input_bed_file, "w") as concatenated_bed:
             for bed_file in feature_bed_files:
-                with open(bed_file, "r") as feature_bed:
+                with open(bed_file) as feature_bed:
                     concatenated_bed.write(feature_bed.read())
 
         output_prefix = Path(tmpdir) / "generate_standardized_bed"

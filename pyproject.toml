@@ -48,6 +48,7 @@ extend-select = [
     "D",
     "E",
     "I",
+    "UP",
 ]
 
 [tool.ruff.lint.pydocstyle]

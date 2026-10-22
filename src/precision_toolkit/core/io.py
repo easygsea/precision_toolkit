@@ -5,7 +5,7 @@ import gzip
 import json
 import logging
 import sys
-from enum import Enum
+from enum import StrEnum
 from io import BytesIO, StringIO
 from pathlib import Path
 from typing import IO, TextIO, cast
@@ -15,7 +15,7 @@ import pandas as pd
 _SNIFF_READ_SIZE = 4096
 
 
-class FileMode(str, Enum):
+class FileMode(StrEnum):
     """Valid file modes."""
 
     READ = "r"
@@ -116,7 +116,7 @@ def read_dataframe(
                 if not isinstance(input_file, str):
                     text = input_file.read()
                 else:
-                    with open(input_file, "r", encoding="utf-8") as f:
+                    with open(input_file, encoding="utf-8") as f:
                         text = f.read()
                 raw_data = json.loads(text, parse_float=str, parse_int=str)
                 df = pd.json_normalize(raw_data)
@@ -152,7 +152,7 @@ def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
             buffer = sys.stdin.read()
             keep_buffer = True
         else:
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 buffer = f.read(_SNIFF_READ_SIZE)
                 keep_buffer = False
 
