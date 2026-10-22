@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from precision_toolkit.core.devtools.pull_request_fetcher import (
-    fetch_pull_requests as fetch_pull_requests,
+    fetch_pull_requests,
 )
 
 

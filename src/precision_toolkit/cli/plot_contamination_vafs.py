@@ -65,6 +65,7 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
     force=True,
 )
+logger = logging.getLogger(__name__)
 
 # Exclude mitochondrial chromosome, ALT contigs, unplaced scaffolds, etc.
 VALID_CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X", "Y"]
@@ -72,7 +73,7 @@ VALID_CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X", "Y"]
 
 def validate_vcf_af_tag(af_tag: str) -> str:
     """Validate that AF tag is properly formatted as <FORMAT|INFO>/<TAG>."""
-    if not (af_tag.startswith("FORMAT/") or af_tag.startswith("INFO/")):
+    if not (af_tag.startswith(("FORMAT/", "INFO/"))):
         raise argparse.ArgumentTypeError(
             f"Invalid tag '{af_tag}': must start with 'FORMAT/' or 'INFO/'"
         )
@@ -141,7 +142,7 @@ def extract_af(af_tag: str, vcf_record_fields: list[str]) -> float:
         if af_match:
             return float(af_match.group(1))
         else:
-            logging.error(
+            logger.error(
                 f"'{af_tag}' not found in INFO field: {vcf_record_fields[7]}."
             )
             sys.exit(1)
@@ -151,7 +152,7 @@ def extract_af(af_tag: str, vcf_record_fields: list[str]) -> float:
         if tag in format_fields_keys:
             return float(format_fields_values[format_fields_keys.index(tag)])
         else:
-            logging.error(f"'{tag}' not found in FORMAT field: {vcf_record_fields[8]}.")
+            logger.error(f"'{tag}' not found in FORMAT field: {vcf_record_fields[8]}.")
             sys.exit(1)
 
 
@@ -178,7 +179,7 @@ def prepare_plot_data(
     is_tmb_trace = str(variant_calls_path).endswith(".tmb.trace.tsv")
     with open_file(variant_calls_path, FileMode.READ) as variant_calls_file:
         for line in variant_calls_file:
-            if line.startswith("#") or line.startswith("Chromosome"):
+            if line.startswith(("#", "Chromosome")):
                 continue
             if filter_on_dragen_germline_status and (
                 "Germline_DB" not in line and "Germline_Proxi" not in line
@@ -284,7 +285,7 @@ def plot_contamination_vafs(
     plot_data_df[["chrom", "pos", "ref", "alt", "vaf"]].to_csv(
         output_folder / "contamination_vafs_plot_data.csv", index=False
     )
-    logging.info(f"Total germline variants plotted: {num_germline_variants}")
+    logger.info(f"Total germline variants plotted: {num_germline_variants}")
 
 
 def main() -> None:
@@ -401,7 +402,7 @@ def main() -> None:
         or "hard-filtered.vcf" in variant_calls.name
     )
     if not is_dragen_output and not (population_variants_vcf or population_markers_vcf):
-        logging.error(
+        logger.error(
             "--population-variants-vcf or --population-markers-vcf must be provided if "
             "the input VCF is not DRAGEN's *.tmb.trace.tsv or *.hard-filtered.vcf.gz."
         )
@@ -409,7 +410,7 @@ def main() -> None:
     if str(variant_calls).endswith(".tmb.trace.tsv"):
         variant_vcf_apply_filters = None  # no FILTER column in *.tmb.trace.tsv
         if population_variants_vcf or population_markers_vcf:
-            logging.warning(
+            logger.warning(
                 "DRAGEN's *.tmb.trace.tsv passed as input. Ignoring supplied "
                 "population variants/markers VCF."
             )
@@ -417,7 +418,7 @@ def main() -> None:
 
     # Subset population variants to population markers (i.e. common bi-allelic SNPs)
     if population_variants_vcf and not population_markers_vcf:
-        logging.info(
+        logger.info(
             f"Selecting population markers from population variants VCF - bi-allelic "
             f"SNPs with AF >= {population_snp_af_threshold}."
         )
@@ -446,7 +447,7 @@ def main() -> None:
 
     # Prepare plot data
     if population_markers_vcf:
-        logging.info(
+        logger.info(
             "Intersecting variant calls with population markers to identify germline "
             "SNVs for VAF plotting."
         )
@@ -457,20 +458,20 @@ def main() -> None:
             output_folder / f"{vcf_stem}.germline_snvs.vcf.gz",
         )
 
-        logging.info("Preparing plot data from intersected germline SNVs.")
+        logger.info("Preparing plot data from intersected germline SNVs.")
         germline_variant_calls_df = prepare_plot_data(
             variant_calls_germline,
             variant_calls_af_tag,
             filter_on_dragen_germline_status=False,
         )
         if germline_variant_calls_df.empty:
-            logging.error(
+            logger.error(
                 "No germline variants identified from intersect of variant calls and "
                 "population markers, thus no data to plot."
             )
             sys.exit(1)
     else:
-        logging.info("Preparing plot data from DRAGEN-identified germline variants.")
+        logger.info("Preparing plot data from DRAGEN-identified germline variants.")
         germline_variant_calls_df = prepare_plot_data(
             variant_calls_filtered,
             variant_calls_af_tag,

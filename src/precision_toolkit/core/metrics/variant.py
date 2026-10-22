@@ -64,13 +64,11 @@ class BaseVariantCallMetrics(ABC):
     @abstractmethod
     def _ci_successes(self) -> int:
         """Number of successes for confidence interval calculation."""
-        pass
 
     @property
     @abstractmethod
     def _ci_total(self) -> int:
         """Total number for confidence interval calculation."""
-        pass
 
     def confidence_interval(
         self,

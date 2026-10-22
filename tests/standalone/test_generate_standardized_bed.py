@@ -267,7 +267,7 @@ def test_filter_genes(test_data_dir: Path) -> None:
 
         # Create temporary gene list file
         input_gene_list = Path(tmpdir) / "genes.txt"
-        input_gene_list.write_text("\n".join(["NRAS", "ANKRD26"]))
+        input_gene_list.write_text("NRAS\nANKRD26")
 
         result = subprocess.run(
             [
@@ -378,7 +378,7 @@ def test_output_introns_multiple_exons(test_data_dir: Path) -> None:
         )
 
         # For each intron, check it's adjacent to the corresponding exon
-        for i in introns.keys():
+        for i in introns:
             assert introns[i][1] == exons[i][0], (
                 f"Intron {i} ends at {introns[i][1]}, but exon {i} starts at "
                 f"{exons[i][0]}"

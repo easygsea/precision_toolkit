@@ -25,7 +25,9 @@ class ProportionConfidenceIntervalMethod(StrEnum):
 class ProportionConfidenceInterval:
     """Calculate confidence intervals for proportions."""
 
-    SUPPORTED_METHODS = [method.value for method in ProportionConfidenceIntervalMethod]
+    SUPPORTED_METHODS = tuple(
+        method.value for method in ProportionConfidenceIntervalMethod
+    )
 
     @staticmethod
     def proportion_confidence_interval(

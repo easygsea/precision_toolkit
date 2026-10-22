@@ -27,6 +27,8 @@ from precision_toolkit.render.diagnostic_metrics import (
     export_diagnostic_metrics_to_word,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def validate_curation_format(curation: str, valid_metrics: list[str]) -> bool:
     """Validate manual curation input format.
@@ -90,7 +92,7 @@ def update_metrics(
             else NameMapper.get_full_name(metric_str.upper())
         )
     except ValueError as e:
-        logging.error(e)
+        logger.error(e)
         raise
 
     mask = (df["Variant Type"] == variant_type) & (df["Variant Filter"] == filter_type)

@@ -29,6 +29,8 @@ import seaborn as sns
 from precision_toolkit.dragen.metrics_parser import DragenMetricsParser
 from precision_toolkit.dragen.utils import format_metric
 
+logger = logging.getLogger(__name__)
+
 
 def parse_metrics_output_tsv(
     metrics_file: Path,
@@ -124,7 +126,7 @@ def get_rgsm_groupings(
 
     # Check if group_by column is present
     if group_by not in fastq_list_df.columns:
-        logging.warning(
+        logger.warning(
             f"'{group_by}' column not found in FASTQ list, grouping won't be applied."
         )
         valid_group_col = None
@@ -148,7 +150,7 @@ def determine_rgsm_order(df: pd.DataFrame, sort_metric: str | None) -> list[str]
                 "Truncated RGSM"
             ].tolist()
         else:
-            logging.warning(
+            logger.warning(
                 f"Sort metric '{sort_metric}' not found in data, sorting alphabetically"
                 f"instead."
             )
@@ -188,7 +190,7 @@ def plot_metrics(
 
         # If all values are NA, skip
         if plot_data["Value"].isna().all():
-            logging.warning(
+            logger.warning(
                 f"Skipping plot for {metric_name} values for all samples are NA."
             )
             continue
@@ -233,7 +235,7 @@ def plot_metrics(
         axes[1].set(xlabel=metric_name)
 
         # Plot fail thresholds first so it appears first in legend
-        if metric_name in fail_thresholds.keys():
+        if metric_name in fail_thresholds:
             threshold, direction = fail_thresholds[metric_name]
             if threshold is not None:
                 axes[0].axvline(
@@ -268,7 +270,7 @@ def plot_metrics(
                 axes[0].set_xlim(xlim)
                 axes[1].set_xlim(xlim)
 
-        if metric_name in guideline_limits.keys():
+        if metric_name in guideline_limits:
             label_added = False  # track to avoid duplicate labels in legend
             for threshold in guideline_limits[metric_name]:
                 if threshold is not None:
@@ -390,7 +392,7 @@ def main() -> None:
 
     # Validate args
     if group_by and not fastq_list_file_path:
-        logging.error("--group-by requires --fastq-list to be provided.")
+        logger.error("--group-by requires --fastq-list to be provided.")
         sys.exit(1)
 
     # Create parser just to get metrics to plot and metadata (e.g. UOM, LSL, etc.)

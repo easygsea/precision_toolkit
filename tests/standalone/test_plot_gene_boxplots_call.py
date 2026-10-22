@@ -18,6 +18,7 @@ def test_plot_gene_boxplots_together(test_data_path: Path) -> None:
 
     result = subprocess.run(
         ["plot-gene-boxplots", "--input-file", str(input_file), "--threshold", "15.0"],
+        check=False,
         capture_output=True,
         text=True,
         cwd=test_data_path,
@@ -50,6 +51,7 @@ def test_plot_gene_boxplots_separate(test_data_path: Path) -> None:
             "15.0",
             "--separate-plots",
         ],
+        check=False,
         capture_output=True,
         text=True,
         cwd=test_data_path,
@@ -80,6 +82,7 @@ def test_plot_gene_boxplots_missing_file() -> None:
             "--input-file",
             "missing.txt",
         ],
+        check=False,
         capture_output=True,
         text=True,
     )
@@ -113,6 +116,7 @@ def test_plot_gene_boxplots_thresholds(
             "--threshold",
             str(threshold),
         ],
+        check=False,
         capture_output=True,
         text=True,
         cwd=test_data_path,

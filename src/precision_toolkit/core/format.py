@@ -3,7 +3,7 @@
 from precision_toolkit.core.constants import DEFAULT_DECIMALS
 
 
-def format_percentage(x: int | float, decimals: int = DEFAULT_DECIMALS) -> str:
+def format_percentage(x: float, decimals: int = DEFAULT_DECIMALS) -> str:
     """Return x as a percentage string with given decimals."""
     if not isinstance(decimals, int) or decimals < 0:
         raise ValueError("Decimals must be a non-negative integer.")

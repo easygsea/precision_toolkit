@@ -61,8 +61,8 @@ def load_data_from_files(
     for file_path in files:
         try:
             all_metrics.extend(parser(file_path))
-        except Exception as e:
-            raise RuntimeError(f"Error processing file {file_path}: {str(e)}")
+        except (OSError, ValueError, KeyError) as e:
+            raise RuntimeError(f"Error processing file {file_path}: {e!s}") from e
 
     return all_metrics
 
@@ -323,7 +323,7 @@ def compute_f1_score(
     sensitivity_results = compute_sensitivity_and_ci(metrics, ci_method)
 
     f1_scores = {}
-    for key in precision_results.keys():
+    for key in precision_results:
         sensitivity = sensitivity_results[key][2]
         precision = precision_results[key][2]
         f1_metrics = F1ScoreMetrics(sensitivity=sensitivity, precision=precision)

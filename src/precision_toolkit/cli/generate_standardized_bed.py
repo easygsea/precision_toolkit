@@ -20,6 +20,7 @@ Usage:
 import argparse
 import logging
 import re
+import sys
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -32,6 +33,7 @@ logging.basicConfig(
     format="[%(asctime)s] %(levelname)s %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
+logger = logging.getLogger(__name__)
 
 VALID_FEATURES = {"CDS", "exon", "gene", "start_codon", "stop_codon", "transcript"}
 
@@ -132,7 +134,7 @@ class Transcript:
              (300, 400): GenomicRange((300, 353), "2")}
         """
         if not self.start_codon or not self.stop_codon:
-            logging.warning(
+            logger.warning(
                 f"Transcript {self.refseq_accession} missing start and/or "
                 f"stop codon information, thus cannot determine non-coding "
                 f"portions of exon... skipping exclusion of UTRs."
@@ -226,14 +228,14 @@ def parse_bed_file(
                 gene_set.add(feature_name)  # for logging purposes
 
                 # Create transcript object, if not already present
-                if refseq_acc not in refseq_accession_to_transcript_obj.keys():
+                if refseq_acc not in refseq_accession_to_transcript_obj:
                     refseq_accession_to_transcript_obj[refseq_acc] = Transcript(
                         refseq_acc, Strand(strand)
                     )
                 transcript_obj = refseq_accession_to_transcript_obj[refseq_acc]
 
                 # Update feature count attribute
-                if feature not in transcript_obj.feature_counts.keys():
+                if feature not in transcript_obj.feature_counts:
                     # Initiate total count
                     transcript_obj.feature_counts[feature] = 1
                 else:
@@ -309,14 +311,14 @@ def get_corresponding_intron(
     exon_range: tuple[int, int], exon_to_intron: dict[tuple[int, int], GenomicRange]
 ) -> GenomicRange | None:
     """Get corresponding intron for provided exon range."""
-    if exon_range in exon_to_intron.keys():
+    if exon_range in exon_to_intron:
         return exon_to_intron[exon_range]
 
     # Attempt to perform "fuzzy" search to account for trimmed exons (i.e. UTR
     # exclusion)
-    for exon in exon_to_intron.keys():
+    for exon, intron in exon_to_intron.items():
         if exon_range[0] <= exon[1] and exon[0] <= exon_range[1]:
-            return exon_to_intron[exon]
+            return intron
 
     # No corresponding intron
     return None
@@ -333,7 +335,7 @@ def trim_utr_exon(
 
     # Check if exon is a coding exon, if so return exon with non-coding
     # regions trimmed (when applicable)
-    if exon_range in exon_to_coding_exon.keys():
+    if exon_range in exon_to_coding_exon:
         return exon_to_coding_exon[exon_range]
     else:
         return None  # UTR-only exon, exclude
@@ -418,7 +420,7 @@ def generate_modified_target_bed(
                 # applicable
                 if genomic_feature == "CDS" and extend_cds_to_stop:
                     if not transcript_obj.stop_codon:
-                        logging.warning(
+                        logger.warning(
                             f"Transcript {refseq_acc} missing stop codon "
                             f"information, thus cannot extend CDS to include "
                             f"stop codon... skipping extension."
@@ -432,8 +434,8 @@ def generate_modified_target_bed(
                         out_bed_entries = [
                             (
                                 genomic_feature,
-                                f"{chr}\t{updated_start}\t"
-                                f"{updated_end}\t{updated_feature_name}\n",
+                                (f"{chr}\t{updated_start}\t"
+                                f"{updated_end}\t{updated_feature_name}\n"),
                             )
                         ]
 
@@ -446,8 +448,8 @@ def generate_modified_target_bed(
                             out_bed_entries = [
                                 (
                                     genomic_feature,
-                                    f"{chr}\t{coding_exon.range[0]}\t"
-                                    f"{coding_exon.range[1]}\t{updated_feature_name}\n",
+                                    (f"{chr}\t{coding_exon.range[0]}\t"
+                                    f"{coding_exon.range[1]}\t{updated_feature_name}\n"),
                                 )
                             ]
                         else:
@@ -484,8 +486,8 @@ def generate_modified_target_bed(
                                 out_bed_entries.append(
                                     (
                                         "intron",
-                                        f"{chr}\t{intron.range[0]}\t"
-                                        f"{intron.range[1]}\t{intron_feature_name}\n",
+                                        (f"{chr}\t{intron.range[0]}\t"
+                                        f"{intron.range[1]}\t{intron_feature_name}\n"),
                                     )
                                 )
 
@@ -577,23 +579,23 @@ def main() -> None:
         ext = bed_ext_search.group(0)
         out_filename = bed_file_path.name.replace(ext, "") + ".reformatted" + ext
     else:
-        logging.error(
+        logger.error(
             "Improper input BED file detected - extension is neither "
             "`.bed` nor `.bed.gz`."
         )
-        exit()
+        sys.exit()
 
     # Ensure valid features were provided
     if args.features:
         feature_list = [f.strip() for f in args.features.split(",")]
         invalid_features = set(feature_list) - VALID_FEATURES
         if invalid_features:
-            logging.error(
+            logger.error(
                 f"Invalid features provided to --features: "
                 f"{','.join(invalid_features)}. Must be one of "
                 f"{','.join(VALID_FEATURES)}."
             )
-            exit()
+            sys.exit()
     else:
         feature_list = list(VALID_FEATURES)
 
@@ -632,7 +634,7 @@ def main() -> None:
     # Output warning if introns are output but exons are not
     # Has been observed when CDS and intron features are output
     if args.output_introns and "exon" not in feature_list:
-        logging.warning(
+        logger.warning(
             "Output standardized BED file may not be in sorted order. Check before "
             "utilizing BED file in downstream applications.",
         )
@@ -642,7 +644,7 @@ def main() -> None:
     if target_gene_set:
         missing_genes = target_gene_set.difference(gene_set)
         if missing_genes:
-            logging.warning(
+            logger.warning(
                 "One or more target genes were not found in input BED file: "
                 "%s. Check whether these genes are stored as gene synonyms "
                 "rather than gene symbols in MANE RefSeq GTF/GFF files.",

@@ -96,7 +96,7 @@ Examples:
 
     # Exit if no file provided
     if args.input_file is sys.stdin and sys.stdin.isatty():
-        raise IOError("No input file or stdin provided.")
+        raise OSError("No input file or stdin provided.")
 
     # Read data
     convert_to_string = args.float_format is None

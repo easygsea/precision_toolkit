@@ -16,6 +16,7 @@ logging.basicConfig(
     format="[%(asctime)s] %(levelname)s %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
+logger = logging.getLogger(__name__)
 
 
 class DragenMetricsParser:
@@ -48,12 +49,15 @@ class DragenMetricsParser:
         does not include version info (e.g. ("MEDIAN_INSERT_SIZE", "V1.LSL")).
         """
         property_parts = metric_property.rsplit(".", 2)
-        if len(property_parts) == 3:
-            # Check if the second part is a version (e.g. V1, V2, etc.)
-            if property_parts[1].startswith("V") and property_parts[1][1:].isdigit():
-                metric_name = property_parts[0]
-                attribute = f"{property_parts[1]}.{property_parts[2]}"
-                return metric_name, attribute
+        # Check if the second part is a version (e.g. V1, V2, etc.)
+        if (
+            len(property_parts) == 3
+            and property_parts[1].startswith("V")
+            and property_parts[1][1:].isdigit()
+        ):
+            metric_name = property_parts[0]
+            attribute = f"{property_parts[1]}.{property_parts[2]}"
+            return metric_name, attribute
 
         property_parts = metric_property.rsplit(".", 1)
         return property_parts[0], (
@@ -109,7 +113,7 @@ class DragenMetricsParser:
                 if attribute == "FACTOR":
                     scale_factor = float(val)
                     # Grab operation (required)
-                    if property not in all_factor_operations.keys():
+                    if property not in all_factor_operations:
                         raise ValueError(
                             f"Factor operation not specified for {metric_name}."
                         )
@@ -173,11 +177,11 @@ class DragenMetricsParser:
             # Create DragenMetric objects for base metrics (those with mapping specs)
             # and derived metrics (those with properties, but no mapping specs)
             all_metric_mappings = {}
-            for metric_name in base_metric_mappings.keys():
+            for metric_name in base_metric_mappings:
                 all_metric_mappings[metric_name] = base_metric_mappings[metric_name]
-            for property in metric_properties.keys():
+            for property in metric_properties:
                 metric_name = self._split_metric_property(property)[0]
-                if metric_name not in all_metric_mappings.keys():
+                if metric_name not in all_metric_mappings:
                     all_metric_mappings[metric_name] = None
 
             valid_dragen_metrics = {}  # attribute for SourceFile object
@@ -227,7 +231,7 @@ class DragenMetricsParser:
         ]
 
         if invalid_metrics:
-            logging.warning(
+            logger.warning(
                 f"The following metrics will not be reported as source file details "
                 f"are not contained in JSON configuration: {invalid_metrics}."
             )
@@ -301,7 +305,7 @@ class DragenMetricsParser:
                         metric_val = row[metric_val_index]
                         if metric_val in ("NA", "None", "nan"):
                             # "Missing" value; replace with default missing value
-                            logging.warning(
+                            logger.warning(
                                 f"DRAGEN returned {metric_val} for {metric_name}. "
                                 f"Standardizing missing values and replacing with "
                                 f"default missing value: "
@@ -318,7 +322,7 @@ class DragenMetricsParser:
 
                             except ValueError:
                                 # Invalid value; replace with default missing value
-                                logging.warning(
+                                logger.warning(
                                     f"Numeric type expected for {metric_name}, "
                                     f"but an invalid value was detected: {metric_val}. "
                                     f"Replacing with default missing value: "
@@ -326,13 +330,13 @@ class DragenMetricsParser:
                                 )
                                 scaled_value = dragen_metric_obj.default_val
 
-                        if metric_name in metric_name_to_value.keys():
+                        if metric_name in metric_name_to_value:
                             # Rows with the same metric group (first column) and metric
                             # description (third column) are present in DRAGEN output
                             # file (e.g. *.mapping_metrics.csv contains stats per read
                             # group, thus the metric description "Mapped reads" appears
                             # multiple times for metric group "MAPPING/ALIGNING PER RG")
-                            logging.warning(
+                            logger.warning(
                                 f"{metric_name} is extracted from rows with "
                                 f"description '{metric_description}', but multiple "
                                 f"matching rows were found in {source_csv_path}. Using "
@@ -358,7 +362,7 @@ class DragenMetricsParser:
         # Traverse levels of nested JSON data by key
         current_level_data = json_data
         for key in keys:
-            if key in current_level_data.keys():
+            if key in current_level_data:
                 current_level_data = current_level_data[key]
 
         return "None" if current_level_data == json_data else str(current_level_data)
@@ -394,7 +398,7 @@ class DragenMetricsParser:
                 )
                 if metric_val in ("NA", "None", "nan"):
                     # "Missing" value; replace with default missing value
-                    logging.warning(
+                    logger.warning(
                         f"DRAGEN returned {metric_val} for {metric_name}. "
                         f"Standardizing missing values and replacing with "
                         f"default missing value: {dragen_metric_obj.default_val}."
@@ -408,7 +412,7 @@ class DragenMetricsParser:
 
                     except ValueError:
                         # Invalid value; replace with default missing value
-                        logging.warning(
+                        logger.warning(
                             f"Numeric type expected for {metric_name}, "
                             f"but an invalid value was detected: {metric_val}. "
                             f"Replacing with default missing value: "
@@ -449,13 +453,13 @@ class DragenMetricsParser:
                     )
                     metric_name_to_value.update(parsed_metrics)
                 else:
-                    logging.warning(
+                    logger.warning(
                         f"Only CSV and JSON filetypes are currently supported. "
                         f"Skipping {source_file_obj.filename} with specified filetype: "
                         f"{source_file_obj.filetype}."
                     )
             elif source_file_obj.allow_missing:
-                logging.warning(
+                logger.warning(
                     f"Source file {source_file_obj.filename} not found in "
                     f"any of the provided analysis directories: "
                     f"{', '.join(str(d) for d in analysis_dirs)}."

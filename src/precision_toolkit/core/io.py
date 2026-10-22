@@ -132,7 +132,7 @@ def read_dataframe(
             )
 
     except Exception as e:
-        logging.exception("Error reading data:")
+        logger.exception("Error reading data:")
         print(f"Exception details: {e}")
         return None
 
@@ -160,5 +160,5 @@ def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
         dialect = sniffer.sniff(buffer)
 
         return dialect.delimiter, buffer if keep_buffer else None
-    except Exception:
+    except (csv.Error, OSError, UnicodeError):
         return None, None

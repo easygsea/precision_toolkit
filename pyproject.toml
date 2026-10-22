@@ -30,6 +30,7 @@ dev = [
     "pytest-cov==7.0.0",
     "pytest-workflow==2.0.1",
     "pytest-xdist==3.6.1",
+    "ruff>=0.17.1",
     "types-requests==2.32.4.20260107",
 ]
 
@@ -38,6 +39,7 @@ line-length = 88
 extend-exclude = [
     ".git",
     "**/__init__.py",
+    "src/third_party",
 ]
 
 [tool.ruff.lint]

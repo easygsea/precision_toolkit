@@ -36,7 +36,7 @@ def fetch_pull_requests(
 
             for repo_data in repositories:
                 if not isinstance(repo_data, dict):
-                    logging.warning(
+                    logger.warning(
                         "Repository at provided link is an unexpected type."
                     )
                     continue
@@ -60,7 +60,7 @@ def fetch_pull_requests(
                             }
                         )
                 else:
-                    logging.warning(
+                    logger.warning(
                         f"Failed to fetch PRs for {repo_slug}:{pr_response.status_code}"
                     )
 
@@ -73,7 +73,7 @@ def fetch_pull_requests(
                     title = pr.get("title")
 
                     if pr_id is None or title is None:
-                        logging.warning(
+                        logger.warning(
                             f"Warning: PR {title or 'Unknown'} is missing fields."
                         )
                         continue
@@ -82,16 +82,16 @@ def fetch_pull_requests(
                         f"{bitbucket_url}/projects/{project}/repos/{r_name}"
                         f"/pull-requests/{pr_id}/overview"
                     )
-                    logging.info(title)
-                    logging.info(f"[{r_name}#{pr_id}]({pr_link})\n")
+                    logger.info(title)
+                    logger.info(f"[{r_name}#{pr_id}]({pr_link})\n")
             else:
-                logging.info("No pull requests found.")
+                logger.info("No pull requests found.")
         else:
-            logging.warning(
+            logger.warning(
                 f"Repo request failed with status code {repo_response.status_code}"
             )
 
     except MissingSchema as e:
-        logging.error(f"Invalid URL: '{base_api_url}': {str(e)}")
+        logger.error(f"Invalid URL: '{base_api_url}': {e!s}")
     except RequestException as e:
-        logging.error(f"An error occurred while fetching data: {str(e)}")
+        logger.error(f"An error occurred while fetching data: {e!s}")

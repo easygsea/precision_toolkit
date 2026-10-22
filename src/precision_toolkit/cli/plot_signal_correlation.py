@@ -233,7 +233,7 @@ def plot_signal_correlation(
                 y_offset,
                 f"{run_id}: Pearson r = {corr:.3f}\n{run_id}: p-value = {p_value:.2e}",
                 transform=plt.gca().transAxes,
-                bbox=dict(facecolor="white", alpha=0.8),
+                bbox={"facecolor": "white", "alpha": 0.8},
             )
 
     # Customize plot

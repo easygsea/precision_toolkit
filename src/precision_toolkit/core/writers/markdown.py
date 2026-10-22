@@ -6,6 +6,8 @@ from pathlib import Path
 import pandas as pd
 from tabulate import tabulate
 
+logger = logging.getLogger(__name__)
+
 
 def populate_markdown(
     df: pd.DataFrame, heading: str | None = None, summary: str | None = None
@@ -51,7 +53,7 @@ def save_markdown(content: str, output_file: str | Path) -> None:
     try:
         with open(output_file, "w") as f:
             f.write(content)
-        logging.info(f"Markdown content saved to {output_file}")
-    except IOError as e:
-        logging.error(f"Failed to save markdown to {output_file}: {e}")
+        logger.info(f"Markdown content saved to {output_file}")
+    except OSError as e:
+        logger.error(f"Failed to save markdown to {output_file}: {e}")
         raise

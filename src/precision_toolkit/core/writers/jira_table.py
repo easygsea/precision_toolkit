@@ -37,7 +37,7 @@ def pandas_to_jira_table(
     for index in df.index:
         for col in df.columns:
             if "|" in str(df.at[index, col]):
-                logging.info(
+                logger.info(
                     f"Detected '|' in row {index}, column '{col}'. "
                     f"Replacing with '\\|' for better formatting."
                 )

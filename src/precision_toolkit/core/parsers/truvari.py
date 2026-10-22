@@ -7,6 +7,8 @@ from pathlib import Path
 
 from precision_toolkit.core.metrics.variant import VariantCallMetrics
 
+logger = logging.getLogger(__name__)
+
 
 class TruvariDataParser:
     """Parser for Truvari output."""
@@ -38,38 +40,24 @@ class TruvariDataParser:
             )
 
         # Get VariantCallFilter from params.json
-        try:
-            with open(params_file_path, "r") as params_file:
-                params_data = json.load(params_file)
-                variant_filter = "PASS" if params_data["passonly"] else "ALL"
-
-        except Exception as e:
-            logging.error(f"Failed to process file {params_file_path}: {str(e)}")
-            raise
+        with open(params_file_path, "r") as params_file:
+            params_data = json.load(params_file)
+            variant_filter = "PASS" if params_data["passonly"] else "ALL"
 
         # Parse summary.json to get remaining metrics
-        try:
-            with open(file_path, "r") as summary_file:
-                summary_data = json.load(summary_file)
+        with open(file_path, "r") as summary_file:
+            summary_data = json.load(summary_file)
 
-            try:
-                metrics = VariantCallMetrics(
-                    VariantType="SV",  # Truvari doesn't output stats per type
-                    VariantCallFilter=variant_filter,
-                    TruthTotal=summary_data["TP-base"] + summary_data["FN"],
-                    TruthTP=summary_data["TP-base"],
-                    TruthFN=summary_data["FN"],
-                    QueryTotal=summary_data["TP-comp"] + summary_data["FP"],
-                    QueryTP=summary_data["TP-comp"],
-                    QueryFP=summary_data["FP"],
-                )
+        metrics = VariantCallMetrics(
+            VariantType="SV",  # Truvari doesn't output stats per type
+            VariantCallFilter=variant_filter,
+            TruthTotal=summary_data["TP-base"] + summary_data["FN"],
+            TruthTP=summary_data["TP-base"],
+            TruthFN=summary_data["FN"],
+            QueryTotal=summary_data["TP-comp"] + summary_data["FP"],
+            QueryTP=summary_data["TP-comp"],
+            QueryFP=summary_data["FP"],
+        )
 
-            except Exception as e:
-                logging.warning(f"Error processing stats: {str(e)}")
-
-            logging.info("Successfully processed metrics")
-            return [metrics]
-
-        except Exception as e:
-            logging.error(f"Failed to process file {file_path}: {str(e)}")
-            raise
+        logger.info("Successfully processed metrics")
+        return [metrics]

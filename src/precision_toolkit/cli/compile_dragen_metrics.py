@@ -68,7 +68,7 @@ def main() -> None:
 
     # Calculate remaining metrics not directly output by DRAGEN, if valid (i.e. in JSON
     # config)
-    for metric_name in all_dragen_metrics.keys():
+    for metric_name in all_dragen_metrics:
         if metric_name.endswith("_BASE"):
             derived_metric_name = metric_name
             metric_name = metric_name.removesuffix("_BASE")

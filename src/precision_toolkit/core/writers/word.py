@@ -7,6 +7,8 @@ from typing import Any
 import pandas as pd
 from docx import Document
 
+logger = logging.getLogger(__name__)
+
 # Module-level default document
 _DEFAULT_DOCUMENT = Document()
 
@@ -70,7 +72,7 @@ def save_word_document(output_file: str | Path, doc: Any = _DEFAULT_DOCUMENT) ->
     """
     try:
         doc.save(output_file)
-        logging.info(f"Word document saved to {output_file}")
-    except IOError as e:
-        logging.error(f"Failed to save Word document to {output_file}: {e}")
+        logger.info(f"Word document saved to {output_file}")
+    except OSError as e:
+        logger.error(f"Failed to save Word document to {output_file}: {e}")
         raise

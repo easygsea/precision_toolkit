@@ -152,5 +152,6 @@ def test_plot_contamination_vafs_invalid_inputs(
                 str(output_folder),
                 *additional_args,
             ],
+            check=False,
         )
         assert result.returncode != 0

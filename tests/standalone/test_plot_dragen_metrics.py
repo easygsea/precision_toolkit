@@ -160,5 +160,6 @@ def test_plot_dragen_metrics_group_by_without_fastq_list(test_data_dir: Path) ->
                 "--group-by",
                 "Sex",
             ],
+            check=False,
         )
         assert result.returncode != 0

@@ -37,6 +37,8 @@ from precision_toolkit.core.statistics.proportion import (
     ProportionConfidenceIntervalMethod,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def main() -> None:
     """Manually curate a diagnostic metric from a CSV and export updated results."""
@@ -125,7 +127,7 @@ def main() -> None:
         for curation in curations:
             validate_curation_format(curation, valid_metrics=valid_metrics)
     except ValueError as e:
-        logging.error(f"Invalid curation format: {e}")
+        logger.error(f"Invalid curation format: {e}")
         raise
 
     # Update counts and recalculate metrics
