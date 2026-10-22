@@ -40,14 +40,7 @@ def detect_format(file_path: str | TextIO) -> str:
         return "csv"
 
     suffix = Path(file_path).suffix.lower()
-    if suffix == ".tsv":
-        return "tsv"
-    elif suffix == ".xlsx":
-        return "excel"
-    elif suffix == ".json":
-        return "json"
-    else:
-        return "csv"
+    return {".tsv": "tsv", ".xlsx": "excel", ".json": "json"}.get(suffix, "csv")
 
 
 def open_file(filename: Path, mode: FileMode) -> IO[str]:

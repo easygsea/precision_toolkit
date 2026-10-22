@@ -79,10 +79,7 @@ def create_plot(
 
     metrics = df_melted["Metric"].unique()
 
-    if separate_plots:
-        metrics_to_plot = [[m] for m in metrics]
-    else:
-        metrics_to_plot = [list(metrics)]
+    metrics_to_plot = [[m] for m in metrics] if separate_plots else [list(metrics)]
 
     for metric_group in metrics_to_plot:
         metric_name = "combined" if not separate_plots else metric_group[0]
