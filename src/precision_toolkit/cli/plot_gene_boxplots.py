@@ -29,8 +29,8 @@ def threshold_type(value: str) -> float:
     """Convert input to float and validate that it falls between 1 and 100."""
     try:
         f = float(value)
-    except ValueError:
-        raise argparse.ArgumentTypeError(f"{value} is not a valid number")
+    except ValueError as err:
+        raise argparse.ArgumentTypeError(f"{value} is not a valid number") from err
     if not (1 <= f <= 100):
         raise argparse.ArgumentTypeError(
             f"Threshold must be between 1 and 100, got {f}"

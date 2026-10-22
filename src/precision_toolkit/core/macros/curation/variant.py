@@ -52,7 +52,7 @@ def validate_curation_format(curation: str, valid_metrics: list[str]) -> bool:
             )
         return True
     except ValueError as e:
-        raise ValueError(f"Invalid curation format: {e}")
+        raise ValueError(f"Invalid curation format: {e}") from e
 
 
 def update_metrics(

@@ -198,13 +198,15 @@ def plot_signal_correlation(
         # Get unique run IDs, handling NaN values gracefully
         unique_runs = signal_df["RUN_ID"].dropna().astype(str).unique().tolist()
         if len(unique_runs) < 1:
-            warnings.warn("No valid RUN_ID found for regression lines.", UserWarning)
+            warnings.warn(
+                "No valid RUN_ID found for regression lines.", UserWarning, stacklevel=2
+            )
             unique_runs = [" "]
             signal_df["RUN_ID"] = " "
 
         # Set a different color palette for regression lines
         palette = sns.color_palette(color_palette, n_colors=len(unique_runs))
-        color_map = dict(zip(unique_runs, palette))
+        color_map = dict(zip(unique_runs, palette, strict=False))
 
         # Add regression lines for each run if coloring by run
         for idx, run_id in enumerate(unique_runs):
@@ -365,7 +367,7 @@ def main() -> None:
         # Extract and validate signals
         signal_df = pd.DataFrame()
         for truth_signal_file, query_signal_file in zip(
-            truth_signal_files, query_signal_files
+            truth_signal_files, query_signal_files, strict=False
         ):
             # Get sample name & run_id from file path
             sample_name = truth_signal_file.with_suffix("").stem.split("_")[0]
@@ -396,7 +398,9 @@ def main() -> None:
             # Sort both lists to ensure consistent pairing
             truth_signal = sorted(truth_signal)
             query_signal = sorted(query_signal)
-            for truth_signal_file, query_signal_file in zip(truth_signal, query_signal):
+            for truth_signal_file, query_signal_file in zip(
+                truth_signal, query_signal, strict=False
+            ):
                 # Get sample name & run_id from file path
                 sample_name = truth_signal_file.with_suffix("").stem.split("_")[0]
                 if run_pattern:

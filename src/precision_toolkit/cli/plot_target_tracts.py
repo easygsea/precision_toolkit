@@ -67,14 +67,20 @@ def main() -> None:
     pool_ids = (
         args.pool_ids if args.pool_ids != [] else ["No_Pool_Info"] * len(input_files)
     )
-    colors = dict(zip(sorted(args.pool_ids), sns.color_palette("hls", len(pool_ids))))
+    colors = dict(
+        zip(
+            sorted(args.pool_ids),
+            sns.color_palette("hls", len(pool_ids)),
+            strict=False,
+        )
+    )
     colors["No_Pool_Info"] = (0.0, 0.0, 1.0)  # default blue points
 
     # Initialize figure
     plt.figure(figsize=(120, 50))
 
     for metric, threshold in args.metrics_thresholds_and_headings.items():
-        for file, pool in zip(input_files, pool_ids):
+        for file, pool in zip(input_files, pool_ids, strict=False):
             # Read data
             df = pd.read_csv(file, sep="\t", comment=None)
             df.columns = pd.Index([col.lstrip("#") for col in df.columns])
@@ -101,7 +107,7 @@ def main() -> None:
         plt.xticks(rotation=90, ha="right")
         plt.tick_params(axis="x", which="major", labelsize=5)
         handles, labels = plt.gca().get_legend_handles_labels()
-        by_label = dict(zip(labels, handles))
+        by_label = dict(zip(labels, handles, strict=False))
         plt.legend(by_label.values(), by_label.keys(), fontsize=32)
 
         # Save plot

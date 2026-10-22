@@ -48,7 +48,9 @@ def test_include_utrs_and_unpadded_names(test_data_dir: Path) -> None:
 
         # Check that chr, start, and stop coordinates match input - no change
         with open(input_bed_file) as input_bed, open(output_file) as reformatted_bed:
-            for input_line, reformatted_line in zip(input_bed, reformatted_bed):
+            for input_line, reformatted_line in zip(
+                input_bed, reformatted_bed, strict=False
+            ):
                 input_coords = input_line.split("\t")[:3]
                 reformatted_coords = reformatted_line.split("\t")[:3]
                 assert input_coords == reformatted_coords, (

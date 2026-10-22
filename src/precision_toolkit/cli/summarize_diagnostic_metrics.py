@@ -49,7 +49,7 @@ def generate_all_data_csv(
     all_data_table = pd.DataFrame()
 
     # Append each metric table to all data table
-    for table, metric in zip(tables_list, metrics_list):
+    for table, metric in zip(tables_list, metrics_list, strict=False):
         metric_name = "F1 score" if metric == "f1_score" else metric
 
         all_data_table = (
