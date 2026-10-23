@@ -4,6 +4,10 @@
 
 ---
 
+### v1.4.0 - 2026-XX-XX
+
+---
+
 ### v1.3.2 - 2026-10-25
 - Hotfix: Dockerfile update to .NET 10 and install runtime from MCR image instead of Debian 12 apt feed.
 
