@@ -4,6 +4,18 @@
 
 ---
 
+### v1.3.1 - 2026-10-23
+- New Standalone Utility: Add third-party `convert-inversions` (adapted from Manta) to convert inversion breakend entries in DRAGEN SV VCF files into symbolic inversion (`<INV>`) records.
+- Feature: Add `d2` into Dockerfile.
+- Feature: Add minor y-axis gridlines at 0.01 intervals to plot-contamination-vafs which are off by default and have a CLI option to enable them.
+- Improvement: Add containerized tools documentation and clarify amd64-only precompiled dependency installation in Dockerfile (`mafft`, `bedtools`, `bedops`, `d2`).
+- Improvement: Add documentation describing third-party tools.
+- Improvement: Keep Python files consistently non-executable and remove shebangs from CLI Python scripts.
+- Bugfix: Fix mypy incompatible type issue in `plot_target_tracts.py`.
+- Bugfix: Upgrade GitHub workflow to actions/checkout@v7 that runs on the Node.js 24 runtime.
+
+---
+
 ### v1.3.0 - 2026-06-16
 - Rename the project from Clinical Tools to Precision Toolkit (`clinical_tools` -> `precision_toolkit`).
 

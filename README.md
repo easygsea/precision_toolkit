@@ -16,15 +16,18 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 - Nextflow (>=25.04.6)
 - Apptainer (>=1.3.1)
 
-Containerized dependencies (no installation required):
-- Python 3.13.12
-- RTG Tools 3.12.1
+### Containerized dependencies (no installation required):
+> **Note:** These tools are preinstalled in the container and can be used directly outside workflows. No installation required. For tool descriptions and official documentation, see [Containerized Tools](./docs/containerized_tools/README.md).
+> **Architecture note:** The current Dockerfile installs precompiled `mafft`, `bedtools`, `bedops`, and `d2` artifacts that are amd64-only.
 - bcftools 1.21
 - bedops 2.4.41
 - bedtools 2.31.0
+- d2 0.7.0
 - hap.py 0.3.15
 - htslib 1.21 (bgzip tabix)
 - MAFFT 7.505-1
+- Python 3.13.12
+- RTG Tools 3.12.1
 - samtools 1.21
 - Truvari 5.4.0
 - uv 0.10.7
@@ -78,7 +81,7 @@ Containerized dependencies (no installation required):
    To get a specific version, use:
 
    ```bash
-   apptainer pull docker://quay.io/easygsea/precision_toolkit:v1.0.1
+   apptainer pull docker://quay.io/easygsea/precision_toolkit:v1.3.1
    ```
 
 2. Run specific tools inside the container. Example:
@@ -165,6 +168,10 @@ The manual is detailed in the [docs](./docs/README.md) directory, including:
     - `fetch-pull-requests`
   - [Structural Variant VCF Liftover](./docs/standalone_utilities/liftover_sv_vcf.md)
     - `liftover_sv_vcf.sh`
+- [Containerized Tools](./docs/containerized_tools/README.md)
+- [Third-Party Tools](./docs/third_party/README.md)
+  - [Convert Inversions](./docs/third_party/README.md#convert-inversions)
+    - `convert-inversions`
 
 ## Resource Optimization and High-Performance Computing
 

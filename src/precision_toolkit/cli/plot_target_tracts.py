@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 Visualize tract/target scores output from target evaluation workflow, grouped by poolID.
 
@@ -85,9 +83,8 @@ def main() -> None:
 
             # Plot graph
             plt.scatter(
-                data=df,
-                x="TRACT",
-                y=metric,
+                df["TRACT"],
+                df[metric],
                 c=matplotlib.colors.rgb2hex(colors[pool]),
                 label=pool,
                 alpha=0.8,

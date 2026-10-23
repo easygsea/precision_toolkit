@@ -57,6 +57,11 @@ def _compute_md5(path: Path) -> str:
     [
         ("NA12878_Coriell_IX13680_F161339.tmb.trace.tsv", [], "dragen_tmb_trace"),
         (
+            "NA12878_Coriell_IX13680_F161339.tmb.trace.tsv",
+            ["--y-gridlines"],
+            "dragen_tmb_trace_with_y_gridlines",
+        ),
+        (
             "NA12878_Coriell_IX13680_F161339.hard-filtered.vcf",
             [],
             "dragen_vc",

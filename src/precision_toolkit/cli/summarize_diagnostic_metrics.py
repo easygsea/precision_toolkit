@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Summarize and compute diagnostic metrics from VCF comparisons.
 
