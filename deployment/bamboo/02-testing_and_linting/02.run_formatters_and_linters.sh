@@ -37,6 +37,7 @@ IMAGE_STORE_ROOT="$3"
 
 cd "${TESTING_DEVELOPMENT_DIRECTORY}/precision_toolkit"
 
+uv audit
 uv run ruff check
 uv run pre-commit run --all-files
 

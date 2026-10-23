@@ -12,7 +12,7 @@ dependencies = [
     "pysam==0.23.0",
     "python-docx==1.1.2",
     "pandas==2.2.3",
-    "requests==2.32.3",
+    "requests==2.33.0",
     "scipy==1.15.2",
     "seaborn==0.13.2",
     "statsmodels==0.14.4",
@@ -26,11 +26,11 @@ exclude = ["src/third_party/"]
 [dependency-groups]
 dev = [
     "pre-commit==4.3.0",
-    "pytest==9.0.2",
+    "pytest==9.0.3",
     "pytest-cov==7.0.0",
     "pytest-workflow==2.0.1",
     "pytest-xdist==3.6.1",
-    "ruff>=0.17.1",
+    "ruff==0.17.1",
     "types-requests==2.32.4.20260107",
 ]
 
