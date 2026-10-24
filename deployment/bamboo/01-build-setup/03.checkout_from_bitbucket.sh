@@ -27,18 +27,24 @@ BAMBOO_CONFIG_DOC
 
 set -euxo pipefail
 
-TESTING_DEPLOYMENT_DIRECTORY="${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}"
-REPOSITORY_URL="${bamboo.planRepository.repositoryUrl}"
-BRANCH_NAME="${bamboo.planRepository.branchName}"
-BUILDING_DEPLOYMENT_DIRECTORY="${bamboo.inject.BUILDING_DEPLOYMENT_DIRECTORY}"
-HOST_NAME="${bamboo.HOST_CONTAINER}"
+# Bamboo substitutes these tokens before Bash parses the SSH task.
+# shellcheck disable=SC2016
+TESTING_DEPLOYMENT_DIRECTORY='${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}'
+# shellcheck disable=SC2016
+REPOSITORY_URL='${bamboo.planRepository.repositoryUrl}'
+# shellcheck disable=SC2016
+BRANCH_NAME='${bamboo.planRepository.branchName}'
+# shellcheck disable=SC2016
+BUILDING_DEPLOYMENT_DIRECTORY='${bamboo.inject.BUILDING_DEPLOYMENT_DIRECTORY}'
+# shellcheck disable=SC2016
+HOST_NAME='${bamboo.HOST_CONTAINER}'
 
 rm -rfv "${TESTING_DEPLOYMENT_DIRECTORY}"
 git clone -b "${BRANCH_NAME}" "${REPOSITORY_URL}" \
   "${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit"
 cd "${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit"
 VERSION=$(sed -nr "s|^version\s*=\s*\"([^\"]+)\"|\1|p" pyproject.toml)
-echo "VERSION=${VERSION}" > precision_toolkit_version.txt
+echo "VERSION=${VERSION}" >precision_toolkit_version.txt
 chmod -R g+w "${TESTING_DEPLOYMENT_DIRECTORY}"
 
 rsync -av README.md pyproject.toml uv.lock Dockerfile apptainer.def src \

@@ -25,6 +25,17 @@ repos:
     hooks:
       - id: ty
 
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1-1
+    hooks:
+      - id: shellcheck
+
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.14.1-1
+    hooks:
+      - id: shfmt
+        args: ["--indent", "2", "--write"]
+
   - repo: https://github.com/semgrep/pre-commit
     rev: v1.157.0
     hooks:
