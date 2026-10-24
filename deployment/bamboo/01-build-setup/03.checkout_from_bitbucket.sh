@@ -43,6 +43,7 @@ rm -rfv "${TESTING_DEPLOYMENT_DIRECTORY}"
 git clone -b "${BRANCH_NAME}" "${REPOSITORY_URL}" \
   "${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit"
 cd "${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit"
+BRANCH_NAME="${BRANCH_NAME}" .pre-commit/validate_branch_name.sh
 VERSION=$(sed -nr "s|^version\s*=\s*\"([^\"]+)\"|\1|p" pyproject.toml)
 echo "VERSION=${VERSION}" >precision_toolkit_version.txt
 chmod -R g+w "${TESTING_DEPLOYMENT_DIRECTORY}"
