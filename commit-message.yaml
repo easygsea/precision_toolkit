@@ -1,0 +1,7 @@
+rules:
+  - id: commit-message-format
+    languages:
+      - generic
+    message: "Commit subject must follow 'TICKET imperative verb ...', for example 'CDI-743 enforce commit message format'."
+    pattern-regex: '(?s)\A(?!CDI-[0-9]+ (?:add|allow|avoid|build|bump|check|clean|configure|convert|create|delete|disable|document|enable|enforce|enhance|ensure|extract|fix|format|generate|improve|introduce|make|migrate|move|parse|pin|prevent|refactor|remove|rename|replace|restore|return|run|set|simplify|sort|support|test|update|upgrade|use|validate|write)\b [^\r\n]+(?:\r?\n|\Z))[\s\S]+'
+    severity: ERROR

@@ -1,4 +1,5 @@
 default_stages: [pre-commit]
+default_install_hook_types: [pre-commit, commit-msg]
 exclude: ^src/third_party/
 
 repos:
@@ -23,6 +24,10 @@ repos:
   - repo: https://github.com/semgrep/pre-commit
     rev: v1.157.0
     hooks:
+      - id: semgrep
+        name: semgrep commit message format
+        args: ["--config", "commit-message.yaml", "--error", "--quiet"]
+        stages: [commit-msg]
       - id: semgrep
         args: ["--config", ".semgrep", "--error", "--quiet"]
         files: "^src/|^tests/"
