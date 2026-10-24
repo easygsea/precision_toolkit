@@ -29,7 +29,6 @@ class TruvariDataParser:
             FileNotFoundError: When params.json is not found in the same directory as
                 file_path.
         """
-        # Derive path to params.json which truvari outputs alongside summary.json
         params_file_path = Path(file_path).parent / Path(file_path).name.replace(
             "refine.variant_summary.json", "params.json"
         ).replace("summary.json", "params.json")
@@ -39,17 +38,15 @@ class TruvariDataParser:
                 f"same directory as {file_path}. "
             )
 
-        # Get VariantCallFilter from params.json
         with open(params_file_path) as params_file:
             params_data = json.load(params_file)
             variant_filter = "PASS" if params_data["passonly"] else "ALL"
 
-        # Parse summary.json to get remaining metrics
         with open(file_path) as summary_file:
             summary_data = json.load(summary_file)
 
         metrics = VariantCallMetrics(
-            VariantType="SV",  # Truvari doesn't output stats per type
+            VariantType="SV",
             VariantCallFilter=variant_filter,
             TruthTotal=summary_data["TP-base"] + summary_data["FN"],
             TruthTP=summary_data["TP-base"],

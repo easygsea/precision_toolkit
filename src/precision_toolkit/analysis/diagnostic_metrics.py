@@ -219,9 +219,9 @@ def _compute_sensitivity_and_ci_for_group(
         TruthTotal=total_truth_tp + total_truth_fn,
         TruthTP=total_truth_tp,
         TruthFN=total_truth_fn,
-        QueryTotal=0,  # Not used for sensitivity
-        QueryTP=0,  # Not used for sensitivity
-        QueryFP=0,  # Not used for sensitivity
+        QueryTotal=0,
+        QueryTP=0,
+        QueryFP=0,
     )
 
     analysis = SensitivityMetrics(aggregated_metrics)
@@ -288,9 +288,9 @@ def _compute_precision_and_ci_for_group(
     aggregated_metrics = VariantCallMetrics(
         VariantType=group[0].VariantType,
         VariantCallFilter=group[0].VariantCallFilter,
-        TruthTotal=0,  # Not used for precision
-        TruthTP=0,  # Not used for precision
-        TruthFN=0,  # Not used for precision
+        TruthTotal=0,
+        TruthTP=0,
+        TruthFN=0,
         QueryTotal=total_query_tp + total_query_fp,
         QueryTP=total_query_tp,
         QueryFP=total_query_fp,

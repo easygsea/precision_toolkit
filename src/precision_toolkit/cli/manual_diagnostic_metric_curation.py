@@ -100,22 +100,18 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    # Set conditional requirements after parsing
     if args.metric == DiagnosticMetricType.CONCORDANCE:
         parser.set_defaults(tp_method=args.tp_method)
     elif args.metric == DiagnosticMetricType.F1_SCORE:
         parser.set_defaults(ci_method=None, ci_level=None)
 
-    # Set default output prefix if not provided
     if not args.output_prefix:
         args.output_prefix = f"manually_curated_{args.metric}"
 
     df = pd.read_csv(args.input)
 
-    # Flatten the list of curation criteria
     curations = [item for sublist in args.curation for item in sublist]
 
-    # Validate manual curation input before processing
     valid_metrics = {
         "concordance": ["TP", "FN", "FP"],
         "sensitivity": ["TP", "FN"],
@@ -129,7 +125,6 @@ def main() -> None:
         logger.error(f"Invalid curation format: {e}")
         raise
 
-    # Update counts and recalculate metrics
     for curation in curations:
         df = update_metrics(
             df,
@@ -140,7 +135,6 @@ def main() -> None:
             args.ci_level,
         )
 
-    # Export results
     export_curation_results(df, args.output_prefix, args.metric, args.decimals)
 
 

@@ -2,7 +2,7 @@
 
 from enum import StrEnum
 
-from statsmodels.stats.proportion import (  # type: ignore[import-untyped]
+from statsmodels.stats.proportion import (
     proportion_confint,
 )
 

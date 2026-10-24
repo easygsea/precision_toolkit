@@ -80,7 +80,6 @@ def test_plot_dragen_metrics_single(
             output_folder / subfolder if subfolder else output_folder
         )
 
-        # If --fastq-list is provided, resolve path to fastq_list.csv
         additional_args_resolved = [
             str(test_data_dir / arg) if arg.endswith(".csv") else arg
             for arg in additional_args
@@ -100,7 +99,6 @@ def test_plot_dragen_metrics_single(
             check=True,
         )
 
-        # Check that MD5 checksum matches with expected
         for filename, expected_md5 in expected_checksums[checksum_json_key].items():
             generated_md5 = hashlib.md5(
                 (expected_output_folder / filename).read_bytes()
@@ -132,7 +130,6 @@ def test_plot_dragen_metrics_multiple(
             check=True,
         )
 
-        # Check that MD5 checksum matches with expected
         for filename, expected_md5 in expected_checksums[
             "panheme_multiple_default"
         ].items():

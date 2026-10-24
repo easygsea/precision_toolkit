@@ -5,7 +5,6 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from precision_toolkit.dragen.models import DragenMetric
 
-# Valid operations to apply with scale factors
 OPERATIONS = {
     "add": operator.add,
     "multiply": operator.mul,
@@ -31,12 +30,10 @@ def format_metric(
         Tuple of metric name with the format <metric> (<unit>) and metric value with
         specified number of decimal places, represented a a string.
     """
-    # Get dragen metric properties
     metric_name = dragen_metric_obj.name
     num_decimal_places = dragen_metric_obj.num_decimal_places
     unit = dragen_metric_obj.unit
 
-    # Apply formatting, if applicable
     formatted_metric_name = f"{metric_name} ({unit})"
     formatted_metric_val = str(metric_val)
     if metric_val is not None and num_decimal_places is not None:
@@ -59,7 +56,6 @@ def scale_metric(dragen_metric_obj: DragenMetric, metric_val: float) -> float:
     Returns:
         Transformed metric value after applying scale factor.
     """
-    # Get dragen metric properties
     scale_factor = dragen_metric_obj.scale_factor
     scale_factor_op = dragen_metric_obj.scale_factor_op
 
@@ -97,7 +93,6 @@ def calc_derived_pct_metric(
     if base_metric_val is None or mapped_reads_val is None:
         return derived_metric_obj.default_val
     else:
-        # Calculate derived metric value
         derived_metric_val = base_metric_val / mapped_reads_val
         return scale_metric(derived_metric_obj, derived_metric_val)
 

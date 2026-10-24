@@ -27,7 +27,6 @@ import seaborn as sns
 
 def main() -> None:
     """Plot target/tract scores by poolID from target evaluation workflow."""
-    # Get input parameters
     parser = argparse.ArgumentParser(
         description=("Plot visualizations per-target region.")
     )
@@ -60,10 +59,8 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    # Convert all filepaths to Path type
     input_files = [Path(file_path) for file_path in args.input_files]
 
-    # Set pools and colors
     pool_ids = (
         args.pool_ids if args.pool_ids != [] else ["No_Pool_Info"] * len(input_files)
     )
@@ -74,19 +71,16 @@ def main() -> None:
             strict=False,
         )
     )
-    colors["No_Pool_Info"] = (0.0, 0.0, 1.0)  # default blue points
+    colors["No_Pool_Info"] = (0.0, 0.0, 1.0)
 
-    # Initialize figure
     plt.figure(figsize=(120, 50))
 
     for metric, threshold in args.metrics_thresholds_and_headings.items():
         for file, pool in zip(input_files, pool_ids, strict=False):
-            # Read data
             df = pd.read_csv(file, sep="\t", comment=None)
             df.columns = pd.Index([col.lstrip("#") for col in df.columns])
             df[metric] = df[metric].astype(float)
 
-            # Plot graph
             plt.scatter(
                 df["TRACT"],
                 df[metric],
@@ -101,7 +95,6 @@ def main() -> None:
                 label="Threshold",
             )
 
-        # Format plot
         plt.grid(axis="x")
         plt.title(f"{metric} per tract", fontsize=64)
         plt.xticks(rotation=90, ha="right")
@@ -110,7 +103,6 @@ def main() -> None:
         by_label = dict(zip(labels, handles, strict=False))
         plt.legend(by_label.values(), by_label.keys(), fontsize=32)
 
-        # Save plot
         plt.savefig(f"{args.prefix}_{metric}.png")
         plt.clf()
 

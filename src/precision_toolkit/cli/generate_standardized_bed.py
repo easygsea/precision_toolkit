@@ -26,7 +26,6 @@ from pathlib import Path
 
 from precision_toolkit.core.io import FileMode, open_file
 
-# Configure logging
 logging.basicConfig(
     level=logging.WARNING,
     format="[%(asctime)s] %(levelname)s %(message)s",
@@ -87,7 +86,6 @@ class Transcript:
         """
         self.introns = []
         if len(exon_ranges) > 1:
-            # Sort exon GenomicRange objects by start position in range attribute
             sorted_exons = sorted(exon_ranges, key=lambda e: e.range[0])
 
             for i in range(len(sorted_exons) - 1):
@@ -96,22 +94,18 @@ class Transcript:
                 intron_start = prev_exon.range[1]
                 intron_end = next_exon.range[0]
 
-                # Determine which exon precedes intron based on strand
                 if self.strand == Strand.MINUS:
                     intron_number = next_exon.number_attribute
                 else:
                     intron_number = prev_exon.number_attribute
 
-                # Create intron GenomicRange object and add to introns list
                 intron = GenomicRange(
                     range=(intron_start, intron_end), number_attribute=intron_number
                 )
                 self.introns.append(intron)
 
-                # Map exon range to intron range
                 self.exon_to_intron[prev_exon.range] = intron
 
-                # Update feature counts
                 self.feature_counts["intron"] = len(self.introns)
 
     def exclude_noncoding_exons(self) -> None:
@@ -150,14 +144,12 @@ class Transcript:
             rightmost_codon = self.start_codon
 
         for exon in self.exons:
-            # Full exon is in UTR, exclude
             if (
                 exon.range[1] < leftmost_codon.range[0]
                 or exon.range[0] > rightmost_codon.range[1]
             ):
                 continue
             else:
-                # Update exon coordinates if stop/start codon in exon
                 coding_exon_start = exon.range[0]
                 coding_exon_end = exon.range[1]
                 if exon.number_attribute == leftmost_codon.number_attribute:
@@ -165,7 +157,6 @@ class Transcript:
                 if exon.number_attribute == rightmost_codon.number_attribute:
                     coding_exon_end = rightmost_codon.range[1]
 
-                # Map exon range to coding exon range
                 self.exon_to_coding_exon[exon.range] = GenomicRange(
                     (coding_exon_start, coding_exon_end), exon.number_attribute
                 )
@@ -204,7 +195,7 @@ def parse_bed_file(
             - Set of gene symbols found in input BED file.
     """
     refseq_accession_to_transcript_obj: dict[str, Transcript] = {}
-    gene_set = set()  # keep track of genes that were in input_bed
+    gene_set = set()
     with open_file(bed_file_path, FileMode.READ) as in_bed:
         for line in in_bed:
             fields = line.split("\t")
@@ -215,33 +206,26 @@ def parse_bed_file(
             feature = fields[7]
             attributes = fields[9]
 
-            # Get RefSeq accession
             refseq_acc = extract_refseq_accession(
                 refseq_accession_regex_pattern, attributes
             )
             if refseq_acc is not None:
-                # Skip features not in target_genes, if applicable
                 if target_genes and feature_name not in target_genes:
                     continue
 
-                gene_set.add(feature_name)  # for logging purposes
+                gene_set.add(feature_name)
 
-                # Create transcript object, if not already present
                 if refseq_acc not in refseq_accession_to_transcript_obj:
                     refseq_accession_to_transcript_obj[refseq_acc] = Transcript(
                         refseq_acc, Strand(strand)
                     )
                 transcript_obj = refseq_accession_to_transcript_obj[refseq_acc]
 
-                # Update feature count attribute
                 if feature not in transcript_obj.feature_counts:
-                    # Initiate total count
                     transcript_obj.feature_counts[feature] = 1
                 else:
-                    # Increment total count
                     transcript_obj.feature_counts[feature] += 1
 
-                # Update exon attribute, if applicable
                 exon_number = extract_exon_number(attributes)
                 if feature == "exon":
                     transcript_obj.exons.append(GenomicRange((start, end), exon_number))
@@ -279,8 +263,6 @@ def construct_feature_name(
     Returns:
         The formatted feature name.
     """
-    # Extract exon number, if applicable, and construct feature name
-    # If no exon number, don't append to feature name
     if exon_num:
         if zero_pad_names and refseq_acc:
             num_digits = len(
@@ -294,7 +276,6 @@ def construct_feature_name(
                 exon_num.zfill(num_digits) if len(exon_num) < num_digits else exon_num
             )
         else:
-            # No padding required
             exon_num_padded = exon_num
         feature_id = genomic_feature.upper() + exon_num_padded
     else:
@@ -313,13 +294,10 @@ def get_corresponding_intron(
     if exon_range in exon_to_intron:
         return exon_to_intron[exon_range]
 
-    # Attempt to perform "fuzzy" search to account for trimmed exons (i.e. UTR
-    # exclusion)
     for exon, intron in exon_to_intron.items():
         if exon_range[0] <= exon[1] and exon[0] <= exon_range[1]:
             return intron
 
-    # No corresponding intron
     return None
 
 
@@ -327,17 +305,14 @@ def trim_utr_exon(
     transcript_obj: Transcript, exon_range: tuple[int, int]
 ) -> GenomicRange | None:
     """Exclude non-coding exons or non-coding regions of exons."""
-    # Calculate coding exon coordinates if not done previously
     if not transcript_obj.exon_to_coding_exon:
         transcript_obj.exclude_noncoding_exons()
     exon_to_coding_exon = transcript_obj.exon_to_coding_exon
 
-    # Check if exon is a coding exon, if so return exon with non-coding
-    # regions trimmed (when applicable)
     if exon_range in exon_to_coding_exon:
         return exon_to_coding_exon[exon_range]
     else:
-        return None  # UTR-only exon, exclude
+        return None
 
 
 def generate_modified_target_bed(
@@ -389,11 +364,9 @@ def generate_modified_target_bed(
             attributes = fields[9]
             exon_num = extract_exon_number(attributes)
 
-            # Skip feature if not in target_genes
             if target_genes and feature_name not in target_genes:
                 continue
 
-            # Extract refseq accession
             refseq_acc = extract_refseq_accession(
                 refseq_accession_regex_pattern, attributes
             )
@@ -407,8 +380,6 @@ def generate_modified_target_bed(
                 zero_pad_names,
             )
 
-            # Apply flags
-            # Default to original coordinates
             out_bed_entries = []
             out_bed_entries.append(
                 (genomic_feature, f"{chr}\t{start}\t{end}\t{updated_feature_name}\n")
@@ -416,8 +387,6 @@ def generate_modified_target_bed(
             if refseq_acc:
                 transcript_obj = refseq_accession_to_transcript_obj[refseq_acc]
 
-                # For CDS features, extend coordinates to include stop codon, if
-                # applicable
                 if genomic_feature == "CDS" and extend_cds_to_stop:
                     if not transcript_obj.stop_codon:
                         logger.warning(
@@ -453,20 +422,17 @@ def generate_modified_target_bed(
                                 )
                             ]
                         else:
-                            continue  # skip UTR-only exon
+                            continue
 
                     if output_introns:
-                        # Calculate introns if not done previously
                         if transcript_obj.introns is None:
                             if exclude_utrs:
-                                # Calculate introns based on coding exons
                                 transcript_obj.calc_intron_ranges(
                                     list(transcript_obj.exon_to_coding_exon.values())
                                 )
                             else:
                                 transcript_obj.calc_intron_ranges(transcript_obj.exons)
 
-                        # Check if transcript has introns (i.e. > 1 exon); if so, write
                         if transcript_obj.introns:
                             exon_to_intron = transcript_obj.exon_to_intron
                             exon_range = (int(start), int(end))
@@ -491,8 +457,6 @@ def generate_modified_target_bed(
                                     )
                                 )
 
-            # Skip feature if not in target_features
-            # Filtering done last to ensure introns can be output independent of exons
             for entry in out_bed_entries:
                 if entry[0] in target_features:
                     out_bed.write(entry[1])
@@ -566,14 +530,12 @@ def main() -> None:
         required=True,
     )
 
-    # Parse args
     args = parser.parse_args()
     bed_file_path = Path(args.bed_file)
     gene_list_path = Path(args.gene_list) if args.gene_list else None
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True)
 
-    # Define output bed filename based on input bed_file
     bed_ext_search = re.search(r"\.bed(\.gz)?$", args.bed_file)
     if bed_ext_search:
         ext = bed_ext_search.group(0)
@@ -585,7 +547,6 @@ def main() -> None:
         )
         sys.exit()
 
-    # Ensure valid features were provided
     if args.features:
         feature_list = [f.strip() for f in args.features.split(",")]
         invalid_features = set(feature_list) - VALID_FEATURES
@@ -599,25 +560,17 @@ def main() -> None:
     else:
         feature_list = list(VALID_FEATURES)
 
-    # If gene_list provided, parse gene_list file and store as target_gene_set
     target_gene_set = set()
     if gene_list_path:
         with open_file(gene_list_path, FileMode.READ) as target_gene_list:
             for line in target_gene_list:
                 target_gene_set.add(line.strip())
 
-    # First pass: parse BED file to extract feature counts and genomic ranges per
-    # transcript
-    # Use non-greedy quantifier to match first RefSeq accession encountered after
-    # args.attribute_key
     refseq_accession_pattern = re.compile(rf"{args.attribute_key}.*?(N[MRP]_\d+\.\d+)")
     refseq_accession_to_transcript_obj, gene_set = parse_bed_file(
         bed_file_path, refseq_accession_pattern, target_gene_set
     )
 
-    # Second pass: generate target BED
-    # Filter BED file for genes/features of interest and adjust exon/CDS
-    # coordinates, if applicable
     generate_modified_target_bed(
         bed_file_path,
         target_gene_set,
@@ -631,16 +584,12 @@ def main() -> None:
         args.zero_pad_names,
     )
 
-    # Output warning if introns are output but exons are not
-    # Has been observed when CDS and intron features are output
     if args.output_introns and "exon" not in feature_list:
         logger.warning(
             "Output standardized BED file may not be in sorted order. Check before "
             "utilizing BED file in downstream applications.",
         )
 
-    # If gene_list provided, output warning if any genes in target gene list
-    # were not found in input BED file
     if target_gene_set:
         missing_genes = target_gene_set.difference(gene_set)
         if missing_genes:

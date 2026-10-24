@@ -9,7 +9,6 @@ from docx.document import Document as DocumentType
 
 logger = logging.getLogger(__name__)
 
-# Module-level default document
 _DEFAULT_DOCUMENT = Document()
 
 

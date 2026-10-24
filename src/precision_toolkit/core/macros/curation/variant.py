@@ -98,7 +98,6 @@ def update_metrics(
     mask = (df["Variant Type"] == variant_type) & (df["Variant Filter"] == filter_type)
     df.loc[mask, metric_full] = value
 
-    # Create metrics object based on the metric class
     metrics: VariantCallMetrics
     metric_value: float
     ci_lower: float | None = None
@@ -166,7 +165,6 @@ def update_metrics(
         metric_value = f1_score_analysis.f1_score
         ci_lower = ci_upper = None
 
-    # Update DataFrame with new metric value
     metric_name = (
         "F1 Score"
         if metric_type == DiagnosticMetricType.F1_SCORE
@@ -174,7 +172,6 @@ def update_metrics(
     )
     df.loc[mask, metric_name] = metric_value
 
-    # Update CI values if they exist
     if ci_lower is not None and ci_upper is not None:
         df.loc[mask, "CI Lower"] = ci_lower
         df.loc[mask, "CI Upper"] = ci_upper

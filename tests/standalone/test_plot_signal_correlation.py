@@ -20,7 +20,6 @@ def test_plot_signal_correlation_basic(test_data_dir: Path) -> None:
         query_signal_file = test_data_dir / "vaf" / "query" / "sample1_query_vaf.tsv"
         output_filename = Path(tmpdir) / "test_vaf_correlation_basic"
 
-        # Run the script
         subprocess.run(
             [
                 "plot-signal-correlation",
@@ -36,7 +35,6 @@ def test_plot_signal_correlation_basic(test_data_dir: Path) -> None:
             text=True,
         )
 
-        # Check that the output plot file was created
         assert output_filename.with_suffix(".png").exists()
         assert output_filename.with_suffix(".pdf").exists()
         assert output_filename.with_suffix(".tsv").exists()

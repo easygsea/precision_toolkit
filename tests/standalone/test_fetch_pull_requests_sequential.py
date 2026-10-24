@@ -16,7 +16,6 @@ def test_fetch_prs_sequential_auth_flow(
     """Test pull request fetcher sequential authentication flow."""
     caplog.set_level(logging.INFO)
 
-    # Setup: First response is 401 (Fail), Second is 200 (Success)
     mock_fail = SimpleNamespace(status_code=401)
     mock_success = SimpleNamespace(status_code=200, json=lambda: {"values": []})
 
@@ -25,12 +24,10 @@ def test_fetch_prs_sequential_auth_flow(
     def mock_get(*args: object, **kwargs: object) -> SimpleNamespace:
         return next(responses)
 
-    # Apply the monkeypatch
     monkeypatch.setattr(
         "precision_toolkit.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
 
-    # First Call: Should print Unauthorized
     fetch_pull_requests(
         bitbucket_url="http://test", project="P", repo="R", token="BAD_TOKEN"
     )
@@ -38,9 +35,8 @@ def test_fetch_prs_sequential_auth_flow(
 
     caplog.clear()
 
-    # Second Call: Should print No PRs found
     fetch_pull_requests(
         bitbucket_url="http://test", project="P", repo="R", token="GOOD_TOKEN"
     )
     assert "No pull requests found" in caplog.text
-    assert "401" not in caplog.text  # Ensure the old error isn't lingering
+    assert "401" not in caplog.text

@@ -34,7 +34,7 @@ class SompyDataParser:
             try:
                 metrics = VariantCallMetrics(
                     VariantType=row["type"],
-                    VariantCallFilter="NA",  # som.py doesn't have filter column
+                    VariantCallFilter="NA",
                     TruthTotal=int(row["total.truth"]),
                     TruthTP=int(row["tp"]),
                     TruthFN=int(row["fn"]),

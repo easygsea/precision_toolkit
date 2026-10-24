@@ -28,7 +28,7 @@ class DragenMetric:
 
     metric_group: str
     name: str
-    mapping_spec: dict | str  # dict for CSV source, str for JSON source
+    mapping_spec: dict | str
     default_val: float | None
     scale_factor: float | None
     scale_factor_op: str

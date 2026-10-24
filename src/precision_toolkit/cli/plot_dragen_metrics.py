@@ -60,18 +60,10 @@ def parse_metrics_output_tsv(
     library_type = None
     nan_vals = {"NA", "None", "nan"}
     with open(metrics_file) as metrics_tsv:
-        # Tracking per table in case rgsm are not ordered the same between tables
         index_to_rgsm_col = {}
-        # Refers to LSL/USL Guidelines only present in TSO500's MetricsOutput.tsv;
-        # this, in addition to other guideline limits provided in the JSON config, are
-        # used for plot annotation later
         specification_limit_col_indices = []
         for line in metrics_tsv:
             if line.startswith("[") and line.strip().endswith("]"):
-                # This applies to TSO500's MetricOutput.tsv where headers preceding
-                # each table in the TSV indicate the library type. For custom workflows
-                # (e.g. Pan-Heme), it's expected that metrics for only one library type
-                # will be present in the input MetricsOutput.tsv.
                 library_type = "RNA" if "RNA" in line else "DNA"
             elif line.startswith("Metric (UOM)"):
                 col_names = line.strip().split("\t")
@@ -93,8 +85,6 @@ def parse_metrics_output_tsv(
                         if fields[idx] not in nan_vals
                     )
 
-                    # Create a separate row for each RGSM's metric value, resulting in a
-                    # long-formatted dataframe
                     for idx, rgsm in index_to_rgsm_col.items():
                         row = {
                             "RGSM": rgsm,
@@ -123,7 +113,6 @@ def get_rgsm_groupings(
     """Validate group_by column name, then return a dataframe mapping RGSM to column."""
     fastq_list_df = pd.read_csv(fastq_list_file)
 
-    # Check if group_by column is present
     if group_by not in fastq_list_df.columns:
         logger.warning(
             f"'{group_by}' column not found in FASTQ list, grouping won't be applied."
@@ -132,7 +121,6 @@ def get_rgsm_groupings(
     else:
         valid_group_col = group_by
 
-    # Return dataframe mapping RGSM to group_by column
     fastq_list_df_unique = fastq_list_df.drop_duplicates(subset=["RGSM"], keep="first")
     cols = ["RGSM"] + ([valid_group_col] if valid_group_col else [])
     return fastq_list_df_unique[cols], valid_group_col
@@ -142,8 +130,6 @@ def determine_rgsm_order(df: pd.DataFrame, sort_metric: str | None) -> list[str]
     """Return RGSMs sorted alphabetically or by sort_metric in descending order."""
     if sort_metric:
         if sort_metric in df["Metric (UOM)"].values:
-            # Grab rows corresponding to sort_metric, then sort values in descending
-            # order
             metric_data = df[df["Metric (UOM)"] == sort_metric]
             return metric_data.sort_values("Value", ascending=False)[
                 "Truncated RGSM"
@@ -154,7 +140,6 @@ def determine_rgsm_order(df: pd.DataFrame, sort_metric: str | None) -> list[str]
                 f"instead."
             )
 
-    # Sort RGSM alphabetically if none specified or sort_metric is not found
     return sorted(df["Truncated RGSM"].unique())
 
 
@@ -180,23 +165,20 @@ def plot_metrics(
             RGSM alphabetically.
         output_folder: Directory to save plots to.
     """
-    # Ensure output folder is created
     output_folder.mkdir(parents=True, exist_ok=True)
 
     rgsm_order = determine_rgsm_order(metrics_df, sort_metric)
     for metric_name in metrics_df["Metric (UOM)"].unique():
         plot_data = metrics_df[metrics_df["Metric (UOM)"] == metric_name]
 
-        # If all values are NA, skip
         if plot_data["Value"].isna().all():
             logger.warning(
                 f"Skipping plot for {metric_name} values for all samples are NA."
             )
             continue
 
-        # Set up plot area
         num_samples = len(plot_data)
-        fig_height = max(num_samples * 0.3, 13)  # adjust based on number of samples
+        fig_height = max(num_samples * 0.3, 13)
         fig, axes = plt.subplots(
             2, 1, figsize=(7, fig_height), gridspec_kw={"height_ratios": [4, 1]}
         )
@@ -204,10 +186,8 @@ def plot_metrics(
         plt.subplots_adjust(left=0.35, right=0.76, top=0.95, bottom=0.05)
         sns.set_style("white")
         sns.set_palette("hls", 8)
-        # Set default to ensure consistent colors across plots if grouping is disabled
         default_color = sns.color_palette("hls", 8)[0]
 
-        # Plot data
         axes[0] = sns.stripplot(
             data=plot_data,
             x="Value",
@@ -233,7 +213,6 @@ def plot_metrics(
         axes[1].grid(True, which="both", axis="both", ls="-")
         axes[1].set(xlabel=metric_name)
 
-        # Plot fail thresholds first so it appears first in legend
         if metric_name in fail_thresholds:
             threshold, direction = fail_thresholds[metric_name]
             if threshold is not None:
@@ -249,7 +228,6 @@ def plot_metrics(
                     x=threshold, linewidth=2, color="#2E7D32", ls=":", zorder=4
                 )
 
-                # Shade pass region
                 xlim = axes[0].get_xlim()
                 pass_boundary = xlim[0] if "greater_than" in direction else xlim[1]
                 axes[0].axvspan(
@@ -264,13 +242,11 @@ def plot_metrics(
                     threshold, pass_boundary, color="#2E7D32", alpha=0.05, zorder=1
                 )
 
-                # Reset xlim due to addition of axvspan triggering autoscaling of
-                # axis limits
                 axes[0].set_xlim(xlim)
                 axes[1].set_xlim(xlim)
 
         if metric_name in guideline_limits:
-            label_added = False  # track to avoid duplicate labels in legend
+            label_added = False
             for threshold in guideline_limits[metric_name]:
                 if threshold is not None:
                     axes[0].axvline(
@@ -279,7 +255,7 @@ def plot_metrics(
                         color="#4C78A8",
                         ls=":",
                         label="Guideline\nlimit" if not label_added else None,
-                        zorder=3,  # plot guideline limits below failure thresholds
+                        zorder=3,
                     )
                     axes[1].axvline(
                         x=threshold, linewidth=2, color="#4C78A8", ls=":", zorder=3
@@ -287,14 +263,11 @@ def plot_metrics(
                     label_added = True
 
         handles, labels = axes[0].get_legend_handles_labels()
-        # If pass shading is present, move label to last position in legend
         if "Pass" in labels:
             pass_index = labels.index("Pass")
             handles.append(handles.pop(pass_index))
             labels.append(labels.pop(pass_index))
 
-        # Add and adjust position of legend if there are any handles
-        # (i.e. thresholds or groupings)
         if handles:
             axes[0].legend(handles, labels)
             sns.move_legend(
@@ -305,7 +278,6 @@ def plot_metrics(
                 title=group_col,
             )
 
-        # Save plots and clean space
         plt.savefig(
             f"{output_folder}/{metric_name}.png", bbox_inches="tight", pad_inches=0.3
         )
@@ -381,7 +353,6 @@ def main() -> None:
         required=True,
     )
 
-    # Parse args
     args = parser.parse_args()
     metrics_json_config_path = Path(args.metrics_json_config)
     group_by = args.group_by
@@ -389,13 +360,10 @@ def main() -> None:
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True, parents=True)
 
-    # Validate args
     if group_by and not fastq_list_file_path:
         logger.error("--group-by requires --fastq-list to be provided.")
         sys.exit(1)
 
-    # Create parser just to get metrics to plot and metadata (e.g. UOM, LSL, etc.)
-    # for each metric
     dragen_metrics_parser = DragenMetricsParser(metrics_json_config_path, "")
 
     metrics_to_plot = []
@@ -404,11 +372,9 @@ def main() -> None:
     for metric_name in dragen_metrics_parser.reported_metric_names:
         dragen_metric_obj = dragen_metrics_parser.metric_to_metric_obj[metric_name]
 
-        # Get names of metrics to plot
         formatted_metric_name, _ = format_metric(dragen_metric_obj, None)
         metrics_to_plot.append(formatted_metric_name)
 
-        # Set thresholds and limits; default to None if not present
         fail_thresholds[formatted_metric_name] = (
             dragen_metric_obj.fail_threshold,
             dragen_metric_obj.fail_direction,
@@ -419,8 +385,6 @@ def main() -> None:
             metric_attributes.get("USL"),
         }
 
-    # Parse each MetricsOutput.tsv and convert into a dataframe with columns RGSM,
-    # Truncated RGSM, Metric (UOM), Value, and Library type
     metrics_dfs = []
     for metrics_file in args.metrics_files:
         parsed_metrics_df, parsed_guideline_limits = parse_metrics_output_tsv(
@@ -435,7 +399,6 @@ def main() -> None:
         metrics_dfs.append(parsed_metrics_df)
     metrics_df = pd.concat(metrics_dfs, ignore_index=True)
 
-    # If grouping is desired, parse FASTQ list to reliably get groupings for each RGSM
     rgsm_to_metadata_df = pd.DataFrame(columns=pd.Index(["RGSM"]))
     valid_group_col = None
     if group_by and fastq_list_file_path:
@@ -443,7 +406,6 @@ def main() -> None:
             fastq_list_file_path, group_by
         )
 
-    # Generate plots and write plot data to file
     for library_type, library_metrics_df in metrics_df.groupby(
         "Library type", dropna=False
     ):
@@ -453,7 +415,6 @@ def main() -> None:
             .fillna({valid_group_col: "Unknown"} if valid_group_col else {})
         )
 
-        # Set output folder depending on library_type
         library_output_folder = (
             output_folder
             if pd.isna(library_type)

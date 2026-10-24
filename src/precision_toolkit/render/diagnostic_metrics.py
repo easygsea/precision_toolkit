@@ -163,7 +163,6 @@ def format_diagnostic_metrics_table(
     """
     formatted_df = df.copy()
     metric_col = "F1 Score" if metric_type == "f1_score" else metric_type.capitalize()
-    # Only format CI columns if they exist
     cols_to_format = [metric_col]
     if metric_type == "f1_score":
         cols_to_format.extend(["Sensitivity", "Precision"])
@@ -208,7 +207,6 @@ def export_diagnostic_metrics_to_markdown(
     elif len(metric_types) != len(dfs):
         raise ValueError("Number of metric types must match number of DataFrames")
 
-    # Process each DataFrame and collect markdown content
     all_content = []
     for i, df in enumerate(dfs):
         formatted_df = format_diagnostic_metrics_table(
@@ -221,7 +219,6 @@ def export_diagnostic_metrics_to_markdown(
         content = populate_markdown(formatted_df, heading, summary)
         all_content.append(content)
 
-    # Combine all content and save to file
     final_content = "\n\n".join(all_content)
     save_markdown(final_content, output_file)
 
@@ -253,10 +250,8 @@ def export_diagnostic_metrics_to_word(
     elif len(metric_types) != len(dfs):
         raise ValueError("Number of metric types must match number of DataFrames")
 
-    # Initiate Word document
     doc = initiate_word_document()
 
-    # Process each DataFrame and add to Word document
     for i, df in enumerate(dfs):
         formatted_df = format_diagnostic_metrics_table(
             typing.cast(pd.DataFrame, df),
@@ -267,5 +262,4 @@ def export_diagnostic_metrics_to_word(
         summary = summaries[i] if summaries else None
         pandas_to_word(formatted_df, doc, heading, summary)
 
-    # Save final Word document
     save_word_document(output_file, doc)

@@ -49,14 +49,12 @@ def assemble_exports(
         ValueError: If number of headings or summaries doesn't match number of
         DataFrames
     """
-    # Convert single instances to lists for consistent processing
     dfs = convert_to_list_if_single_instance(dfs)
     if headings is not None:
         headings = convert_to_list_if_single_instance(headings)
     if summaries is not None:
         summaries = convert_to_list_if_single_instance(summaries)
 
-    # Validate that headings and summaries match the number of DataFrames
     if headings is not None and len(headings) != len(dfs):
         raise ValueError("Number of headings must match number of DataFrames")
     if summaries is not None and len(summaries) != len(dfs):

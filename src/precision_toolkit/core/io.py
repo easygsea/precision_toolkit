@@ -22,7 +22,6 @@ class FileMode(StrEnum):
     WRITE = "w"
 
 
-# Setup logging:
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -69,20 +68,16 @@ def read_dataframe(
         DataFrame or None if reading fails.
     """
     try:
-        # Auto-detect format if not specified
         if format_type is None:
             format_type = detect_format(input_file)
 
-        # Auto-detect delimiter if not specified
         if delimiter is None and format_type in {"csv", "tsv"}:
             delimiter, buffer = sniff_delimiter(input_file)
-            # Use default delimiter if sniffing fails
             if delimiter is None:
                 delimiter = "\t" if format_type == "tsv" else ","
             if buffer is not None:
                 input_file = StringIO(buffer)
 
-        # Read file based on format
         dtype = str if convert_to_string else None
         if format_type == "tsv":
             return pd.read_csv(

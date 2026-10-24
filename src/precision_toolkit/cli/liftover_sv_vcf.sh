@@ -1,28 +1,17 @@
 #!/bin/bash
-#
-# Structural Variant VCF Liftover Tool
-#
-# This script converts VCF files from one genome assembly to another using UCSC's liftOver utility.
-# It mainly supports structural variants (CNVs, SV breakends, imprecise intervals).
-# For SNVs and indels, Picard LiftoverVcf is recommended.
-#
-# Usage: liftover_sv_vcf.sh <input.vcf> <output.vcf> <chain_file> [options]
 
 set -euo pipefail
 
-# Default values
 VERBOSE=false
 KEEP_TEMP=false
 TEMP_DIR="./temp_liftover_$$"
 
-# Simplified logging function
 log_msg() {
     local level="$1"
     local msg="$2"
     echo "[$level] $(date '+%Y-%m-%d %H:%M:%S') - $msg"
 }
 
-# Function to show usage
 show_usage() {
     cat << EOF
 Structural Variant VCF Liftover Tool
@@ -51,7 +40,6 @@ Prerequisites:
 EOF
 }
 
-# Function to check dependencies
 check_dependencies() {
     if ! command -v liftOver &> /dev/null; then
         log_msg "ERROR" "UCSC liftOver utility not found in PATH"
@@ -60,7 +48,6 @@ check_dependencies() {
     fi
 }
 
-# Function to validate input files
 validate_inputs() {
 	local input_vcf="$1"
 	local chain_file="$2"
@@ -74,13 +61,10 @@ validate_inputs() {
 	fi
 }
 
-# Function to convert VCF to BED format (BED4+)
-# Extracts END from INFO if present, otherwise uses POS+length(REF)-1
 vcf_to_bed() {
 	local input_vcf="$1"
 	local output_bed="$2"
 	log_msg "INFO" "Converting VCF to BED format (BED4+INFO)..."
-	# Always use the uncompressed VCF file (input_vcf is already uncompressed to temp)
 	awk -F'\t' 'BEGIN{OFS="\t"}
 	/^#/ { next }
 	{
@@ -89,21 +73,18 @@ vcf_to_bed() {
 		id = $3
 		ref = $4
 		info = $8
-		# Try to extract END from INFO
 		end = ""
 		if (match(info, /END=([0-9]+)/, arr)) {
 			end = arr[1]
 		} else {
 			end = pos + length(ref) - 1
 		}
-		start = pos - 1  # BED is 0-based, half-open
-		# Use variant ID if available, otherwise create coordinate-based name
+		start = pos - 1
 		if (id == "." || id == "") {
 			name = chrom ":" pos
 		} else {
 			name = id
 		}
-		# Output: chrom, start, end, name, info (BED4+)
 		print chrom, start, end, name, info
 	}' "${input_vcf}" > "${output_bed}"
 	local variant_count
@@ -111,7 +92,6 @@ vcf_to_bed() {
 	log_msg "INFO" "Created BED file with ${variant_count} variants"
 }
 
-# Function to run liftover with -bedPlus=4
 run_liftover() {
 	local input_bed="$1"
 	local chain_file="$2"
@@ -129,18 +109,15 @@ run_liftover() {
 	fi
 }
 
-# Function to convert BED4+INFO back to VCF
 bed_to_vcf() {
 	local original_vcf="$1"
 	local bed_file="$2"
 	local output_vcf="$3"
 	local chain_file="$4"
 	log_msg "INFO" "Converting BED back to VCF format..."
-	# Create temporary files
 	local temp_header="${TEMP_DIR}/header.tmp"
 	local temp_variants="${TEMP_DIR}/variants.tmp"
 	local temp_mapping="${TEMP_DIR}/mapping.tmp"
-	# Extract VCF header and append lengths extracted from chain file to contig fields
 	awk 'FNR==NR { if (/^chain/) target_contig_lengths[$8]=$9; next }
 	/^#/ {
 		if (/^##contig/) {
@@ -151,8 +128,6 @@ bed_to_vcf() {
 		}
 		print
 	}' "${chain_file}" "${original_vcf}" > "${temp_header}"
-	# Create coordinate mapping from BED file (BED4+INFO)
-	# Output: name \t new_chrom \t new_start \t new_end \t info
 	awk -F'\t' 'BEGIN{OFS="\t"}{
 		name = $4
 		new_chrom = $1
@@ -161,10 +136,8 @@ bed_to_vcf() {
 		info = $5
 		print name, new_chrom, new_start, new_end, info
 	}' "${bed_file}" > "${temp_mapping}"
-	# Process variants and update coordinates
 	awk -F'\t' -v mapping_file="${temp_mapping}" 'BEGIN{OFS="\t"}
 	BEGIN {
-		# Load coordinate mapping
 		while ((getline line < mapping_file) > 0) {
 			split(line, fields, "\t")
 			mapping[fields[1]] = fields[2] "\t" fields[3] "\t" fields[4] "\t" fields[5]
@@ -185,24 +158,17 @@ bed_to_vcf() {
 			new_start = new_coords[2]
 			new_end = new_coords[3]
 			new_info = new_coords[4]
-			# VCF POS is 1-based, BED start is 0-based
 			$1 = new_chrom
 			$2 = new_start + 1
-			# Update END in INFO field if present
-			# Replace END=old with END=new_end
 			if ($8 ~ /END=[0-9]+/) {
 				gsub(/END=[0-9]+/, "END=" new_end, $8)
 			} else {
-				# If END not present, append it
 				if ($8 == ".") {
 					$8 = "END=" new_end
 				} else {
 					$8 = $8 ";END=" new_end
 				}
 			}
-			# Optionally, restore original INFO if needed:
-			# $8 = new_info
-			# Print updated line
 			for (i = 1; i <= NF; i++) {
 				printf "%s", $i
 				if (i < NF) printf OFS
@@ -212,14 +178,12 @@ bed_to_vcf() {
 			printf "Variant %s was not mapped\n", name > "/dev/stderr"
 		}
 	}' "${original_vcf}" > "${temp_variants}"
-	# Combine header and variants
 	cat "${temp_header}" "${temp_variants}" > "${output_vcf}"
 	local mapped_count
 	mapped_count=$(wc -l < "${temp_variants}")
 	log_msg "INFO" "Created VCF with ${mapped_count} successfully lifted variants"
 }
 
-# Function to report statistics
 report_statistics() {
 	local output_bed="$1"
 	local unmapped_bed="$2"
@@ -238,7 +202,6 @@ report_statistics() {
 	fi
 }
 
-# Function to cleanup temporary files
 cleanup() {
 	if [[ "${KEEP_TEMP}" == "false" ]] && [[ -d "${TEMP_DIR}" ]]; then
 		log_msg "INFO" "Cleaning up temporary files..."
@@ -248,19 +211,15 @@ cleanup() {
 	fi
 }
 
-# Main function
 main() {
-	# Check if we have the required arguments
 	if [[ $# -lt 3 ]]; then
 		log_msg "ERROR" "Missing required arguments"
 		show_usage
 		exit 1
 	fi
-	# Parse required positional arguments
 	local input_vcf="$1"
 	local output_vcf="$2"
 	local chain_file="$3"
-	# Parse command line arguments
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
 			-h|--help)
@@ -296,14 +255,10 @@ main() {
 		log_msg "DEBUG" "Chain file: ${chain_file}"
 		log_msg "DEBUG" "Temporary directory: ${TEMP_DIR}"
 	fi
-	# Check dependencies
 	check_dependencies
-	# Validate inputs
 	validate_inputs "${input_vcf}" "${chain_file}"
-	# Create temporary directory
 	mkdir -p "${TEMP_DIR}"
 
-	# Unzip input VCF to a temporary file if needed, and use that for all downstream processing
 	local uncompressed_vcf="${TEMP_DIR}/input.vcf"
 	if [[ "${input_vcf}" == *.gz ]]; then
 		log_msg "INFO" "Unzipping input VCF to temporary file: ${uncompressed_vcf}"
@@ -319,22 +274,15 @@ main() {
 		cp "${input_vcf}" "${uncompressed_vcf}"
 	fi
 
-	# Define temporary file paths
 	local input_bed="${TEMP_DIR}/input.bed"
 	local output_bed="${TEMP_DIR}/output.bed"
 	local unmapped_bed="${TEMP_DIR}/unmapped.bed"
-	# Set up trap to cleanup on exit
 	trap cleanup EXIT
-	# Step 1: Convert VCF to BED4+INFO
 	vcf_to_bed "${uncompressed_vcf}" "${input_bed}"
-	# Step 2: Run liftover with -bedPlus=4
 	run_liftover "${input_bed}" "${chain_file}" "${output_bed}" "${unmapped_bed}"
-	# Step 3: Convert back to VCF
 	bed_to_vcf "${uncompressed_vcf}" "${output_bed}" "${output_vcf}" "${chain_file}"
-	# Step 4: Report statistics
 	report_statistics "${output_bed}" "${unmapped_bed}"
 	log_msg "INFO" "Liftover completed successfully. Output: ${output_vcf}"
 }
 
-# Run main function with all arguments
 main "$@"

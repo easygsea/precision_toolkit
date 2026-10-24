@@ -68,10 +68,8 @@ def count_variants_by_size(
     Returns:
         Dictionary with size ranges as keys and counts as values
     """
-    # Sort and deduplicate stratification points
     size_points = sorted(set(size_stratification))
 
-    # Create size ranges
     size_ranges = []
     size_ranges.append(
         str(size_points[0]) if size_points[0] == 1 else f"1-{size_points[0]}"
@@ -197,7 +195,7 @@ def intersect_vcfs(
             catch_stdout=False,
         )
 
-        vcf_to_keep = Path(tmpdir) / f"{keep}.vcf"  # isec doesn't output bgzipped VCFs
+        vcf_to_keep = Path(tmpdir) / f"{keep}.vcf"
         if str(intersected_vcf_path).endswith(".vcf.gz"):
             shutil.copy2(bgzip_and_index_vcf(vcf_to_keep), intersected_vcf_path)
         else:

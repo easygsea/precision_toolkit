@@ -84,8 +84,6 @@ def test_plot_contamination_vafs(
     with tempfile.TemporaryDirectory() as tmpdir:
         output_folder = Path(tmpdir) / "plot_contamination_vafs"
 
-        # If --population-variants-vcf or --population-marks-vcf is provided, resolve
-        # path
         additional_args_resolved = [
             str(test_data_dir / arg) if arg.endswith(".vcf") else arg
             for arg in additional_args
@@ -103,8 +101,6 @@ def test_plot_contamination_vafs(
             check=True,
         )
 
-        # Check that MD5 checksum matches with expected for each output file, with the
-        # exception of *.tbi files
         for filename, expected_md5 in expected_checksums[checksum_json_key].items():
             generated_md5 = _compute_md5(output_folder / filename)
             assert generated_md5 == expected_md5

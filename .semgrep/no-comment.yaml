@@ -1,0 +1,11 @@
+rules:
+  - id: no-comment
+    languages:
+      - python
+      - bash
+    message: "Do not use comments."
+    patterns:
+      - pattern-regex: '(?m)^[ \t]*#(?!\!).*|[ \t]+#.*$'
+      - pattern-not-regex: '(?i)#\s*(?:nosec\b|noqa\b|ty:\s*ignore\b)'
+    fix: ""
+    severity: ERROR

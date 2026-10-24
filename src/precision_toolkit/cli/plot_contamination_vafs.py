@@ -10,13 +10,14 @@ Usage:
     [--population-snp-af-threshold <min_af>]
 
 Example usage:
-    # Example input datasets available in tests_data/contamination
-    # DRAGEN's *.tmb.trace.tsv output
+    Example input datasets available in tests_data/contamination
+
+    DRAGEN .tmb.trace.tsv output
     plot-contamination-vafs \
         --variant-calls NA12878_Coriell_IX13680_F161339.tmb.trace.tsv \
         --output-folder contamination_vaf_plot
 
-    # Variant calls VCF + population variants VCF
+    Variant calls VCF + population variants VCF
     plot-contamination-vafs \
         --variant-calls NA12878_Coriell_IX13680_F161339.hard-filtered.vcf \
         --variant-vcf-apply-filters 'PASS' \
@@ -26,7 +27,7 @@ Example usage:
         --population-snp-af-threshold 0.01 \
         --output-folder contamination_vaf_plot
 
-    # Variant calls VCF + population markers VCF
+    Variant calls VCF + population markers VCF
     plot-contamination-vafs \
         --variant-calls NA12878_Coriell_IX13680_F161339.hard-filtered.vcf \
         --variant-vcf-apply-filters 'PASS' \
@@ -57,7 +58,6 @@ from precision_toolkit.analysis.vcf import (
 )
 from precision_toolkit.core.io import FileMode, open_file
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s %(message)s",
@@ -66,7 +66,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Exclude mitochondrial chromosome, ALT contigs, unplaced scaffolds, etc.
 VALID_CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X", "Y"]
 
 
@@ -102,15 +101,11 @@ def generate_population_markers_vcf(
             ".vcf"
         )
 
-        # Ensure population variants VCF is properly formatted: sites only and
-        # multi-allelic sites are collapsed for consistent filtering of bi-allelic SNPs
         sites_only_vcf_path = Path(tmpdir) / f"{vcf_stem}.sites_only.vcf.gz"
         drop_genotypes(population_variants_vcf, sites_only_vcf_path)
         collapsed_vcf_path = Path(tmpdir) / f"{vcf_stem}.collapsed.vcf.gz"
         collapse_multi_allelics(sites_only_vcf_path, collapsed_vcf_path)
 
-        # Subset VCF to population markers: bi-allelic SNPs above the specified AF
-        # threshold
         biallelic_snps_vcf_path = Path(tmpdir) / f"{vcf_stem}.biallelic_snps.vcf.gz"
         extract_biallelic_snps(collapsed_vcf_path, biallelic_snps_vcf_path)
         population_markers_vcf_path = (
@@ -145,7 +140,7 @@ def extract_af(af_tag: str, vcf_record_fields: list[str]) -> float:
                 f"'{af_tag}' not found in INFO field: {vcf_record_fields[7]}."
             )
             sys.exit(1)
-    else:  # vcf_column == "FORMAT"
+    else:
         format_fields_keys = vcf_record_fields[8].split(":")
         format_fields_values = vcf_record_fields[9].split(":")
         if tag in format_fields_keys:
@@ -185,7 +180,6 @@ def prepare_plot_data(
             ):
                 continue
 
-            # Parse fields depending on input type
             fields = line.strip().split("\t")
             if is_tmb_trace:
                 chrom, pos, ref, alt = fields[:4]
@@ -214,8 +208,6 @@ def plot_contamination_vafs(
         output_folder: Directory to write the VAF plot and corresponding data to.
         show_y_gridlines: If True, display major and minor y-axis gridlines.
     """
-    # Filter for valid chromosomes (autosomal + sex chromosomes), then sort by chrom
-    # and pos
     germline_variant_calls_df["chrom_no_prefix"] = germline_variant_calls_df[
         "chrom"
     ].str.replace("chr", "")
@@ -227,12 +219,11 @@ def plot_contamination_vafs(
     )
     plot_data_df.sort_values(["chrom_no_prefix", "pos"], inplace=True)
 
-    # Plot VAFs
     num_germline_variants = len(plot_data_df)
     plot_data_df["x"] = range(num_germline_variants)
     fig, ax = plt.subplots(
         figsize=(min(max(8, num_germline_variants / 150), 30), 5)
-    )  # scale width by number of variants
+    )
     ax.scatter(
         plot_data_df["x"],
         plot_data_df["vaf"],
@@ -243,19 +234,17 @@ def plot_contamination_vafs(
         zorder=2,
     )
 
-    # Identify chromosome boundaries to add separator lines
     chrom_boundaries_df = plot_data_df.groupby("chrom_no_prefix", observed=True)[
         "x"
     ].agg(["min", "max"])
     x_labels = {}
     for chrom, row in chrom_boundaries_df.iterrows():
         if row["min"] > 0:
-            # Subtract 0.5 to position line between points of adjacent chromosomes
             ax.axvline(row["min"] - 0.5, color="lightgrey", linewidth=0.8, zorder=1)
         label_pos = (row["min"] + row["max"]) / 2
         x_labels[label_pos] = str(chrom)
 
-    ax.set_xlim(-0.5, num_germline_variants - 0.5)  # offset padding to center labels
+    ax.set_xlim(-0.5, num_germline_variants - 0.5)
     ax.set_xticks(list(x_labels.keys()))
     ax.set_xticklabels(x_labels.values())
     ax.tick_params(axis="x", length=0, labelsize=8)
@@ -279,7 +268,6 @@ def plot_contamination_vafs(
     ax.axhline(0.75, color="grey", linestyle="--", linewidth=1.0, zorder=1)
     fig.tight_layout()
 
-    # Save plot and write data to output folder
     fig.savefig(output_folder / "contamination_vafs.png", dpi=300)
     plt.close(fig)
     plot_data_df[["chrom", "pos", "ref", "alt", "vaf"]].to_csv(
@@ -379,7 +367,6 @@ def main() -> None:
         default=False,
     )
 
-    # Parse args
     args = parser.parse_args()
     variant_calls = Path(args.variant_calls)
     population_variants_vcf = (
@@ -396,7 +383,6 @@ def main() -> None:
     output_folder.mkdir(parents=True, exist_ok=True)
     show_y_gridlines = args.y_gridlines
 
-    # Validate args
     is_dragen_output = (
         str(variant_calls).endswith(".tmb.trace.tsv")
         or "hard-filtered.vcf" in variant_calls.name
@@ -408,7 +394,7 @@ def main() -> None:
         )
         sys.exit(1)
     if str(variant_calls).endswith(".tmb.trace.tsv"):
-        variant_vcf_apply_filters = None  # no FILTER column in *.tmb.trace.tsv
+        variant_vcf_apply_filters = None
         if population_variants_vcf or population_markers_vcf:
             logger.warning(
                 "DRAGEN's *.tmb.trace.tsv passed as input. Ignoring supplied "
@@ -416,7 +402,6 @@ def main() -> None:
             )
             population_variants_vcf, population_markers_vcf = None, None
 
-    # Subset population variants to population markers (i.e. common bi-allelic SNPs)
     if population_variants_vcf and not population_markers_vcf:
         logger.info(
             f"Selecting population markers from population variants VCF - bi-allelic "
@@ -429,7 +414,6 @@ def main() -> None:
             output_folder,
         )
 
-    # Filter variant calls VCF to specified FILTER values
     vcf_stem = variant_calls.name.removesuffix(".vcf.gz").removesuffix(".vcf")
     if variant_vcf_apply_filters:
         variant_calls_filter_expression = " || ".join(
@@ -445,7 +429,6 @@ def main() -> None:
     else:
         variant_calls_filtered = variant_calls
 
-    # Prepare plot data
     if population_markers_vcf:
         logger.info(
             "Intersecting variant calls with population markers to identify germline "
@@ -478,7 +461,6 @@ def main() -> None:
             filter_on_dragen_germline_status=True,
         )
 
-    # Plot
     plot_contamination_vafs(germline_variant_calls_df, output_folder, show_y_gridlines)
 
 

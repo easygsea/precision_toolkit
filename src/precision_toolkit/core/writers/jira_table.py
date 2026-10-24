@@ -6,7 +6,6 @@ import re
 import pandas as pd
 from tabulate import tabulate
 
-# Setup logging:
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 

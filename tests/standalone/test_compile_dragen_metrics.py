@@ -174,7 +174,6 @@ def test_compile_dragen_metrics(
         output_file = output_prefix / f"{rgsm}_MetricsOutput.tsv"
         assert output_file.exists()
 
-        # Compare parsed to expected values
         parsed_colnames, parsed_metrics = _parse_script_output(output_file)
         expected_colnames = [
             "Metric (UOM)",
@@ -185,6 +184,5 @@ def test_compile_dragen_metrics(
             "Status",
         ]
 
-        # Ensure parsed values match expected
         assert parsed_colnames == expected_colnames
         assert parsed_metrics == expected_metrics

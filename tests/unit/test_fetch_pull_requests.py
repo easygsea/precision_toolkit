@@ -17,7 +17,6 @@ def test_fetch_repos_success_no_prs(
 ) -> None:
     """Test that correct calls is made for existing repo with no prs."""
     caplog.set_level(logging.INFO)
-    # Response for the first call (Fetch Repos)
     repo_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -25,10 +24,8 @@ def test_fetch_repos_success_no_prs(
         },
     )
 
-    # Response for the second call (Fetch PRs for repo-a)
     pr_response = SimpleNamespace(status_code=200, json=lambda: {"values": []})
 
-    # Call tracker to manage multiple calls and count them
     responses = [repo_response, pr_response]
     calls = []
 
@@ -36,12 +33,10 @@ def test_fetch_repos_success_no_prs(
         calls.append(url)
         return responses.pop(0) if responses else repo_response
 
-    # Apply the monkeypatch
     monkeypatch.setattr(
         "precision_toolkit.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
 
-    # Call the function
     fetch_pull_requests(bitbucket_url="http://fake", project="P", repo="R", token="T")
 
     assert len(calls) == 2, f"Expected 2 calls, but got {len(calls)}: {calls}"
@@ -54,7 +49,6 @@ def test_fetch_prs_empty_args(caplog: pytest.LogCaptureFixture) -> None:
     caplog.set_level(logging.WARNING)
     fetch_pull_requests("", "", "", "")
 
-    # Check if the expected "Invalid URL" message was printed
     assert "Invalid URL" in caplog.text
 
 
@@ -63,7 +57,6 @@ def test_fetch_prs_invalid_args(caplog: pytest.LogCaptureFixture) -> None:
     caplog.set_level(logging.WARNING)
     fetch_pull_requests("123", "test", "test", "123")
 
-    # Check if the expected "Invalid URL" message was printed
     assert "Invalid URL" in caplog.text
 
 
@@ -72,7 +65,6 @@ def test_fetch_repos_success_with_prs(
 ) -> None:
     """Test that correct calls is made for repo with prs."""
     caplog.set_level(logging.INFO)
-    # Response for the first call (Fetch Repos)
     repo_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -82,7 +74,6 @@ def test_fetch_repos_success_with_prs(
         },
     )
 
-    # Response for the second call (Fetch PRs for repo-a)
     pr_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -96,7 +87,6 @@ def test_fetch_repos_success_with_prs(
         },
     )
 
-    # Call tracker to manage multiple calls and count them
     responses = [repo_response, pr_response]
     calls = []
 
@@ -104,7 +94,6 @@ def test_fetch_repos_success_with_prs(
         calls.append(url)
         return responses.pop(0) if responses else repo_response
 
-    # Apply the monkeypatch
     monkeypatch.setattr(
         "precision_toolkit.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
@@ -126,7 +115,6 @@ def test_fetch_prs_request_exception(
 ) -> None:
     """Test request exception error handling when calling PR fetching function."""
     caplog.set_level(logging.WARNING)
-    # Setup: Make the mock "throw" a ConnectionError
 
     def mock_get_exception(*args: object, **kwargs: object) -> NoReturn:
         """Mock function to raise a ConnectionError."""
@@ -136,7 +124,6 @@ def test_fetch_prs_request_exception(
 
     fetch_pull_requests(bitbucket_url="http://fake", project="P", repo="R", token="T")
 
-    # Check if 'except' block caught it and printed the error
     assert (
         "Connection refused" in caplog.text
         and "An error occurred while fetching data" in caplog.text
@@ -149,7 +136,6 @@ def test_fetch_prs_missing_fields(
     """Test print behavior for multiple PR's containing valid/invalid fields."""
     caplog.set_level(logging.INFO)
 
-    # Response for the first call (Fetch Repos)
     repo_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -159,7 +145,6 @@ def test_fetch_prs_missing_fields(
         },
     )
 
-    # Response for the second call (Fetch PRs for repo-a)
     pr_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -171,12 +156,11 @@ def test_fetch_prs_missing_fields(
                 },
                 {
                     "title": "Broken PR"
-                },  # Missing required fields such as id and fromRef
+                },
             ]
         },
     )
 
-    # Call tracker to manage multiple calls and count them
     responses = [repo_response, pr_response]
     calls = []
 
@@ -184,7 +168,6 @@ def test_fetch_prs_missing_fields(
         calls.append(url)
         return responses.pop(0) if responses else repo_response
 
-    # Apply the monkeypatch
     monkeypatch.setattr(
         "precision_toolkit.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
