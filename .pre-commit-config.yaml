@@ -11,9 +11,13 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      - id: trailing-whitespace
-        exclude: ^tests/.*/data/|^tests_data/
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
       - id: end-of-file-fixer
+        exclude: ^tests/.*/data/|^tests_data/
+      - id: trailing-whitespace
         exclude: ^tests/.*/data/|^tests_data/
 
   - repo: https://github.com/astral-sh/ty-pre-commit
