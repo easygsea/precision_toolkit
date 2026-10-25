@@ -11,6 +11,32 @@ repos:
         language: script
         always_run: true
         pass_filenames: false
+      - id: ruff-check
+        name: uv run ruff check
+        entry: uv run ruff check
+        language: system
+        pass_filenames: false
+      - id: uv-audit
+        name: uv audit (auto-upgrade on findings)
+        entry: .pre-commit/uv_audit_fix.sh
+        language: script
+        pass_filenames: false
+
+  - repo: https://github.com/AleksaC/hadolint-py
+    rev: v2.15.1
+    hooks:
+      - id: hadolint
+        args: [
+          "--ignore", "DL3003",  # Allow WORKDIR to change directories
+          "--ignore", "DL3008",  # Allow apt-get without version pins for latest packages
+          "--ignore", "DL3013"   # Allow pip without version pins for latest pip
+        ]
+        files: "^Dockerfile"
+
+  - repo: https://github.com/astral-sh/ty-pre-commit
+    rev: v0.0.90
+    hooks:
+      - id: ty
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.13.5
@@ -29,21 +55,13 @@ repos:
       - id: trailing-whitespace
         exclude: ^tests/.*/data/|^tests_data/
 
-  - repo: https://github.com/astral-sh/ty-pre-commit
-    rev: v0.0.90
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.4
     hooks:
-      - id: ty
-
-  - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1-1
-    hooks:
-      - id: shellcheck
-
-  - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.14.1-1
-    hooks:
-      - id: shfmt
-        args: ["--indent", "2", "--write"]
+      - id: bandit
+        types: [python]
+        args: ["-r", "-lll", "-c", "pyproject.toml"]
+        files: "^src/|^tests/"
 
   - repo: https://github.com/semgrep/pre-commit
     rev: v1.157.0
@@ -56,21 +74,13 @@ repos:
         args: ["--config", ".semgrep", "--error", "--quiet"]
         files: "^src/|^tests/"
 
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.9.4
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1-1
     hooks:
-      - id: bandit
-        types: [python]
-        args: ["-r", "-lll", "-c", "pyproject.toml"]
-        files: "^src/"
+      - id: shellcheck
 
-  - repo: https://github.com/AleksaC/hadolint-py
-    rev: v2.15.1
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.14.1-1
     hooks:
-      - id: hadolint
-        args: [
-          "--ignore", "DL3003",  # Allow WORKDIR to change directories
-          "--ignore", "DL3008",  # Allow apt-get without version pins for latest packages
-          "--ignore", "DL3013"   # Allow pip without version pins for latest pip
-        ]
-        files: "^Dockerfile"
+      - id: shfmt
+        args: ["--indent", "2", "--write"]

@@ -37,9 +37,6 @@ IMAGE_STORE_ROOT="$3"
 
 cd "${TESTING_DEVELOPMENT_DIRECTORY}/precision_toolkit"
 
-git log --format=%B origin/main..HEAD | uv run semgrep --config commit-message.yaml --error --quiet -
-uv audit
-uv run ruff check
 uv run pre-commit run --all-files
 
 VERSION=$(sed 's/^VERSION=//' precision_toolkit_version.txt)

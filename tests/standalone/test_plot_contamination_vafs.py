@@ -48,8 +48,8 @@ def _compute_md5(path: Path) -> str:
             content = "".join(
                 line for line in f.readlines() if not line.startswith("#")
             )
-        return hashlib.md5(content.encode()).hexdigest()
-    return hashlib.md5(path.read_bytes()).hexdigest()
+        return hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
+    return hashlib.md5(path.read_bytes(), usedforsecurity=False).hexdigest()
 
 
 @pytest.mark.parametrize(

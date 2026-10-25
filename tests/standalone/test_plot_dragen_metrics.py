@@ -101,7 +101,7 @@ def test_plot_dragen_metrics_single(
 
         for filename, expected_md5 in expected_checksums[checksum_json_key].items():
             generated_md5 = hashlib.md5(
-                (expected_output_folder / filename).read_bytes()
+                (expected_output_folder / filename).read_bytes(), usedforsecurity=False
             ).hexdigest()
             assert generated_md5 == expected_md5
 
@@ -134,7 +134,7 @@ def test_plot_dragen_metrics_multiple(
             "panheme_multiple_default"
         ].items():
             generated_md5 = hashlib.md5(
-                (output_folder / filename).read_bytes()
+                (output_folder / filename).read_bytes(), usedforsecurity=False
             ).hexdigest()
             assert generated_md5 == expected_md5
 

@@ -70,8 +70,8 @@ def test_jira_table_formats(
 def test_jira_table_stdin(sample_files: dict[str, Path | pd.DataFrame]) -> None:
     """Test basic jira-table command with stdin."""
     result = subprocess.run(
-        f"cat {sample_files['csv_file']} | jira-table",
-        shell=True,
+        ["jira-table"],
+        input=Path(str(sample_files["csv_file"])).read_text(),
         check=True,
         capture_output=True,
         text=True,

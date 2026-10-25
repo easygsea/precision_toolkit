@@ -20,20 +20,40 @@ dependencies = [
     "openpyxl==3.1.5"
 ]
 
-[tool.ty.src]
-exclude = ["src/third_party/"]
-
 [dependency-groups]
 dev = [
-    "pre-commit==4.3.0",
+    "pre-commit==4.7.0",
     "pytest==9.0.3",
     "pytest-cov==7.0.0",
     "pytest-workflow==2.0.1",
     "pytest-xdist==3.6.1",
     "ruff==0.17.1",
-    "semgrep==1.157.0",
     "types-requests==2.32.4.20260107",
 ]
+
+[project.scripts]
+compile-dragen-metrics = "precision_toolkit.cli.compile_dragen_metrics:main"
+convert-inversions = "third_party.convertInversions:main"
+convert-multi-sample-vcf = "precision_toolkit.cli.convert_multi_sample_vcf:main"
+count-variants-by-size = "precision_toolkit.cli.count_variants_by_size:main"
+fetch-pull-requests = "precision_toolkit.cli.fetch_pull_requests:main"
+generate-standardized-bed = "precision_toolkit.cli.generate_standardized_bed:main"
+jira-table = "precision_toolkit.cli.jira_table:main"
+manual-diagnostic-metric-curation = "precision_toolkit.cli.manual_diagnostic_metric_curation:main"
+plot-contamination-vafs = "precision_toolkit.cli.plot_contamination_vafs:main"
+plot-dragen-metrics = "precision_toolkit.cli.plot_dragen_metrics:main"
+plot-gene-boxplots = "precision_toolkit.cli.plot_gene_boxplots:main"
+plot-signal-correlation = "precision_toolkit.cli.plot_signal_correlation:main"
+plot-target-tracts = "precision_toolkit.cli.plot_target_tracts:main"
+summarize-diagnostic-metrics = "precision_toolkit.cli.summarize_diagnostic_metrics:main"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests/unit",
+    "tests/standalone",
+    "tests/workflow",
+]
+addopts = "-v --cov=src --cov-report=term-missing"
 
 [tool.ruff]
 line-length = 88
@@ -60,21 +80,15 @@ convention = "google"
 [tool.ty.analysis]
 respect-type-ignore-comments = false
 
-[project.scripts]
-compile-dragen-metrics = "precision_toolkit.cli.compile_dragen_metrics:main"
-convert-inversions = "third_party.convertInversions:main"
-convert-multi-sample-vcf = "precision_toolkit.cli.convert_multi_sample_vcf:main"
-count-variants-by-size = "precision_toolkit.cli.count_variants_by_size:main"
-fetch-pull-requests = "precision_toolkit.cli.fetch_pull_requests:main"
-generate-standardized-bed = "precision_toolkit.cli.generate_standardized_bed:main"
-jira-table = "precision_toolkit.cli.jira_table:main"
-manual-diagnostic-metric-curation = "precision_toolkit.cli.manual_diagnostic_metric_curation:main"
-plot-contamination-vafs = "precision_toolkit.cli.plot_contamination_vafs:main"
-plot-dragen-metrics = "precision_toolkit.cli.plot_dragen_metrics:main"
-plot-gene-boxplots = "precision_toolkit.cli.plot_gene_boxplots:main"
-plot-signal-correlation = "precision_toolkit.cli.plot_signal_correlation:main"
-plot-target-tracts = "precision_toolkit.cli.plot_target_tracts:main"
-summarize-diagnostic-metrics = "precision_toolkit.cli.summarize_diagnostic_metrics:main"
+[tool.ty.src]
+exclude = ["src/third_party/"]
+
+[tool.uv]
+exclude-newer = "2 days"
+preview-features = ["malware-check", "audit-command"]
+
+[tool.uv.audit]
+malware-check = true
 
 [build-system]
 requires = ["uv_build>=0.10.7,<0.11.0"]
@@ -82,11 +96,3 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-name = "precision_toolkit"
-
-[tool.pytest.ini_options]
-testpaths = [
-    "tests/unit",
-    "tests/standalone",
-    "tests/workflow",
-]
-addopts = "-v --cov=src --cov-report=term-missing"
