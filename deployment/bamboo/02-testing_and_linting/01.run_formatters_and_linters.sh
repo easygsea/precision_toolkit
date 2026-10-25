@@ -22,7 +22,7 @@ Password:
 
 SSH command:
 cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit/deployment/bamboo/02-testing_and_linting/
-bash 02.run_formatters_and_linters.sh \
+bash 01.run_formatters_and_linters.sh \
 ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
 ${bamboo.inject.IMAGE_NAME} \
 ${bamboo.TEMPORARY_IMAGE_ROOT}
