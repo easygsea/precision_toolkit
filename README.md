@@ -81,7 +81,7 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
    To get a specific version, use:
 
    ```bash
-   apptainer pull docker://quay.io/easygsea/precision_toolkit:v1.3.1
+   apptainer pull docker://quay.io/easygsea/precision_toolkit:v1.3.2
    ```
 
 2. Run specific tools inside the container. Example:

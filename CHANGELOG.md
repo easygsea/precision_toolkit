@@ -4,6 +4,11 @@
 
 ---
 
+### v1.3.2 - 2026-10-25
+- Hotfix: Dockerfile update to .NET 10 and install runtime from MCR image instead of Debian 12 apt feed.
+
+---
+
 ### v1.3.1 - 2026-10-23
 - New Standalone Utility: Add third-party `convert-inversions` (adapted from Manta) to convert inversion breakend entries in DRAGEN SV VCF files into symbolic inversion (`<INV>`) records.
 - Feature: Add `d2` into Dockerfile.
