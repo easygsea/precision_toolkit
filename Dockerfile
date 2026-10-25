@@ -21,7 +21,7 @@ ARG WITTYER_VERSION
 WORKDIR /opt/witty.er
 
 # Build witty.er as-is for its own target framework (net6.0); the .NET 10 SDK builds older targets unchanged.
-# It runs on the .NET 10 runtime via DOTNET_ROLL_FORWARD=Major (set in the final image).
+# It runs on the .NET 10 runtime via DOTNET_ROLL_FORWARD=Major (set in the witty.er wrapper only).
 # Note: DOTNET_CHANNEL is used instead of DOTNET_VERSION because Microsoft's .NET images set
 # ENV DOTNET_VERSION to the full patch version (e.g. 10.0.14), which would override an ARG of the same name.
 RUN apt-get update && apt-get install -y --no-install-recommends git && \
@@ -50,12 +50,11 @@ ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
 ARG TRUVARI_VERSION
 ARG WITTYER_DOTNET
+ARG WITTYER_VERSION
 WORKDIR /app
 
-# Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and build tools
-RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${PSUTIL_VERSION}" && \
-    pip uninstall --y bx-python cryptography cvxopt idna lxml numexpr pillow pip py pyxdg pycrypto setuptools && \
-    apt-get update && apt-get upgrade -y && \
+# Update system libraries and build tools, upgrade python2.7 libraries, and uninstall vulnerable packages
+RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends software-properties-common && \
     add-apt-repository ppa:ubuntu-toolchain-r/test && \
     apt-get update && \
@@ -82,6 +81,11 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
     wget \
     zlib1g-dev && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 && \
+    # Python 2.7 packages upgrade, rebuild, and remove vulnerable packages
+    pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${PSUTIL_VERSION}" && \
+    pip uninstall -y bx-python && \
+    pip install --no-cache-dir bx-python --no-binary bx-python && \
+    pip uninstall -y cryptography cvxopt idna lxml numexpr pillow pip py pyxdg pycrypto setuptools && \
     # Install mafft (dependency for truvari)
     wget --quiet "https://mafft.cbrc.jp/alignment/software/mafft_${MAFFT_VERSION}_amd64.deb" && \
     dpkg -i "mafft_${MAFFT_VERSION}_amd64.deb" && \
@@ -136,14 +140,12 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
 # Install .NET runtime
 COPY --from=dotnet_runtime /usr/share/dotnet /usr/share/dotnet
 RUN ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
-# DOTNET_ROLL_FORWARD=Major lets witty.er (built for net6.0) run on the .NET 10 runtime
 ENV DOTNET_ROOT=/usr/share/dotnet \
-    DOTNET_ROLL_FORWARD=Major \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
     DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # Copy witty.er binary
-COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
+COPY --from=witty_er_builder /opt/witty.er/Wittyer/bin/Release/${WITTYER_DOTNET} /witty.er/lib
 
 # Set environment variables
 ENV PATH="$PATH:/opt/hap.py/bin:/opt/truvari/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
@@ -151,21 +153,21 @@ ENV PATH="$PATH:/usr/bin"
 
 # Update shebangs, create wrapper script, smoke-test witty.er, set python defaults, and install truvari
 RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~#!/usr/bin/env python2.7~' {} \; && \
-    printf '#!/bin/bash\nexec dotnet /witty.er/bin/Release/%s/Wittyer.dll "$@"\n' "${WITTYER_DOTNET}" > /witty.er/bin/witty.er && \
+    # Wrapper: DOTNET_ROLL_FORWARD=Major lets witty.er (built for net6.0) run on the .NET 10 runtime
+    mkdir -p /witty.er/bin && \
+    printf '#!/bin/bash\nexport DOTNET_ROLL_FORWARD=Major\nexec dotnet /witty.er/lib/Wittyer.dll "$@"\n' > /witty.er/bin/witty.er && \
     chmod +x /witty.er/bin/witty.er && \
     dotnet --info && \
     # Smoke-test the actual wrapper: fail on missing DLL, missing framework, or an unhandled exception
-    { witty.er --help > /tmp/wittyer-help.txt 2>&1 || true; } && \
-    cat /tmp/wittyer-help.txt && \
-    ! grep -qiE "does not exist|must install or update \.NET|framework.*was not found|Unhandled exception|Could not load" /tmp/wittyer-help.txt && \
-    rm /tmp/wittyer-help.txt && \
+    { WITTYER_OUT="$(witty.er --version 2>&1)" || { echo "${WITTYER_OUT}"; echo "witty.er --version exited non-zero" >&2; exit 1; }; } && \
+    echo "${WITTYER_OUT}" && \
+    echo "${WITTYER_OUT}" | grep -q "^witty\.er ${WITTYER_VERSION}" && \
     update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1 && \
     update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1 && \
     python -m pip install --no-cache-dir --upgrade pip setuptools && \
     python -m venv /opt/truvari && \
     /opt/truvari/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/truvari/bin/pip install --no-cache-dir "truvari==${TRUVARI_VERSION}" && \
-    python2.7 -m pip install --no-cache-dir bx-python --no-binary bx-python
+    /opt/truvari/bin/pip install --no-cache-dir "truvari==${TRUVARI_VERSION}"
 
 # CDI-158 fix som.py inconsistency issue
 RUN sed -i 's~True,  # pass_only~not args.inc_nonpass, # account for nonpass in truth vcf~' /opt/hap.py/bin/som.py
