@@ -2,7 +2,7 @@
 ARG BEDOPS_VERSION=2.4.41
 ARG BEDTOOLS_VERSION=2.31.0
 ARG D2_VERSION=0.7.0
-ARG DOTNET_VERSION=10.0
+ARG DOTNET_CHANNEL=10.0
 ARG HAPPY_VERSION=0.3.15
 ARG HTSLIB_VERSION=1.21
 ARG JOBLIB_VERSION=0.14.1
@@ -11,22 +11,29 @@ ARG PSUTIL_VERSION=6.1.1
 ARG PYTHON_VERSION=3.13.12
 ARG TRUVARI_VERSION=5.4.0
 ARG UV_VERSION=0.10.7
+ARG WITTYER_DOTNET=net6.0
 ARG WITTYER_VERSION=0.5.2
 
 # Stage 1: Build witty.er from source
-FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS witty_er_builder
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_CHANNEL} AS witty_er_builder
+ARG WITTYER_DOTNET
 ARG WITTYER_VERSION
 WORKDIR /opt/witty.er
 
+# Build witty.er as-is for its own target framework (net6.0); the .NET 10 SDK builds older targets unchanged.
+# It runs on the .NET 10 runtime via DOTNET_ROLL_FORWARD=Major (set in the final image).
+# Note: DOTNET_CHANNEL is used instead of DOTNET_VERSION because Microsoft's .NET images set
+# ENV DOTNET_VERSION to the full patch version (e.g. 10.0.14), which would override an ARG of the same name.
 RUN apt-get update && apt-get install -y --no-install-recommends git && \
     rm -rf /var/lib/apt/lists/* && \
     git clone https://github.com/Illumina/witty.er.git . && \
     git checkout tags/v${WITTYER_VERSION} -b v${WITTYER_VERSION}-build && \
     cd Wittyer && \
-    dotnet publish . -c Release
+    dotnet publish . -c Release && \
+    test -f "bin/Release/${WITTYER_DOTNET}/Wittyer.dll"
 
 # Stage 2: .NET runtime
-FROM mcr.microsoft.com/dotnet/runtime:${DOTNET_VERSION} AS dotnet_runtime
+FROM mcr.microsoft.com/dotnet/runtime:${DOTNET_CHANNEL} AS dotnet_runtime
 
 # Stage 3: uv binary
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_binary
@@ -42,6 +49,7 @@ ARG MAFFT_VERSION
 ARG PSUTIL_VERSION
 ARG PYTHON_VERSION
 ARG TRUVARI_VERSION
+ARG WITTYER_DOTNET
 WORKDIR /app
 
 # Upgrade python2.7 libraries, uninstall vulnerable packages, update system libraries, and build tools
@@ -128,7 +136,9 @@ RUN pip install --upgrade --no-cache-dir "joblib==${JOBLIB_VERSION}" "psutil==${
 # Install .NET runtime
 COPY --from=dotnet_runtime /usr/share/dotnet /usr/share/dotnet
 RUN ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
+# DOTNET_ROLL_FORWARD=Major lets witty.er (built for net6.0) run on the .NET 10 runtime
 ENV DOTNET_ROOT=/usr/share/dotnet \
+    DOTNET_ROLL_FORWARD=Major \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
     DOTNET_CLI_TELEMETRY_OPTOUT=1
 
@@ -139,11 +149,16 @@ COPY --from=witty_er_builder /opt/witty.er/Wittyer /witty.er
 ENV PATH="$PATH:/opt/hap.py/bin:/opt/truvari/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
 ENV PATH="$PATH:/usr/bin"
 
-# Update shebangs, create wrapper script, set python defaults, and install truvari
+# Update shebangs, create wrapper script, smoke-test witty.er, set python defaults, and install truvari
 RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~#!/usr/bin/env python2.7~' {} \; && \
-    printf '#!/bin/bash\ndotnet /witty.er/bin/Release/net10.0/Wittyer.dll "$@"\n' > /witty.er/bin/witty.er && \
+    printf '#!/bin/bash\nexec dotnet /witty.er/bin/Release/%s/Wittyer.dll "$@"\n' "${WITTYER_DOTNET}" > /witty.er/bin/witty.er && \
     chmod +x /witty.er/bin/witty.er && \
     dotnet --info && \
+    # Smoke-test the actual wrapper: fail on missing DLL, missing framework, or an unhandled exception
+    { witty.er --help > /tmp/wittyer-help.txt 2>&1 || true; } && \
+    cat /tmp/wittyer-help.txt && \
+    ! grep -qiE "does not exist|must install or update \.NET|framework.*was not found|Unhandled exception|Could not load" /tmp/wittyer-help.txt && \
+    rm /tmp/wittyer-help.txt && \
     update-alternatives --install /usr/bin/python python /usr/local/bin/python3 1 && \
     update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3 1 && \
     python -m pip install --no-cache-dir --upgrade pip setuptools && \
