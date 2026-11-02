@@ -25,12 +25,9 @@ from enum import StrEnum
 from pathlib import Path
 
 from precision_toolkit.core.io import FileMode, open_file
+from precision_toolkit.core.logging_setup import setup_logging
 
-logging.basicConfig(
-    level=logging.WARNING,
-    format="[%(asctime)s] %(levelname)s %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+setup_logging()
 logger = logging.getLogger(__name__)
 
 VALID_FEATURES = {"CDS", "exon", "gene", "start_codon", "stop_codon", "transcript"}

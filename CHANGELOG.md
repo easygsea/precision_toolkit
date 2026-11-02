@@ -5,6 +5,7 @@
 ---
 
 ### v1.4.0 - 2026-XX-XX
+- Improvement: Centralize logger creation.
 - Improvement: Strengthen pre-commit and CI checks with Ruff linting, ty type checking, automated dependency auditing, security scanning, shell and file-format validation, and custom semgrep rules enforcing branch naming, commit message conventions, no noqa suppressions, and no code comments. Update code and dependencies to meet the stricter checks and expand CI/CD documentation.
 
 ---

@@ -7,14 +7,11 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from precision_toolkit.core.logging_setup import setup_logging
 from precision_toolkit.dragen.models import DragenMetric, SourceFile
 from precision_toolkit.dragen.utils import scale_metric
 
-logging.basicConfig(
-    level=logging.WARNING,
-    format="[%(asctime)s] %(levelname)s %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+setup_logging()
 logger = logging.getLogger(__name__)
 VERSIONED_PROPERTY_PART_COUNT = 3
 PROPERTY_AND_ATTRIBUTE_PART_COUNT = 2

@@ -8,7 +8,9 @@ from requests.exceptions import (
     RequestException,
 )
 
-logging.basicConfig(format="%(message)s", level=logging.INFO)
+from precision_toolkit.core.logging_setup import setup_logging
+
+setup_logging()
 logger = logging.getLogger(__name__)
 
 

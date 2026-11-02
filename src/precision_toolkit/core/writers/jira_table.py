@@ -6,7 +6,9 @@ import re
 import pandas as pd
 from tabulate import tabulate
 
-logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
+from precision_toolkit.core.logging_setup import setup_logging
+
+setup_logging()
 logger = logging.getLogger(__name__)
 
 

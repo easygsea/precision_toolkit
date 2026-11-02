@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
+from precision_toolkit.core.logging_setup import setup_logging
 from precision_toolkit.dragen.metrics_parser import DragenMetricsParser
 from precision_toolkit.dragen.utils import format_metric
 
@@ -286,6 +287,7 @@ def plot_metrics(
 
 def main() -> None:
     """Parse DRAGEN output files and generate QC metric plots."""
+    setup_logging()
     parser = argparse.ArgumentParser(
         "Parse DRAGEN's MetricsOutput.tsv and generate summary plots per metric."
     )

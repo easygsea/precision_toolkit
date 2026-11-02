@@ -12,6 +12,8 @@ from typing import IO, TextIO, cast
 
 import pandas as pd
 
+from precision_toolkit.core.logging_setup import setup_logging
+
 _SNIFF_READ_SIZE = 4096
 
 
@@ -22,7 +24,7 @@ class FileMode(StrEnum):
     WRITE = "w"
 
 
-logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
+setup_logging()
 logger = logging.getLogger(__name__)
 
 

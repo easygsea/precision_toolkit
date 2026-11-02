@@ -24,6 +24,7 @@ from precision_toolkit.core.constants import (
     DEFAULT_DECIMALS,
     DiagnosticMetricType,
 )
+from precision_toolkit.core.logging_setup import setup_logging
 from precision_toolkit.core.macros.curation.variant import (
     export_curation_results,
     update_metrics,
@@ -41,6 +42,7 @@ logger = logging.getLogger(__name__)
 
 def main() -> None:
     """Manually curate a diagnostic metric from a CSV and export updated results."""
+    setup_logging()
     parser = argparse.ArgumentParser(
         description="Curate diagnostic metrics from an existing table with count "
         "information and recompute statistics. Example: "

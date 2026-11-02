@@ -57,13 +57,9 @@ from precision_toolkit.analysis.vcf import (
     intersect_vcfs,
 )
 from precision_toolkit.core.io import FileMode, open_file
+from precision_toolkit.core.logging_setup import setup_logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s] %(levelname)s %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    force=True,
-)
+setup_logging()
 logger = logging.getLogger(__name__)
 
 VALID_CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X", "Y"]
