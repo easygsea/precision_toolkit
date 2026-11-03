@@ -27,18 +27,16 @@ def fetch_pull_requests(
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
-        repo_response = requests.get(base_api_url, headers=headers)
+        repo_response = requests.get(base_api_url, headers=headers, timeout=30)
 
-        if repo_response.status_code == 200:
+        if repo_response.status_code == requests.codes.ok:
             repositories = repo_response.json().get("values", [])
 
             all_prs = []
 
             for repo_data in repositories:
                 if not isinstance(repo_data, dict):
-                    logger.warning(
-                        "Repository at provided link is an unexpected type."
-                    )
+                    logger.warning("Repository at provided link is an unexpected type.")
                     continue
 
                 if repo and repo_data.get("name") != repo:
@@ -47,9 +45,9 @@ def fetch_pull_requests(
                 repo_slug = repo_data.get("slug")
                 pr_url = f"{base_api_url}/{repo_slug}/pull-requests"
 
-                pr_response = requests.get(pr_url, headers=headers)
+                pr_response = requests.get(pr_url, headers=headers, timeout=30)
 
-                if pr_response.status_code == 200:
+                if pr_response.status_code == requests.codes.ok:
                     pull_requests = pr_response.json().get("values", [])
 
                     for pr in pull_requests:

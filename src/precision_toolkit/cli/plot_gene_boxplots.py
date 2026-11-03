@@ -23,6 +23,8 @@ CUSTOM_COLORS = {
     "Base Quality (%)": "#DC267F",
     "Mapping Quality (%)": "#FFB000",
 }
+GENE_GROUP_COUNT = 3
+MAX_THRESHOLD_PERCENT = 100
 
 
 def threshold_type(value: str) -> float:
@@ -31,7 +33,7 @@ def threshold_type(value: str) -> float:
         f = float(value)
     except ValueError as err:
         raise argparse.ArgumentTypeError(f"{value} is not a valid number") from err
-    if not (1 <= f <= 100):
+    if not (1 <= f <= MAX_THRESHOLD_PERCENT):
         raise argparse.ArgumentTypeError(
             f"Threshold must be between 1 and 100, got {f}"
         )
@@ -64,8 +66,8 @@ def get_gene_groups(df: pd.DataFrame) -> list[np.ndarray]:
     """Determine how many subplots are needed based on gene count."""
     all_genes_arr = np.array(sorted(df["GENE"].unique()))
 
-    if len(all_genes_arr) >= 3:
-        return np.array_split(all_genes_arr, 3)
+    if len(all_genes_arr) >= GENE_GROUP_COUNT:
+        return np.array_split(all_genes_arr, GENE_GROUP_COUNT)
     return [all_genes_arr]
 
 

@@ -403,8 +403,10 @@ def generate_modified_target_bed(
                         out_bed_entries = [
                             (
                                 genomic_feature,
-                                (f"{chr}\t{updated_start}\t"
-                                f"{updated_end}\t{updated_feature_name}\n"),
+                                (
+                                    f"{chr}\t{updated_start}\t"
+                                    f"{updated_end}\t{updated_feature_name}\n"
+                                ),
                             )
                         ]
 
@@ -417,8 +419,10 @@ def generate_modified_target_bed(
                             out_bed_entries = [
                                 (
                                     genomic_feature,
-                                    (f"{chr}\t{coding_exon.range[0]}\t"
-                                    f"{coding_exon.range[1]}\t{updated_feature_name}\n"),
+                                    (
+                                        f"{chr}\t{coding_exon.range[0]}\t"
+                                        f"{coding_exon.range[1]}\t{updated_feature_name}\n"
+                                    ),
                                 )
                             ]
                         else:
@@ -452,8 +456,10 @@ def generate_modified_target_bed(
                                 out_bed_entries.append(
                                     (
                                         "intron",
-                                        (f"{chr}\t{intron.range[0]}\t"
-                                        f"{intron.range[1]}\t{intron_feature_name}\n"),
+                                        (
+                                            f"{chr}\t{intron.range[0]}\t"
+                                            f"{intron.range[1]}\t{intron_feature_name}\n"
+                                        ),
                                     )
                                 )
 

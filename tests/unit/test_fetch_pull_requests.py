@@ -154,9 +154,7 @@ def test_fetch_prs_missing_fields(
                     "title": "Valid PR",
                     "fromRef": {"repository": {"name": "My_Repo"}},
                 },
-                {
-                    "title": "Broken PR"
-                },
+                {"title": "Broken PR"},
             ]
         },
     )

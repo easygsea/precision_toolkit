@@ -37,9 +37,7 @@ def test_multi_sample_vcf(tmp_path: Path) -> str:
             "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tSAMPLE1\tSAMPLE2\n"
         )
         f.write("1\t100\t.\tA\tG\t.\tPASS\t.\tGT\t0/1\t0/1\n")
-        f.write(
-            "1\t200\t.\tA\tAT\t.\tPASS\t.\tGT\t0/1\t0/0\n"
-        )
+        f.write("1\t200\t.\tA\tAT\t.\tPASS\t.\tGT\t0/1\t0/0\n")
     return str(vcf_path)
 
 
@@ -55,18 +53,10 @@ def test_multi_sample_vcf_with_end(tmp_path: Path) -> str:
         f.write(
             "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tSAMPLE1\tSAMPLE2\n"
         )
-        f.write(
-            "1\t100\t.\t.\t<DEL>\t.\tPASS\tEND=200\tCN\t1\t.\n"
-        )
-        f.write(
-            "1\t250\t.\t.\t<DUP>\t.\tPASS\tEND=400\tCN\t2.5\t.\n"
-        )
-        f.write(
-            "1\t450\t.\t.\t<DEL>\t.\tPASS\tEND=1000\tCN\t0.5\t.\n"
-        )
-        f.write(
-            "1\t1050\t.\t.\t<DUP>\t.\tPASS\tEND=2100\tCN\t3\t1.5\n"
-        )
+        f.write("1\t100\t.\t.\t<DEL>\t.\tPASS\tEND=200\tCN\t1\t.\n")
+        f.write("1\t250\t.\t.\t<DUP>\t.\tPASS\tEND=400\tCN\t2.5\t.\n")
+        f.write("1\t450\t.\t.\t<DEL>\t.\tPASS\tEND=1000\tCN\t0.5\t.\n")
+        f.write("1\t1050\t.\t.\t<DUP>\t.\tPASS\tEND=2100\tCN\t3\t1.5\n")
     return str(vcf_path)
 
 

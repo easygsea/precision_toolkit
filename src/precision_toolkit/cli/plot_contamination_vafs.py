@@ -136,9 +136,7 @@ def extract_af(af_tag: str, vcf_record_fields: list[str]) -> float:
         if af_match:
             return float(af_match.group(1))
         else:
-            logger.error(
-                f"'{af_tag}' not found in INFO field: {vcf_record_fields[7]}."
-            )
+            logger.error(f"'{af_tag}' not found in INFO field: {vcf_record_fields[7]}.")
             sys.exit(1)
     else:
         format_fields_keys = vcf_record_fields[8].split(":")
@@ -221,9 +219,7 @@ def plot_contamination_vafs(
 
     num_germline_variants = len(plot_data_df)
     plot_data_df["x"] = range(num_germline_variants)
-    fig, ax = plt.subplots(
-        figsize=(min(max(8, num_germline_variants / 150), 30), 5)
-    )
+    fig, ax = plt.subplots(figsize=(min(max(8, num_germline_variants / 150), 30), 5))
     ax.scatter(
         plot_data_df["x"],
         plot_data_df["vaf"],

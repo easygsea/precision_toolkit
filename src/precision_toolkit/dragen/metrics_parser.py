@@ -16,6 +16,8 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+VERSIONED_PROPERTY_PART_COUNT = 3
+PROPERTY_AND_ATTRIBUTE_PART_COUNT = 2
 
 
 class DragenMetricsParser:
@@ -48,7 +50,7 @@ class DragenMetricsParser:
         """
         property_parts = metric_property.rsplit(".", 2)
         if (
-            len(property_parts) == 3
+            len(property_parts) == VERSIONED_PROPERTY_PART_COUNT
             and property_parts[1].startswith("V")
             and property_parts[1][1:].isdigit()
         ):
@@ -58,7 +60,9 @@ class DragenMetricsParser:
 
         property_parts = metric_property.rsplit(".", 1)
         return property_parts[0], (
-            property_parts[1] if len(property_parts) == 2 else ""
+            property_parts[1]
+            if len(property_parts) == PROPERTY_AND_ATTRIBUTE_PART_COUNT
+            else ""
         )
 
     def _get_metric_properties(
@@ -259,9 +263,7 @@ class DragenMetricsParser:
         for dragen_metric_obj in name_to_metric_obj.values():
             metric_name = dragen_metric_obj.name
             spec_dict = dragen_metric_obj.mapping_spec
-            if spec_dict and isinstance(
-                spec_dict, dict
-            ):
+            if spec_dict and isinstance(spec_dict, dict):
                 metric_description = spec_dict["Row"][0]
                 metric_description_index = spec_dict["Row"][1]
                 metric_val_index = spec_dict["Col"][0]
@@ -361,9 +363,7 @@ class DragenMetricsParser:
         for dragen_metric_obj in name_to_metric_obj.values():
             metric_name = dragen_metric_obj.name
             spec_jsonpath_expr = dragen_metric_obj.mapping_spec
-            if spec_jsonpath_expr and isinstance(
-                spec_jsonpath_expr, str
-            ):
+            if spec_jsonpath_expr and isinstance(spec_jsonpath_expr, str):
                 metric_val = self._get_value_by_jsonpath_expr(
                     json_data, spec_jsonpath_expr
                 )
