@@ -229,8 +229,8 @@ It supports seamless integration with HPC environments:
    - Pre-configured SLURM profile for cluster execution
    - Customizable parameters:
      ```bash
-     --slurm_account <account_name>
-     --slurm_queue <partition_name>
+     --slurm_account <account_name>  # Optional; SLURM billing account (not your login); required on some clusters
+     --slurm_queue <partition_name>  # Optional; defaults to the cluster setting
      ```
    - Automatic job submission and monitoring
 

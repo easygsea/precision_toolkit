@@ -123,9 +123,9 @@ def helpMessage() {
         --max_memory <memory_size>          # Maximum memory per task (default: 64.GB)
 
     SLURM Execution:
-        --profile slurm                     # Enable SLURM execution
-        --slurm_account <your_account>      # Your SLURM account name
-        --slurm_queue <queue_name>          # SLURM partition to use (default: general)
+        -profile slurm                      # Enable SLURM execution
+        --slurm_account <account_name>      # Optional billing/project account charged for job usage (not your login)
+        --slurm_queue <queue_name>          # Optional SLURM partition (default: cluster setting)
 
     ====================
     Example Commands
@@ -160,9 +160,7 @@ def helpMessage() {
             --query_dir query_vcfs/
 
     SLURM Execution:
-        nextflow run main.nf --profile slurm \\
-            --slurm_account my_account \\
-            --slurm_partition general \\
+        nextflow run main.nf -profile slurm \\
             --max_cpus 8 \\
             --max_memory 32.GB \\
             --workflows variant_benchmark \\

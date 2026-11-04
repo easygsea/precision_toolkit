@@ -7,6 +7,7 @@
 ### v1.4.0 - 2026-XX-XX
 - Improvement: Centralize logger creation.
 - Improvement: Strengthen pre-commit and CI checks with Ruff linting, ty type checking, automated dependency auditing, security scanning, shell and file-format validation, and custom semgrep rules enforcing branch naming, commit message conventions, no noqa suppressions, and no code comments. Update code and dependencies to meet the stricter checks and expand CI/CD documentation.
+- Bugfix: Clarify SLURM usage with the `-profile` option, explain the billing/project account parameter, and make the queue optional to use the cluster default.
 
 ---
 
