@@ -1,41 +1,54 @@
-nextflow.enable.dsl=2
+nextflow.enable.dsl = 2
 
 include {
-    validate_enum_value
+    validate_enum_value ;
     get_enum_valid_values
 } from '../modules/utils'
 
 // Variant concordance analysis engine enum
 enum VariantConcordanceEngine {
-    happy, sompy, truvari, wittyer
+    happy,
+    sompy,
+    truvari,
+    wittyer,
 }
 
 // Diagnostic metrics enum
 enum DiagnosticMetrics {
-    concordance, sensitivity, precision, f1_score
+    concordance,
+    sensitivity,
+    precision,
+    f1_score,
 }
 
 // Concordance TP method enum
 enum ConcordanceTPMethod {
-    truth, query, min
+    truth,
+    query,
+    min,
 }
 
 // hap.py engine enum
 enum HappyEngine {
-    vcfeval, xcmp, scmp_distance, scmp_somatic
+    vcfeval,
+    xcmp,
+    scmp_distance,
+    scmp_somatic,
 }
 
 // Confidence interval method enum
 enum ConfidenceIntervalMethod {
-    agresti_coull, beta, binom_test, jeffreys, normal, wilson
+    agresti_coull,
+    beta,
+    binom_test,
+    jeffreys,
+    normal,
+    wilson,
 }
 
 def validate_genome_ref(genome_ref) {
     if (!file(genome_ref).exists()) {
-        throw new IllegalArgumentException(
-            "Invalid 'genome_ref': ${genome_ref}. " +
-            "File does not exist."
-        )
+        throw new IllegalArgumentException("Invalid 'genome_ref': ${genome_ref}. " + "File does not exist.")
     }
 }
 
@@ -52,11 +65,7 @@ def validate_metrics_selection(metrics) {
 // Function to validate hap.py engine selection
 def validate_happy_engine(engine) {
     if (engine.contains('_')) {
-        throw new IllegalArgumentException(
-            "Invalid 'happy_engine': ${engine}. " +
-            "Engine name cannot contain underscores. " +
-            "Valid options are: ${get_enum_valid_values(HappyEngine).join(', ')}"
-        )
+        throw new IllegalArgumentException("Invalid 'happy_engine': ${engine}. " + "Engine name cannot contain underscores. " + "Valid options are: ${get_enum_valid_values(HappyEngine).join(', ')}")
     }
     def normalized_engine = engine.replace('-', '_')
     validate_enum_value([normalized_engine], HappyEngine)

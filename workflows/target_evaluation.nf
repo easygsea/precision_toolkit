@@ -1,9 +1,10 @@
-nextflow.enable.dsl=2
+nextflow.enable.dsl = 2
 
 include { validate_enum_value } from '../modules/utils'
 
 enum NormalizationMethod {
-    mean, median
+    mean,
+    median,
 }
 
 def validate_normalization_method(method) {

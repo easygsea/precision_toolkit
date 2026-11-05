@@ -1,9 +1,9 @@
 include {
-    bgzip_vcf
-    index_vcf as index_spurious_variants_original_vcf
-    index_vcf as index_spurious_variants_normalized_vcf
-    exclude_spurious_variants as exclude_spurious_variants_truth
-    exclude_spurious_variants as exclude_spurious_variants_query
+    bgzip_vcf ;
+    index_vcf as index_spurious_variants_original_vcf ;
+    index_vcf as index_spurious_variants_normalized_vcf ;
+    exclude_spurious_variants as exclude_spurious_variants_truth ;
+    exclude_spurious_variants as exclude_spurious_variants_query ;
     normalize_vcf
 } from '../../modules/vcf'
 
@@ -15,10 +15,13 @@ workflow process_spurious_variants {
 
     main:
     def spurious_variants_vcf = file(spurious_variants_vcf_path)
-    if (!spurious_variants_vcf.exists()) error "Input file not found, please check: ${spurious_variants_vcf}"
+    if (!spurious_variants_vcf.exists()) {
+        error("Input file not found, please check: ${spurious_variants_vcf}")
+    }
 
-    def spurious_variants_vcf_gz_path = spurious_variants_vcf.toString().endsWith('.gz') ?
-        spurious_variants_vcf : file("${spurious_variants_vcf}.gz")
+    def spurious_variants_vcf_gz_path = spurious_variants_vcf.toString().endsWith('.gz')
+        ? spurious_variants_vcf
+        : file("${spurious_variants_vcf}.gz")
     def spurious_variants_vcf_gz = Channel.value(spurious_variants_vcf_gz_path)
     if (!spurious_variants_vcf_gz_path.exists()) {
         spurious_variants_vcf_gz = bgzip_vcf(
@@ -48,7 +51,7 @@ workflow process_spurious_variants {
         normalized_spurious_variants_vcf,
         normalized_spurious_variants_vcf_tbi,
         "truth",
-        collapse
+        collapse,
     ).no_spurious_vcf
 
     def no_spurious_query = exclude_spurious_variants_query(
@@ -56,7 +59,7 @@ workflow process_spurious_variants {
         normalized_spurious_variants_vcf,
         normalized_spurious_variants_vcf_tbi,
         "query",
-        collapse
+        collapse,
     ).no_spurious_vcf
 
     emit:

@@ -8,12 +8,10 @@
  * @return            Channel of tuples containing sample name, truth VCF, and query VCF.
  */
 def build_vcf_pair_channels(truth_dir, query_dir) {
-    return Channel
-        .fromPath("${truth_dir}/*.{vcf,vcf.gz}")
+    return Channel.fromPath("${truth_dir}/*.{vcf,vcf.gz}")
         .map { truth_vcf ->
             def sample_name = truth_vcf.getName().replaceFirst(/\..*$/, "")
-            def query_vcf = file("${query_dir}/${sample_name}.*.vcf.gz") ?:
-                            file("${query_dir}/${sample_name}.*.vcf")
+            def query_vcf = file("${query_dir}/${sample_name}.*.vcf.gz") ?: file("${query_dir}/${sample_name}.*.vcf")
             return tuple(sample_name, truth_vcf, query_vcf[0])
         }
 }
@@ -29,10 +27,7 @@ def build_vcf_pair_channels(truth_dir, query_dir) {
 def validate_enum_value(value_array, valid_enum_class) {
     def valid = get_enum_valid_values(valid_enum_class)
     if (!value_array.every { it in valid }) {
-        throw new IllegalArgumentException(
-            "Invalid value: ${value_array}. " +
-            "Valid options: ${valid.join(', ')}"
-        )
+        throw new IllegalArgumentException("Invalid value: ${value_array}. " + "Valid options: ${valid.join(', ')}")
     }
 }
 

@@ -32,7 +32,7 @@ process normalize_vcf {
     path vcf_tbi
 
     output:
-    path("${vcf}.normalized.vcf.gz"), emit: normalized_vcf
+    path ("${vcf}.normalized.vcf.gz"), emit: normalized_vcf
 
     script:
     """
@@ -49,7 +49,7 @@ process exclude_spurious_variants {
     path normalized_spurious_vcf
     path normalized_spurious_vcf_tbi
     val label
-    val collapse // collapse option for bcftools isec
+    val collapse
 
     output:
     tuple val(sample_name), path("${sample_name}.${label}.no_spurious.vcf.gz"), emit: no_spurious_vcf

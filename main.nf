@@ -1,11 +1,12 @@
-nextflow.enable.dsl=2
+nextflow.enable.dsl = 2
 
 include { variant_benchmark } from './workflows/variant_benchmark'
 include { signal_correlation } from './workflows/signal_correlation'
 include { target_evaluation } from './workflows/target_evaluation'
 
 def helpMessage() {
-    log.info"""
+    log.info(
+        """
     =========================
     Clinical Validation Tools
     =========================
@@ -193,11 +194,13 @@ def helpMessage() {
         ├── diagnostic_metrics_happy_combined.md             # Combined raw/curated diagnostic metrics in Markdown
         └── diagnostic_metrics_happy_combined.docx           # Combined raw/curated diagnostic metrics in Word
     """.stripIndent()
+    )
 }
 
 workflow {
     workflow.onComplete {
-        log.info"""
+        log.info(
+            """
         ========================================
         Precision Toolkit Analysis Complete!
         ========================================
@@ -209,24 +212,26 @@ workflow {
         Work directory  : ${workflow.workDir}
         Output directory: ${params.output_dir}
         """
+        )
 
         if (!workflow.success) {
-            log.error "Pipeline failed! Check the logs for details."
+            log.error("Pipeline failed! Check the logs for details.")
         }
     }
 
     if (!params.workflows) {
         helpMessage()
-        exit 0
-    } else {
+        exit(0)
+    }
+    else {
         def workflowList = params.workflows.split(',').collect { it.trim() }
         def validWorkflows = ['variant_benchmark', 'signal_correlation', 'target_evaluation']
 
         def invalidWorkflows = workflowList - validWorkflows
         if (invalidWorkflows) {
-            error "Unknown workflow(s): ${invalidWorkflows.join(', ')}. Valid options are: ${validWorkflows.join(', ')}"
+            error("Unknown workflow(s): ${invalidWorkflows.join(', ')}. Valid options are: ${validWorkflows.join(', ')}")
         }
 
-        workflowList.each { workflow -> "$workflow"() }
+        workflowList.each { workflow -> "${workflow}".call() }
     }
 }

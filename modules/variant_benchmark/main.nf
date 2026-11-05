@@ -13,8 +13,8 @@ process run_happy {
     val label
 
     output:
-    path("${sample_name}.${label}.summary.csv"), emit: happy_summary
-    path("${sample_name}*"), emit: happy_outputs
+    path ("${sample_name}.${label}.summary.csv"), emit: happy_summary
+    path ("${sample_name}*"), emit: happy_outputs
 
     script:
     """
@@ -46,8 +46,8 @@ process run_sompy {
     val label
 
     output:
-    path("*.stats.csv"), emit: sompy_summary
-    path("${sample_name}*"), emit: sompy_outputs
+    path ("*.stats.csv"), emit: sompy_summary
+    path ("${sample_name}*"), emit: sompy_outputs
 
     script:
     PREFIX = "${sample_name}.${label}"
@@ -80,8 +80,8 @@ process run_truvari_bench {
     val label
 
     output:
-    path("*summary.json"), emit: truvari_bench_summary
-    path("*params.json"), emit: truvari_parameters
+    path ("*summary.json"), emit: truvari_bench_summary
+    path ("*params.json"), emit: truvari_parameters
     tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
 
     script:
@@ -114,7 +114,7 @@ process run_truvari_refine {
     val label
 
     output:
-    path("*refine.variant_summary.json"), emit: truvari_refine_summary
+    path ("*refine.variant_summary.json"), emit: truvari_refine_summary
     tuple val(sample_name), path("${sample_name}.${label}"), emit: truvari_output_dir
 
     script:
@@ -147,8 +147,8 @@ process run_wittyer {
     val label
 
     output:
-    path("*/*Wittyer.Stats.json"), emit: wittyer_summary
-    path("${sample_name}*"), emit: wittyer_outputs
+    path ("*/*Wittyer.Stats.json"), emit: wittyer_summary
+    path ("${sample_name}*"), emit: wittyer_outputs
 
     script:
     PREFIX = "${sample_name}.${label}"
@@ -176,15 +176,15 @@ process summarize_diagnostic_metrics {
     val include_all_data_csv
 
     output:
-    path("${PREFIX}*"), emit: variant_benchmark_summary
+    path ("${PREFIX}*"), emit: variant_benchmark_summary
 
     script:
     PREFIX = "diagnostic_metrics"
     """
     summarize-diagnostic-metrics --metrics ${diagnostic_metrics} \
         --engine "${variant_benchmark_engine}" \
-        ${(raw_variant_benchmark_outputs != []) ? "--raw-files " + raw_variant_benchmark_outputs.findAll { file -> !file.name.endsWith('.params.json') }.join(' ') : ""} \
-        ${(curated_variant_benchmark_outputs != []) ? "--curated-files " + curated_variant_benchmark_outputs.findAll { file -> !file.name.endsWith('.params.json') }.join(' ') : ""} \
+        ${raw_variant_benchmark_outputs != [] ? "--raw-files " + raw_variant_benchmark_outputs.findAll { file -> !file.name.endsWith('.params.json') }.join(' ') : ""} \
+        ${curated_variant_benchmark_outputs != [] ? "--curated-files " + curated_variant_benchmark_outputs.findAll { file -> !file.name.endsWith('.params.json') }.join(' ') : ""} \
         --tp-method "${concordance_tp}" \
         --ci-method "${ci_method}" \
         --ci-level ${ci_level} \

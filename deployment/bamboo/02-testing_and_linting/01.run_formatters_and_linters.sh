@@ -25,17 +25,25 @@ cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit/deployment/ba
 bash 01.run_formatters_and_linters.sh \
 ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
 ${bamboo.inject.IMAGE_NAME} \
-${bamboo.TEMPORARY_IMAGE_ROOT}
+${bamboo.TEMPORARY_IMAGE_ROOT} \
+${bamboo.NEXTFLOW_EXECUTABLE} \
+${bamboo.JAVA_EXECUTABLE}
 
 BAMBOO_CONFIG_DOC
 
 set -euxo pipefail
 
-TESTING_DEVELOPMENT_DIRECTORY="$1"
+TESTING_DEPLOYMENT_DIRECTORY="$1"
 IMAGE_NAME="$2"
 IMAGE_STORE_ROOT="$3"
+NEXTFLOW_EXECUTABLE="$4"
+JAVA_EXECUTABLE="$5"
 
-cd "${TESTING_DEVELOPMENT_DIRECTORY}/precision_toolkit"
+export PATH="$PATH:${NEXTFLOW_EXECUTABLE}"
+export JAVA_HOME="${JAVA_EXECUTABLE}"
+export PATH=$JAVA_HOME/bin:$PATH
+
+cd "${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit"
 
 uv run pre-commit run --all-files
 

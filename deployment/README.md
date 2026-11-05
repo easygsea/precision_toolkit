@@ -44,7 +44,7 @@ Transfers the built image into the temporary testing path.
 - 01.run_formatters_and_linters.sh\
 Executes formatters and linters to enforce coding standards.
 - 02.run_unit_and_integration_tests.sh\
-Lints Nextflow scripts and configuration before running unit and integration tests. Requires a Nextflow version supporting `nextflow lint`.
+Runs unit and integration tests, including workflow tests with Nextflow.
 
 ### 03-build-cleanup
 - 01.cleanup_testing_directory.sh\

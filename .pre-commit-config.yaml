@@ -21,6 +21,12 @@ repos:
         entry: uv run --locked ruff format --check
         language: system
         types: [python]
+      - id: nextflow-lint
+        name: nextflow lint and format
+        entry: nextflow lint -format .
+        language: system
+        files: '\.(nf|config)$'
+        pass_filenames: false
       - id: uv-audit
         name: uv audit (auto-upgrade on findings)
         entry: .pre-commit/uv_audit_fix.sh
