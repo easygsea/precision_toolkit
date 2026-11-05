@@ -4,7 +4,7 @@
 
 ---
 
-### v1.4.0 - 2026-XX-XX
+### v1.4.0 - 2026-11-05
 - Improvement: Add Nextflow linting to Bamboo CI and fix lint errors, retry-strategy syntax, spurious-variant channels, and curated Truvari reference inputs. Extract shared VCF preparation and clean up unused-parameter warnings.
 - Improvement: Centralize logger creation.
 - Improvement: Enforce shebang and executable permissions in pre-commit; remove Nextflow shebangs and make Bamboo scripts executable.

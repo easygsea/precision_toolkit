@@ -325,3 +325,9 @@ uv run pytest tests/workflow/test_signal_correlation.yml --workflow-threads 1 --
 ```
 
 See the [Bamboo test task](./deployment/bamboo/02-testing_and_linting/01.run_unit_and_integration_tests.sh) for the CI commands, including workflow tests against the newly built local image.
+
+# Citation
+
+If you use Precision Toolkit in your work, please cite our abstract:
+
+> Cheng X, Du XL, Lo TWT, Chapel ME, Dudarev A, Jaison M, Jan SC, Goktas MT, Dowhy T, Feijao P, Mungall KL, Yip S, Jones SJM. Precision Toolkit: a containerized framework for reproducible clinical genomics assay development and validation [abstract I011]. J Mol Diagn. 2026;28(11 Suppl):S82.
