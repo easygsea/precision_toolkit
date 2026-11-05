@@ -76,7 +76,7 @@ workflow gene_target_evaluation_workflow {
             def pool_id = matcher.find() ? matcher.group(0) : null
             tuple (sample_name, file_path, pool_id)
         }
-        .branch { sample_name, file_path, pool_id ->
+        .branch { _sample_name, file_path, _pool_id ->
             def ext = file_path.extension.toLowerCase()
             bam: ext == 'bam'
             cram: ext == 'cram'
@@ -86,7 +86,7 @@ workflow gene_target_evaluation_workflow {
     // if no genome_ref, skip any cram file & output warning for each file not processed
     if (!params.genome_ref) {
         mixed_aligned_ch.cram
-            .view {sample_name, no_ref_cram, pool_id ->
+            .view {_sample_name, no_ref_cram, _pool_id ->
                 log.warn "No genome reference provided for cram files. \n" +
                 "SKIPPING ${no_ref_cram}" }
         bam_ch = mixed_aligned_ch.bam
@@ -200,7 +200,7 @@ workflow gene_target_evaluation_workflow {
         SCORE_PER_BASE_SUMMARY_ON_MQ.out.scored_output,
         Channel.from(
             metrics_thresholds_and_headings
-                .findAll { k, v -> ['cov','bq','mq'].contains(k) }
+                .findAll { k, _value -> ['cov','bq','mq'].contains(k) }
                 .values() ),
         params.tract_gap_tolerance
     )
@@ -210,7 +210,7 @@ workflow gene_target_evaluation_workflow {
     // STAGE 5: Summarize Bases and Targets Failed for Analysis
     ch_files_for_report = SCORE_BASES_PER_LIBRARY.out.scored_output
         .join(SCORE_TARGETS_PER_LIBRARY.out.scored_output)
-        .map { sample_name, base_file, pool_id, aggr_file, pool_id2 ->
+        .map { _sample_name, base_file, _pool_id, aggr_file, _pool_id2 ->
             [base_file, aggr_file]
         }
         .collect()
@@ -229,8 +229,8 @@ workflow gene_target_evaluation_workflow {
             plot_data_ch.collect{it[2]},
             "plot",
             metrics_thresholds_and_headings
-                .findAll { k, v -> ['cov','bq','mq'].contains(k) }
-                .collectEntries {  k,v -> [ (v.target_header): v.threshold ] }
+                .findAll { k, _value -> ['cov','bq','mq'].contains(k) }
+                .collectEntries { _key, value -> [ (value.target_header): value.threshold ] }
         )
     }
 
@@ -239,7 +239,7 @@ workflow gene_target_evaluation_workflow {
 
     // STAGE 7: General fail analysis box plots using threshold from stage 6.
     boxplot_data_ch = GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base
-        .map { sample, file, pool ->
+        .map { sample, file, _pool ->
 	    return [sample, file, (params.cohort_percent_library_fail_threshold * 100), params.separate_plots]
         }
 

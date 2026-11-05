@@ -1,7 +1,10 @@
 include {
     build_vcf_pair_channels
-    process_spurious_variants
 } from '../../modules/utils'
+
+include {
+    process_spurious_variants
+} from '../prepare_vcfs'
 
 include {
     extract_signal
@@ -18,7 +21,7 @@ workflow signal_correlation_workflow {
             vcf_pairs,
             params.spurious_variants_vcf,
             params.collapse
-        )
+        ).curated_vcf_pairs
     } else {
         curated_vcf_pairs = vcf_pairs
     }

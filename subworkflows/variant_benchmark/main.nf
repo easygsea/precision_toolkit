@@ -169,6 +169,8 @@ workflow variant_benchmark_workflow {
                 if (enable_refine) {
                     summary_files_curated = run_truvari_refine_curated(
                         curated_results.truvari_output_dir,
+                        genome_ref_path,
+                        genome_fai_path,
                         params.truvari_refine_options,
                         "${params.variant_benchmark_subdir}/curated",
                         "curated"

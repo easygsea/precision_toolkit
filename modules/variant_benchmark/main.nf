@@ -137,7 +137,7 @@ process run_truvari_refine {
 process run_wittyer {
     label "dynamic_resource"
     tag "${sample_name}"
-    containerOptions = "-B /home"
+    containerOptions "-B /home"
     publishDir "${params.output_dir}/${output_dir ?: ''}/wittyer", mode: 'copy'
 
     input:

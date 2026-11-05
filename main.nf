@@ -195,28 +195,26 @@ def helpMessage() {
     """.stripIndent()
 }
 
-// Workflow completion handler
-workflow.onComplete {
-    log.info"""
-    ========================================
-    Precision Toolkit Analysis Complete!
-    ========================================
-    Command line    : ${workflow.commandLine}
-    Completed at    : ${workflow.complete}
-    Duration        : ${workflow.duration}
-    Success         : ${workflow.success}
-    Exit status    : ${workflow.exitStatus}
-    Work directory  : ${workflow.workDir}
-    Output directory: ${params.output_dir}
-    """
-
-    if (!workflow.success) {
-        log.error "Pipeline failed! Check the logs for details."
-    }
-}
-
 workflow {
-    // Default workflow (show help)
+    workflow.onComplete {
+        log.info"""
+        ========================================
+        Precision Toolkit Analysis Complete!
+        ========================================
+        Command line    : ${workflow.commandLine}
+        Completed at    : ${workflow.complete}
+        Duration        : ${workflow.duration}
+        Success         : ${workflow.success}
+        Exit status    : ${workflow.exitStatus}
+        Work directory  : ${workflow.workDir}
+        Output directory: ${params.output_dir}
+        """
+
+        if (!workflow.success) {
+            log.error "Pipeline failed! Check the logs for details."
+        }
+    }
+
     if (!params.workflows) {
         helpMessage()
         exit 0
@@ -224,13 +222,11 @@ workflow {
         def workflowList = params.workflows.split(',').collect { it.trim() }
         def validWorkflows = ['variant_benchmark', 'signal_correlation', 'target_evaluation']
 
-        // Validate user-selected workflows
         def invalidWorkflows = workflowList - validWorkflows
         if (invalidWorkflows) {
             error "Unknown workflow(s): ${invalidWorkflows.join(', ')}. Valid options are: ${validWorkflows.join(', ')}"
         }
 
-        // Run user-selected workflows
         workflowList.each { workflow -> "$workflow"() }
     }
 }

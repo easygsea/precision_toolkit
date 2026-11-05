@@ -1,7 +1,10 @@
 include {
     build_vcf_pair_channels
-    process_spurious_variants
 } from '../../modules/utils'
+
+include {
+    process_spurious_variants
+} from '../prepare_vcfs'
 
 include {
     bgzip_vcf
@@ -31,7 +34,7 @@ workflow prepare_variant_benchmark_inputs {
             vcf_pairs,
             params.spurious_variants_vcf,
             params.collapse,
-        )
+        ).curated_vcf_pairs
     }
 
     // If engine is truvari, ensure truth and query VCFs are bgzipped and indexed
