@@ -224,7 +224,7 @@ workflow {
         exit(0)
     }
     else {
-        def workflowList = params.workflows.split(',').collect { it.trim() }
+        def workflowList = params.workflows.tokenize(',').collect { w -> w.trim() }
         def validWorkflows = ['variant_benchmark', 'signal_correlation', 'target_evaluation']
 
         def invalidWorkflows = workflowList - validWorkflows
@@ -232,6 +232,14 @@ workflow {
             error("Unknown workflow(s): ${invalidWorkflows.join(', ')}. Valid options are: ${validWorkflows.join(', ')}")
         }
 
-        workflowList.each { workflow -> "${workflow}".call() }
+        if ('variant_benchmark' in workflowList) {
+            variant_benchmark()
+        }
+        if ('signal_correlation' in workflowList) {
+            signal_correlation()
+        }
+        if ('target_evaluation' in workflowList) {
+            target_evaluation()
+        }
     }
 }
