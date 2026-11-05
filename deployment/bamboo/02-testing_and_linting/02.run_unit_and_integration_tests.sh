@@ -6,7 +6,7 @@ Task type:
   SSH Task
 
 Task description:
-  Run unit and integration tests
+  Lint Nextflow and run unit and integration tests
 
 Hosts:
   ${bamboo.HOST}
@@ -69,6 +69,8 @@ export JAVA_HOME="${JAVA_EXECUTABLE}"
 export PATH=$JAVA_HOME/bin:$PATH
 
 cd "${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit"
+
+nextflow lint .
 
 # Execute Python unit and standalone tests
 uv run pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standalone.xml
