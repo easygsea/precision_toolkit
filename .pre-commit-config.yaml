@@ -26,12 +26,20 @@ repos:
         entry: .pre-commit/uv_audit_fix.sh
         language: script
         pass_filenames: false
+      - id: no-python-shebangs
+        name: forbid unnecessary shebangs in Python modules and tests
+        entry: '\A#!'
+        language: pygrep
+        types: [python]
+        files: ^(src/precision_toolkit/|tests/)
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
+      - id: check-executables-have-shebangs
       - id: check-json
+      - id: check-shebang-scripts-are-executable
       - id: check-toml
       - id: check-yaml
       - id: debug-statements
