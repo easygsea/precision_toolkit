@@ -273,7 +273,7 @@ For optimal performance, ensure your system meets the minimum requirements and c
 
 # Developer Setup
 
-Install Git, Python (>=3.11,<4), and [uv](https://docs.astral.sh/uv/getting-started/installation/) on your development machine. From the cloned repository root, install the locked development dependencies, enable Git hooks, and run the checks:
+Install Git, Python (>=3.11,<4), [uv](https://docs.astral.sh/uv/getting-started/installation/), Java, and a Nextflow version supporting `nextflow lint` on your development machine (see [Dependencies](#dependencies)). Ensure Java and Nextflow are available to the hooks. From the cloned repository root, install the locked development dependencies, enable Git hooks, and run the checks:
 
 ```bash
 uv sync --locked --group dev
@@ -321,7 +321,7 @@ uv run pytest tests/workflow/ --workflow-threads 1 --ga --symlink
 For targeted testing, run an individual Python test file or the workflow tests defined in a specific YAML file:
 ```bash
 uv run pytest tests/unit/test_diagnostic_metrics.py
-uv run pytest tests/workflow/test_signal_correlation.yml --workflow-threads 1 --ga --symlink
+uv run pytest tests/workflow/test_signal_correlation.yaml --workflow-threads 1 --ga --symlink
 ```
 
 See the [Bamboo test task](./deployment/bamboo/02-testing_and_linting/01.run_unit_and_integration_tests.sh) for the CI commands, including workflow tests against the newly built local image.

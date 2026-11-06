@@ -3,5 +3,5 @@ rules:
     languages:
       - python
     message: "Do not use '# noqa'. Fix the underlying lint error instead."
-    pattern-regex: "#\\s*noqa\\b"
+    pattern-regex: "(?i)#\\s*noqa\\b"
     severity: ERROR
