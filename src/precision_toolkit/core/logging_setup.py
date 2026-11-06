@@ -9,5 +9,5 @@ def setup_logging(
     level: int = logging.INFO,
     format_string: str = DEFAULT_LOG_FORMAT,
 ) -> None:
-    """Configure the package root logger with the standard format."""
-    logging.basicConfig(level=level, format=format_string, force=True)
+    """Configure root logging only when no handlers are already installed."""
+    logging.basicConfig(level=level, format=format_string)
