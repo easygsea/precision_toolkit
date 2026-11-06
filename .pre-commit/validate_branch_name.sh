@@ -12,7 +12,7 @@ readonly PATTERN
 
 branch="${BRANCH_NAME:-$(git rev-parse --abbrev-ref HEAD)}"
 
-if [[ "${branch}" == 'HEAD' ]]; then
+if [[ "${branch}" == 'HEAD' || "${branch}" == 'main' ]]; then
   exit 0
 fi
 
