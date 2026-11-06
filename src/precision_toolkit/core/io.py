@@ -5,25 +5,26 @@ import gzip
 import json
 import logging
 import sys
-from enum import Enum
+from enum import StrEnum
 from io import BytesIO, StringIO
 from pathlib import Path
 from typing import IO, TextIO, cast
 
 import pandas as pd
 
+from precision_toolkit.core.logging_setup import setup_logging
+
 _SNIFF_READ_SIZE = 4096
 
 
-class FileMode(str, Enum):
+class FileMode(StrEnum):
     """Valid file modes."""
 
     READ = "r"
     WRITE = "w"
 
 
-# Setup logging:
-logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
+setup_logging()
 logger = logging.getLogger(__name__)
 
 
@@ -40,14 +41,7 @@ def detect_format(file_path: str | TextIO) -> str:
         return "csv"
 
     suffix = Path(file_path).suffix.lower()
-    if suffix == ".tsv":
-        return "tsv"
-    elif suffix == ".xlsx":
-        return "excel"
-    elif suffix == ".json":
-        return "json"
-    else:
-        return "csv"
+    return {".tsv": "tsv", ".xlsx": "excel", ".json": "json"}.get(suffix, "csv")
 
 
 def open_file(filename: Path, mode: FileMode) -> IO[str]:
@@ -76,47 +70,43 @@ def read_dataframe(
         DataFrame or None if reading fails.
     """
     try:
-        # Auto-detect format if not specified
         if format_type is None:
             format_type = detect_format(input_file)
 
-        # Auto-detect delimiter if not specified
         if delimiter is None and format_type in {"csv", "tsv"}:
             delimiter, buffer = sniff_delimiter(input_file)
-            # Use default delimiter if sniffing fails
             if delimiter is None:
                 delimiter = "\t" if format_type == "tsv" else ","
             if buffer is not None:
                 input_file = StringIO(buffer)
 
-        # Read file based on format
-        read_arg: dict[str, type[str]] = {"dtype": str} if convert_to_string else {}
+        dtype = str if convert_to_string else None
         if format_type == "tsv":
             return pd.read_csv(
                 input_file,
                 sep=delimiter,
-                **read_arg,  # type: ignore[call-overload]
+                dtype=dtype,
             )
         elif format_type == "excel":
             if hasattr(input_file, "buffer"):
-                data = input_file.buffer.read()
+                data = cast(TextIO, input_file).buffer.read()
                 return pd.read_excel(
                     BytesIO(data),
                     engine="openpyxl",
-                    **read_arg,  # type: ignore[call-overload]
+                    dtype=dtype,
                 )
             else:
                 return pd.read_excel(
                     input_file,
                     engine="openpyxl",
-                    **read_arg,  # type: ignore[call-overload]
+                    dtype=dtype,
                 )
         elif format_type == "json":
             if convert_to_string:
-                if hasattr(input_file, "read"):
+                if not isinstance(input_file, str):
                     text = input_file.read()
                 else:
-                    with open(input_file, "r", encoding="utf-8") as f:
+                    with open(input_file, encoding="utf-8") as f:
                         text = f.read()
                 raw_data = json.loads(text, parse_float=str, parse_int=str)
                 df = pd.json_normalize(raw_data)
@@ -128,11 +118,11 @@ def read_dataframe(
             return pd.read_csv(
                 input_file,
                 sep=delimiter,
-                **read_arg,  # type: ignore[call-overload]
+                dtype=dtype,
             )
 
     except Exception as e:
-        logging.exception("Error reading data:")
+        logger.exception("Error reading data:")
         print(f"Exception details: {e}")
         return None
 
@@ -152,7 +142,7 @@ def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
             buffer = sys.stdin.read()
             keep_buffer = True
         else:
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 buffer = f.read(_SNIFF_READ_SIZE)
                 keep_buffer = False
 
@@ -160,5 +150,5 @@ def sniff_delimiter(file_path: str | TextIO) -> tuple[str | None, str | None]:
         dialect = sniffer.sniff(buffer)
 
         return dialect.delimiter, buffer if keep_buffer else None
-    except Exception:
+    except (csv.Error, OSError, UnicodeError):
         return None, None

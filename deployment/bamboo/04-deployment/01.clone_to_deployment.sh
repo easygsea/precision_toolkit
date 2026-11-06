@@ -45,7 +45,7 @@ function clone_and_deploy {
     (
       cd "${version_folder}"
       uv venv --python "${PYTHON_EXECUTABLE}"
-      uv sync
+      uv sync --locked
       cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" "./${NEW_IMAGE_NAME}"
       sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/precision_toolkit/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
     )
@@ -57,7 +57,7 @@ function clone_and_deploy {
     chmod --changes --recursive a-w main
   fi
   rm -rfv tmp_dir/
-  rm -rfv "${IMAGE_STORE_ROOT}/${version}"
+  rm -rfv "${IMAGE_STORE_ROOT:?}/${version}"
 }
 
 # Get version defined in the pyproject.toml
@@ -73,14 +73,16 @@ function get_version {
 }
 
 function main {
+  # Bamboo substitutes these tokens before Bash parses the SSH task.
+  # shellcheck disable=SC2016
   declare -r \
-    BRANCH_NAME="${1:-${bamboo.planRepository.branchName}}"  \
-    REPOSITORY_URL="${2:-${bamboo.planRepository.repositoryUrl}}"  \
-    DEPLOYMENT_ROOT="${3:-${bamboo.DEPLOYMENT_ROOT}}" \
-    IMAGE_NAME="${4:-${bamboo.inject.IMAGE_NAME}}" \
-    PYTHON_EXECUTABLE="${5:-${bamboo.PYTHON_EXECUTABLE}}" \
-    IMAGE_STORE_ROOT="${6:-${bamboo.TEMPORARY_IMAGE_ROOT}}" \
-    NEW_IMAGE_NAME="${7:-${bamboo.APPTAINER_IMAGE_NAME}}.sif"
+    BRANCH_NAME=${1:-'${bamboo.planRepository.branchName}'} \
+    REPOSITORY_URL=${2:-'${bamboo.planRepository.repositoryUrl}'} \
+    DEPLOYMENT_ROOT=${3:-'${bamboo.DEPLOYMENT_ROOT}'} \
+    IMAGE_NAME=${4:-'${bamboo.inject.IMAGE_NAME}'} \
+    PYTHON_EXECUTABLE=${5:-'${bamboo.PYTHON_EXECUTABLE}'} \
+    IMAGE_STORE_ROOT=${6:-'${bamboo.TEMPORARY_IMAGE_ROOT}'} \
+    NEW_IMAGE_NAME=${7:-'${bamboo.APPTAINER_IMAGE_NAME}'.sif}
 
   if [[ "${BRANCH_NAME}" != "main" ]]; then
     echo "Deployment is restricted to the 'main' branch only."

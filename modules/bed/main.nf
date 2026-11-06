@@ -6,7 +6,7 @@ process SORT_BED {
     path OUT, emit: sorted_bed
 
     script:
-    OUT="${bed_file.baseName}.sorted.bed"
+    OUT = "${bed_file.baseName}.sorted.bed"
     """
     sort-bed ${bed_file} > ${OUT}
     """

@@ -27,6 +27,8 @@ from precision_toolkit.render.diagnostic_metrics import (
     export_diagnostic_metrics_to_word,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def validate_curation_format(curation: str, valid_metrics: list[str]) -> bool:
     """Validate manual curation input format.
@@ -50,7 +52,7 @@ def validate_curation_format(curation: str, valid_metrics: list[str]) -> bool:
             )
         return True
     except ValueError as e:
-        raise ValueError(f"Invalid curation format: {e}")
+        raise ValueError(f"Invalid curation format: {e}") from e
 
 
 def update_metrics(
@@ -90,13 +92,12 @@ def update_metrics(
             else NameMapper.get_full_name(metric_str.upper())
         )
     except ValueError as e:
-        logging.error(e)
+        logger.error(e)
         raise
 
     mask = (df["Variant Type"] == variant_type) & (df["Variant Filter"] == filter_type)
     df.loc[mask, metric_full] = value
 
-    # Create metrics object based on the metric class
     metrics: VariantCallMetrics
     metric_value: float
     ci_lower: float | None = None
@@ -164,7 +165,6 @@ def update_metrics(
         metric_value = f1_score_analysis.f1_score
         ci_lower = ci_upper = None
 
-    # Update DataFrame with new metric value
     metric_name = (
         "F1 Score"
         if metric_type == DiagnosticMetricType.F1_SCORE
@@ -172,7 +172,6 @@ def update_metrics(
     )
     df.loc[mask, metric_name] = metric_value
 
-    # Update CI values if they exist
     if ci_lower is not None and ci_upper is not None:
         df.loc[mask, "CI Lower"] = ci_lower
         df.loc[mask, "CI Upper"] = ci_upper
@@ -192,7 +191,7 @@ def export_curation_results(
         df: DataFrame containing results
         output_prefix: Prefix for output files
         metric_type: Type of metric (e.g. "sensitivity")
-        summary_text: Summary text for the report
+        decimals: Number of decimal places in Markdown and Word output
     """
     metric_name = "F1 Score" if metric_type == "f1_score" else metric_type
     summary_text = f"Manually curated {metric_name.capitalize()} summary"

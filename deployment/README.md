@@ -41,10 +41,10 @@ Builds the Apptainer image on `HOST_CONTAINER`.
 Transfers the built image into the temporary testing path.
 
 ### 02-testing_and_linting
-- 01.run_unit_and_integration_tests.sh\
-Runs unit and integration tests.
-- 02.run_formatters_and_linters.sh\
+- 01.run_formatters_and_linters.sh\
 Executes formatters and linters to enforce coding standards.
+- 02.run_unit_and_integration_tests.sh\
+Runs unit and integration tests, including workflow tests with Nextflow.
 
 ### 03-build-cleanup
 - 01.cleanup_testing_directory.sh\

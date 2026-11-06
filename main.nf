@@ -1,13 +1,12 @@
-#!/usr/bin/env nextflow
-
-nextflow.enable.dsl=2
+nextflow.enable.dsl = 2
 
 include { variant_benchmark } from './workflows/variant_benchmark'
 include { signal_correlation } from './workflows/signal_correlation'
 include { target_evaluation } from './workflows/target_evaluation'
 
 def helpMessage() {
-    log.info"""
+    log.info(
+        """
     =========================
     Clinical Validation Tools
     =========================
@@ -123,9 +122,9 @@ def helpMessage() {
         --max_memory <memory_size>          # Maximum memory per task (default: 64.GB)
 
     SLURM Execution:
-        --profile slurm                     # Enable SLURM execution
-        --slurm_account <your_account>      # Your SLURM account name
-        --slurm_queue <queue_name>          # SLURM partition to use (default: general)
+        -profile slurm                      # Enable SLURM execution
+        --slurm_account <account_name>      # Optional billing/project account charged for job usage (not your login)
+        --slurm_queue <queue_name>          # Optional SLURM partition (default: cluster setting)
 
     ====================
     Example Commands
@@ -160,9 +159,7 @@ def helpMessage() {
             --query_dir query_vcfs/
 
     SLURM Execution:
-        nextflow run main.nf --profile slurm \\
-            --slurm_account my_account \\
-            --slurm_partition general \\
+        nextflow run main.nf -profile slurm \\
             --max_cpus 8 \\
             --max_memory 32.GB \\
             --workflows variant_benchmark \\
@@ -197,44 +194,52 @@ def helpMessage() {
         ├── diagnostic_metrics_happy_combined.md             # Combined raw/curated diagnostic metrics in Markdown
         └── diagnostic_metrics_happy_combined.docx           # Combined raw/curated diagnostic metrics in Word
     """.stripIndent()
-}
-
-// Workflow completion handler
-workflow.onComplete {
-    log.info"""
-    ========================================
-    Precision Toolkit Analysis Complete!
-    ========================================
-    Command line    : ${workflow.commandLine}
-    Completed at    : ${workflow.complete}
-    Duration        : ${workflow.duration}
-    Success         : ${workflow.success}
-    Exit status    : ${workflow.exitStatus}
-    Work directory  : ${workflow.workDir}
-    Output directory: ${params.output_dir}
-    """
-
-    if (!workflow.success) {
-        log.error "Pipeline failed! Check the logs for details."
-    }
+    )
 }
 
 workflow {
-    // Default workflow (show help)
+    workflow.onComplete {
+        log.info(
+            """
+        ========================================
+        Precision Toolkit Analysis Complete!
+        ========================================
+        Command line    : ${workflow.commandLine}
+        Completed at    : ${workflow.complete}
+        Duration        : ${workflow.duration}
+        Success         : ${workflow.success}
+        Exit status    : ${workflow.exitStatus}
+        Work directory  : ${workflow.workDir}
+        Output directory: ${params.output_dir}
+        """
+        )
+
+        if (!workflow.success) {
+            log.error("Pipeline failed! Check the logs for details.")
+        }
+    }
+
     if (!params.workflows) {
         helpMessage()
-        exit 0
-    } else {
-        def workflowList = params.workflows.split(',').collect { it.trim() }
+        exit(0)
+    }
+    else {
+        def workflowList = params.workflows.tokenize(',').collect { w -> w.trim() }
         def validWorkflows = ['variant_benchmark', 'signal_correlation', 'target_evaluation']
 
-        // Validate user-selected workflows
         def invalidWorkflows = workflowList - validWorkflows
         if (invalidWorkflows) {
-            error "Unknown workflow(s): ${invalidWorkflows.join(', ')}. Valid options are: ${validWorkflows.join(', ')}"
+            error("Unknown workflow(s): ${invalidWorkflows.join(', ')}. Valid options are: ${validWorkflows.join(', ')}")
         }
 
-        // Run user-selected workflows
-        workflowList.each { workflow -> "$workflow"() }
+        if ('variant_benchmark' in workflowList) {
+            variant_benchmark()
+        }
+        if ('signal_correlation' in workflowList) {
+            signal_correlation()
+        }
+        if ('target_evaluation' in workflowList) {
+            target_evaluation()
+        }
     }
 }

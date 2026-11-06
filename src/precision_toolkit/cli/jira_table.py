@@ -1,24 +1,4 @@
-"""
-Standalone JIRA table converter for command line usage.
-
-Usage:
-    jira-table file.csv
-        # Convert file to JIRA table based on extension and auto-detected delimiter
-    cat file.csv | jira-table
-        # Convert from stdin
-    jira-table -h
-        # Show help
-    jira-table --format tsv file.tsv
-        # Specify input format
-    jira-table --delimiter ';' file.txt
-        # Specify custom delimiter
-    jira-table --heading "My Table" --summary "This is a summary" data.csv
-        # Add heading and summary
-    jira-table --float-format 0 file.csv
-        # Specify custom float format
-    jira-table --pretty-print file.csv
-        # Add spaces between columns
-"""
+"""Standalone JIRA table converter for command line usage."""
 
 import argparse
 import sys
@@ -39,19 +19,19 @@ def main() -> None:
         epilog="""
 Examples:
   jira-table data.csv
-    # Convert file to JIRA table based on extension and auto-detected delimiter
+    : Convert file to JIRA table based on extension and auto-detected delimiter
   cat data.csv | jira-table
-    # Convert from stdin
+    : Convert from stdin
   jira-table --format tsv data.tsv
-    # Convert TSV file
+    : Convert TSV file
   jira-table --delimiter ';' data.txt
-    # Use custom delimiter
+    : Use custom delimiter
   jira-table --heading "My Table" --summary "This is a summary" data.csv
-    # Add heading and summary
+    : Add heading and summary
   jira-table --float-format 0 file.csv
-    # Specify custom float format
+    : Specify custom float format
   jira-table --pretty-print file.csv
-    # Add spaces between columns
+    : Add spaces between columns
         """,
     )
     parser.add_argument(
@@ -94,26 +74,21 @@ Examples:
 
     args = parser.parse_args()
 
-    # Exit if no file provided
     if args.input_file is sys.stdin and sys.stdin.isatty():
-        raise IOError("No input file or stdin provided.")
+        raise OSError("No input file or stdin provided.")
 
-    # Read data
     convert_to_string = args.float_format is None
     df = read_dataframe(args.input_file, convert_to_string, args.format, args.delimiter)
 
-    # Exit if unable to read file
     if df is None:
         raise ValueError("Failed to read input file")
 
-    # Handle headers option
     if args.no_headers:
         current_header = df.columns
         df.columns = pd.Index([f"Column_{i + 1}" for i in range(len(df.columns))])
         first_row = pd.DataFrame([current_header], columns=df.columns)
         df = pd.concat([first_row, df], ignore_index=True)
 
-    # Convert to JIRA table, with optional heading and summary
     jira_table = populate_jira_table(
         df,
         heading=args.heading if args.heading else None,
@@ -122,7 +97,6 @@ Examples:
         pretty_print=args.pretty_print,
     )
 
-    # Output
     print(jira_table)
 
 

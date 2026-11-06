@@ -89,7 +89,6 @@ def test_dragen_metric_obj_creation(
     dragen_metrics_parser = DragenMetricsParser(json_config_file, "sample")
     metric_obj = dragen_metrics_parser.metric_to_metric_obj[metric_name]
 
-    # Check that DragenMetric object attributes match expected
     for property, expected_val in expected_properties.items():
         assert getattr(metric_obj, property) == expected_val
 
@@ -174,19 +173,16 @@ def test_dragen_metrics_parser(
     Expected behaviour:
     - Metrics with valid values in source files are scaled and returned
     """
-    # Create parser and parse metrics
     json_config_file = test_data_dir / "minimal_config.json"
     dragen_metrics_parser = DragenMetricsParser(json_config_file, sample)
     parsed_metrics = dragen_metrics_parser.parse_metrics(
         [test_data_dir],
     )
 
-    # Check that expected metrics are parsed
     parsed_metric_labels = parsed_metrics.keys()
     expected_metric_labels = expected_metrics.keys()
     assert set(expected_metric_labels) == set(parsed_metric_labels)
 
-    # Check that parsed values match expected
     for metric, expected_val in expected_metrics.items():
         parsed_val = parsed_metrics[metric]
         if expected_val is None:

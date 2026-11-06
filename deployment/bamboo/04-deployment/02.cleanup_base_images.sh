@@ -26,4 +26,6 @@ SSH command:
 BAMBOO_CONFIG_DOC
 
 docker images --format '{{.Repository}}:{{.Tag}}' | grep 'precision_toolkit' | xargs docker rmi
-rm -f "${bamboo.BASE_IMAGE_ROOT}"/*.sif
+# Bamboo substitutes this token before Bash parses the SSH task.
+# shellcheck disable=SC2016
+rm -f '${bamboo.BASE_IMAGE_ROOT}'/*.sif

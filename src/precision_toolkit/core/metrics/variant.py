@@ -14,9 +14,9 @@ from precision_toolkit.core.statistics.proportion import (
 class ConcordanceTPMethod(StrEnum):
     """TP selection methods for variant concordance."""
 
-    TruthTP = "truth"  # Use truth TP for variant concordance
-    QueryTP = "query"  # Use query TP for variant concordance
-    MinTP = "min"  # Use minimum of truth and query TP for variant concordance
+    TruthTP = "truth"
+    QueryTP = "query"
+    MinTP = "min"
 
 
 @dataclass(frozen=True)
@@ -64,13 +64,11 @@ class BaseVariantCallMetrics(ABC):
     @abstractmethod
     def _ci_successes(self) -> int:
         """Number of successes for confidence interval calculation."""
-        pass
 
     @property
     @abstractmethod
     def _ci_total(self) -> int:
         """Total number for confidence interval calculation."""
-        pass
 
     def confidence_interval(
         self,

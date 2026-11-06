@@ -9,8 +9,8 @@ process extract_signal {
     tuple val(sample_name), path(truth_vcf), path(query_vcf)
 
     output:
-    path("truth/${truth_signal_name}/*"), emit: truth_signal
-    path("query/${query_signal_name}/*"), emit: query_signal
+    path ("truth/${truth_signal_name}/*"), emit: truth_signal
+    path ("query/${query_signal_name}/*"), emit: query_signal
 
     script:
     def truth_output_folder = "truth/${truth_signal_name}"
@@ -50,9 +50,9 @@ process plot_signal_correlation {
     val color_palette
 
     output:
-    path("correlation_*.png"), emit: signal_correlation_png
-    path("correlation_*.pdf"), emit: signal_correlation_pdf
-    path("correlation_*.tsv"), emit: signal_correlation_table
+    path ("correlation_*.png"), emit: signal_correlation_png
+    path ("correlation_*.pdf"), emit: signal_correlation_pdf
+    path ("correlation_*.tsv"), emit: signal_correlation_table
 
     script:
     def output_filename = "correlation_${truth_signal_name}_${query_signal_name}"

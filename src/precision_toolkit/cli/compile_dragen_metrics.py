@@ -1,5 +1,4 @@
-"""
-Parse DRAGEN output files to compile backbone-level metrics specified in JSON config.
+"""Parse DRAGEN output files to compile backbone-level metrics specified in JSON config.
 
 Usage:
     compile-dragen-metrics --metrics-json-config <json_config>
@@ -53,7 +52,6 @@ def main() -> None:
         required=True,
     )
 
-    # Parse args
     args = parser.parse_args()
     metrics_json_config_path = Path(args.metrics_json_config)
     analysis_folders = [Path(dir) for dir in args.analysis_dirs]
@@ -61,14 +59,10 @@ def main() -> None:
     output_folder = Path(args.output_folder)
     output_folder.mkdir(exist_ok=True, parents=True)
 
-    # Parse valid metrics (specified in JSON config) from DRAGEN output files or replace
-    # with default value if not present
     dragen_metrics_parser = DragenMetricsParser(metrics_json_config_path, rgsm)
     all_dragen_metrics = dragen_metrics_parser.parse_metrics(analysis_folders)
 
-    # Calculate remaining metrics not directly output by DRAGEN, if valid (i.e. in JSON
-    # config)
-    for metric_name in all_dragen_metrics.keys():
+    for metric_name in all_dragen_metrics:
         if metric_name.endswith("_BASE"):
             derived_metric_name = metric_name
             metric_name = metric_name.removesuffix("_BASE")
@@ -81,21 +75,16 @@ def main() -> None:
 
     out_filename = output_folder / f"{rgsm}_MetricsOutput.tsv"
     with open(out_filename, "w") as out_dragen_metrics_tsv:
-        # Write header
         out_dragen_metrics_tsv.write(
             f"Metric (UOM)\tCategory\t{rgsm}\tFailureDirection\tThreshold\tStatus\n"
         )
 
-        # Iterate through reported metric names to ensure consistent output order
-        # across samples
         for reported_metric_name in dragen_metrics_parser.reported_metric_names:
             dragen_metric_obj = dragen_metrics_parser.metric_to_metric_obj[
                 reported_metric_name
             ]
             metric_val = all_dragen_metrics[reported_metric_name]
 
-            # Format metric names (append unit) and values (appropriate number of
-            # decimal places)
             if metric_val:
                 formatted_metrics = format_metric(dragen_metric_obj, metric_val)
             else:
@@ -104,8 +93,6 @@ def main() -> None:
                     str(metric_val),
                 )
 
-            # Classify metric as either 'Monitoring' or 'Production' and if
-            # 'Production', PASS/FAIL based on threshold
             category, status = classify_metric(dragen_metric_obj, metric_val)
 
             out_dragen_metrics_tsv.write(

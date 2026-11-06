@@ -2,6 +2,18 @@
 
 ## Version History
 
+### v1.4.1 - 2026-11-06
+- Hotfix: Sync the Dockerfile with GitHub v1.3.2, fix the main-branch naming hook, align deployment dependencies with CI using `uv sync --locked`, preserve application logging handlers, handle Bamboo variable defaults safely, enable pipefail for Dockerfile RUN pipelines, stop uv audit auto upgrade, upgrade Dockerfile uv to `0.13.5`, and enforce case-insensitive no-suppression policy.
+
+---
+
+### v1.4.0 - 2026-11-05
+- Improvement: Add Nextflow linting to Bamboo CI and fix lint errors, retry-strategy syntax, spurious-variant channels, and curated Truvari reference inputs. Extract shared VCF preparation and clean up unused-parameter warnings.
+- Improvement: Centralize logger creation.
+- Improvement: Enforce shebang and executable permissions in pre-commit; remove Nextflow shebangs and make Bamboo scripts executable.
+- Improvement: Strengthen pre-commit and CI checks with Ruff linting, ty type checking, automated dependency auditing, security scanning, shell and file-format validation, and custom semgrep rules enforcing branch naming, commit message conventions, no noqa suppressions, and no code comments. Update code and dependencies to meet the stricter checks and expand CI/CD documentation.
+- Bugfix: Clarify SLURM usage with the `-profile` option, explain the billing/project account parameter, and make the queue optional to use the cluster default.
+
 ---
 
 ### v1.3.2 - 2026-10-25

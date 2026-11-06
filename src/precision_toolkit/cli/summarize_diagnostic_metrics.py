@@ -1,5 +1,4 @@
-"""
-Summarize and compute diagnostic metrics from VCF comparisons.
+"""Summarize and compute diagnostic metrics from VCF comparisons.
 
 Usage:
     summarize-diagnostic-metrics --engine <engine> --raw-files <raw_files>
@@ -46,11 +45,9 @@ def generate_all_data_csv(
     tables_list: list[pd.DataFrame], metrics_list: list[str]
 ) -> pd.DataFrame:
     """Generate and return a large dataframe containing data from all metric tables."""
-    # Initialize all data table
     all_data_table = pd.DataFrame()
 
-    # Append each metric table to all data table
-    for table, metric in zip(tables_list, metrics_list):
+    for table, metric in zip(tables_list, metrics_list, strict=False):
         metric_name = "F1 score" if metric == "f1_score" else metric
 
         all_data_table = (
@@ -65,7 +62,6 @@ def generate_all_data_csv(
             )
         )
 
-    # Reset index and return table
     all_data_table = all_data_table.rename_axis(
         ["Variant Type", "Variant Filter"]
     ).reset_index()
@@ -150,11 +146,9 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    # Validate that at least one of raw-files or curated-files is provided
     if not args.raw_files and not args.curated_files:
         parser.error("At least one of --raw-files or --curated-files must be provided")
 
-    # Determine output prefix suffix based on provided files
     if args.raw_files and args.curated_files:
         suffix = "combined"
     elif args.raw_files:
@@ -163,7 +157,6 @@ def main() -> None:
         suffix = "curated"
     output_prefix = f"{args.prefix}_{args.engine}_{suffix}"
 
-    # Initialize tables, headings and summaries
     raw_tables: list[pd.DataFrame] = []
     curated_tables: list[pd.DataFrame] = []
     raw_headings: list[str] = []
@@ -172,7 +165,6 @@ def main() -> None:
     curated_summaries: list[str] = []
     initial_metric_types: list[DiagnosticMetricType] = []
 
-    # Process raw VCF comparisons
     if args.raw_files:
         raw_results = process_diagnostic_metrics(
             file_paths=args.raw_files,
@@ -193,18 +185,15 @@ def main() -> None:
             )
             initial_metric_types.append(metric)
 
-            # Export raw results to CSV
             raw_csv_output = f"{args.prefix}_{args.engine}_raw_{metric}.csv"
             export_diagnostic_metrics_to_csv(raw_table, raw_csv_output)
 
-        # Generate and export raw all_data_csv if option selected
         if args.include_all_data_csv == "true":
             raw_all_data_table = generate_all_data_csv(raw_tables, args.metrics)
             export_diagnostic_metrics_to_csv(
                 raw_all_data_table, f"{args.prefix}_{args.engine}_raw_all_data.csv"
             )
 
-    # Process curated VCF comparisons if provided
     if args.curated_files:
         curated_results = process_diagnostic_metrics(
             file_paths=args.curated_files,
@@ -227,11 +216,9 @@ def main() -> None:
             )
             initial_metric_types.append(metric)
 
-            # Export curated results to CSV
             curated_csv_output = f"{args.prefix}_{args.engine}_curated_{metric}.csv"
             export_diagnostic_metrics_to_csv(curated_table, curated_csv_output)
 
-        # Generate and export curated all_data_csv if option selected
         if args.include_all_data_csv == "true":
             curated_all_data_table = generate_all_data_csv(curated_tables, args.metrics)
             export_diagnostic_metrics_to_csv(
@@ -239,14 +226,12 @@ def main() -> None:
                 f"{args.prefix}_{args.engine}_curated_all_data.csv",
             )
 
-    # Combine tables in desired order
     tables: list[pd.DataFrame] = []
     headings: list[str] = []
     summaries: list[str] = []
     final_metric_types: list[DiagnosticMetricType] = []
 
     if args.raw_files and args.curated_files:
-        # Interleave raw and curated tables by metric
         for i in range(len(args.metrics)):
             if i < len(raw_tables):
                 tables.append(raw_tables[i])
@@ -259,13 +244,11 @@ def main() -> None:
                 summaries.append(curated_summaries[i])
                 final_metric_types.append(initial_metric_types[i])
     else:
-        # Use whichever set of tables exists
         tables = raw_tables if args.raw_files else curated_tables
         headings = raw_headings if args.raw_files else curated_headings
         summaries = raw_summaries if args.raw_files else curated_summaries
         final_metric_types = initial_metric_types
 
-    # Export results to markdown and word formats
     export_diagnostic_metrics_to_markdown(
         tables,
         f"{output_prefix}.md",

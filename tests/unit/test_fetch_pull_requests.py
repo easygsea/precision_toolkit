@@ -2,22 +2,21 @@
 
 import logging
 from types import SimpleNamespace
-from typing import Any, NoReturn
+from typing import NoReturn
 
 import pytest
 import requests
 
 from precision_toolkit.core.devtools.pull_request_fetcher import (
-    fetch_pull_requests as fetch_pull_requests,
+    fetch_pull_requests,
 )
 
 
 def test_fetch_repos_success_no_prs(
-    monkeypatch: pytest.MonkeyPatch, caplog: Any
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that correct calls is made for existing repo with no prs."""
     caplog.set_level(logging.INFO)
-    # Response for the first call (Fetch Repos)
     repo_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -25,23 +24,19 @@ def test_fetch_repos_success_no_prs(
         },
     )
 
-    # Response for the second call (Fetch PRs for repo-a)
     pr_response = SimpleNamespace(status_code=200, json=lambda: {"values": []})
 
-    # Call tracker to manage multiple calls and count them
     responses = [repo_response, pr_response]
     calls = []
 
-    def mock_get(url: str, **kwargs: Any) -> Any:
+    def mock_get(url: str, **kwargs: object) -> SimpleNamespace:
         calls.append(url)
         return responses.pop(0) if responses else repo_response
 
-    # Apply the monkeypatch
     monkeypatch.setattr(
         "precision_toolkit.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
 
-    # Call the function
     fetch_pull_requests(bitbucket_url="http://fake", project="P", repo="R", token="T")
 
     assert len(calls) == 2, f"Expected 2 calls, but got {len(calls)}: {calls}"
@@ -49,30 +44,27 @@ def test_fetch_repos_success_no_prs(
     assert "No pull requests found" in caplog.text
 
 
-def test_fetch_prs_empty_args(caplog: Any) -> None:
+def test_fetch_prs_empty_args(caplog: pytest.LogCaptureFixture) -> None:
     """Test 'INVALID URL' is printed when CLI args are missing."""
     caplog.set_level(logging.WARNING)
     fetch_pull_requests("", "", "", "")
 
-    # Check if the expected "Invalid URL" message was printed
     assert "Invalid URL" in caplog.text
 
 
-def test_fetch_prs_invalid_args(caplog: Any) -> None:
+def test_fetch_prs_invalid_args(caplog: pytest.LogCaptureFixture) -> None:
     """Test 'INVALID URL' is printed when CLI args are invalid."""
     caplog.set_level(logging.WARNING)
     fetch_pull_requests("123", "test", "test", "123")
 
-    # Check if the expected "Invalid URL" message was printed
     assert "Invalid URL" in caplog.text
 
 
 def test_fetch_repos_success_with_prs(
-    monkeypatch: pytest.MonkeyPatch, caplog: Any
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that correct calls is made for repo with prs."""
     caplog.set_level(logging.INFO)
-    # Response for the first call (Fetch Repos)
     repo_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -82,7 +74,6 @@ def test_fetch_repos_success_with_prs(
         },
     )
 
-    # Response for the second call (Fetch PRs for repo-a)
     pr_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -96,15 +87,13 @@ def test_fetch_repos_success_with_prs(
         },
     )
 
-    # Call tracker to manage multiple calls and count them
     responses = [repo_response, pr_response]
     calls = []
 
-    def mock_get(url: str, **kwargs: Any) -> Any:
+    def mock_get(url: str, **kwargs: object) -> SimpleNamespace:
         calls.append(url)
         return responses.pop(0) if responses else repo_response
 
-    # Apply the monkeypatch
     monkeypatch.setattr(
         "precision_toolkit.core.devtools.pull_request_fetcher.requests.get", mock_get
     )
@@ -122,13 +111,12 @@ def test_fetch_repos_success_with_prs(
 
 
 def test_fetch_prs_request_exception(
-    monkeypatch: pytest.MonkeyPatch, caplog: Any
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test request exception error handling when calling PR fetching function."""
     caplog.set_level(logging.WARNING)
-    # Setup: Make the mock "throw" a ConnectionError
 
-    def mock_get_exception(*args: Any, **kwargs: Any) -> NoReturn:
+    def mock_get_exception(*args: object, **kwargs: object) -> NoReturn:
         """Mock function to raise a ConnectionError."""
         raise requests.exceptions.ConnectionError("Connection refused")
 
@@ -136,18 +124,18 @@ def test_fetch_prs_request_exception(
 
     fetch_pull_requests(bitbucket_url="http://fake", project="P", repo="R", token="T")
 
-    # Check if 'except' block caught it and printed the error
     assert (
         "Connection refused" in caplog.text
         and "An error occurred while fetching data" in caplog.text
     )
 
 
-def test_fetch_prs_missing_fields(monkeypatch: pytest.MonkeyPatch, caplog: Any) -> None:
+def test_fetch_prs_missing_fields(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
     """Test print behavior for multiple PR's containing valid/invalid fields."""
     caplog.set_level(logging.INFO)
 
-    # Response for the first call (Fetch Repos)
     repo_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -157,7 +145,6 @@ def test_fetch_prs_missing_fields(monkeypatch: pytest.MonkeyPatch, caplog: Any) 
         },
     )
 
-    # Response for the second call (Fetch PRs for repo-a)
     pr_response = SimpleNamespace(
         status_code=200,
         json=lambda: {
@@ -167,22 +154,18 @@ def test_fetch_prs_missing_fields(monkeypatch: pytest.MonkeyPatch, caplog: Any) 
                     "title": "Valid PR",
                     "fromRef": {"repository": {"name": "My_Repo"}},
                 },
-                {
-                    "title": "Broken PR"
-                },  # Missing required fields such as id and fromRef
+                {"title": "Broken PR"},
             ]
         },
     )
 
-    # Call tracker to manage multiple calls and count them
     responses = [repo_response, pr_response]
     calls = []
 
-    def mock_get(url: str, **kwargs: Any) -> Any:
+    def mock_get(url: str, **kwargs: object) -> SimpleNamespace:
         calls.append(url)
         return responses.pop(0) if responses else repo_response
 
-    # Apply the monkeypatch
     monkeypatch.setattr(
         "precision_toolkit.core.devtools.pull_request_fetcher.requests.get", mock_get
     )

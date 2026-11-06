@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 
+logger = logging.getLogger(__name__)
+
 
 def pandas_to_csv(df: pd.DataFrame, output_file: str | Path) -> None:
     """Save DataFrame to CSV file.
@@ -14,4 +16,4 @@ def pandas_to_csv(df: pd.DataFrame, output_file: str | Path) -> None:
         output_file: Path to output file
     """
     df.to_csv(output_file, index=False)
-    logging.info(f"Table saved to {output_file}")
+    logger.info(f"Table saved to {output_file}")

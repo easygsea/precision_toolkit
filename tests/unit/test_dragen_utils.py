@@ -161,8 +161,7 @@ def test_classify_metric(
     expected_val: str | None,
     request: pytest.FixtureRequest,
 ) -> None:
-    """
-    Test classify_metric.
+    """Test classify_metric.
 
     Several scenarios are tested and compared to expected outputs via parametrization:
     - Valid float value that passes specified threshold in DragenMetric

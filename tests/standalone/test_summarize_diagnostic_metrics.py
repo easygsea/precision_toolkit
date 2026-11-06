@@ -55,7 +55,6 @@ def test_summarize_diagnostic_metrics(
     output_md = output_prefix.with_name(f"{output_prefix.name}_happy_combined.md")
     output_docx = output_prefix.with_name(f"{output_prefix.name}_happy_combined.docx")
 
-    # Run the script
     subprocess.run(
         [
             "summarize-diagnostic-metrics",
@@ -81,7 +80,6 @@ def test_summarize_diagnostic_metrics(
         check=True,
     )
 
-    # Check that output files were created
     for output_csv in output_csvs:
         assert output_csv.exists()
     for output_all_data_csv in output_all_data_csvs:
@@ -89,11 +87,9 @@ def test_summarize_diagnostic_metrics(
     assert output_md.exists()
     assert output_docx.exists()
 
-    # Check the CSV outputs
     for output_csv in output_csvs:
         df = pd.read_csv(output_csv)
 
-        # Check metric-specific columns
         metric = (
             output_csv.stem.split("raw_")[-1]
             .split("curated_")[-1]

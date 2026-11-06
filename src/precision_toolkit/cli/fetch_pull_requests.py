@@ -1,5 +1,4 @@
-"""
-Standalone PR fetching utility script for command line usage.
+"""Standalone PR fetching utility script for command line usage.
 
 Usage:
     fetch-pull-requests --bitbucket_url <URL_TO_BITBUCKET>

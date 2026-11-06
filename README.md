@@ -2,9 +2,31 @@
 
 **Precision Toolkit** is a containerized toolkit that integrates end-to-end pipelines for assay benchmarking, sequencing quality assessment, DRAGEN output analysis, and routine laboratory operations.
 
-Analytical tasks are parallelized and orchestrated within a continuous integration/continuous deployment (CI/CD) framework that promotes best practices, reduces platform dependencies, and ensures reproducible execution across computational environments.
+Nextflow orchestrates and parallelizes analytical tasks, while containerization reduces platform dependencies and supports reproducible execution across computational environments. A continuous integration and continuous delivery (CI/CD) framework supports software engineering best practices through automated builds, testing, and code quality checks.
 
-The toolkit also includes demonstration datasets to support adoption, validation, training, and method development.
+Demonstration datasets used in CI tests also support adoption, validation, training, and method development.
+
+## Continuous Integration
+
+Code quality and security checks are integrated into the development workflow through `pre-commit`. These checks promote consistent coding practices and help identify potential issues early.
+
+Every push to Bitbucket triggers the automated Bamboo build and verification plan. Each run:
+
+- Builds the Apptainer image used by the toolkit.
+- Runs Python unit and standalone utility tests with `pytest`.
+- Runs Nextflow workflow integration tests against the newly built local image.
+- Produces JUnit test reports for collection and analysis in Bamboo.
+- Runs configured formatters, linters, and security checks across the repository through `pre-commit`.
+
+Together, these checks help detect regressions, flag potential security issues, and verify toolkit functionality and workflow integration before deployment.
+
+See [Developer Setup](#developer-setup) for relevant commands and key configuration files.
+
+## Continuous Delivery
+
+Deployment remains a separate, manually triggered stage: a successful build does not automatically deploy the toolkit to the operational environment.
+
+See [deployment](./deployment/README.md) for details.
 
 ## Supported Architectures
 
@@ -81,7 +103,7 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
    To get a specific version, use:
 
    ```bash
-   apptainer pull docker://quay.io/easygsea/precision_toolkit:v1.3.2
+   apptainer pull docker://quay.io/easygsea/precision_toolkit:v1.4.1
    ```
 
 2. Run specific tools inside the container. Example:
@@ -138,6 +160,7 @@ apptainer exec \
 
 - [Manual](#manual)
 - [Resource Optimization and High-Performance Computing](#resource-optimization-and-high-performance-computing)
+- [Developer Setup](#developer-setup)
 
 ## Manual
 
@@ -206,8 +229,8 @@ It supports seamless integration with HPC environments:
    - Pre-configured SLURM profile for cluster execution
    - Customizable parameters:
      ```bash
-     --slurm_account <account_name>
-     --slurm_queue <partition_name>
+     --slurm_account <account_name>  # Optional; SLURM billing account (not your login); required on some clusters
+     --slurm_queue <partition_name>  # Optional; defaults to the cluster setting
      ```
    - Automatic job submission and monitoring
 
@@ -247,3 +270,64 @@ It supports seamless integration with HPC environments:
    - View detailed resource usage statistics
 
 For optimal performance, ensure your system meets the minimum requirements and consider these recommendations when configuring your execution environment.
+
+# Developer Setup
+
+Install Git, Python (>=3.11,<4), [uv](https://docs.astral.sh/uv/getting-started/installation/), Java, and a Nextflow version supporting `nextflow lint` on your development machine (see [Dependencies](#dependencies)). Ensure Java and Nextflow are available to the hooks. From the cloned repository root, install the locked development dependencies, enable Git hooks, and run the checks:
+
+```bash
+uv sync --locked --group dev
+uv run pre-commit install
+uv run pre-commit run --all-files
+```
+
+The first run downloads hook environments and requires network access. Use a `uv` version that supports the audit and malware-check features configured in [pyproject.toml](./pyproject.toml).
+
+The setup is defined by these files:
+
+| File | Purpose |
+| --- | --- |
+| [pyproject.toml](./pyproject.toml) and [uv.lock](./uv.lock) | Define development dependencies, shared tool settings, and locked dependency versions. |
+| [.pre-commit-config.yaml](./.pre-commit-config.yaml) | Defines hook versions, stages, file filters, exclusions, and arguments. Checks cover branch names, Python linting and typing, dependency auditing and locking, Dockerfile and shell linting, structured file validation, whitespace, and security scanning. |
+| [.semgrep/](./.semgrep/), [.pre-commit/](./.pre-commit/), and [commit-message.yaml](./commit-message.yaml) | Enforce custom code-scanning, branch-naming, and commit-message rules. |
+| [Bamboo environment setup](./deployment/bamboo/01-build-setup/04.create_virtual_environment.sh) and [Bamboo linting task](./deployment/bamboo/01-testing_and_linting/01.run_formatters_and_linters.sh) | Install the development environment and run the repository-wide checks in CI. |
+
+Some hooks modify files. Review the changes, rerun the checks, and restage the updated files before committing. If the audit hook upgrades dependencies, run the tests below before committing the updated lockfile.
+
+## Running Tests
+
+Install the development dependencies as described above, then run the following commands from the repository root.
+
+Run all Python unit and standalone utility tests:
+
+```bash
+uv run pytest tests/unit/ tests/standalone/
+```
+
+Workflow integration tests require Java, Nextflow, and Apptainer (see [Dependencies](#dependencies)). Before running them, update the existing `container` setting in [nextflow.config](./nextflow.config) to the absolute path of an Apptainer image built from the code you want to test. For example:
+
+```groovy
+container = "file:///absolute/path/to/precision_toolkit.sif"
+```
+
+Replace the example path with your image's actual location and ensure it is readable on the test host. This ensures workflow tests use your development image rather than the default published release image.
+
+On a host that supports Apptainer, run all workflow tests with one workflow at a time:
+
+```bash
+uv run pytest tests/workflow/ --workflow-threads 1 --ga --symlink
+```
+
+For targeted testing, run an individual Python test file or the workflow tests defined in a specific YAML file:
+```bash
+uv run pytest tests/unit/test_diagnostic_metrics.py
+uv run pytest tests/workflow/test_signal_correlation.yaml --workflow-threads 1 --ga --symlink
+```
+
+See the [Bamboo test task](./deployment/bamboo/02-testing_and_linting/01.run_unit_and_integration_tests.sh) for the CI commands, including workflow tests against the newly built local image.
+
+# Citation
+
+If you use Precision Toolkit in your work, please cite our abstract:
+
+> Cheng X, Du XL, Lo TWT, Chapel ME, Dudarev A, Jaison M, Jan SC, Goktas MT, Dowhy T, Feijao P, Mungall KL, Yip S, Jones SJM. Precision Toolkit: a containerized framework for reproducible clinical genomics assay development and validation [abstract I011]. J Mol Diagn. 2026;28(11 Suppl):S82.

@@ -1,5 +1,4 @@
-"""
-Visualize gene fail scores output from target evaluation workflow.
+"""Visualize gene fail scores output from target evaluation workflow.
 
 Usage:
     plot-gene-boxplots --input-file <input_file>
@@ -24,15 +23,17 @@ CUSTOM_COLORS = {
     "Base Quality (%)": "#DC267F",
     "Mapping Quality (%)": "#FFB000",
 }
+GENE_GROUP_COUNT = 3
+MAX_THRESHOLD_PERCENT = 100
 
 
 def threshold_type(value: str) -> float:
     """Convert input to float and validate that it falls between 1 and 100."""
     try:
         f = float(value)
-    except ValueError:
-        raise argparse.ArgumentTypeError(f"{value} is not a valid number")
-    if not (1 <= f <= 100):
+    except ValueError as err:
+        raise argparse.ArgumentTypeError(f"{value} is not a valid number") from err
+    if not (1 <= f <= MAX_THRESHOLD_PERCENT):
         raise argparse.ArgumentTypeError(
             f"Threshold must be between 1 and 100, got {f}"
         )
@@ -65,8 +66,8 @@ def get_gene_groups(df: pd.DataFrame) -> list[np.ndarray]:
     """Determine how many subplots are needed based on gene count."""
     all_genes_arr = np.array(sorted(df["GENE"].unique()))
 
-    if len(all_genes_arr) >= 3:
-        return np.array_split(all_genes_arr, 3)
+    if len(all_genes_arr) >= GENE_GROUP_COUNT:
+        return np.array_split(all_genes_arr, GENE_GROUP_COUNT)
     return [all_genes_arr]
 
 
@@ -80,10 +81,7 @@ def create_plot(
 
     metrics = df_melted["Metric"].unique()
 
-    if separate_plots:
-        metrics_to_plot = [[m] for m in metrics]
-    else:
-        metrics_to_plot = [list(metrics)]
+    metrics_to_plot = [[m] for m in metrics] if separate_plots else [list(metrics)]
 
     for metric_group in metrics_to_plot:
         metric_name = "combined" if not separate_plots else metric_group[0]

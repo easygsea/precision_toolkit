@@ -19,10 +19,10 @@ from precision_toolkit.core.metrics.variant import (
 @pytest.mark.parametrize(
     "truth_total, truth_tp, truth_fn, expected_sensitivity",
     [
-        (100, 90, 10, 0.9),  # Normal case
-        (0, 0, 0, 0.0),  # Zero TruthTotal
-        (100, 0, 100, 0.0),  # Zero TruthTP
-        (100, 100, 0, 1.0),  # Perfect sensitivity (zero TruthFN)
+        (100, 90, 10, 0.9),
+        (0, 0, 0, 0.0),
+        (100, 0, 100, 0.0),
+        (100, 100, 0, 1.0),
     ],
     ids=["normal_case", "zero_truth_total", "zero_truth_tp", "perfect_sensitivity"],
 )
@@ -61,10 +61,10 @@ def test_sensitivity_metrics(
 @pytest.mark.parametrize(
     "query_total, query_tp, query_fp, expected_precision",
     [
-        (120, 90, 30, 0.75),  # Normal case
-        (0, 0, 0, 0.0),  # Zero QueryTotal
-        (120, 0, 120, 0.0),  # Zero QueryTP
-        (120, 120, 0, 1.0),  # Perfect precision (zero QueryFP)
+        (120, 90, 30, 0.75),
+        (0, 0, 0, 0.0),
+        (120, 0, 120, 0.0),
+        (120, 120, 0, 1.0),
     ],
     ids=["normal_case", "zero_query_total", "zero_query_tp", "perfect_precision"],
 )
@@ -113,7 +113,7 @@ def test_precision_metrics(
             30,
             ConcordanceTPMethod.TruthTP.value,
             0.6923,
-        ),  # Use TruthTP
+        ),
         (
             100,
             90,
@@ -123,7 +123,7 @@ def test_precision_metrics(
             30,
             ConcordanceTPMethod.QueryTP.value,
             0.6667,
-        ),  # Use QueryTP
+        ),
         (
             100,
             90,
@@ -133,7 +133,7 @@ def test_precision_metrics(
             30,
             ConcordanceTPMethod.MinTP.value,
             0.6667,
-        ),  # Use MinTP (QueryTP is smaller)
+        ),
         (
             100,
             80,
@@ -143,9 +143,9 @@ def test_precision_metrics(
             30,
             ConcordanceTPMethod.MinTP.value,
             0.6154,
-        ),  # Use MinTP (TruthTP is smaller)
-        (0, 0, 0, 0, 0, 0, ConcordanceTPMethod.MinTP.value, 0.0),  # Zero total calls
-        (100, 0, 100, 120, 0, 120, ConcordanceTPMethod.MinTP.value, 0.0),  # Zero TP
+        ),
+        (0, 0, 0, 0, 0, 0, ConcordanceTPMethod.MinTP.value, 0.0),
+        (100, 0, 100, 120, 0, 120, ConcordanceTPMethod.MinTP.value, 0.0),
     ],
     ids=[
         "truth_tp",
@@ -195,10 +195,10 @@ def test_concordance_metrics(
 @pytest.mark.parametrize(
     "truth_total, truth_tp, truth_fn, query_total, query_tp, query_fp, expected_f1",
     [
-        (100, 90, 10, 120, 90, 30, 0.8182),  # Normal case
-        (100, 0, 100, 120, 0, 120, 0.0),  # Zero TP
-        (0, 0, 0, 0, 0, 0, 0.0),  # Zero totals
-        (100, 100, 0, 100, 100, 0, 1.0),  # Perfect match
+        (100, 90, 10, 120, 90, 30, 0.8182),
+        (100, 0, 100, 120, 0, 120, 0.0),
+        (0, 0, 0, 0, 0, 0, 0.0),
+        (100, 100, 0, 100, 100, 0, 1.0),
     ],
     ids=["normal_case", "zero_tp", "zero_totals", "perfect_match"],
 )
@@ -251,7 +251,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.826, 0.945),
-        ),  # Normal case
+        ),
         (
             100,
             0,
@@ -259,7 +259,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.0, 0.037),
-        ),  # Zero TP
+        ),
         (
             0,
             0,
@@ -267,7 +267,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.0, 0.0),
-        ),  # Zero totals
+        ),
         (
             100,
             100,
@@ -275,7 +275,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.964, 1.0),
-        ),  # Perfect match
+        ),
         (
             100,
             90,
@@ -283,7 +283,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.824, 0.946),
-        ),  # Normal case agresti coull
+        ),
         (
             100,
             0,
@@ -291,7 +291,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.0, 0.0444),
-        ),  # Zero TP agresti coull
+        ),
         (
             0,
             0,
@@ -299,7 +299,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.0, 0.0),
-        ),  # Zero totals agresti coull
+        ),
         (
             100,
             100,
@@ -307,7 +307,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.956, 1.0),
-        ),  # Perfect match agresti coull
+        ),
         (
             100,
             90,
@@ -315,7 +315,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.WILSON,
             0.99,
             (0.796, 0.954),
-        ),  # Normal case with 99% CI
+        ),
         (
             100,
             90,
@@ -323,7 +323,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.99,
             (0.793, 0.958),
-        ),  # Normal case agresti coull with 99% CI
+        ),
         (
             100,
             90,
@@ -331,7 +331,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.BETA,
             0.95,
             (0.824, 0.951),
-        ),  # Normal case beta
+        ),
         (
             100,
             90,
@@ -339,7 +339,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.BINOMIAL_TEST,
             0.95,
             (0.826, 0.947),
-        ),  # Normal case binomial test
+        ),
         (
             100,
             90,
@@ -347,7 +347,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.JEFFREYS,
             0.95,
             (0.830, 0.947),
-        ),  # Normal case jeffreys
+        ),
         (
             100,
             90,
@@ -355,7 +355,7 @@ def test_f1_score(
             ProportionConfidenceIntervalMethod.NORMAL,
             0.95,
             (0.841, 0.959),
-        ),  # Normal case normal
+        ),
     ],
     ids=[
         "normal_case",
@@ -424,7 +424,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.665, 0.819),
-        ),  # Normal case
+        ),
         (
             120,
             0,
@@ -432,7 +432,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.0, 0.031),
-        ),  # Zero TP
+        ),
         (
             0,
             0,
@@ -440,7 +440,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.0, 0.0),
-        ),  # Zero totals
+        ),
         (
             120,
             120,
@@ -448,7 +448,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.969, 1.0),
-        ),  # Perfect match
+        ),
         (
             120,
             90,
@@ -456,7 +456,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.665, 0.819),
-        ),  # Normal case
+        ),
         (
             120,
             0,
@@ -464,7 +464,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.0, 0.0373),
-        ),  # Zero TP
+        ),
         (
             0,
             0,
@@ -472,7 +472,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.0, 0.0),
-        ),  # Zero totals
+        ),
         (
             120,
             120,
@@ -480,7 +480,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.963, 1.0),
-        ),  # Perfect match
+        ),
         (
             120,
             90,
@@ -488,7 +488,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.WILSON,
             0.99,
             (0.637, 0.837),
-        ),  # Normal case with 99% CI
+        ),
         (
             120,
             90,
@@ -496,7 +496,7 @@ def test_confidence_interval_sensitivity(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.99,
             (0.636, 0.838),
-        ),  # Normal case agresti coull with 99% CI
+        ),
     ],
     ids=[
         "normal_case",
@@ -568,7 +568,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.608, 0.765),
-        ),  # Normal case
+        ),
         (
             100,
             0,
@@ -579,7 +579,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.0, 0.0172),
-        ),  # Zero TP
+        ),
         (
             0,
             0,
@@ -590,7 +590,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.0, 0.0),
-        ),  # Zero totals
+        ),
         (
             100,
             100,
@@ -601,7 +601,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.WILSON,
             0.95,
             (0.963, 1.0),
-        ),  # Perfect match
+        ),
         (
             100,
             90,
@@ -612,7 +612,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.608, 0.765),
-        ),  # Normal case
+        ),
         (
             100,
             0,
@@ -623,7 +623,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.0, 0.0207),
-        ),  # Zero TP
+        ),
         (
             0,
             0,
@@ -634,7 +634,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.0, 0.0),
-        ),  # Zero totals
+        ),
         (
             100,
             100,
@@ -645,7 +645,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.95,
             (0.9556, 1.0),
-        ),  # Perfect match
+        ),
         (
             100,
             90,
@@ -656,7 +656,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.WILSON,
             0.99,
             (0.581, 0.785),
-        ),  # Normal case with 99% CI
+        ),
         (
             100,
             90,
@@ -667,7 +667,7 @@ def test_confidence_interval_precision(
             ProportionConfidenceIntervalMethod.AGRESTI_COULL,
             0.99,
             (0.58, 0.786),
-        ),  # Normal case agresti coull with 99% CI
+        ),
     ],
     ids=[
         "normal_case",

@@ -7,6 +7,8 @@ from pathlib import Path
 
 from precision_toolkit.core.metrics.variant import VariantCallMetrics
 
+logger = logging.getLogger(__name__)
+
 
 class WittyerDataParser:
     """Parser for Wittyer output."""
@@ -21,10 +23,10 @@ class WittyerDataParser:
         Returns:
             Sequence of VariantCallMetrics objects containing processed data
         """
-        logging.info(f"Processing Wittyer output file: {file_path}")
+        logger.info(f"Processing Wittyer output file: {file_path}")
 
         try:
-            with open(file_path, "r") as file:
+            with open(file_path) as file:
                 data = json.load(file)
 
             results = []
@@ -43,12 +45,12 @@ class WittyerDataParser:
                                 QueryFP=stats["QueryFpCount"],
                             )
                             results.append(metrics)
-                        except Exception as e:
-                            logging.warning(f"Error processing stats: {str(e)}")
+                        except (KeyError, TypeError) as e:
+                            logger.warning(f"Error processing stats: {e!s}")
 
-            logging.info(f"Successfully processed {len(results)} metrics")
+            logger.info(f"Successfully processed {len(results)} metrics")
             return results
 
         except Exception as e:
-            logging.error(f"Failed to process file {file_path}: {str(e)}")
+            logger.error(f"Failed to process file {file_path}: {e!s}")
             raise

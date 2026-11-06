@@ -26,7 +26,6 @@ def test_manual_concordance_curation(test_data_dir: Path) -> None:
         output_prefix = Path(tmpdir) / "manually_curated_concordance"
         curation = ["SNP:PASS:TP:100", "SNP:PASS:FN:50", "SNP:PASS:FP:20"]
 
-        # Run the script
         subprocess.run(
             [
                 "manual-diagnostic-metric-curation",
@@ -45,7 +44,6 @@ def test_manual_concordance_curation(test_data_dir: Path) -> None:
             check=True,
         )
 
-        # Verify the output
         output_csv = output_prefix.with_suffix(".csv")
         assert output_csv.exists()
 
@@ -54,7 +52,6 @@ def test_manual_concordance_curation(test_data_dir: Path) -> None:
         assert "CI Lower" in df.columns
         assert "CI Upper" in df.columns
 
-        # Verify content
         row = df.iloc[0]
         assert row["Variant Type"] == "SNP"
         assert row["Variant Filter"] == "PASS"
@@ -73,7 +70,6 @@ def test_manual_sensitivity_curation(test_data_dir: Path) -> None:
         output_prefix = Path(tmpdir) / "manually_curated_sensitivity"
         curation = ["SNP:PASS:TP:100", "SNP:PASS:FN:50"]
 
-        # Run the script
         subprocess.run(
             [
                 "manual-diagnostic-metric-curation",
@@ -92,7 +88,6 @@ def test_manual_sensitivity_curation(test_data_dir: Path) -> None:
             check=True,
         )
 
-        # Verify the output
         output_csv = output_prefix.with_suffix(".csv")
         assert output_csv.exists()
 
@@ -101,7 +96,6 @@ def test_manual_sensitivity_curation(test_data_dir: Path) -> None:
         assert "CI Lower" in df.columns
         assert "CI Upper" in df.columns
 
-        # Verify content
         row = df.iloc[0]
         assert row["Variant Type"] == "SNP"
         assert row["Variant Filter"] == "PASS"
@@ -119,7 +113,6 @@ def test_manual_precision_curation(test_data_dir: Path) -> None:
         output_prefix = Path(tmpdir) / "manually_curated_precision"
         curation = ["SNP:PASS:TP:100", "SNP:PASS:FP:50"]
 
-        # Run the script
         subprocess.run(
             [
                 "manual-diagnostic-metric-curation",
@@ -138,7 +131,6 @@ def test_manual_precision_curation(test_data_dir: Path) -> None:
             check=True,
         )
 
-        # Verify the output
         output_csv = output_prefix.with_suffix(".csv")
         assert output_csv.exists()
 
@@ -147,7 +139,6 @@ def test_manual_precision_curation(test_data_dir: Path) -> None:
         assert "CI Lower" in df.columns
         assert "CI Upper" in df.columns
 
-        # Verify content
         row = df.iloc[0]
         assert row["Variant Type"] == "SNP"
         assert row["Variant Filter"] == "PASS"
@@ -165,7 +156,6 @@ def test_manual_f1_score_curation(test_data_dir: Path) -> None:
         output_prefix = Path(tmpdir) / "manually_curated_f1_score"
         curation = ["SNP:PASS:sensitivity:0.95", "SNP:PASS:precision:0.90"]
 
-        # Run the script
         subprocess.run(
             [
                 "manual-diagnostic-metric-curation",
@@ -180,7 +170,6 @@ def test_manual_f1_score_curation(test_data_dir: Path) -> None:
             check=True,
         )
 
-        # Verify the output
         output_csv = output_prefix.with_suffix(".csv")
         assert output_csv.exists()
 
@@ -189,7 +178,6 @@ def test_manual_f1_score_curation(test_data_dir: Path) -> None:
         assert "Sensitivity" in df.columns
         assert "Precision" in df.columns
 
-        # Verify content
         row = df.iloc[0]
         assert row["Variant Type"] == "SNP"
         assert row["Variant Filter"] == "PASS"

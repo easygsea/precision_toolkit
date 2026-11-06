@@ -8,6 +8,8 @@ import pandas as pd
 
 from precision_toolkit.core.metrics.variant import VariantCallMetrics
 
+logger = logging.getLogger(__name__)
+
 
 class HappyDataParser:
     """Parser for hap.py output."""
@@ -22,32 +24,27 @@ class HappyDataParser:
         Returns:
             Sequence of VariantCallMetrics objects containing processed data.
         """
-        logging.info(f"Processing hap.py output file: {file_path}")
+        logger.info(f"Processing hap.py output file: {file_path}")
 
-        try:
-            df = pd.read_csv(file_path)
-            logging.debug(f"Successfully loaded CSV with {len(df)} rows")
+        df = pd.read_csv(file_path)
+        logger.debug(f"Successfully loaded CSV with {len(df)} rows")
 
-            results = []
-            for idx, row in df.iterrows():
-                try:
-                    metrics = VariantCallMetrics(
-                        VariantType=row["Type"],
-                        VariantCallFilter=row["Filter"],
-                        TruthTotal=row["TRUTH.TOTAL"],
-                        TruthTP=int(row["TRUTH.TP"]),
-                        TruthFN=int(row["TRUTH.FN"]),
-                        QueryTotal=int(row["QUERY.TOTAL"]),
-                        QueryTP=int(row["TRUTH.TP"]),
-                        QueryFP=int(row["QUERY.FP"]),
-                    )
-                    results.append(metrics)
-                except Exception as e:
-                    logging.warning(f"Error processing row {idx}: {str(e)}")
+        results = []
+        for idx, row in df.iterrows():
+            try:
+                metrics = VariantCallMetrics(
+                    VariantType=row["Type"],
+                    VariantCallFilter=row["Filter"],
+                    TruthTotal=row["TRUTH.TOTAL"],
+                    TruthTP=int(row["TRUTH.TP"]),
+                    TruthFN=int(row["TRUTH.FN"]),
+                    QueryTotal=int(row["QUERY.TOTAL"]),
+                    QueryTP=int(row["TRUTH.TP"]),
+                    QueryFP=int(row["QUERY.FP"]),
+                )
+                results.append(metrics)
+            except (KeyError, TypeError, ValueError, OverflowError) as e:
+                logger.warning(f"Error processing row {idx}: {e!s}")
 
-            logging.info(f"Successfully processed {len(results)} metrics")
-            return results
-
-        except Exception as e:
-            logging.error(f"Failed to process file {file_path}: {str(e)}")
-            raise
+        logger.info(f"Successfully processed {len(results)} metrics")
+        return results

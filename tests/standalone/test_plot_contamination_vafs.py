@@ -48,8 +48,8 @@ def _compute_md5(path: Path) -> str:
             content = "".join(
                 line for line in f.readlines() if not line.startswith("#")
             )
-        return hashlib.md5(content.encode()).hexdigest()
-    return hashlib.md5(path.read_bytes()).hexdigest()
+        return hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
+    return hashlib.md5(path.read_bytes(), usedforsecurity=False).hexdigest()
 
 
 @pytest.mark.parametrize(
@@ -84,8 +84,6 @@ def test_plot_contamination_vafs(
     with tempfile.TemporaryDirectory() as tmpdir:
         output_folder = Path(tmpdir) / "plot_contamination_vafs"
 
-        # If --population-variants-vcf or --population-marks-vcf is provided, resolve
-        # path
         additional_args_resolved = [
             str(test_data_dir / arg) if arg.endswith(".vcf") else arg
             for arg in additional_args
@@ -103,8 +101,6 @@ def test_plot_contamination_vafs(
             check=True,
         )
 
-        # Check that MD5 checksum matches with expected for each output file, with the
-        # exception of *.tbi files
         for filename, expected_md5 in expected_checksums[checksum_json_key].items():
             generated_md5 = _compute_md5(output_folder / filename)
             assert generated_md5 == expected_md5
@@ -152,5 +148,6 @@ def test_plot_contamination_vafs_invalid_inputs(
                 str(output_folder),
                 *additional_args,
             ],
+            check=False,
         )
         assert result.returncode != 0

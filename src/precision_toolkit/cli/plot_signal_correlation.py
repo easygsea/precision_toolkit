@@ -1,5 +1,4 @@
-r"""
-Generate a scatter plot from paired truth and query signal files.
+r"""Generate a scatter plot from paired truth and query signal files.
 
 Each signal file should have the following columns:
 - CHROM
@@ -59,13 +58,11 @@ def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.Data
     truth_signal_cols = identify_raw_signal_columns(truth_signal_df)
     query_signal_cols = identify_raw_signal_columns(query_signal_df)
 
-    # Auto convert % values to float
     for col in truth_signal_cols:
         truth_signal_df[col] = truth_signal_df[col].apply(parse_percentage_and_float)
     for col in query_signal_cols:
         query_signal_df[col] = query_signal_df[col].apply(parse_percentage_and_float)
 
-    # Add suffixes to distinguish columns after merge
     truth_signal_df = truth_signal_df.rename(
         columns=lambda x: f"{x}_TRUTH" if x not in CONSTANT_COLUMNS else x
     )
@@ -82,8 +79,7 @@ def extract_signals(truth_signal_file: Path, query_signal_file: Path) -> pd.Data
 
 
 def identify_signal_columns(signal_df: pd.DataFrame) -> tuple[str, str]:
-    """
-    Identify truth and query signal column names from the DataFrame.
+    """Identify truth and query signal column names from the DataFrame.
 
     Args:
         signal_df: DataFrame with merged signals.
@@ -155,17 +151,14 @@ def plot_signal_correlation(
         color_source: Color by 'FILTER_TRUTH', 'FILTER_QUERY', or 'RUN_ID' if provided.
         color_palette: Color scheme for plotting if provided.
     """
-    # sort dataframe to ensure deterministic behaviour
     signal_df = signal_df.sort_values(by=list(signal_df.columns)).reset_index(drop=True)
 
     truth_col, query_col = identify_signal_columns(signal_df)
 
-    # Create figure with enhanced styling
     plt.figure(figsize=figsize)
     sns.set_style("whitegrid")
     sns.set_palette(color_palette)
 
-    # Create base scatter plot with optional coloring by filter
     if color_source.lower() == "truth" and "FILTER_TRUTH" in signal_df.columns:
         sns.scatterplot(
             data=signal_df,
@@ -197,23 +190,20 @@ def plot_signal_correlation(
         plt.scatter(signal_df[truth_col], signal_df[query_col], alpha=0.5, s=50)
 
     if show_regression:
-        # Get unique run IDs, handling NaN values gracefully
         unique_runs = signal_df["RUN_ID"].dropna().astype(str).unique().tolist()
         if len(unique_runs) < 1:
-            warnings.warn("No valid RUN_ID found for regression lines.", UserWarning)
+            warnings.warn(
+                "No valid RUN_ID found for regression lines.", UserWarning, stacklevel=2
+            )
             unique_runs = [" "]
             signal_df["RUN_ID"] = " "
 
-        # Set a different color palette for regression lines
         palette = sns.color_palette(color_palette, n_colors=len(unique_runs))
-        color_map = dict(zip(unique_runs, palette))
+        color_map = dict(zip(unique_runs, palette, strict=False))
 
-        # Add regression lines for each run if coloring by run
         for idx, run_id in enumerate(unique_runs):
-            # Isolate data unique to run
             run_df = signal_df[signal_df["RUN_ID"] == run_id]
 
-            # Add regression line on top of scatter
             sns.regplot(
                 x=truth_col,
                 y=query_col,
@@ -223,35 +213,29 @@ def plot_signal_correlation(
                 label=f"Run {run_id}",
             )
 
-            # Calculate correlation and p-value
             corr, p_value = calculate_correlation(run_df)
 
-            # Add correlation statistics to plot
-            y_offset = 0.95 - (idx * 0.07)  # Offset to avoid overlap
+            y_offset = 0.95 - (idx * 0.07)
             plt.text(
                 0.05,
                 y_offset,
                 f"{run_id}: Pearson r = {corr:.3f}\n{run_id}: p-value = {p_value:.2e}",
                 transform=plt.gca().transAxes,
-                bbox=dict(facecolor="white", alpha=0.8),
+                bbox={"facecolor": "white", "alpha": 0.8},
             )
 
-    # Customize plot
     plt.xlabel(f"Truth ({truth_col.replace('_TRUTH', '')})")
     plt.ylabel(f"Query ({query_col.replace('_QUERY', '')})")
     plt.title(title)
 
-    # Set axis limits if provided
     if xlim is not None:
         plt.xlim(xlim)
     if ylim is not None:
         plt.ylim(ylim)
 
-    # Save figure with high resolution
     plt.tight_layout()
     plt.savefig(f"{output_filename}.png", dpi=300, bbox_inches="tight")
 
-    # Save PDF with proper vector graphics
     with PdfPages(f"{output_filename}.pdf") as pdf:
         pdf.savefig(bbox_inches="tight", dpi=300)
 
@@ -339,7 +323,6 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    # Convert arguments to appropriate types
     truth_signal = [Path(path) for path in args.truth_signal]
     query_signal = [Path(path) for path in args.query_signal]
     output_filename = args.output_filename
@@ -350,26 +333,22 @@ def main() -> None:
     run_pattern = args.run_pattern if args.run_pattern else None
     color_palette = args.color_palette
 
-    # Dynamically handle file(s) and folder inputs
     if (
         len(truth_signal) == 1
         and len(query_signal) == 1
         and truth_signal[0].is_dir()
         and query_signal[0].is_dir()
     ):
-        # Get all signal files from folders
         truth_signal_files = sorted(truth_signal[0].glob("*.tsv"))
         query_signal_files = sorted(query_signal[0].glob("*.tsv"))
 
         if not truth_signal_files or not query_signal_files:
             raise ValueError("No signal files found in input folders.")
 
-        # Extract and validate signals
         signal_df = pd.DataFrame()
         for truth_signal_file, query_signal_file in zip(
-            truth_signal_files, query_signal_files
+            truth_signal_files, query_signal_files, strict=False
         ):
-            # Get sample name & run_id from file path
             sample_name = truth_signal_file.with_suffix("").stem.split("_")[0]
             if run_pattern:
                 m = re.search(run_pattern, truth_signal_file.name)
@@ -377,7 +356,6 @@ def main() -> None:
             else:
                 run_id = None
 
-            # Extract signals for this sample
             sample_df = extract_signals(truth_signal_file, query_signal_file)
             if sample_df.empty:
                 raise ValueError(
@@ -385,21 +363,18 @@ def main() -> None:
                     f"{query_signal_file}."
                 )
 
-            # Add sample name & run_id column
             sample_df["SAMPLE"] = sample_name
             sample_df["RUN_ID"] = run_id
 
-            # Append to combined dataframe
             signal_df = pd.concat([signal_df, sample_df], ignore_index=True)
     else:
         if isinstance(truth_signal, list) and isinstance(query_signal, list):
-            # Multiple files mode
             signal_df = pd.DataFrame()
-            # Sort both lists to ensure consistent pairing
             truth_signal = sorted(truth_signal)
             query_signal = sorted(query_signal)
-            for truth_signal_file, query_signal_file in zip(truth_signal, query_signal):
-                # Get sample name & run_id from file path
+            for truth_signal_file, query_signal_file in zip(
+                truth_signal, query_signal, strict=False
+            ):
                 sample_name = truth_signal_file.with_suffix("").stem.split("_")[0]
                 if run_pattern:
                     m = re.search(run_pattern, truth_signal_file.name)
@@ -407,7 +382,6 @@ def main() -> None:
                 else:
                     run_id = None
 
-                # Extract signals for this sample
                 sample_df = extract_signals(truth_signal_file, query_signal_file)
                 if sample_df.empty:
                     raise ValueError(
@@ -415,14 +389,11 @@ def main() -> None:
                         f"{query_signal_file}."
                     )
 
-                # Add sample name & run_id column
                 sample_df["SAMPLE"] = sample_name
                 sample_df["RUN_ID"] = run_id
 
-                # Append to combined dataframe
                 signal_df = pd.concat([signal_df, sample_df], ignore_index=True)
         else:
-            # Single file mode
             signal_df = extract_signals(truth_signal, query_signal)
             if signal_df.empty:
                 raise ValueError(
@@ -430,21 +401,17 @@ def main() -> None:
                     f"{query_signal}."
                 )
 
-            # find run pattern
             if run_pattern:
                 m = re.search(run_pattern, truth_signal.name)
                 run_id = m.group() if m else None
             else:
                 run_id = None
 
-            # Add sample name & run_id column
             signal_df["SAMPLE"] = truth_signal.with_suffix("").stem.split("_")[0]
             signal_df["RUN_ID"] = run_id
 
-    # Save signal table
     signal_df.to_csv(output_table, sep="\t", index=False)
 
-    # Generate correlation figure
     plot_signal_correlation(
         signal_df,
         output_filename,

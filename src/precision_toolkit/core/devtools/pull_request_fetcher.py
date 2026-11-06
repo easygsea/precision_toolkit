@@ -8,7 +8,9 @@ from requests.exceptions import (
     RequestException,
 )
 
-logging.basicConfig(format="%(message)s", level=logging.INFO)
+from precision_toolkit.core.logging_setup import setup_logging
+
+setup_logging()
 logger = logging.getLogger(__name__)
 
 
@@ -27,18 +29,16 @@ def fetch_pull_requests(
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
-        repo_response = requests.get(base_api_url, headers=headers)
+        repo_response = requests.get(base_api_url, headers=headers, timeout=30)
 
-        if repo_response.status_code == 200:
+        if repo_response.status_code == requests.codes.ok:
             repositories = repo_response.json().get("values", [])
 
             all_prs = []
 
             for repo_data in repositories:
                 if not isinstance(repo_data, dict):
-                    logging.warning(
-                        "Repository at provided link is an unexpected type."
-                    )
+                    logger.warning("Repository at provided link is an unexpected type.")
                     continue
 
                 if repo and repo_data.get("name") != repo:
@@ -47,9 +47,9 @@ def fetch_pull_requests(
                 repo_slug = repo_data.get("slug")
                 pr_url = f"{base_api_url}/{repo_slug}/pull-requests"
 
-                pr_response = requests.get(pr_url, headers=headers)
+                pr_response = requests.get(pr_url, headers=headers, timeout=30)
 
-                if pr_response.status_code == 200:
+                if pr_response.status_code == requests.codes.ok:
                     pull_requests = pr_response.json().get("values", [])
 
                     for pr in pull_requests:
@@ -60,7 +60,7 @@ def fetch_pull_requests(
                             }
                         )
                 else:
-                    logging.warning(
+                    logger.warning(
                         f"Failed to fetch PRs for {repo_slug}:{pr_response.status_code}"
                     )
 
@@ -73,7 +73,7 @@ def fetch_pull_requests(
                     title = pr.get("title")
 
                     if pr_id is None or title is None:
-                        logging.warning(
+                        logger.warning(
                             f"Warning: PR {title or 'Unknown'} is missing fields."
                         )
                         continue
@@ -82,16 +82,16 @@ def fetch_pull_requests(
                         f"{bitbucket_url}/projects/{project}/repos/{r_name}"
                         f"/pull-requests/{pr_id}/overview"
                     )
-                    logging.info(title)
-                    logging.info(f"[{r_name}#{pr_id}]({pr_link})\n")
+                    logger.info(title)
+                    logger.info(f"[{r_name}#{pr_id}]({pr_link})\n")
             else:
-                logging.info("No pull requests found.")
+                logger.info("No pull requests found.")
         else:
-            logging.warning(
+            logger.warning(
                 f"Repo request failed with status code {repo_response.status_code}"
             )
 
     except MissingSchema as e:
-        logging.error(f"Invalid URL: '{base_api_url}': {str(e)}")
+        logger.error(f"Invalid URL: '{base_api_url}': {e!s}")
     except RequestException as e:
-        logging.error(f"An error occurred while fetching data: {str(e)}")
+        logger.error(f"An error occurred while fetching data: {e!s}")

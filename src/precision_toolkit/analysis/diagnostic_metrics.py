@@ -61,8 +61,8 @@ def load_data_from_files(
     for file_path in files:
         try:
             all_metrics.extend(parser(file_path))
-        except Exception as e:
-            raise RuntimeError(f"Error processing file {file_path}: {str(e)}")
+        except (OSError, ValueError, KeyError) as e:
+            raise RuntimeError(f"Error processing file {file_path}: {e!s}") from e
 
     return all_metrics
 
@@ -219,9 +219,9 @@ def _compute_sensitivity_and_ci_for_group(
         TruthTotal=total_truth_tp + total_truth_fn,
         TruthTP=total_truth_tp,
         TruthFN=total_truth_fn,
-        QueryTotal=0,  # Not used for sensitivity
-        QueryTP=0,  # Not used for sensitivity
-        QueryFP=0,  # Not used for sensitivity
+        QueryTotal=0,
+        QueryTP=0,
+        QueryFP=0,
     )
 
     analysis = SensitivityMetrics(aggregated_metrics)
@@ -288,9 +288,9 @@ def _compute_precision_and_ci_for_group(
     aggregated_metrics = VariantCallMetrics(
         VariantType=group[0].VariantType,
         VariantCallFilter=group[0].VariantCallFilter,
-        TruthTotal=0,  # Not used for precision
-        TruthTP=0,  # Not used for precision
-        TruthFN=0,  # Not used for precision
+        TruthTotal=0,
+        TruthTP=0,
+        TruthFN=0,
         QueryTotal=total_query_tp + total_query_fp,
         QueryTP=total_query_tp,
         QueryFP=total_query_fp,
@@ -323,7 +323,7 @@ def compute_f1_score(
     sensitivity_results = compute_sensitivity_and_ci(metrics, ci_method)
 
     f1_scores = {}
-    for key in precision_results.keys():
+    for key in precision_results:
         sensitivity = sensitivity_results[key][2]
         precision = precision_results[key][2]
         f1_metrics = F1ScoreMetrics(sensitivity=sensitivity, precision=precision)

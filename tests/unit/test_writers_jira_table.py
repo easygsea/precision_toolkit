@@ -18,18 +18,18 @@ from precision_toolkit.core.writers.jira_table import (
             "Name": ["Alice", "Bob"],
             "Age": [25, 30],
             "City": ["NYC", "LA"],
-        },  # Basic case
-        {"A": [1, 2, 3], "B": [10.5, 20.1, 30.6], "C": [100, 200, 300]},  # Numeric case
+        },
+        {"A": [1, 2, 3], "B": [10.5, 20.1, 30.6], "C": [100, 200, 300]},
         {
             "Passed": [True, False, True],
             "Active": [False, False, True],
             "Inactive": [False, False, False],
-        },  # Boolean case
+        },
         {
             "Product1": ["A|B", "C||D", "東京"],
             "Description": ["Line.Break$", "Pipe | Symbol", "Regular text"],
             "Product_Price": [9.99, "Mango $2", True],
-        },  # Special characters case
+        },
     ],
     ids=["basic_case", "numeric_values", "boolean_values", "special_characters"],
 )
@@ -59,10 +59,10 @@ def test_empty_pandas_to_jira_table() -> None:
 @pytest.mark.parametrize(
     "float_format, expected_pattern",
     [
-        (None, r"12345\.678947"),  # raw formatting
-        (0, r"1\.234568e\+04"),  # scientific notation
-        (2, r"12345\.68"),  # float with 2 decimals
-        (4, r"12345\.6789"),  # float with 4 decimals
+        (None, r"12345\.678947"),
+        (0, r"1\.234568e\+04"),
+        (2, r"12345\.68"),
+        (4, r"12345\.6789"),
     ],
     ids=["default", "scientific", "2_decimal", "4_decimal"],
 )
@@ -88,10 +88,10 @@ def basic_df() -> pd.DataFrame:
             "This is a heading",
             "This is a summary",
             ["h1. This is a heading", "This is a summary"],
-        ),  # heading & summary
-        ("This is a heading", None, ["h1. This is a heading", None]),  # heading only
-        (None, "This is a summary", [None, "This is a summary"]),  # summary only
-        (None, None, [None, None]),  # no heading nor summary
+        ),
+        ("This is a heading", None, ["h1. This is a heading", None]),
+        (None, "This is a summary", [None, "This is a summary"]),
+        (None, None, [None, None]),
     ],
     ids=["heading_and_summary", "heading_only", "summary_only", "none"],
 )

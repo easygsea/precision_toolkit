@@ -3,15 +3,15 @@ process NORMALIZE_COVERAGE_TO_TARGET {
 
     input:
     tuple val(sample_name), path(parsed_pileup), val(pool_id)
-    path(targets_bed)
-    val(target_coverage)
-    val(normalization_method)
+    path targets_bed
+    val target_coverage
+    val normalization_method
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: normalized_pileup
 
     script:
-    OUT="${parsed_pileup.baseName}.normalized.txt"
+    OUT = "${parsed_pileup.baseName}.normalized.txt"
     """
     echo "Starting calculation for ${parsed_pileup}" #info
     norm_factor=\$(awk -v tc=${target_coverage} -v method=${normalization_method} '
@@ -71,13 +71,6 @@ process GET_PER_BASE_STATS {
     label "dynamic_resource"
     tag "${sample_name}"
 
-    // Current specs used here:
-    // 1. Output all positions in bed file
-    // 2. Min BQ and MQ of 0
-    // 3. -A count anomalous reads pairs -x turn off overlaps removal (BQ 0 acceptable)
-    // 4. -B to turn off BAQ recalculations based on reference genome
-    // 5. Custom gawk to adjust for deletions & parse
-
     input:
     path targets_bed
     tuple val(sample_name), path(in_bam), val(pool_id)
@@ -90,7 +83,7 @@ process GET_PER_BASE_STATS {
     tuple val(sample_name), path(OUT), val(pool_id), emit: parsed_pileup
 
     script:
-    OUT="${in_bam.baseName}.mpileup.per_base.parsed.txt"
+    OUT = "${in_bam.baseName}.mpileup.per_base.parsed.txt"
     cram_extra_param = cram_fasta ? "--fasta-ref ${cram_fasta}" : " "
     """
     samtools mpileup -B -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
@@ -156,7 +149,7 @@ process GET_PER_BASE_STATS_NO_PARSE {
     publishDir "${params.output_dir}/${params.target_evaluation_subdir}/raw_mpileups", mode: 'copy'
 
     input:
-    path(targets_bed)
+    path targets_bed
     tuple val(sample_name), path(in_bam), val(pool_id)
     path cram_fasta
 
@@ -164,7 +157,7 @@ process GET_PER_BASE_STATS_NO_PARSE {
     tuple val(sample_name), path(OUT), val(pool_id), emit: raw_mpileup_out
 
     script:
-    OUT="${in_bam.baseName}.mpileup.raw.txt"
+    OUT = "${in_bam.baseName}.mpileup.raw.txt"
     cram_extra_param = cram_fasta ? "--fasta-ref ${cram_fasta}" : " "
     """
     samtools mpileup -B -A -aa -x --min-BQ 0 --min-MQ 0 --output-MQ \
@@ -178,14 +171,14 @@ process ADD_TARGET_LABELS {
 
     input:
     tuple val(sample_name), path(parsed_pileup), val(pool_id)
-    path(targets_bed)
-    val(metrics_thresholds_and_headings)
+    path targets_bed
+    val metrics_thresholds_and_headings
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: labelled_pileup
 
     script:
-    OUT="${parsed_pileup.baseName}.labelled.txt"
+    OUT = "${parsed_pileup.baseName}.labelled.txt"
     // NOTE: back to 0-indexed
     """
     awk 'BEGIN{OFS="\\t"} NR > 1 {print \$1, \$2-1, \$2, \$0}' ${parsed_pileup} |
@@ -208,15 +201,15 @@ process GET_PER_TARGET_AGGREGATED_STATS {
 
     input:
     tuple val(sample_name), path(labelled_pileup), val(pool_id)
-    path(targets_bed)
-    val(target_fail_tolerance)
-    val(metrics_thresholds_and_headings)
+    path targets_bed
+    val target_fail_tolerance
+    val metrics_thresholds_and_headings
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: per_target_aggregated
 
     script:
-    OUT="${labelled_pileup.baseName}.target_aggregated.txt"
+    OUT = "${labelled_pileup.baseName}.target_aggregated.txt"
     """
     grep -v ^# ${labelled_pileup} |
     sort -V -k1,1 -k3,3 -k2,2n |
@@ -247,15 +240,15 @@ process GENERATE_PER_BASE_SUMMARY {
     tag "All_Samples"
 
     input:
-    path(combined_labelled_pileups)
-    val(agg_percentile)
-    val(metrics_thresholds_and_headings)
+    path combined_labelled_pileups
+    val agg_percentile
+    val metrics_thresholds_and_headings
 
     output:
     tuple val("All_Samples"), path(OUT), val("All_Pools"), emit: all_libraries_per_base
 
     script:
-    OUT="cohort_base_analysis.tsv"
+    OUT = "cohort_base_analysis.tsv"
     """
     grep -v '^#' ${combined_labelled_pileups} |
     sort -k1,1 -k2,2 -k3,3 |
@@ -300,13 +293,13 @@ process SCORE_OUTPUT_ON_METRICS {
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
-    val(metrics_thresholds_and_headings)
+    val metrics_thresholds_and_headings
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: scored_output
 
     script:
-    OUT="${pre_scored_file.baseName}.scored.txt"
+    OUT = "${pre_scored_file.baseName}.scored.txt"
     """
     awk -v OFS='\\t' '
     /^#/ {
@@ -325,19 +318,19 @@ process SCORE_OUTPUT_ON_METRICS {
 
 process SCORE_OUTPUT_ON_FIELD {
     tag "${sample_name}"
-    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/${sample_name=='All_Samples' ? '' : 'library_level'}", mode: 'copy'
+    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/${sample_name == 'All_Samples' ? '' : 'library_level'}", mode: 'copy'
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
-    val(col_to_score)
-    val(output_col_name)
-    val(scoring_threshold)
+    val col_to_score
+    val output_col_name
+    val scoring_threshold
 
     output:
     tuple val(sample_name), path(OUT), val(pool_id), emit: scored_output
 
     script:
-    OUT="${pre_scored_file.baseName.replaceFirst( "\\.scored",'')}.scored.txt"
+    OUT = "${pre_scored_file.baseName.replaceFirst("\\.scored", '')}.scored.txt"
     """
     awk -v OFS='\\t' '
     /^#/ {
@@ -361,14 +354,14 @@ process GENERATE_TRACTS {
 
     input:
     tuple val(sample_name), path(scored_file), val(pool_id)
-    each(headers_dict)
-    val(gap_tolerance)
+    each headers_dict
+    val gap_tolerance
 
     output:
-    path(OUT), emit: tract_bed
+    path (OUT), emit: tract_bed
 
     script:
-    OUT="tracts.${headers_dict.base_score_output_header.toLowerCase()}.bed"
+    OUT = "tracts.${headers_dict.base_score_output_header.toLowerCase()}.bed"
     //TODO: also target/all library file
     """
     awk -v OFS='\\t' '
@@ -397,13 +390,13 @@ process UNIONIZE_TRACTS {
     publishDir "${params.output_dir}/${params.target_evaluation_subdir}/tracts", mode: 'copy'
 
     input:
-    path(all_tracts_bed)
+    path all_tracts_bed
 
     output:
-    path(OUT), emit: tract_bed
+    path (OUT), emit: tract_bed
 
     script:
-    OUT="tracts.unionized.bed"
+    OUT = "tracts.unionized.bed"
     """
     sort-bed ${all_tracts_bed} | bedtools merge -c 4 -o distinct > ${OUT}
     """
@@ -418,10 +411,10 @@ process GENERATE_PER_LIBRARY_QC_REPORT {
     path "files/*"
 
     output:
-    path("cohort_qc_report.tsv"), emit: final_table
+    path ("cohort_qc_report.tsv"), emit: final_table
 
     script:
-    OUT="cohort_qc_report.tsv"
+    OUT = "cohort_qc_report.tsv"
     """
     echo -e "SAMPLE_ID\t%_Bases_Failed\t%_Targets_Failed\tAvg_%_Bases_Failed_Per_Target" > ${OUT}
 
@@ -452,16 +445,16 @@ process GENERATE_VISUALIZATION {
     publishDir "${params.output_dir}/${params.target_evaluation_subdir}/plots", mode: 'copy'
 
     input:
-    path(input_files)
-    val(pool_ids)
-    val(prefix)
-    val(metrics_thresholds_and_headings)
+    path input_files
+    val pool_ids
+    val prefix
+    val metrics_thresholds_and_headings
 
     output:
-    path(OUT)
+    path OUT
 
     script:
-    OUT="${prefix}_*"
+    OUT = "${prefix}_*"
     """
     plot-target-tracts \
     --input-files ${input_files} \
@@ -479,10 +472,10 @@ process GENERATE_COMMON_REGIONS_FAIL {
     tuple val(sample_name), path(all_libraries_per_base), val(pool)
 
     output:
-    path(OUT), emit: common_fail_regions
+    path (OUT), emit: common_fail_regions
 
     script:
-    OUT="common_fail_regions.bed"
+    OUT = "common_fail_regions.bed"
     """
     awk -v OFS="\\t" '
         \$11 > ${params.cohort_percent_library_fail_threshold * 100} ||
@@ -504,7 +497,7 @@ process GENERATE_BOX_PLOTS {
     tuple val(sample_name), path(input_file), val(threshold), val(separate_plots)
 
     output:
-    path(OUT), emit: percent_failed_box_plot
+    path (OUT), emit: percent_failed_box_plot
 
     script:
     OUT = "failure_threshold_*.png"

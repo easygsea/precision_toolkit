@@ -8,6 +8,8 @@ import pandas as pd
 
 from precision_toolkit.core.metrics.variant import VariantCallMetrics
 
+logger = logging.getLogger(__name__)
+
 
 class SompyDataParser:
     """Parser for som.py output."""
@@ -22,32 +24,27 @@ class SompyDataParser:
         Returns:
             Sequence of VariantCallMetrics objects containing processed data.
         """
-        logging.info(f"Processing som.py output file: {file_path}")
+        logger.info(f"Processing som.py output file: {file_path}")
 
-        try:
-            df = pd.read_csv(file_path)
-            logging.debug(f"Successfully loaded CSV with {len(df)} rows")
+        df = pd.read_csv(file_path)
+        logger.debug(f"Successfully loaded CSV with {len(df)} rows")
 
-            results = []
-            for idx, row in df.iterrows():
-                try:
-                    metrics = VariantCallMetrics(
-                        VariantType=row["type"],
-                        VariantCallFilter="NA",  # som.py doesn't have filter column
-                        TruthTotal=int(row["total.truth"]),
-                        TruthTP=int(row["tp"]),
-                        TruthFN=int(row["fn"]),
-                        QueryTotal=int(row["total.query"]),
-                        QueryTP=int(row["tp"]),
-                        QueryFP=int(row["fp"]),
-                    )
-                    results.append(metrics)
-                except Exception as e:
-                    logging.warning(f"Error processing row {idx}: {str(e)}")
+        results = []
+        for idx, row in df.iterrows():
+            try:
+                metrics = VariantCallMetrics(
+                    VariantType=row["type"],
+                    VariantCallFilter="NA",
+                    TruthTotal=int(row["total.truth"]),
+                    TruthTP=int(row["tp"]),
+                    TruthFN=int(row["fn"]),
+                    QueryTotal=int(row["total.query"]),
+                    QueryTP=int(row["tp"]),
+                    QueryFP=int(row["fp"]),
+                )
+                results.append(metrics)
+            except (KeyError, TypeError, ValueError, OverflowError) as e:
+                logger.warning(f"Error processing row {idx}: {e!s}")
 
-            logging.info(f"Successfully processed {len(results)} metrics")
-            return results
-
-        except Exception as e:
-            logging.error(f"Failed to process file {file_path}: {str(e)}")
-            raise
+        logger.info(f"Successfully processed {len(results)} metrics")
+        return results

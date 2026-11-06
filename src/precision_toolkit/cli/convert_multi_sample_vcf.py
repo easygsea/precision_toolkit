@@ -1,5 +1,4 @@
-"""
-Convert multi-sample VCF file to a folder of single sample VCF files.
+"""Convert multi-sample VCF file to a folder of single sample VCF files.
 
 Usage:
     convert_multi_sample_vcf --input-vcf=<PATH_TO_VCF> --output-folder=<NEW_FOLDER_NAME>
@@ -41,17 +40,14 @@ def parse_file(input_file_path: Path) -> tuple[list[str], pd.DataFrame]:
         df: DataFrame containing the parsed sample data.
     """
     info_lines: list[str] = []
-    if input_file_path.suffix == ".gz":
-        file = gzip.open(input_file_path, "rt")
-    else:
-        file = open(input_file_path, "r")
-
-    for line in file:
-        if line.startswith("##"):
-            info_lines.append(line.strip())
-        elif line.startswith("#CHROM"):
-            header_line = line.strip().split("\t")
-            break
+    opener = gzip.open if input_file_path.suffix == ".gz" else open
+    with opener(input_file_path, "rt") as file:
+        for line in file:
+            if line.startswith("##"):
+                info_lines.append(line.strip())
+            elif line.startswith("#CHROM"):
+                header_line = line.strip().split("\t")
+                break
 
     df = pd.read_csv(
         input_file_path, comment="#", sep="\t", header=None, names=header_line

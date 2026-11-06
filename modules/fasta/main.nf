@@ -5,7 +5,7 @@ process generate_fai {
     path genome_ref
 
     output:
-    path("${genome_ref}.fai"), emit: genome_fai
+    path ("${genome_ref}.fai"), emit: genome_fai
 
     script:
     """

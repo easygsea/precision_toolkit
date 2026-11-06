@@ -1,6 +1,7 @@
 """Constants for the precision toolkit package."""
 
 from enum import StrEnum
+from typing import ClassVar
 
 DEFAULT_CI_LEVEL: float = 0.95
 DEFAULT_CI_METHOD: str = "wilson"
@@ -28,7 +29,7 @@ class VariantConcordanceEngine(StrEnum):
 class NameMapper:
     """Metric abbreviations and full names."""
 
-    NAME_MAP = {
+    NAME_MAP: ClassVar[dict[str, str]] = {
         "TP": "True Positive",
         "FP": "False Positive",
         "TN": "True Negative",

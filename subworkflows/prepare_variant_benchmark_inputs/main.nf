@@ -1,15 +1,17 @@
 include {
     build_vcf_pair_channels
-    process_spurious_variants
 } from '../../modules/utils'
 
 include {
-    bgzip_vcf
+    process_spurious_variants
+} from '../prepare_vcfs'
+
+include {
+    bgzip_vcf ;
     index_vcf
 } from '../../modules/vcf'
 
 workflow prepare_variant_benchmark_inputs {
-
     main:
     // Validate input directories
     if (!file(params.truth_dir).exists()) {
@@ -31,7 +33,7 @@ workflow prepare_variant_benchmark_inputs {
             vcf_pairs,
             params.spurious_variants_vcf,
             params.collapse,
-        )
+        ).curated_vcf_pairs
     }
 
     // If engine is truvari, ensure truth and query VCFs are bgzipped and indexed
@@ -41,14 +43,14 @@ workflow prepare_variant_benchmark_inputs {
             .flatMap { sample_name, truth_vcf, query_vcf ->
                 [
                     tuple("${sample_name}.raw_truth", truth_vcf),
-                    tuple("${sample_name}.raw_query", query_vcf)
+                    tuple("${sample_name}.raw_query", query_vcf),
                 ]
             }
             .mix(
                 curated_vcf_pairs.flatMap { sample_name, truth_vcf, query_vcf ->
                     [
                         tuple("${sample_name}.curated_truth", truth_vcf),
-                        tuple("${sample_name}.curated_query", query_vcf)
+                        tuple("${sample_name}.curated_query", query_vcf),
                     ]
                 }
             )
@@ -82,15 +84,13 @@ workflow prepare_variant_benchmark_inputs {
         vcf_tbi_pairs = all_bgzipped_vcfs_and_indices_branched.raw_truth
             .map { label, vcf, tbi -> tuple(label.replace('.raw_truth', ''), vcf, tbi) }
             .join(
-                all_bgzipped_vcfs_and_indices_branched.raw_query
-                    .map { label, vcf, tbi -> tuple(label.replace('.raw_query', ''), vcf, tbi) }
+                all_bgzipped_vcfs_and_indices_branched.raw_query.map { label, vcf, tbi -> tuple(label.replace('.raw_query', ''), vcf, tbi) }
             )
 
         curated_vcf_tbi_pairs = all_bgzipped_vcfs_and_indices_branched.curated_truth
             .map { label, vcf, tbi -> tuple(label.replace('.curated_truth', ''), vcf, tbi) }
             .join(
-                all_bgzipped_vcfs_and_indices_branched.curated_query
-                    .map { label, vcf, tbi -> tuple(label.replace('.curated_query', ''), vcf, tbi) }
+                all_bgzipped_vcfs_and_indices_branched.curated_query.map { label, vcf, tbi -> tuple(label.replace('.curated_query', ''), vcf, tbi) }
             )
     }
 

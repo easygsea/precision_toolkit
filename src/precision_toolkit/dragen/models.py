@@ -12,7 +12,8 @@ class DragenMetric:
     Attributes:
         metric_group: Top-level metric group (e.g. "MAPPING/ALIGNING SUMMARY").
         name: Metric name (e.g. "MAPPED_READS").
-        mapping_spec: Specification for extracting the metric from source file.
+        mapping_spec: CSV row/column mapping dictionary or JSONPath expression string,
+            depending on the source file type.
         default_val: Default value to use if metric is missing.
         scale_factor: Factor to scale the metric value by.
         scale_factor_op: Operation to apply with the scale factor (e.g., add, multiply
@@ -28,7 +29,7 @@ class DragenMetric:
 
     metric_group: str
     name: str
-    mapping_spec: dict | str  # dict for CSV source, str for JSON source
+    mapping_spec: dict | str
     default_val: float | None
     scale_factor: float | None
     scale_factor_op: str

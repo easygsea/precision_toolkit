@@ -8,7 +8,7 @@ process INDEX_BAM_FILE {
     path OUT, emit: bam_index
 
     script:
-    OUT="${bam_file.baseName}.bai"
+    OUT = "${bam_file.baseName}.bai"
     """
     samtools index ${bam_file} -o ${OUT}
     """

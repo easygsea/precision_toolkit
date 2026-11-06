@@ -12,7 +12,7 @@ process SUBSET_CRAM_TO_BAM {
     tuple val(sample_name), path(bam_file), val(pool), emit: cram_bam
 
     script:
-    bam_file="${alignment_file.baseName}.bam"
+    bam_file = "${alignment_file.baseName}.bam"
     """
     #temp files
     INTERSECTING_READS=intersect_reads.txt

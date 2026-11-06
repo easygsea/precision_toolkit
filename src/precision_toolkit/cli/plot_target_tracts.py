@@ -1,5 +1,4 @@
-"""
-Visualize tract/target scores output from target evaluation workflow, grouped by poolID.
+"""Visualize target evaluation workflow tract/target scores grouped by poolID.
 
 Usage:
     plot-target-tracts --input-files <input_files> --pool-ids <pool_ids>
@@ -28,7 +27,6 @@ import seaborn as sns
 
 def main() -> None:
     """Plot target/tract scores by poolID from target evaluation workflow."""
-    # Get input parameters
     parser = argparse.ArgumentParser(
         description=("Plot visualizations per-target region.")
     )
@@ -61,27 +59,28 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    # Convert all filepaths to Path type
     input_files = [Path(file_path) for file_path in args.input_files]
 
-    # Set pools and colors
     pool_ids = (
         args.pool_ids if args.pool_ids != [] else ["No_Pool_Info"] * len(input_files)
     )
-    colors = dict(zip(sorted(args.pool_ids), sns.color_palette("hls", len(pool_ids))))
-    colors["No_Pool_Info"] = (0.0, 0.0, 1.0)  # default blue points
+    colors = dict(
+        zip(
+            sorted(args.pool_ids),
+            sns.color_palette("hls", len(pool_ids)),
+            strict=False,
+        )
+    )
+    colors["No_Pool_Info"] = (0.0, 0.0, 1.0)
 
-    # Initialize figure
     plt.figure(figsize=(120, 50))
 
     for metric, threshold in args.metrics_thresholds_and_headings.items():
-        for file, pool in zip(input_files, pool_ids):
-            # Read data
+        for file, pool in zip(input_files, pool_ids, strict=False):
             df = pd.read_csv(file, sep="\t", comment=None)
             df.columns = pd.Index([col.lstrip("#") for col in df.columns])
             df[metric] = df[metric].astype(float)
 
-            # Plot graph
             plt.scatter(
                 df["TRACT"],
                 df[metric],
@@ -96,16 +95,14 @@ def main() -> None:
                 label="Threshold",
             )
 
-        # Format plot
         plt.grid(axis="x")
         plt.title(f"{metric} per tract", fontsize=64)
         plt.xticks(rotation=90, ha="right")
         plt.tick_params(axis="x", which="major", labelsize=5)
         handles, labels = plt.gca().get_legend_handles_labels()
-        by_label = dict(zip(labels, handles))
+        by_label = dict(zip(labels, handles, strict=False))
         plt.legend(by_label.values(), by_label.keys(), fontsize=32)
 
-        # Save plot
         plt.savefig(f"{args.prefix}_{metric}.png")
         plt.clf()
 

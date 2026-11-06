@@ -1,10 +1,13 @@
 include {
     build_vcf_pair_channels
-    process_spurious_variants
 } from '../../modules/utils'
 
 include {
-    extract_signal
+    process_spurious_variants
+} from '../prepare_vcfs'
+
+include {
+    extract_signal ;
     plot_signal_correlation
 } from '../../modules/signal_correlation'
 
@@ -17,9 +20,10 @@ workflow signal_correlation_workflow {
         curated_vcf_pairs = process_spurious_variants(
             vcf_pairs,
             params.spurious_variants_vcf,
-            params.collapse
-        )
-    } else {
+            params.collapse,
+        ).curated_vcf_pairs
+    }
+    else {
         curated_vcf_pairs = vcf_pairs
     }
 
@@ -37,6 +41,6 @@ workflow signal_correlation_workflow {
         params.show_regression,
         params.color_source,
         params.run_pattern,
-        params.color_palette
+        params.color_palette,
     )
 }

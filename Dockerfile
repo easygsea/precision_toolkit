@@ -10,7 +10,7 @@ ARG MAFFT_VERSION=7.505-1
 ARG PSUTIL_VERSION=6.1.1
 ARG PYTHON_VERSION=3.13.12
 ARG TRUVARI_VERSION=5.4.0
-ARG UV_VERSION=0.10.7
+ARG UV_VERSION=0.13.5
 ARG WITTYER_DOTNET=net6.0
 ARG WITTYER_VERSION=0.5.2
 
@@ -150,6 +150,8 @@ COPY --from=witty_er_builder /opt/witty.er/Wittyer/bin/Release/${WITTYER_DOTNET}
 # Set environment variables
 ENV PATH="$PATH:/opt/hap.py/bin:/opt/truvari/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
 ENV PATH="$PATH:/usr/bin"
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Update shebangs, create wrapper script, smoke-test witty.er, set python defaults, and install truvari
 RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~#!/usr/bin/env python2.7~' {} \; && \

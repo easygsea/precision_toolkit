@@ -22,7 +22,7 @@ Password:
 
 SSH command:
 cd ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit/deployment/bamboo/02-testing_and_linting/
-bash 01.run_unit_and_integration_tests.sh \
+bash 02.run_unit_and_integration_tests.sh \
 ${bamboo.inject.TESTING_DEPLOYMENT_DIRECTORY} \
 ${bamboo.inject.IMAGE_NAME} \
 ${bamboo.NEXTFLOW_EXECUTABLE} \
@@ -76,7 +76,7 @@ uv run pytest tests/standalone/ tests/unit/ --junit-xml=test_results_unit_standa
 # Replace the pointer to the remote image to the local one and run workflow tests with Nextflow pointing to the local image
 sed -i 's~container = ".*"~container = "file://'"${TESTING_DEPLOYMENT_DIRECTORY}/precision_toolkit/${IMAGE_NAME}"'"~' nextflow.config
 
-WORKFLOW_THREADS=$(( $(nproc) - 2 ))
+WORKFLOW_THREADS=$(($(nproc) - 2))
 if [ "${WORKFLOW_THREADS}" -gt 6 ]; then
   WORKFLOW_THREADS=6
 fi
