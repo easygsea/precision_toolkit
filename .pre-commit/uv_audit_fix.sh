@@ -3,19 +3,15 @@ set -euo pipefail
 
 if uv audit; then
   exit 0
-fi
-
-echo ">> Vulnerabilities found, upgrading uv.lock..."
-uv lock --upgrade || {
-  echo ">> uv lock --upgrade failed"
-  exit 1
-}
-
-if uv audit; then
-  echo ">> uv.lock upgraded and audit is clean."
-  echo ">> Review the diff, run your tests, then: git add uv.lock && commit again."
 else
-  echo ">> Still vulnerable after upgrading. Either no fix exists yet, or the fix"
-  echo ">> is newer than exclude-newer days. Exempt it with exclude-newer-package."
+  audit_status=$?
 fi
-exit 1
+
+if [[ $audit_status -eq 1 ]]; then
+  echo ">> Vulnerabilities found. Update the affected package(s) manually, for example:"
+  echo ">> uv lock --upgrade-package <package>"
+  echo ">> Review uv.lock, run your tests, and rerun uv audit."
+  exit 1
+fi
+
+exit "$audit_status"
