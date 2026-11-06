@@ -45,7 +45,7 @@ function clone_and_deploy {
     (
       cd "${version_folder}"
       uv venv --python "${PYTHON_EXECUTABLE}"
-      uv sync
+      uv sync --locked
       cp -v "${IMAGE_STORE_ROOT}/${version}/${IMAGE_NAME}" "./${NEW_IMAGE_NAME}"
       sed -i "s~container = \".*\"~container = \"${DEPLOYMENT_ROOT}/precision_toolkit/${version}/${NEW_IMAGE_NAME}\"~" nextflow.config
     )
