@@ -2,6 +2,9 @@
 
 ## Version History
 
+### v1.4.1 - 2026-11-06
+- Hotfix: Sync the Dockerfile with GitHub v1.3.2, fix the main-branch naming hook, align deployment dependencies with CI using `uv sync --locked`, preserve application logging handlers, handle Bamboo variable defaults safely, enable pipefail for Dockerfile RUN pipelines, stop uv audit auto upgrade, upgrade Dockerfile uv to `0.13.5`, and enforce case-insensitive no-suppression policy.
+
 ---
 
 ### v1.4.0 - 2026-11-05
