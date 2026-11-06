@@ -151,6 +151,8 @@ COPY --from=witty_er_builder /opt/witty.er/Wittyer/bin/Release/${WITTYER_DOTNET}
 ENV PATH="$PATH:/opt/hap.py/bin:/opt/truvari/bin:/witty.er/bin:/opt/hap.py/libexec/rtg-tools-install"
 ENV PATH="$PATH:/usr/bin"
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Update shebangs, create wrapper script, smoke-test witty.er, set python defaults, and install truvari
 RUN find /opt/hap.py/bin -type f -name "*.py" -exec sed -i 's~#!/usr/bin/python~#!/usr/bin/env python2.7~' {} \; && \
     # Wrapper: DOTNET_ROLL_FORWARD=Major lets witty.er (built for net6.0) run on the .NET 10 runtime
