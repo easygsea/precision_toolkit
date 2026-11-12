@@ -28,14 +28,15 @@ def format_metric(
 
     Returns:
         Tuple of metric name with the format <metric> (<unit>) and metric value with
-        specified number of decimal places, represented a a string.
+        specified number of decimal places, represented as a string. Missing
+        values are formatted as "NA".
     """
     metric_name = dragen_metric_obj.name
     num_decimal_places = dragen_metric_obj.num_decimal_places
     unit = dragen_metric_obj.unit
 
     formatted_metric_name = f"{metric_name} ({unit})"
-    formatted_metric_val = str(metric_val)
+    formatted_metric_val = "NA" if metric_val is None else str(metric_val)
     if metric_val is not None and num_decimal_places is not None:
         precision = Decimal(10) ** -num_decimal_places
         rounded_val = Decimal(formatted_metric_val).quantize(
@@ -100,7 +101,7 @@ def calc_derived_pct_metric(
 def classify_metric(
     dragen_metric_obj: DragenMetric,
     metric_val: float | None,
-) -> tuple[str, str | None]:
+) -> tuple[str, str]:
     """Classify metric depending on whether value satisfies threshold condition.
 
     A metric is classified as 'Production' if a fail threshold is defined, otherwise
@@ -114,10 +115,10 @@ def classify_metric(
     Returns:
         Tuple of (category, status) where:
         - category: Either 'Production' or 'Monitoring'.
-        - status: Either 'Pass', 'Fail', or None (for Monitoring metrics).
+        - status: Either 'Pass', 'Fail', or 'NA' (for Monitoring metrics).
     """
     category = "Monitoring"
-    status = None
+    status = "NA"
     if dragen_metric_obj.fail_threshold:
         category = "Production"
         if metric_val is None or OPERATIONS[dragen_metric_obj.fail_direction](

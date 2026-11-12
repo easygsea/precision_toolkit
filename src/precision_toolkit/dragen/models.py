@@ -39,6 +39,46 @@ class DragenMetric:
     fail_direction: str
     other_properties: dict[str, Any]
 
+    @property
+    def configured_lsl(self) -> float | None:
+        """Configured lower specification limit, without failure-threshold fallback."""
+        guideline = self.other_properties.get("LSL")
+        if guideline is not None:
+            return float(guideline)
+        return None
+
+    @property
+    def lsl(self) -> float | None:
+        """Lower specification limit, falling back to a directional threshold."""
+        if self.configured_lsl is not None:
+            return self.configured_lsl
+        if self.fail_threshold is not None and self.fail_direction in {
+            "less_than",
+            "less_than_or_equal",
+        }:
+            return self.fail_threshold
+        return None
+
+    @property
+    def configured_usl(self) -> float | None:
+        """Configured upper specification limit, without failure-threshold fallback."""
+        guideline = self.other_properties.get("USL")
+        if guideline is not None:
+            return float(guideline)
+        return None
+
+    @property
+    def usl(self) -> float | None:
+        """Upper specification limit, falling back to a directional threshold."""
+        if self.configured_usl is not None:
+            return self.configured_usl
+        if self.fail_threshold is not None and self.fail_direction in {
+            "greater_than",
+            "greater_than_or_equal",
+        }:
+            return self.fail_threshold
+        return None
+
 
 @dataclass
 class SourceFile:

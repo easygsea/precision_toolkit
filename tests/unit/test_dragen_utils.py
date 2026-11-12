@@ -101,7 +101,7 @@ def name_to_metric_obj() -> dict[str, DragenMetric]:
     [
         ("pct_contamination_est", 0.125, "PCT_CONTAMINATION_EST (%)", "0.13"),
         ("pct_contamination_est_none", 0.0001, "PCT_CONTAMINATION_EST (%)", "0.0001"),
-        ("pct_contamination_est", None, "PCT_CONTAMINATION_EST (%)", "None"),
+        ("pct_contamination_est", None, "PCT_CONTAMINATION_EST (%)", "NA"),
     ],
 )
 def test_format_metric(
@@ -151,14 +151,14 @@ def test_scale_metric(
     "dragen_metric_fixture,metric_val,expected_val",
     [
         ("pct_contamination_est", 0.01, ("Production", "Pass")),
-        ("pct_contamination_est_none", 0.01, ("Monitoring", None)),
+        ("pct_contamination_est_none", 0.01, ("Monitoring", "NA")),
         ("pct_contamination_est", None, ("Production", "Fail")),
     ],
 )
 def test_classify_metric(
     dragen_metric_fixture: str,
     metric_val: float | None,
-    expected_val: str | None,
+    expected_val: tuple[str, str],
     request: pytest.FixtureRequest,
 ) -> None:
     """Test classify_metric.

@@ -41,6 +41,7 @@ For example, given the following configuration file:
                 "MAPPED_READS.FACTOR": 0.0001,
                 "PCT_CHIMERIC_READS.UOM": "%",
                 "PCT_CHIMERIC_READS.RAD": 2,
+                "PCT_CHIMERIC_READS.USL": 8.0,
                 "PCT_CHIMERIC_READS.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.FACTOR": 100,
                 "PCT_CONTAMINATION_EST.UOM": "%",
@@ -62,24 +63,35 @@ For example, given the following configuration file:
 
 `compile-dragen-metrics` will look for the source file `<RGSM>_mapping_metrics.csv` in each directory passed to `--analysis-dirs` and extract values for the metrics `TOTAL_PF_READS`, `MAPPED_READS`, `PCT_CHIMERIC_READS_BASE`, and `PCT_CONTAMINATION_EST`. As many metrics expressed as percentages are reported as counts in DRAGEN source files, further calculation is required. These metrics are specified with the `_BASE` suffix (e.g. `PCT_CHIMERIC_READS_BASE`), indicating that the reported count must be divided by `MAPPED_READS` to compute the corresponding percentage.
 
-Extracted QC metrics are written to `<RGSM>_MetricsOutput.tsv`, with metric names and values formatted according to attributes defined in the `Constants` section of the configuration file. Common attributes include:
+Extracted QC metrics are written to `<RGSM>_MetricsOutput.tsv` in the order listed in the `ReportedMetrics` section, with metric names and values formatted according to attributes defined in the `Constants` section of the configuration file. Common attributes include:
 * `FACTOR`: scale **factor**
 * `RAD`: **r**ounding **a**t **d**isplay
 * `UOM`: **u**nit **o**f **m**easurement
 
-Metrics will also be classified as either "Monitoring" or "Production", with "Monitoring" as the default. Metrics with failure thresholds defined in the `Failures` section are classified as "Production", and assigned "Pass" or "Fail" status depending on whether the threshold condition is met.
+By default, `<RGSM>_MetricsOutput.tsv` is a flat TSV with columns `Metric (UOM)`, `Category`, `<RGSM>`, `FailureDirection`, `Threshold`, and `Status`. Metrics with failure thresholds are classified as "Production" and assigned "Pass" or "Fail"; other metrics are "Monitoring" with status `NA`.
+
+With `--section-name <name>`, the output is a sectioned TSV with an INI-style section header, following the convention used by Illumina's containerized DRAGEN workflows (e.g. TSO 500). For example, `--section-name "QC Metrics"` writes `[QC Metrics]`, followed by a tab-delimited table with columns `Metric (UOM)`, `LSL Guideline`, `USL Guideline`, and `<RGSM>`. Missing guidelines use the corresponding failure threshold by default; add `--no-failure-threshold-fallback` to keep them as `NA`. Only one section is supported per output.
 
 Usage:
 ```bash
-compile-dragen-metrics --metrics-json-config <json_config> --analysis-dirs <dragen_backbone_analysis_dir> [<dragen_backbone_analysis_dir> ...] --rgsm <rgsm> --output-folder <output_folder>
+compile-dragen-metrics --metrics-json-config <json_config> --analysis-dirs <dragen_backbone_analysis_dir> [<dragen_backbone_analysis_dir> ...] --rgsm <rgsm> --output-folder <output_folder> [--section-name <name>] [--no-failure-threshold-fallback]
 ```
 
 Example output:
 ```bash
 Metric (UOM)	Category	<RGSM>	FailureDirection	Threshold   Status
-TOTAL_PF_READS (Count)	Monitoring  100 None	None	None
+TOTAL_PF_READS (Count)	Monitoring  100 NA	NA	NA
 PCT_CONTAMINATION_EST (%)	Production  0.01    greater_than    0.02	Pass
-PCT_CHIMERIC_READS (%)	Monitoring	25.00	None	None	None
+PCT_CHIMERIC_READS (%)	Monitoring	25.00	NA	NA	NA
+```
+
+Example sectioned TSV output with `--section-name "QC Metrics"`:
+```bash
+[QC Metrics]
+Metric (UOM)	LSL Guideline	USL Guideline	<RGSM>
+TOTAL_PF_READS (Count)	NA	NA	100
+PCT_CONTAMINATION_EST (%)	NA	0.02	0.01
+PCT_CHIMERIC_READS (%)	NA	8.00	25.00
 ```
 
 For detailed documentation of how to prepare the configuration file, see [Summarizing DRAGEN QC metrics with `compile-dragen-metrics` and `plot-dragen-metrics`](compile_and_plot_dragen_metrics.md).
