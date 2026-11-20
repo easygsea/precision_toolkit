@@ -2,6 +2,11 @@
 
 ## Version History
 
+### v1.5.0 - 2026
+- Improvement: Add Copilot pre-execution hooks that deny destructive Git operations.
+
+---
+
 ### v1.4.2 - 2026-11-12
 - Feature: Add `--no-failure-threshold-fallback` to keep undefined INI guideline values as `NA`.
 - Feature: Add sectioned TSV output with an INI-style section header to `compile-dragen-metrics`, enabled with `--section-name`.
