@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "matcher": "bash|powershell",
+        "bash": "./scripts/block-dangerous-git.sh",
+        "cwd": ".github/hooks",
+        "timeoutSec": 10
+      }
+    ],
+    "PreToolUse": [
+      {
+        "type": "command",
+        "matcher": "Bash",
+        "bash": "./scripts/block-dangerous-git.sh",
+        "cwd": ".github/hooks",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

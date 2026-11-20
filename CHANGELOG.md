@@ -2,6 +2,11 @@
 
 ## Version History
 
+### v1.5.0 - 2026
+- Improvement: Add Copilot pre-execution hooks that deny destructive Git operations.
+
+---
+
 ### v1.4.3 - 2026-11-26
 - Improvement: Avoid redundant path separators and use explicit publishDir arguments.
 - Improvement: Replace deprecated Nextflow channel factory syntax and implicit closure parameters.

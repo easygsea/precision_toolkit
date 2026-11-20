@@ -289,6 +289,7 @@ The setup is defined by these files:
 | --- | --- |
 | [pyproject.toml](./pyproject.toml) and [uv.lock](./uv.lock) | Define development dependencies, shared tool settings, and locked dependency versions. |
 | [.pre-commit-config.yaml](./.pre-commit-config.yaml) | Defines hook versions, stages, file filters, exclusions, and arguments. Checks cover branch names, Python linting and typing, dependency auditing and locking, Dockerfile and shell linting, structured file validation, whitespace, and security scanning. |
+| [.github/hooks/](./.github/hooks/) | Defines Copilot pre-tool hooks. |
 | [.semgrep/](./.semgrep/), [.pre-commit/](./.pre-commit/), and [commit-message.yaml](./commit-message.yaml) | Enforce custom code-scanning, branch-naming, and commit-message rules. |
 | [Bamboo environment setup](./deployment/bamboo/01-build-setup/04.create_virtual_environment.sh) and [Bamboo linting task](./deployment/bamboo/01-testing_and_linting/01.run_formatters_and_linters.sh) | Install the development environment and run the repository-wide checks in CI. |
 
