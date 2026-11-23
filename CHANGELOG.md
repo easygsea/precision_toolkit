@@ -3,6 +3,7 @@
 ## Version History
 
 ### v1.5.0 - 2026
+- Improvement: Add basic skills.
 - Improvement: Add Copilot pre-execution hooks that deny destructive Git operations.
 
 ---
