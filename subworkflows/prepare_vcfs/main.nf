@@ -22,7 +22,7 @@ workflow process_spurious_variants {
     def spurious_variants_vcf_gz_path = spurious_variants_vcf.toString().endsWith('.gz')
         ? spurious_variants_vcf
         : file("${spurious_variants_vcf}.gz")
-    def spurious_variants_vcf_gz = Channel.value(spurious_variants_vcf_gz_path)
+    def spurious_variants_vcf_gz = channel.value(spurious_variants_vcf_gz_path)
     if (!spurious_variants_vcf_gz_path.exists()) {
         spurious_variants_vcf_gz = bgzip_vcf(
             tuple("spurious_variants", file(spurious_variants_vcf))
@@ -30,7 +30,7 @@ workflow process_spurious_variants {
     }
 
     def spurious_variants_vcf_tbi_path = file("${spurious_variants_vcf_gz_path}.tbi")
-    def spurious_variants_vcf_tbi = Channel.value(spurious_variants_vcf_tbi_path)
+    def spurious_variants_vcf_tbi = channel.value(spurious_variants_vcf_tbi_path)
     if (!spurious_variants_vcf_gz_path.exists() || !spurious_variants_vcf_tbi_path.exists()) {
         spurious_variants_vcf_tbi = index_spurious_variants_original_vcf(
             spurious_variants_vcf_gz.map { gzipped_vcf -> tuple("spurious_variants", gzipped_vcf) }

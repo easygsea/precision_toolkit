@@ -27,9 +27,9 @@ workflow gene_target_evaluation_workflow {
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        Handle workflow setup, input & file formats
+    Handle workflow setup, input & file formats
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    */
+     */
 
     // define workflow variables
     def metrics_thresholds_and_headings = [
@@ -67,7 +67,7 @@ workflow gene_target_evaluation_workflow {
     targets_bed = SORT_BED(file(params.targets_bed)).sorted_bed
 
     // build input channel & branch based on filetype
-    mixed_aligned_ch = Channel.fromPath(params.aligned_files)
+    mixed_aligned_ch = channel.fromPath(params.aligned_files)
         .map { file_path ->
             def sample_name = file_path.getName().replaceFirst(/\..*$/, "")
             def matcher = file_path.toString() =~ /IX\d{5}/
@@ -98,9 +98,9 @@ workflow gene_target_evaluation_workflow {
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        Process BAM files to extract metrics
+    Process BAM files to extract metrics
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    */
+     */
     INDEX_BAM_FILE(bam_ch)
 
     // STAGE 1: Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
@@ -165,7 +165,7 @@ workflow gene_target_evaluation_workflow {
 
     // STAGE 3: Aggregate per base across libraries (percentile of per-base stats)
     GENERATE_PER_BASE_SUMMARY(
-        SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: 'combined_labelled_pileups.txt') { it[1] },
+        SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: 'combined_labelled_pileups.txt') { result -> result[1] },
         params.cohort_percent_library_fail_threshold,
         metrics_thresholds_and_headings,
     )
@@ -195,7 +195,7 @@ workflow gene_target_evaluation_workflow {
     // generate tracts per metric
     GENERATE_TRACTS(
         SCORE_PER_BASE_SUMMARY_ON_MQ.out.scored_output,
-        Channel.from(
+        channel.from(
             metrics_thresholds_and_headings.findAll { k, _value -> ['cov', 'bq', 'mq'].contains(k) }.values()
         ),
         params.tract_gap_tolerance,
@@ -221,8 +221,8 @@ workflow gene_target_evaluation_workflow {
 
         // visualization of target quality (target-level)
         GENERATE_VISUALIZATION(
-            plot_data_ch.collect { it[1] },
-            plot_data_ch.collect { it[2] },
+            plot_data_ch.collect { result -> result[1] },
+            plot_data_ch.collect { result -> result[2] },
             "plot",
             metrics_thresholds_and_headings.findAll { k, _value -> ['cov', 'bq', 'mq'].contains(k) }.collectEntries { _key, value -> [value.target_header, value.threshold] },
         )

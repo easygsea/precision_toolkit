@@ -35,7 +35,7 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
 ## Dependencies
 
 - Java (>=17.0.2)
-- Nextflow (>=25.04.6)
+- Nextflow (>=26.10.7)
 - Apptainer (>=1.3.1)
 
 ### Containerized dependencies (no installation required):
@@ -103,7 +103,7 @@ amd64, arm64v8, ppc64le, s390x ([more info](https://github.com/docker-library/of
    To get a specific version, use:
 
    ```bash
-   apptainer pull docker://quay.io/easygsea/precision_toolkit:v1.4.1
+   apptainer pull docker://quay.io/easygsea/precision_toolkit:v1.4.3
    ```
 
 2. Run specific tools inside the container. Example:
