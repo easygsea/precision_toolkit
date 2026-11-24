@@ -1,7 +1,7 @@
 process run_happy {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}/${output_dir ?: ''}/happy", mode: 'copy'
+    publishDir { "${params.output_dir}/${output_dir ?: ''}/happy" }, mode: 'copy'
 
     input:
     tuple val(sample_name), path(truth_vcf), path(query_vcf)
@@ -35,7 +35,7 @@ process run_happy {
 process run_sompy {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}/${output_dir ?: ''}/sompy", mode: 'copy'
+    publishDir { "${params.output_dir}/${output_dir ?: ''}/sompy" }, mode: 'copy'
 
     input:
     tuple val(sample_name), path(truth_vcf), path(query_vcf)
@@ -69,7 +69,9 @@ process run_sompy {
 process run_truvari_bench {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}${output_dir ? '/' + output_dir : ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
+    publishDir { "${params.output_dir}${output_dir ? '/' + output_dir : ''}/truvari" }, mode: 'copy', saveAs: { filename ->
+        filename == "${sample_name}.${label}" ? filename : null
+    }
 
     input:
     tuple val(sample_name), path(truth_vcf), path(truth_tbi), path(query_vcf), path(query_tbi)
@@ -103,7 +105,9 @@ process run_truvari_bench {
 process run_truvari_refine {
     label "dynamic_resource"
     tag "${sample_name}"
-    publishDir "${params.output_dir}${output_dir ? '/' + output_dir : ''}/truvari", mode: 'copy', pattern: "${sample_name}.${label}"
+    publishDir { "${params.output_dir}${output_dir ? '/' + output_dir : ''}/truvari" }, mode: 'copy', saveAs: { filename ->
+        filename == "${sample_name}.${label}" ? filename : null
+    }
 
     input:
     tuple val(sample_name), path(truvari_bench_results)
@@ -138,7 +142,7 @@ process run_wittyer {
     label "dynamic_resource"
     tag "${sample_name}"
     containerOptions "-B /home"
-    publishDir "${params.output_dir}/${output_dir ?: ''}/wittyer", mode: 'copy'
+    publishDir { "${params.output_dir}/${output_dir ?: ''}/wittyer" }, mode: 'copy'
 
     input:
     tuple val(sample_name), path(truth_vcf), path(query_vcf)
@@ -161,7 +165,7 @@ process run_wittyer {
 }
 
 process summarize_diagnostic_metrics {
-    publishDir "${params.output_dir}/${output_dir ?: ''}", mode: 'copy'
+    publishDir { "${params.output_dir}/${output_dir ?: ''}" }, mode: 'copy'
 
     input:
     val variant_benchmark_engine
