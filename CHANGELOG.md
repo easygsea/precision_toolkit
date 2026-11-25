@@ -5,6 +5,7 @@
 ### v1.4.3 - 2026-11-XX
 - Improvement: Replace deprecated Nextflow channel factory syntax and implicit closure parameters.
 - Improvement: Upgrade the minimum required Nextflow version to 26.10.7.
+- Bugfix: Convert target-evaluation tolerance parameters to numeric values before calculating percentage-based thresholds and labels.
 - Bugfix: Defer dynamic `publishDir` paths and output filtering until process inputs are available.
 
 ### v1.4.2 - 2026-11-12

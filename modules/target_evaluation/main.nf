@@ -478,9 +478,9 @@ process GENERATE_COMMON_REGIONS_FAIL {
     OUT = "common_fail_regions.bed"
     """
     awk -v OFS="\\t" '
-        \$11 > ${params.cohort_percent_library_fail_threshold * 100} ||
-        \$12 > ${params.cohort_percent_library_fail_threshold * 100} ||
-        \$13 > ${params.cohort_percent_library_fail_threshold * 100} {
+        \$11 > ${(params.cohort_percent_library_fail_threshold as Float) * 100} ||
+        \$12 > ${(params.cohort_percent_library_fail_threshold as Float) * 100} ||
+        \$13 > ${(params.cohort_percent_library_fail_threshold as Float) * 100} {
             print \$1,\$2,\$2+1,\$3
         }
         ' ${all_libraries_per_base} |
