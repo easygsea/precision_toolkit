@@ -2,11 +2,12 @@
 
 ## Version History
 
-### v1.4.3 - 2026-11-XX
+### v1.4.3 - 2026-11-26
 - Improvement: Replace deprecated Nextflow channel factory syntax and implicit closure parameters.
 - Improvement: Upgrade the minimum required Nextflow version to 26.10.7.
 - Bugfix: Convert target-evaluation tolerance parameters to numeric values before calculating percentage-based thresholds and labels.
 - Bugfix: Defer dynamic `publishDir` paths and output filtering until process inputs are available.
+- Bugfix: Preserve workflow metadata and the output directory for the Nextflow completion summary.
 
 ### v1.4.2 - 2026-11-12
 - Feature: Add `--no-failure-threshold-fallback` to keep undefined INI guideline values as `NA`.
