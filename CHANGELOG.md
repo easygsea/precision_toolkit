@@ -7,7 +7,9 @@
 - Improvement: Upgrade the minimum required Nextflow version to 26.10.7.
 - Bugfix: Convert target-evaluation tolerance parameters to numeric values before calculating percentage-based thresholds and labels.
 - Bugfix: Defer dynamic `publishDir` paths and output filtering until process inputs are available.
-- Bugfix: Preserve workflow metadata and the output directory for the Nextflow completion summary.
+- Bugfix: Replace legacy `workflow.onComplete` closure with `onComplete:` section.
+
+---
 
 ### v1.4.2 - 2026-11-12
 - Feature: Add `--no-failure-threshold-fallback` to keep undefined INI guideline values as `NA`.
