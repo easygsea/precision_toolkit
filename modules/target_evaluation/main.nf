@@ -318,7 +318,7 @@ process SCORE_OUTPUT_ON_METRICS {
 
 process SCORE_OUTPUT_ON_FIELD {
     tag "${sample_name}"
-    publishDir { "${params.output_dir}/${params.target_evaluation_subdir}/${sample_name == 'All_Samples' ? '' : 'library_level'}" }, mode: 'copy'
+    publishDir { "${params.output_dir}/${params.target_evaluation_subdir}${sample_name == 'All_Samples' ? '' : '/library_level'}" }, mode: 'copy'
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
