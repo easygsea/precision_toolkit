@@ -318,7 +318,7 @@ process SCORE_OUTPUT_ON_METRICS {
 
 process SCORE_OUTPUT_ON_FIELD {
     tag "${sample_name}"
-    publishDir "${params.output_dir}/${params.target_evaluation_subdir}/${sample_name == 'All_Samples' ? '' : 'library_level'}", mode: 'copy'
+    publishDir { "${params.output_dir}/${params.target_evaluation_subdir}${sample_name == 'All_Samples' ? '' : '/library_level'}" }, mode: 'copy'
 
     input:
     tuple val(sample_name), path(pre_scored_file), val(pool_id)
@@ -478,9 +478,9 @@ process GENERATE_COMMON_REGIONS_FAIL {
     OUT = "common_fail_regions.bed"
     """
     awk -v OFS="\\t" '
-        \$11 > ${params.cohort_percent_library_fail_threshold * 100} ||
-        \$12 > ${params.cohort_percent_library_fail_threshold * 100} ||
-        \$13 > ${params.cohort_percent_library_fail_threshold * 100} {
+        \$11 > ${(params.cohort_percent_library_fail_threshold as Float) * 100} ||
+        \$12 > ${(params.cohort_percent_library_fail_threshold as Float) * 100} ||
+        \$13 > ${(params.cohort_percent_library_fail_threshold as Float) * 100} {
             print \$1,\$2,\$2+1,\$3
         }
         ' ${all_libraries_per_base} |

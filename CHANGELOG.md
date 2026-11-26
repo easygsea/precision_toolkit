@@ -2,6 +2,16 @@
 
 ## Version History
 
+### v1.4.3 - 2026-11-26
+- Improvement: Avoid redundant path separators and use explicit publishDir arguments.
+- Improvement: Replace deprecated Nextflow channel factory syntax and implicit closure parameters.
+- Improvement: Upgrade the minimum required Nextflow version to 26.10.7.
+- Bugfix: Convert target-evaluation tolerance parameters to numeric values before calculating percentage-based thresholds and labels.
+- Bugfix: Defer dynamic `publishDir` paths and output filtering until process inputs are available.
+- Bugfix: Replace legacy `workflow.onComplete` closure with `onComplete:` section.
+
+---
+
 ### v1.4.2 - 2026-11-12
 - Feature: Add `--no-failure-threshold-fallback` to keep undefined INI guideline values as `NA`.
 - Feature: Add sectioned TSV output with an INI-style section header to `compile-dragen-metrics`, enabled with `--section-name`.

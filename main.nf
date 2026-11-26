@@ -198,27 +198,8 @@ def helpMessage() {
 }
 
 workflow {
-    workflow.onComplete {
-        log.info(
-            """
-        ========================================
-        Precision Toolkit Analysis Complete!
-        ========================================
-        Command line    : ${workflow.commandLine}
-        Completed at    : ${workflow.complete}
-        Duration        : ${workflow.duration}
-        Success         : ${workflow.success}
-        Exit status    : ${workflow.exitStatus}
-        Work directory  : ${workflow.workDir}
-        Output directory: ${params.output_dir}
-        """
-        )
 
-        if (!workflow.success) {
-            log.error("Pipeline failed! Check the logs for details.")
-        }
-    }
-
+    main:
     if (!params.workflows) {
         helpMessage()
         exit(0)
@@ -241,5 +222,25 @@ workflow {
         if ('target_evaluation' in workflowList) {
             target_evaluation()
         }
+    }
+
+    onComplete:
+    log.info(
+        """
+        ========================================
+        Precision Toolkit Analysis Complete!
+        ========================================
+        Command line    : ${workflow.commandLine}
+        Completed at    : ${workflow.complete}
+        Duration        : ${workflow.duration}
+        Success         : ${workflow.success}
+        Exit status     : ${workflow.exitStatus}
+        Work directory  : ${workflow.workDir}
+        Output directory: ${params.output_dir}
+        """.stripIndent()
+    )
+
+    if (!workflow.success) {
+        log.error("Pipeline failed! Check the logs for details.")
     }
 }

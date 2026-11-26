@@ -25,37 +25,41 @@ include { SORT_BED } from '../../modules/bed'
 // Main variant gene target evaluation workflow
 workflow gene_target_evaluation_workflow {
 
+    def read_fail_percent = ((params.read_fail_tolerance as Float) * 100) as Integer
+    def target_fail_percent = ((params.target_fail_tolerance as Float) * 100) as Integer
+    def cohort_fail_percent = ((params.cohort_percent_library_fail_threshold as Float) * 100) as Integer
+
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        Handle workflow setup, input & file formats
+    Handle workflow setup, input & file formats
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    */
+     */
 
     // define workflow variables
     def metrics_thresholds_and_headings = [
         cov: [
-            library_header: "COVERAGE_P${params.read_fail_tolerance * 100 as Integer}",
-            target_header: "TARGET_P${params.target_fail_tolerance * 100 as Integer}(BASE_COV)",
-            base_header: "SAMPLES_P${params.cohort_percent_library_fail_threshold * 100 as Integer}(BASE_COV)",
+            library_header: "COVERAGE_P${read_fail_percent}",
+            target_header: "TARGET_P${target_fail_percent}(BASE_COV)",
+            base_header: "SAMPLES_P${cohort_fail_percent}(BASE_COV)",
             base_score_header: "PCT_LIB_FAIL(COV)",
             base_score_output_header: "COV_SCORE",
-            threshold: params.coverage_threshold,
+            threshold: params.coverage_threshold as Float,
         ],
         bq: [
-            library_header: "BASEQ_P${params.read_fail_tolerance * 100 as Integer}",
-            target_header: "TARGET_P${params.target_fail_tolerance * 100 as Integer}(BASE_BQ_P${params.read_fail_tolerance * 100 as Integer})",
-            base_header: "SAMPLES_P${params.cohort_percent_library_fail_threshold * 100 as Integer}(BASE_BQ_Q${params.read_fail_tolerance * 100 as Integer})",
+            library_header: "BASEQ_P${read_fail_percent}",
+            target_header: "TARGET_P${target_fail_percent}(BASE_BQ_P${read_fail_percent})",
+            base_header: "SAMPLES_P${cohort_fail_percent}(BASE_BQ_Q${read_fail_percent})",
             base_score_header: "PCT_LIB_FAIL(BQ)",
             base_score_output_header: "BQ_SCORE",
-            threshold: params.baseq_threshold,
+            threshold: params.baseq_threshold as Float,
         ],
         mq: [
-            library_header: "MAPQ_P${params.read_fail_tolerance * 100 as Integer}",
-            target_header: "TARGET_P${params.target_fail_tolerance * 100 as Integer}(BASE_MQ_P${params.read_fail_tolerance * 100 as Integer})",
-            base_header: "SAMPLES_P${params.cohort_percent_library_fail_threshold * 100 as Integer}(BASE_MQ_P${params.read_fail_tolerance * 100 as Integer})",
+            library_header: "MAPQ_P${read_fail_percent}",
+            target_header: "TARGET_P${target_fail_percent}(BASE_MQ_P${read_fail_percent})",
+            base_header: "SAMPLES_P${cohort_fail_percent}(BASE_MQ_P${read_fail_percent})",
             base_score_header: "PCT_LIB_FAIL(MQ)",
             base_score_output_header: "MQ_SCORE",
-            threshold: params.mapq_threshold,
+            threshold: params.mapq_threshold as Float,
         ],
         gen: [
             target_score_header: "PCT_BASES_FAIL",
@@ -67,7 +71,7 @@ workflow gene_target_evaluation_workflow {
     targets_bed = SORT_BED(file(params.targets_bed)).sorted_bed
 
     // build input channel & branch based on filetype
-    mixed_aligned_ch = Channel.fromPath(params.aligned_files)
+    mixed_aligned_ch = channel.fromPath(params.aligned_files)
         .map { file_path ->
             def sample_name = file_path.getName().replaceFirst(/\..*$/, "")
             def matcher = file_path.toString() =~ /IX\d{5}/
@@ -98,9 +102,9 @@ workflow gene_target_evaluation_workflow {
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        Process BAM files to extract metrics
+    Process BAM files to extract metrics
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    */
+     */
     INDEX_BAM_FILE(bam_ch)
 
     // STAGE 1: Get per-base stats (Raw Coverage, Q1 of each base MapQ BaseQ)
@@ -165,7 +169,7 @@ workflow gene_target_evaluation_workflow {
 
     // STAGE 3: Aggregate per base across libraries (percentile of per-base stats)
     GENERATE_PER_BASE_SUMMARY(
-        SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: 'combined_labelled_pileups.txt') { it[1] },
+        SCORE_BASES_PER_LIBRARY.out.scored_output.collectFile(name: 'combined_labelled_pileups.txt') { result -> result[1] },
         params.cohort_percent_library_fail_threshold,
         metrics_thresholds_and_headings,
     )
@@ -195,7 +199,7 @@ workflow gene_target_evaluation_workflow {
     // generate tracts per metric
     GENERATE_TRACTS(
         SCORE_PER_BASE_SUMMARY_ON_MQ.out.scored_output,
-        Channel.from(
+        channel.from(
             metrics_thresholds_and_headings.findAll { k, _value -> ['cov', 'bq', 'mq'].contains(k) }.values()
         ),
         params.tract_gap_tolerance,
@@ -221,8 +225,8 @@ workflow gene_target_evaluation_workflow {
 
         // visualization of target quality (target-level)
         GENERATE_VISUALIZATION(
-            plot_data_ch.collect { it[1] },
-            plot_data_ch.collect { it[2] },
+            plot_data_ch.collect { result -> result[1] },
+            plot_data_ch.collect { result -> result[2] },
             "plot",
             metrics_thresholds_and_headings.findAll { k, _value -> ['cov', 'bq', 'mq'].contains(k) }.collectEntries { _key, value -> [value.target_header, value.threshold] },
         )
@@ -233,7 +237,7 @@ workflow gene_target_evaluation_workflow {
 
     // STAGE 7: General fail analysis box plots using threshold from stage 6.
     boxplot_data_ch = GENERATE_PER_BASE_SUMMARY.out.all_libraries_per_base.map { sample, file, _pool ->
-        return [sample, file, (params.cohort_percent_library_fail_threshold * 100), params.separate_plots]
+        return [sample, file, (params.cohort_percent_library_fail_threshold as Float) * 100, params.separate_plots]
     }
 
     GENERATE_BOX_PLOTS(boxplot_data_ch)

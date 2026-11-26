@@ -12,6 +12,7 @@ include {
 } from '../../modules/vcf'
 
 workflow prepare_variant_benchmark_inputs {
+
     main:
     // Validate input directories
     if (!file(params.truth_dir).exists()) {
